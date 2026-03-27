@@ -1780,7 +1780,9 @@ function resetOps(){
   rebuildAll();
   buildOpEditor();
   refreshAll();
-  toast('↩ Todos os valores resetados!');
+  fbPush('overrides', {});
+  fbPush('meta', {total: 0, meta: META_DEFAULT});
+  toast('↩ Todos os valores resetados e sincronizados!');
 }
 
 // ── LIVE CALC ──
@@ -2453,6 +2455,7 @@ function rdSave(){toast('💾 Salvo automaticamente!');}
 function rdClearDay(){
   if(!confirm('Zerar todos os valores do dia?\nEsta ação não pode ser desfeita.')) return;
   localStorage.removeItem(rdTodayKey());
+  fbPush('rd', {});
   rdRender();
   toast('🗑 Dia zerado!');
 }
@@ -2617,9 +2620,10 @@ function metaOpSave(){
     if(val>0) saved[op.name]=val; else delete saved[op.name];
   });
   setMetasOp(saved);
+  fbPush('metas_op', saved);
   metaOpRender();
   if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
-  toast('✅ Metas individuais salvas — ranking atualizado!');
+  toast('✅ Metas individuais salvas e sincronizadas!');
 }
 
 function metaOpFillFromTeam(){
@@ -2759,6 +2763,7 @@ function mvApply(){
   if(!ov.moves) ov.moves=[];
   ov.moves.push({op:opName, from:op.eq, to:toEq, ts:Date.now()});
   gSetOverrides(ov);
+  fbPush('gestao', ov);
 
   rebuildAll();
   refreshAll();
@@ -2844,8 +2849,9 @@ function metasSave(){
     if(val>0) metas[eq.name] = val;
   });
   gSetMetas(metas);
+  fbPush('metas_eq', metas);
   gestaoMetasInit();
-  toast('✅ Metas salvas por equipe!');
+  toast('✅ Metas salvas e sincronizadas para todos!');
 }
 
 // expose metas to other parts
@@ -2895,6 +2901,7 @@ function novoApply(){
   if(!ov.novos) ov.novos=[];
   ov.novos.push({name:nome, eq:eqNm, rec, ts:Date.now()});
   gSetOverrides(ov);
+  fbPush('gestao', ov);
 
   rebuildAll();
   refreshAll();
@@ -4049,6 +4056,9 @@ function syncDisconnect(){
   if(fbListeners.overrides) { fbDb?.ref(fbRoom+'/overrides').off(); }
   if(fbListeners.photos)    { fbDb?.ref(fbRoom+'/photos').off(); }
   if(fbListeners.meta)      { fbDb?.ref(fbRoom+'/meta').off(); }
+  if(fbListeners.metas_eq)  { fbDb?.ref(fbRoom+'/metas_eq').off(); }
+  if(fbListeners.metas_op)  { fbDb?.ref(fbRoom+'/metas_op').off(); }
+  if(fbListeners.gestao)    { fbDb?.ref(fbRoom+'/gestao').off(); }
   fbListeners={};
   fbApp=null; fbDb=null; fbRoom=null;
   fbSaveCfg({});
@@ -4157,6 +4167,40 @@ function fbStartListening(){
     toast('🔄 Total atualizado em tempo real!');
   });
   fbListeners.meta = true;
+
+  // ── Metas por Equipe ──
+  fbDb.ref(fbRoom+'/metas_eq').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    const local = gGetMetas();
+    if(JSON.stringify(remote)===JSON.stringify(local)) return;
+    gSetMetas({...local,...remote});
+    pulseSyncDot();
+  });
+  fbListeners.metas_eq = true;
+
+  // ── Metas por Operador ──
+  fbDb.ref(fbRoom+'/metas_op').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    const local = getMetasOp();
+    if(JSON.stringify(remote)===JSON.stringify(local)) return;
+    setMetasOp({...local,...remote});
+    if(document.getElementById('pg-ranking')?.classList.contains('on')) mkRanking();
+    pulseSyncDot();
+  });
+  fbListeners.metas_op = true;
+
+  // ── Gestão (movimentação de operadores) ──
+  fbDb.ref(fbRoom+'/gestao').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    const local = gGetOverrides();
+    if(JSON.stringify(remote)===JSON.stringify(local)) return;
+    gSetOverrides({...local,...remote});
+    pulseSyncDot();
+  });
+  fbListeners.gestao = true;
 }
 
 // ── PUSH TO FIREBASE ──
@@ -4193,36 +4237,30 @@ function photoSet(opName, url){
   fbPush('photos', all);
 }
 
-// ── AUTO-RECONNECT ON START ──
+// ── AUTO-CONNECT FIXO — Firebase e sala já configurados ──
+const FB_URL_FIXO  = 'https://cofen-dashboard-622a8-default-rtdb.firebaseio.com';
+const FB_ROOM_FIXO = 'cofen-principal';
+
 async function fbAutoConnect(){
-  const cfg = fbLoadCfg();
-  if(!cfg.room||!cfg.url) return;
-  // Silently restore connection
+  const url  = FB_URL_FIXO;
+  const room = FB_ROOM_FIXO;
+  // Salva config para o modal mostrar correto
+  fbSaveCfg({url, room});
   try {
-    fbApp = firebase.initializeApp({databaseURL: cfg.url}, 'cofen-sync-auto');
-    fbDb  = firebase.database(fbApp);
-    fbRoom= cfg.room;
-    document.getElementById('sync-topbtn').textContent='🔄 Sync...';
-    // REST ping (works from local file)
-    let ok = false;
-    try {
-      const r = await fetch(cfg.url+'/.json?shallow=true', {signal: AbortSignal.timeout(6000)});
-      ok = r.ok || r.status===200 || r.status===204;
-    } catch(e){ ok = false; }
-    if(!ok){
-      const testRef = fbDb.ref('.info/connected');
-      await new Promise(resolve=>{
-        const t=setTimeout(()=>resolve(),5000);
-        testRef.on('value',snap=>{ if(snap.val()===true){clearTimeout(t);resolve();} });
-      });
+    if(!fbApp){
+      fbApp = firebase.initializeApp({databaseURL: url}, 'cofen-sync-auto');
     }
-    document.getElementById('sync-topbtn').textContent='🟢 Sync';
-    document.getElementById('sync-topbtn').style.color='var(--pp)';
-    document.getElementById('sync-topbtn').style.background='var(--ppl)';
+    fbDb  = firebase.database(fbApp);
+    fbRoom= room;
+    const btn = document.getElementById('sync-topbtn');
+    if(btn) btn.textContent='🔄 Sync...';
     fbStartListening();
-    toast('🟢 Sync reconectado — Sala: '+cfg.room);
+    if(btn){ btn.textContent='🟢 Sync'; btn.style.color='var(--pp)'; btn.style.background='var(--ppl)'; }
+    console.log('✅ Firebase conectado automaticamente — Sala: '+room);
   } catch(e){
-    document.getElementById('sync-topbtn').textContent='🔗 Sync';
+    console.warn('Firebase auto-connect falhou:', e);
+    const btn = document.getElementById('sync-topbtn');
+    if(btn) btn.textContent='🔗 Sync';
     fbApp=null; fbDb=null; fbRoom=null;
   }
 }
