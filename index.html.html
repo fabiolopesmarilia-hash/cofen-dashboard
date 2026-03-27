@@ -3995,8 +3995,8 @@ function syncRoomChanged(){
 async function syncConnect(){
   const room = document.getElementById('sync-room').value.trim().replace(/[^a-zA-Z0-9_-]/g,'-');
   const url  = document.getElementById('sync-fburl').value.trim().replace(/\/$/,'');
-  if(!room){ toast('⚠️ Digite o nome da sala!'); return; }
-  if(!url||!url.startsWith('https')){ toast('⚠️ Cole a URL do Firebase!'); return; }
+  if(!room){ toast('cofen-2026'); return; }
+  if(!url||!url.startsWith('https')){ toast('https://cofen-dashboard.vercel.app'); return; }
 
   syncSetStatus('connecting','🔄 Conectando...');
   document.getElementById('sync-connect-btn').textContent='⏳ Conectando...';
