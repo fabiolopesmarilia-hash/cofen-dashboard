@@ -3100,7 +3100,7 @@ function importParse(raw){
   const missing = [];
 
   Object.entries(acc).forEach(([name, data])=>{
-    const totalReal = data.ho;
+    const totalReal = data.ho / 0.25;
     const normalize = s => s.toLowerCase().replace(/[_\s]/g,'');
     const matched = ALL.find(o => normalize(o.name) === normalize(name));
 
@@ -3109,7 +3109,7 @@ function importParse(raw){
         rawName:  name,
         opName:   matched.name,
         eq:       matched.eq,
-        hoImport: data.ho * 0.25,
+        hoImport: data.ho,
         recImport:totalReal,
         recCurrent: matched.rec,
         hoCurrent:  matched.ho,
