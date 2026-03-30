@@ -1597,7 +1597,7 @@ function getTotalRec(){
 // ── INIT HERO & GERAL ──
 function initHero(){
   const totalRec = getTotalRec();
-  const totalHO  = totalRec * 0.25;
+  const totalHO  = totalRec;
   const falta    = Math.max(0, meta - totalRec);
   const media    = DU.passou>0 ? totalRec/DU.passou : 0;
   const need     = DU.restam>0 ? falta/DU.restam : 0;
