@@ -2425,8 +2425,8 @@ function rdAddAgora(opName){
   if(!v||v<=0){ toast('⚠️ Digite um valor maior que zero'); return; }
   const map=rdGetSaved();
   map[opName]=(parseFloat(map[opName]||0))+v;
-  rdSetSaved(map);
-  // Histórico
+  rdSetSaved(map); // já faz fbPush via patch
+  // Histórico local
   const histKey=rdTodayKey()+'_hist_'+sid;
   let hist=[]; try{hist=JSON.parse(localStorage.getItem(histKey)||'[]')}catch{}
   const now=new Date();
@@ -2445,8 +2445,8 @@ function rdAddAgora(opName){
   if(hojehoEl) hojehoEl.textContent='HO: '+fR(((op?.rec||0)+vHoje)*0.25);
   if(row) row.style.background='#FFFDF5';
   rdUpdateKPIs();
-  toast('💰 +'+fR(v)+' adicionado a '+opName.replace(/_/g,' '));
-  try{ rdBC&&rdBC.postMessage({type:'rd',key:rdTodayKey(),data:map}); }catch{}
+  rdBuildSubTabs();
+  toast('💰 +'+fR(v)+' adicionado a '+opName.replace(/_/g,' ')+ (fbDb&&fbRoom?' · Sincronizado!':''));
 }
 
 
@@ -3768,20 +3768,6 @@ function syncBroadcast(type, payload){
   try{ if(syncChannel) syncChannel.postMessage({type, payload}); }catch(e){}
 }
 
-// Patch rdSetSaved to broadcast
-const _rdSetSaved_orig = rdSetSaved;
-function rdSetSaved(map){
-  _rdSetSaved_orig(map);
-  syncBroadcast('rd_update', JSON.stringify(map));
-}
-
-// Patch photoSet to broadcast
-const _photoSet_orig = photoSet;
-function photoSet(opName, url){
-  _photoSet_orig(opName, url);
-  syncBroadcast('photo_update', JSON.stringify(photoGetAll()));
-}
-
 // ══════════════════════════════════════════
 // MODO TV
 // ══════════════════════════════════════════
@@ -4089,26 +4075,25 @@ function fbStartListening(){
   fbDb.ref(fbRoom+'/rd').on('value', snap=>{
     const remote = snap.val();
     if(!remote) return;
-    // Merge with local — remote wins per key
-    const local = rdGetSaved();
+    const local  = rdGetSaved();
+    if(JSON.stringify(remote)===JSON.stringify(local)) return;
     const merged = {...local, ...remote};
-    // Only update if different from what we have
-    const localStr = JSON.stringify(local);
-    if(JSON.stringify(remote)!==localStr){
-      localStorage.setItem(rdTodayKey(), JSON.stringify(merged));
-      if(document.getElementById('pg-recdia')?.classList.contains('on')) rdRender();
-      pulseSyncDot();
-    }
+    localStorage.setItem(rdTodayKey(), JSON.stringify(merged));
+    // Sempre atualiza os KPIs do hero e os subtabs — independente da aba ativa
+    rdUpdateKPIs();
+    rdBuildSubTabs();
+    // Se estiver na aba Recebimento do Dia, renderiza a lista completa
+    if(document.getElementById('pg-recdia')?.classList.contains('on')) rdRender();
+    pulseSyncDot();
   });
   fbListeners.rd = true;
 
-  // ── Overrides (recebimento base) ──
+  // ── Overrides (recebimento base dos operadores) ──
   fbDb.ref(fbRoom+'/overrides').on('value', snap=>{
     const remote = snap.val();
     if(!remote) return;
     const local = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
-    // Apply remote
     Object.entries(remote).forEach(([nm,val])=>{
       const op=ALL.find(o=>o.name===nm);
       if(!op) return;
@@ -4121,6 +4106,8 @@ function fbStartListening(){
     rebuildAll();
     refreshAll();
     localStorage.setItem('cofen_op_overrides', JSON.stringify({...local,...remote}));
+    // Se estiver no Recebimento do Dia, atualizar também
+    if(document.getElementById('pg-recdia')?.classList.contains('on')) rdRender();
     pulseSyncDot();
   });
   fbListeners.overrides = true;
