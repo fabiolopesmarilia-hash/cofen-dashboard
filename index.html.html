@@ -3535,6 +3535,7 @@ function acImportPreview(raw){
 
 function acImportApply(){
   if(!acImportParsed.length){toast('⚠️ Nenhum dado para importar!');return;}
+  const acordosData = {};
   acImportParsed.forEach(r=>{
     const op=ALL.find(o=>o.name===r.opName);
     if(!op) return;
@@ -3544,7 +3545,13 @@ function acImportApply(){
     op['agendados']= r.ag || (r.g - r.p);
     op['eficiencia']= r.g>0 ? parseFloat((r.p/r.g*100).toFixed(1)) : 0;
     if(r.p>0) op['ticket'] = parseFloat((op.rec/r.p).toFixed(2));
+    acordosData[r.opName] = {
+      gerados: op.gerados, pagos: op.pagos, pendentes: op.pendentes,
+      agendados: op.agendados, eficiencia: op.eficiencia, ticket: op.ticket||0
+    };
   });
+  // Sincronizar acordos para todos via Firebase
+  fbPush('acordos', acordosData);
   acordosInit();
   markImportDone('ac');
   toast('✅ Acordos atualizados para '+acImportParsed.length+' operadores!');
@@ -4045,6 +4052,7 @@ function syncDisconnect(){
   if(fbListeners.metas_eq)  { fbDb?.ref(fbRoom+'/metas_eq').off(); }
   if(fbListeners.metas_op)  { fbDb?.ref(fbRoom+'/metas_op').off(); }
   if(fbListeners.gestao)    { fbDb?.ref(fbRoom+'/gestao').off(); }
+  if(fbListeners.acordos)   { fbDb?.ref(fbRoom+'/acordos').off(); }
   fbListeners={};
   fbApp=null; fbDb=null; fbRoom=null;
   fbSaveCfg({});
@@ -4091,22 +4099,26 @@ function fbStartListening(){
   // ── Overrides (recebimento base dos operadores) ──
   fbDb.ref(fbRoom+'/overrides').on('value', snap=>{
     const remote = snap.val();
-    if(!remote) return;
+    if(!remote || Object.keys(remote).length===0) return;
     const local = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
-    if(JSON.stringify(remote)===JSON.stringify(local)) return;
+    // Merge remoto sobre local
+    const merged = {...local, ...remote};
+    // Aplicar todos os valores remotos nos operadores
+    let changed = false;
     Object.entries(remote).forEach(([nm,val])=>{
       const op=ALL.find(o=>o.name===nm);
       if(!op) return;
-      op.rec=val; op.ho=op.rec*0.25;
+      if(Math.abs(op.rec - val) > 0.005){ op.rec=val; op.ho=op.rec*0.25; changed=true; }
     });
+    if(!changed) return;
+    // Recalcular totais por equipe
     D.equipes.forEach(eq=>{
       eq.rec=eq.ops.reduce((s,o)=>s+o.rec,0);
       eq.ho=eq.ops.reduce((s,o)=>s+o.ho,0);
     });
+    localStorage.setItem('cofen_op_overrides', JSON.stringify(merged));
     rebuildAll();
     refreshAll();
-    localStorage.setItem('cofen_op_overrides', JSON.stringify({...local,...remote}));
-    // Se estiver no Recebimento do Dia, atualizar também
     if(document.getElementById('pg-recdia')?.classList.contains('on')) rdRender();
     pulseSyncDot();
   });
@@ -4178,13 +4190,46 @@ function fbStartListening(){
   });
   fbListeners.metas_op = true;
 
-  // ── Gestão (movimentação de operadores) ──
+  // ── Acordos dos operadores ──
+  fbDb.ref(fbRoom+'/acordos').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    let changed = false;
+    Object.entries(remote).forEach(([nm, data])=>{
+      const op = ALL.find(o=>o.name===nm);
+      if(!op) return;
+      op.gerados    = data.gerados    ?? op.gerados;
+      op.pagos      = data.pagos      ?? op.pagos;
+      op.pendentes  = data.pendentes  ?? op.pendentes;
+      op.agendados  = data.agendados  ?? op.agendados;
+      op.eficiencia = data.eficiencia ?? op.eficiencia;
+      op.ticket     = data.ticket     ?? op.ticket;
+      changed = true;
+    });
+    if(!changed) return;
+    // Recalcular acordos totais por equipe
+    D.equipes.forEach(eq=>{
+      eq.acordos = eq.ops.reduce((s,o)=>s+(o.gerados||0),0);
+    });
+    rebuildAll();
+    refreshAll();
+    if(document.getElementById('pg-acordos')?.classList.contains('on')) acordosInit();
+    pulseSyncDot();
+  });
+  fbListeners.acordos = true;
+
+  // ── Gestão (movimentação de operadores + novos) ──
   fbDb.ref(fbRoom+'/gestao').on('value', snap=>{
     const remote = snap.val();
     if(!remote) return;
     const local = gGetOverrides();
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
-    gSetOverrides({...local,...remote});
+    const merged = {...local, ...remote};
+    gSetOverrides(merged);
+    // Re-aplicar gestão remota: novos operadores e movimentações
+    loadGestaoOverrides();
+    rebuildAll();
+    refreshAll();
     pulseSyncDot();
   });
   fbListeners.gestao = true;
@@ -4206,12 +4251,15 @@ function rdSetSaved(map){
   fbPush('rd', map);
 }
 
-// Patch applyOps to push overrides
+// Patch applyOps to push overrides — envia TODOS os valores atuais para garantir sync completo
 const _applyOps_orig = applyOps;
 function applyOps(){
   _applyOps_orig();
-  const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
-  fbPush('overrides', ov);
+  // Construir mapa completo com valores atuais de todos os operadores
+  const fullOv = {};
+  ALL.forEach(op=>{ fullOv[op.name] = op.rec; });
+  localStorage.setItem('cofen_op_overrides', JSON.stringify(fullOv));
+  fbPush('overrides', fullOv);
 }
 
 // Patch photoSet to push photos
