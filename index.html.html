@@ -398,6 +398,7 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('gestao',this)">⚙️ Gestão de Equipes</div>
   <div class="tab"     onclick="go('import',this)">📥 Importar Relatório</div>
   <div class="tab"     onclick="go('acordos',this)">🤝 Acordos</div>
+  <div class="tab"     onclick="go('rotina',this)">📋 Rotina Supervisor</div>
 </div>
 
 <!-- ══════════ PAGE: GERAL ══════════ -->
@@ -1588,7 +1589,19 @@ function duResetManual(){
 }
 
 // ── TOTAL REC (with override) ──
+// Sempre inclui o recebimento do dia atual na base de cálculo
 function getTotalRec(){
+  const rdHoje = rdSumToday ? rdSumToday() : 0;
+  if(overrideTotalRec > 0){
+    // Se há override manual, somamos o diário em cima dele
+    return overrideTotalRec + rdHoje;
+  }
+  const base = D.equipes.reduce((s,e)=>s+e.rec,0);
+  return base + rdHoje;
+}
+
+// Retorna apenas a base sem diário (para exibir "Base" nas tabelas)
+function getBaseRec(){
   return overrideTotalRec > 0
     ? overrideTotalRec
     : D.equipes.reduce((s,e)=>s+e.rec,0);
@@ -2177,7 +2190,7 @@ function closeM(e){
 function go(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
-  ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos'].forEach(p=>document.getElementById('pg-'+p).classList.remove('on'));
+  ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos','rotina'].forEach(p=>document.getElementById('pg-'+p).classList.remove('on'));
   document.getElementById('pg-'+id).classList.add('on');
   if(id==='geral'){mkGD();mkDist();buildDUManualGrid();}
   if(id==='editor') buildOpEditor();
@@ -2187,6 +2200,7 @@ function go(id,el){
   if(id==='gestao') gestaoInit();
   if(id==='import') importInit();
   if(id==='acordos') acordosInit();
+  if(id==='rotina') rotinaInit();
 }
 
 // ── REFRESH ALL ──
@@ -2196,6 +2210,7 @@ function refreshAll(){
   if(document.getElementById('pg-geral').classList.contains('on')){mkGD();mkDist();mkTop5();}
   if(document.getElementById('pg-equipes').classList.contains('on')) mkEq();
   if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
+  if(document.getElementById('pg-recdia').classList.contains('on')) rdUpdateKPIs();
 }
 
 // ── TOAST ──
@@ -2242,7 +2257,7 @@ function rdAtivos(){return Object.values(rdGetSaved()).filter(v=>(parseFloat(v)|
 
 function rdUpdateKPIs(){
   const hoje=rdSumToday(), hojeHO=hoje*0.25;
-  const baseRec=getTotalRec(), accRec=baseRec+hoje, accHO=accRec*0.25;
+  const baseRec=getBaseRec(), accRec=baseRec+hoje, accHO=accRec*0.25;
   const ativos=rdAtivos();
   const metaDia=parseFloat(document.getElementById('rd-meta-dia')?.value||30680);
   const pct=metaDia>0?Math.min(100,hoje/metaDia*100):0;
@@ -2268,6 +2283,11 @@ function rdUpdateKPIs(){
   const ds=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
   s('rd-data-hoje',ds.charAt(0).toUpperCase()+ds.slice(1));
   rdRenderEqBreakdown();
+
+  // Atualiza o Hero e demais seções com o total incluindo diário
+  initHero();
+  if(document.getElementById('pg-equipes').classList.contains('on')) mkEq();
+  if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
 }
 
 function rdUpdateMeta(){rdUpdateKPIs()}
@@ -4657,6 +4677,406 @@ setInterval(()=>{
   buildCal('cal-grid2');
 }, 30000);
 
+</script>
+
+<!-- ══════════ PAGE: ROTINA SUPERVISOR ══════════ -->
+<div class="page" id="pg-rotina">
+
+  <!-- Hero da Rotina -->
+  <div style="background:linear-gradient(135deg,var(--ppd),#1B4332 55%,#0D3D2B);border-radius:var(--rxl);padding:20px 24px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(0,200,127,.07);pointer-events:none"></div>
+    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">📋 ROTINA DIÁRIA</div>
+    <div style="font-family:Bebas Neue,sans-serif;font-size:24px;letter-spacing:3px;color:#fff;margin-bottom:6px">CHECKLIST DO SUPERVISOR</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.55);font-weight:600;margin-bottom:16px">Acompanhe cada passo do seu dia para garantir a máxima performance da equipe</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--rl);padding:12px 18px;min-width:120px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px">Concluídos</div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:#4ADE80;letter-spacing:.5px" id="rot-count-done">0</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--rl);padding:12px 18px;min-width:120px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px">Total de Tarefas</div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:#fff;letter-spacing:.5px" id="rot-count-total">0</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--rl);padding:12px 18px;flex:1;min-width:200px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px">Progresso do Dia</div>
+        <div style="background:rgba(255,255,255,.12);border-radius:100px;height:8px;overflow:hidden">
+          <div id="rot-progress-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#4ADE80,#00C97F);transition:width .6s cubic-bezier(.4,0,.2,1);width:0%"></div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:700;margin-top:6px" id="rot-progress-lbl">0% completo</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+        <button onclick="rotinaReset()"
+          style="padding:10px 18px;border-radius:var(--rm);border:1px solid rgba(255,100,100,.3);background:rgba(255,60,60,.12);color:#FCA5A5;font-family:Nunito,sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s"
+          onmouseover="this.style.background='rgba(255,60,60,.25)'" onmouseout="this.style.background='rgba(255,60,60,.12)'">
+          🔄 Reiniciar Dia
+        </button>
+        <button onclick="rotinaCopiar()"
+          style="padding:10px 18px;border-radius:var(--rm);border:none;background:linear-gradient(135deg,var(--pp),var(--pp3));color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;transition:all .2s"
+          onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
+          📋 Copiar Resumo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data e turno -->
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:12px 18px;box-shadow:var(--sh);display:flex;align-items:center;gap:10px;flex:1;min-width:200px">
+      <div style="font-size:22px">📅</div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.8px">Data de hoje</div>
+        <div style="font-weight:800;font-size:14px;color:var(--g900)" id="rot-data-hoje">—</div>
+      </div>
+    </div>
+    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:12px 18px;box-shadow:var(--sh);display:flex;align-items:center;gap:10px;flex:1;min-width:200px">
+      <div style="font-size:22px">👤</div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.8px">Supervisor</div>
+        <input id="rot-supervisor-nome" placeholder="Digite seu nome..." 
+          style="background:transparent;border:none;outline:none;font-weight:800;font-size:14px;color:var(--g900);font-family:Nunito,sans-serif;width:100%"
+          oninput="rotinaSaveNome(this.value)">
+      </div>
+    </div>
+    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:12px 18px;box-shadow:var(--sh);display:flex;align-items:center;gap:10px;flex:1;min-width:200px">
+      <div style="font-size:22px">⏰</div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.8px">Turno</div>
+        <select id="rot-turno" style="background:transparent;border:none;outline:none;font-weight:800;font-size:14px;color:var(--g900);font-family:Nunito,sans-serif;cursor:pointer" onchange="rotinaInit()">
+          <option value="manha">☀️ Manhã</option>
+          <option value="tarde">🌤 Tarde</option>
+          <option value="integral">🌟 Integral</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checklist -->
+  <div id="rot-checklist-container" style="display:flex;flex-direction:column;gap:14px"></div>
+
+  <!-- Observações do dia -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px;box-shadow:var(--sh)">
+    <div class="sec">📝 Observações do Dia</div>
+    <textarea id="rot-obs" placeholder="Anote aqui situações relevantes do dia, operadores que precisam de atenção, pendências para amanhã..."
+      style="width:100%;min-height:100px;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);padding:12px;font-family:Nunito,sans-serif;font-size:13px;font-weight:600;color:var(--g900);outline:none;resize:vertical;line-height:1.6;transition:all .2s"
+      onfocus="this.style.borderColor='var(--pp)';this.style.background='#fff'"
+      onblur="this.style.borderColor='var(--g200)';this.style.background='var(--g50)'"
+      oninput="rotinaSaveObs(this.value)"></textarea>
+  </div>
+
+</div>
+<!-- ══════════ FIM PAGE: ROTINA ══════════ -->
+
+<script>
+// ══════════════════════════════════════════
+// ROTINA DO SUPERVISOR — CHECKLIST INTERATIVO
+// ══════════════════════════════════════════
+
+const ROTINA_SECTIONS = [
+  {
+    id:'recebimento',
+    icon:'💰',
+    title:'Verificar Recebimento do Dia Anterior',
+    color:'#00A86B',
+    items:[
+      {id:'rec1', text:'Checar o total recebido no dia anterior no dashboard'},
+      {id:'rec2', text:'Enviar resultado individual de cada operador para o grupo'},
+      {id:'rec3', text:'Informar a meta do dia e quanto falta para atingir'},
+      {id:'rec4', text:'Informar a meta da semana e o progresso atual'},
+      {id:'rec5', text:'Informar a meta mínima do mês e a projeção atual'},
+    ]
+  },
+  {
+    id:'agendamentos',
+    icon:'📅',
+    title:'Acompanhamento dos Agendamentos',
+    color:'#3B82F6',
+    items:[
+      {id:'ag1', text:'Verificar quantos acordos foram gerados hoje'},
+      {id:'ag2', text:'Verificar quantos acordos estão sendo pagos (conversão)'},
+      {id:'ag3', text:'Checar agendamentos previstos para hoje e amanhã'},
+      {id:'ag4', text:'Identificar operadores sem geração de acordos'},
+    ]
+  },
+  {
+    id:'presenca',
+    icon:'✅',
+    title:'Confirmar Presença da Equipe',
+    color:'#F59E0B',
+    items:[
+      {id:'pr1', text:'Confirmar presença de todos os operadores no sistema'},
+      {id:'pr2', text:'Registrar e alertar sobre atrasos'},
+      {id:'pr3', text:'Organizar horas a compensar / banco de horas'},
+      {id:'pr4', text:'Informar ausências à coordenação se necessário'},
+    ]
+  },
+  {
+    id:'ranking',
+    icon:'🏆',
+    title:'Divulgar Ranking',
+    color:'#FC5C7D',
+    items:[
+      {id:'rk1', text:'Publicar o ranking atualizado no grupo da equipe'},
+      {id:'rk2', text:'Informar quanto falta para cada operador subir de nível (S/A/B/C)'},
+      {id:'rk3', text:'Destacar quem está logo à frente no ranking'},
+      {id:'rk4', text:'Celebrar destaques e melhorias individuais'},
+    ]
+  },
+  {
+    id:'ligacoes',
+    icon:'🎧',
+    title:'Escutar Ligações',
+    color:'#8B5CF6',
+    items:[
+      {id:'lig1', text:'Escutar pelo menos 1 ligação antes das 10h'},
+      {id:'lig2', text:'Escutar pelo menos 1 ligação no período da tarde'},
+      {id:'lig3', text:'Escutar pelo menos 1 ligação de operador com baixo desempenho'},
+      {id:'lig4', text:'Registrar feedbacks e oportunidades de melhoria'},
+    ]
+  },
+  {
+    id:'abaixo',
+    icon:'📉',
+    title:'Identificar Operadores Abaixo da Média',
+    color:'#EF4444',
+    items:[
+      {id:'ab1', text:'Identificar operadores com recebimento abaixo da média da equipe'},
+      {id:'ab2', text:'Criar plano de recuperação individualizado'},
+      {id:'ab3', text:'Agendar conversa de acompanhamento (feedback 1:1)'},
+      {id:'ab4', text:'Acompanhar evolução ao longo do dia'},
+      {id:'ab5', text:'Registrar progresso ou dificuldades encontradas'},
+    ]
+  }
+];
+
+function rotinaKey(){
+  const d=new Date();
+  return 'cofen_rotina_'+d.getFullYear()+'_'+(d.getMonth()+1)+'_'+d.getDate();
+}
+function rotinaGet(){try{return JSON.parse(localStorage.getItem(rotinaKey())||'{}')}catch(e){return {}}}
+function rotinaSet(obj){localStorage.setItem(rotinaKey(),JSON.stringify(obj))}
+
+function rotinaSaveNome(v){
+  const s=rotinaGet(); s._nome=v; rotinaSet(s);
+}
+function rotinaSaveObs(v){
+  const s=rotinaGet(); s._obs=v; rotinaSet(s);
+}
+
+function rotinaToggle(itemId){
+  const s=rotinaGet();
+  s[itemId]=!s[itemId];
+  rotinaSet(s);
+  // Update visual
+  const cb=document.getElementById('rot-cb-'+itemId);
+  const row=document.getElementById('rot-row-'+itemId);
+  if(cb && row){
+    const done=s[itemId];
+    cb.innerHTML=done?'✓':'';
+    cb.style.background=done?'var(--pp)':'var(--w)';
+    cb.style.borderColor=done?'var(--pp)':'var(--g300)';
+    cb.style.color='#fff';
+    row.style.opacity=done?'.6':'1';
+    row.querySelector('.rot-item-text').style.textDecoration=done?'line-through':'none';
+    row.querySelector('.rot-item-text').style.color=done?'var(--g500)':'var(--g900)';
+  }
+  rotinaUpdateProgress();
+}
+
+function rotinaUpdateProgress(){
+  const s=rotinaGet();
+  let total=0, done=0;
+  ROTINA_SECTIONS.forEach(sec=>{
+    sec.items.forEach(it=>{
+      total++;
+      if(s[it.id]) done++;
+    });
+  });
+  document.getElementById('rot-count-done').textContent=done;
+  document.getElementById('rot-count-total').textContent=total;
+  const pct=total>0?Math.round(done/total*100):0;
+  const bar=document.getElementById('rot-progress-bar');
+  if(bar) bar.style.width=pct+'%';
+  const lbl=document.getElementById('rot-progress-lbl');
+  if(lbl) lbl.textContent=pct+'% completo — '+done+' de '+total+' tarefas';
+  // Color bar based on progress
+  if(bar){
+    if(pct>=100) bar.style.background='linear-gradient(90deg,#4ADE80,#00C97F)';
+    else if(pct>=60) bar.style.background='linear-gradient(90deg,#67E8F9,#3B82F6)';
+    else if(pct>=30) bar.style.background='linear-gradient(90deg,#FCD34D,#F59E0B)';
+    else bar.style.background='linear-gradient(90deg,#FCA5A5,#EF4444)';
+  }
+}
+
+function rotinaInit(){
+  // Data
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  const el=document.getElementById('rot-data-hoje');
+  if(el) el.textContent=ds.charAt(0).toUpperCase()+ds.slice(1);
+
+  // Load saved state
+  const s=rotinaGet();
+
+  // Nome supervisor
+  const nomeEl=document.getElementById('rot-supervisor-nome');
+  if(nomeEl && s._nome) nomeEl.value=s._nome;
+
+  // Obs
+  const obsEl=document.getElementById('rot-obs');
+  if(obsEl) obsEl.value=s._obs||'';
+
+  // Build checklist
+  const container=document.getElementById('rot-checklist-container');
+  if(!container) return;
+  container.innerHTML='';
+
+  ROTINA_SECTIONS.forEach(sec=>{
+    const doneInSec=sec.items.filter(it=>s[it.id]).length;
+    const allDone=doneInSec===sec.items.length;
+    const secEl=document.createElement('div');
+    secEl.style.cssText='background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden';
+
+    // Section header
+    const hdr=document.createElement('div');
+    hdr.style.cssText=`display:flex;align-items:center;justify-content:space-between;padding:14px 18px;
+      border-left:4px solid ${sec.color};cursor:pointer;transition:background .2s;
+      background:${allDone?sec.color+'08':'var(--w)'}`;
+    hdr.onclick=()=>{
+      const body=secEl.querySelector('.rot-sec-body');
+      const arrow=secEl.querySelector('.rot-arrow');
+      const isOpen=body.style.display!=='none';
+      body.style.display=isOpen?'none':'block';
+      arrow.textContent=isOpen?'▶':'▼';
+    };
+    hdr.innerHTML=`
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:38px;height:38px;border-radius:10px;background:${sec.color}18;border:1px solid ${sec.color}30;
+          display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${sec.icon}</div>
+        <div>
+          <div style="font-weight:800;font-size:13px;color:var(--g900)">${sec.title}</div>
+          <div style="font-size:10px;font-weight:700;color:${allDone?sec.color:'var(--g500)'};margin-top:2px">
+            ${allDone?'✅ Tudo concluído!':doneInSec+' de '+sec.items.length+' concluídos'}
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="background:${sec.color}18;border:1px solid ${sec.color}30;border-radius:100px;
+          padding:3px 10px;font-size:11px;font-weight:800;color:${sec.color}">
+          ${doneInSec}/${sec.items.length}
+        </div>
+        <div class="rot-arrow" style="font-size:12px;color:var(--g500);font-weight:700;transition:all .2s">▼</div>
+      </div>`;
+
+    // Section body
+    const body=document.createElement('div');
+    body.className='rot-sec-body';
+    body.style.cssText='border-top:1px solid var(--g200);padding:10px 16px;display:flex;flex-direction:column;gap:4px';
+
+    sec.items.forEach((item,idx)=>{
+      const done=!!s[item.id];
+      const row=document.createElement('div');
+      row.id='rot-row-'+item.id;
+      row.style.cssText=`display:flex;align-items:center;gap:12px;padding:10px 12px;
+        border-radius:var(--rm);cursor:pointer;transition:all .2s;
+        opacity:${done?'.6':'1'};
+        background:${done?sec.color+'06':'transparent'}`;
+      row.onclick=()=>rotinaToggle(item.id);
+      row.onmouseover=function(){if(!s[item.id])this.style.background=sec.color+'0D';};
+      row.onmouseout=function(){this.style.background=s[item.id]?sec.color+'06':'transparent';};
+      row.innerHTML=`
+        <div id="rot-cb-${item.id}" style="width:22px;height:22px;border-radius:6px;border:2px solid ${done?sec.color:'var(--g300)'};
+          background:${done?sec.color:'var(--w)'};display:flex;align-items:center;justify-content:center;
+          flex-shrink:0;font-size:12px;font-weight:900;color:#fff;transition:all .2s">${done?'✓':''}</div>
+        <div style="flex:1">
+          <div class="rot-item-text" style="font-size:13px;font-weight:700;color:${done?'var(--g500)':'var(--g900)'};
+            text-decoration:${done?'line-through':'none'};transition:all .2s;line-height:1.4">${item.text}</div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:${done?sec.color:'var(--g300)'}">
+          ${done?'✅ Feito':''}
+        </div>`;
+      body.appendChild(row);
+    });
+
+    // "Marcar todos" button
+    const markAllRow=document.createElement('div');
+    markAllRow.style.cssText='display:flex;gap:8px;padding:8px 12px 4px;border-top:1px dashed var(--g200);margin-top:4px';
+    markAllRow.innerHTML=`
+      <button onclick="rotinaMarkAll('${sec.id}',true)" 
+        style="flex:1;padding:7px;border-radius:var(--rm);border:1px solid ${sec.color}44;
+        background:${sec.color}0D;color:${sec.color};font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;transition:all .2s"
+        onmouseover="this.style.background='${sec.color}20'" onmouseout="this.style.background='${sec.color}0D'">
+        ✅ Marcar tudo como feito
+      </button>
+      <button onclick="rotinaMarkAll('${sec.id}',false)"
+        style="padding:7px 12px;border-radius:var(--rm);border:1px solid var(--g200);
+        background:var(--g50);color:var(--g500);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer;transition:all .2s"
+        onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'"
+        onmouseout="this.style.borderColor='var(--g200)';this.style.color='var(--g500)'">
+        ↩ Desmarcar
+      </button>`;
+    body.appendChild(markAllRow);
+
+    secEl.appendChild(hdr);
+    secEl.appendChild(body);
+    container.appendChild(secEl);
+  });
+
+  rotinaUpdateProgress();
+}
+
+function rotinaMarkAll(secId, value){
+  const sec=ROTINA_SECTIONS.find(s=>s.id===secId);
+  if(!sec) return;
+  const s=rotinaGet();
+  sec.items.forEach(it=>{ s[it.id]=value; });
+  rotinaSet(s);
+  rotinaInit(); // rebuild
+  toast(value?'✅ Todas as tarefas marcadas como feitas!':'↩ Tarefas desmarcadas');
+}
+
+function rotinaReset(){
+  if(!confirm('Reiniciar o checklist do dia? Os itens marcados serão perdidos.')) return;
+  const s=rotinaGet();
+  const nome=s._nome||''; const obs=s._obs||'';
+  const novo={_nome:nome,_obs:obs};
+  rotinaSet(novo);
+  rotinaInit();
+  toast('🔄 Checklist reiniciado!');
+}
+
+function rotinaCopiar(){
+  const s=rotinaGet();
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+  const nome=s._nome||'Supervisor';
+  const turnoEl=document.getElementById('rot-turno');
+  const turnoMap={manha:'Manhã ☀️',tarde:'Tarde 🌤',integral:'Integral 🌟'};
+  const turno=turnoMap[turnoEl?.value||'manha'];
+
+  let total=0,done=0;
+  ROTINA_SECTIONS.forEach(sec=>sec.items.forEach(it=>{total++;if(s[it.id])done++;}));
+  const pct=total>0?Math.round(done/total*100):0;
+
+  let txt=`📋 ROTINA DO SUPERVISOR — COB COFEN\n`;
+  txt+=`👤 ${nome} | ${turno}\n`;
+  txt+=`📅 ${ds.charAt(0).toUpperCase()+ds.slice(1)}\n`;
+  txt+=`📊 Progresso: ${done}/${total} tarefas (${pct}%)\n\n`;
+
+  ROTINA_SECTIONS.forEach(sec=>{
+    const doneInSec=sec.items.filter(it=>s[it.id]).length;
+    txt+=`${sec.icon} ${sec.title.toUpperCase()} (${doneInSec}/${sec.items.length})\n`;
+    sec.items.forEach(it=>{
+      txt+=(s[it.id]?'  ✅ ':'  ☐ ')+it.text+'\n';
+    });
+    txt+='\n';
+  });
+
+  const obs=s._obs||'';
+  if(obs) txt+=`📝 OBSERVAÇÕES:\n${obs}\n`;
+
+  navigator.clipboard?.writeText(txt).then(()=>toast('📋 Resumo copiado para a área de transferência!'))
+    .catch(()=>toast('⚠️ Não foi possível copiar automaticamente'));
+}
 </script>
 
 <!-- TV MODE OVERLAY -->
