@@ -2192,8 +2192,9 @@ function go(id,el){
   if(el)el.classList.add('on');
   ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos','rotina'].forEach(p=>document.getElementById('pg-'+p).classList.remove('on'));
   document.getElementById('pg-'+id).classList.add('on');
-  if(id==='geral'){mkGD();mkDist();buildDUManualGrid();}
+  if(id==='geral'){mkGD();mkDist();mkTop5();buildDUManualGrid();}
   if(id==='editor') buildOpEditor();
+  if(id==='equipes') mkEq();
   if(id==='ranking') mkRanking();
   if(id==='diario'){mkDf();mkDe();buildCal('cal-grid2');}
   if(id==='recdia') rdInit();
@@ -3289,31 +3290,57 @@ function importApply(){
 
   let updated=0, unchanged=0;
 
+  // 1. Atualiza cada operador diretamente no objeto D
   importParsed.found.forEach(r=>{
-    const op = ALL.find(o=>o.name===r.opName);
-    if(!op) return;
-    if(Math.abs(r.recImport - op.rec) < 0.01){ unchanged++; return; }
-
-    // Update in D
-    op.rec = r.recImport;
-    op.ho  = r.hoImport;
-
-    // Update in equipe
-    const eqObj = D.equipes.find(e=>e.name===op.eq);
-    if(eqObj){
-      eqObj.rec = eqObj.ops.reduce((s,o)=>s+o.rec,0);
-      eqObj.ho  = eqObj.ops.reduce((s,o)=>s+o.ho,0);
-    }
-    updated++;
+    // Busca o operador em D.equipes (fonte de verdade)
+    let found = false;
+    D.equipes.forEach(eq=>{
+      eq.ops.forEach(op=>{
+        if(op.name === r.opName){
+          if(Math.abs(r.recImport - op.rec) < 0.01){ unchanged++; }
+          else { updated++; }
+          op.rec = r.recImport;
+          op.ho  = r.hoImport;
+          found = true;
+        }
+      });
+    });
+    if(!found) unchanged++;
   });
 
-  rebuildAll();
-  refreshAll();
+  // 2. Recalcula TODOS os totais de TODAS as equipes
+  D.equipes.forEach(eq=>{
+    eq.rec = eq.ops.reduce((s,o)=>s+o.rec, 0);
+    eq.ho  = eq.ops.reduce((s,o)=>s+o.ho,  0);
+    eq.n_op = eq.ops.length;
+  });
 
-  // Save to localStorage as override
+  // 3. Zera o override manual de total (o relatório importado É a fonte de verdade agora)
+  overrideTotalRec = 0;
+  localStorage.removeItem('cofen_total');
+  // Atualiza campo do editor se estiver visível
+  const inpTotal = document.getElementById('inp-total');
+  if(inpTotal) inpTotal.value = '';
+
+  // 4. Salva overrides individuais no localStorage
   const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
-  importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
+  importParsed.found.forEach(r=>{ ov[r.opName] = r.recImport; });
   localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
+
+  // 5. Sincroniza via Firebase e BroadcastChannel
+  fbPush('overrides', ov);
+  syncBroadcast('rec_update', JSON.stringify(ov));
+
+  // 6. Reconstrói ALL e atualiza TUDO
+  rebuildAll();
+
+  // Força atualização do hero, equipes, ranking e recebimento do dia
+  initHero();
+  mkGD(); mkDist(); mkTop5();
+  mkEq();
+  mkRanking();
+  if(document.getElementById('pg-recdia').classList.contains('on')) rdInit();
+  buildOpEditor();
 
   const totalImportado = importParsed.found.reduce((s,r)=>s+r.recImport,0);
   toast(`✅ ${updated} operadores atualizados! Total: ${fRK(totalImportado)} · HO: ${fRK(totalImportado*0.25)}`);
