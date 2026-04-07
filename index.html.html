@@ -891,26 +891,6 @@ select.ev-inp{cursor:pointer}
       Adicione um novo operador ao sistema. Ele aparecerá no ranking, equipes e recebimento do dia.
     </div>
 
-    <!-- ── SUB: REMOVER OPERADOR ── -->
-    <div id="gsub-remover" class="gsub" style="display:none;background:var(--w);border:1px solid var(--g200);border-radius:0 0 var(--rl) var(--rl);padding:20px;box-shadow:var(--sh)">
-      <div style="font-size:12px;color:#92400E;font-weight:600;margin-bottom:16px;background:#FFF7ED;border:1px solid #FCD34D;border-radius:var(--rm);padding:9px 14px">
-        ⚠️ O operador será removido de todas as abas: Ranking, Equipes, Recebimento, Acordos e Importação. Esta ação é sincronizada para todos os dispositivos.
-      </div>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
-        <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase">Selecionar Operador para Remover</label>
-        <select id="remover-op-sel" style="background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);padding:10px 13px;font-family:Nunito,sans-serif;font-size:14px;font-weight:700;color:var(--g900);outline:none;width:100%">
-          <option value="">— Selecione o operador —</option>
-        </select>
-      </div>
-      <div id="remover-op-preview" style="display:none;background:var(--g50);border:1px solid var(--g200);border-radius:var(--rm);padding:14px;margin-bottom:16px">
-        <div style="font-size:11px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Dados do operador</div>
-        <div id="remover-op-info" style="font-size:13px;font-weight:700;color:var(--g900)"></div>
-      </div>
-      <button onclick="removerOpApply()" style="width:100%;padding:12px;border-radius:var(--rm);border:none;cursor:pointer;background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:15px;letter-spacing:.3px">
-        🗑️ Remover Operador Permanentemente
-      </button>
-      <div id="remover-lista-wrap" style="margin-top:20px"></div>
-    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
       <div>
         <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Nome do Operador *</label>
@@ -949,6 +929,27 @@ select.ev-inp{cursor:pointer}
       </div>
       <div id="novo-adicionados"></div>
     </div>
+  </div>
+
+  <!-- ── SUB: REMOVER OPERADOR ── -->
+  <div id="gsub-remover" class="gsub" style="display:none;background:var(--w);border:1px solid var(--g200);border-radius:0 0 var(--rl) var(--rl);padding:20px;box-shadow:var(--sh)">
+    <div style="font-size:12px;color:#92400E;font-weight:600;margin-bottom:16px;background:#FFF7ED;border:1px solid #FCD34D;border-radius:var(--rm);padding:9px 14px">
+      ⚠️ O operador será removido de todas as abas: Ranking, Equipes, Recebimento, Acordos e Importação. Esta ação é sincronizada para todos os dispositivos.
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase">Selecionar Operador para Remover</label>
+      <select id="remover-op-sel" style="background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);padding:10px 13px;font-family:Nunito,sans-serif;font-size:14px;font-weight:700;color:var(--g900);outline:none;width:100%">
+        <option value="">— Selecione o operador —</option>
+      </select>
+    </div>
+    <div id="remover-op-preview" style="display:none;background:var(--g50);border:1px solid var(--g200);border-radius:var(--rm);padding:14px;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Dados do operador</div>
+      <div id="remover-op-info" style="font-size:13px;font-weight:700;color:var(--g900)"></div>
+    </div>
+    <button onclick="removerOpApply()" style="width:100%;padding:12px;border-radius:var(--rm);border:none;cursor:pointer;background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:15px;letter-spacing:.3px">
+      🗑️ Remover Operador Permanentemente
+    </button>
+    <div id="remover-lista-wrap" style="margin-top:20px"></div>
   </div>
 
   <!-- ── SUB: FOTOS ── -->
@@ -3329,6 +3330,9 @@ function importApply(){
   document.getElementById('import-status').style.color='var(--ok)';
 
   importPreview(document.getElementById('import-area').value);
+
+  // Força atualização do ranking (garante ordem correta após importação)
+  mkRanking();
 
   // Sincronizar para todos via Firebase
   if(fbDb && fbRoom){
