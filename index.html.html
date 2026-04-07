@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>🏆 COB COFEN | Dashboard</title>
+<title>🏆 COB COFEN | Dashboard ABRIL 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -369,7 +369,7 @@ select.ev-inp{cursor:pointer}
 <div class="topbar">
   <div class="brand">
     <div class="bi"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></div>
-    <div><div class="bn">COB COFEN</div><div class="bs">Dashboard Completo · Março 2026</div></div>
+    <div><div class="bn">COB COFEN</div><div class="bs">Dashboard Completo · Abril 2026</div></div>
   </div>
   <div class="hpills">
     <div class="pill pill-n">46 Operadores</div>
@@ -398,14 +398,15 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('gestao',this)">⚙️ Gestão de Equipes</div>
   <div class="tab"     onclick="go('import',this)">📥 Importar Relatório</div>
   <div class="tab"     onclick="go('acordos',this)">🤝 Acordos</div>
-  <div class="tab"     onclick="go('rotina',this)">📋 Rotina Supervisor</div>
+  <div class="tab"     onclick="go('calend',this)">📆 Calendário</div>
+  <div class="tab"     onclick="go('check',this)">✅ Checklist Líder</div>
 </div>
 
 <!-- ══════════ PAGE: GERAL ══════════ -->
 <div class="page on" id="pg-geral">
   <div class="hero">
-    <div class="htitle">Recebimento Global · Março 2026</div>
-    <div class="hmonth">MARÇO 2026 — COB COFEN</div>
+    <div class="htitle">Recebimento Global · Abril 2026</div>
+    <div class="hmonth">ABRIL 2026 — COB COFEN</div>
     <div class="hkpis">
       <div class="hkpi"><div class="hkpi-l">Total Real Recebido</div><div class="hkpi-v ok" id="h-total">—</div><div class="hkpi-s">Cobrança Jurídica</div></div>
       <div class="hkpi"><div class="hkpi-l">HO (25%)</div><div class="hkpi-v tl" id="h-ho">—</div><div class="hkpi-s">Honorários PaguePlay</div></div>
@@ -431,7 +432,7 @@ select.ev-inp{cursor:pointer}
     <div>
       <!-- DU + Calendar -->
       <div class="du-strip" style="margin-bottom:12px">
-        <div class="du-title">📅 Dias Úteis — Março 2026 (Seg–Sex)</div>
+        <div class="du-title">📅 Dias Úteis — Abril 2026 (Seg–Sex)</div>
         <div class="du-grid">
           <div class="du-item"><div class="du-num" id="du-total">20</div><div class="du-lbl">Total</div></div>
           <div class="du-item"><div class="du-num" id="du-passou">13</div><div class="du-lbl">Passados</div></div>
@@ -594,7 +595,7 @@ select.ev-inp{cursor:pointer}
     <div class="card"><div class="sec">📅 Diário Global — PaguePlay</div><div style="height:220px"><canvas id="ch-df"></canvas></div></div>
     <div>
       <div class="du-strip" style="margin-bottom:12px">
-        <div class="du-title">Dias Úteis — Março 2026</div>
+        <div class="du-title">Dias Úteis — Abril 2026</div>
         <div class="du-grid">
           <div class="du-item"><div class="du-num" id="du2-total">20</div><div class="du-lbl">Total</div></div>
           <div class="du-item"><div class="du-num" id="du2-passou">13</div><div class="du-lbl">Passados</div></div>
@@ -602,7 +603,7 @@ select.ev-inp{cursor:pointer}
         </div>
       </div>
       <div class="cal-card">
-        <div class="cal-title">Março 2026</div>
+        <div class="cal-title">Abril 2026</div>
         <div class="cal-year" style="margin-bottom:10px">Calendário automático</div>
         <div class="cal-grid" id="cal-grid2"></div>
       </div>
@@ -786,6 +787,11 @@ select.ev-inp{cursor:pointer}
       border-bottom:2px solid transparent;margin-bottom:-2px">
       🎯 Metas/Operador
     </div>
+    <div class="gtab" onclick="gTab('remover',this)"
+      style="padding:11px 18px;font-weight:800;font-size:12px;cursor:pointer;color:var(--g500);
+      border-bottom:2px solid transparent;margin-bottom:-2px">
+      🗑️ Remover Operador
+    </div>
   </div>
 
   <!-- ── SUB: MOVER OPERADORES ── -->
@@ -883,6 +889,27 @@ select.ev-inp{cursor:pointer}
   <div id="gsub-novo" class="gsub" style="display:none;background:var(--w);border:1px solid var(--g200);border-radius:0 0 var(--rl) var(--rl);padding:20px;box-shadow:var(--sh)">
     <div style="font-size:12px;color:var(--g500);font-weight:600;margin-bottom:16px;background:var(--ppl);border:1px solid rgba(0,168,107,.2);border-radius:var(--rm);padding:9px 14px">
       Adicione um novo operador ao sistema. Ele aparecerá no ranking, equipes e recebimento do dia.
+    </div>
+
+    <!-- ── SUB: REMOVER OPERADOR ── -->
+    <div id="gsub-remover" class="gsub" style="display:none;background:var(--w);border:1px solid var(--g200);border-radius:0 0 var(--rl) var(--rl);padding:20px;box-shadow:var(--sh)">
+      <div style="font-size:12px;color:#92400E;font-weight:600;margin-bottom:16px;background:#FFF7ED;border:1px solid #FCD34D;border-radius:var(--rm);padding:9px 14px">
+        ⚠️ O operador será removido de todas as abas: Ranking, Equipes, Recebimento, Acordos e Importação. Esta ação é sincronizada para todos os dispositivos.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+        <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase">Selecionar Operador para Remover</label>
+        <select id="remover-op-sel" style="background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);padding:10px 13px;font-family:Nunito,sans-serif;font-size:14px;font-weight:700;color:var(--g900);outline:none;width:100%">
+          <option value="">— Selecione o operador —</option>
+        </select>
+      </div>
+      <div id="remover-op-preview" style="display:none;background:var(--g50);border:1px solid var(--g200);border-radius:var(--rm);padding:14px;margin-bottom:16px">
+        <div style="font-size:11px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Dados do operador</div>
+        <div id="remover-op-info" style="font-size:13px;font-weight:700;color:var(--g900)"></div>
+      </div>
+      <button onclick="removerOpApply()" style="width:100%;padding:12px;border-radius:var(--rm);border:none;cursor:pointer;background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:15px;letter-spacing:.3px">
+        🗑️ Remover Operador Permanentemente
+      </button>
+      <div id="remover-lista-wrap" style="margin-top:20px"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
       <div>
@@ -1155,7 +1182,7 @@ select.ev-inp{cursor:pointer}
       </div>
 
       <textarea id="ac-import-area"
-        placeholder="Cole aqui (Ctrl+V) ou arraste o arquivo...&#10;&#10;Usuário    SubGrupo    Dt.Prev.Pgto.    Dt.Pagamento    ...&#10;caio_shimite    COFEN MARILIA BRENDA    2026-03-31    NaT    ..."
+        placeholder="Cole aqui (Ctrl+V) ou arraste o arquivo...&#10;&#10;Usuário    SubGrupo    Dt.Prev.Pgto.    Dt.Pagamento    ...&#10;caio_shimite    COFEN MARILIA BRENDA    2026-04-31    NaT    ..."
         style="width:100%;height:180px;background:var(--g50);border:1.5px solid var(--g200);
         border-radius:var(--rm);padding:12px;font-family:Courier New,sans-serif,monospace;font-size:12px;
         color:var(--g700);outline:none;resize:vertical;line-height:1.5;transition:all .2s"
@@ -1383,13 +1410,13 @@ select.ev-inp{cursor:pointer}
 // ══════════════════════════════
 // DATA
 // ══════════════════════════════
-const ORIG = {"global":{"total":430285.03,"pp":107405.76,"coren":242167.54,"cofen":80727.73,"daily":{"1":525.0,"2":13092.06,"3":44098.39,"4":14509.68,"5":28248.6,"6":29146.1,"7":5651.68,"8":2013.32,"9":33247.28,"10":46625.14,"11":23593.46,"12":31031.45,"13":29505.68,"14":306.01,"15":278.54,"16":24778.0,"17":26517.77,"18":19518.31,"19":24836.49,"20":30226.94,"21":1768.6,"22":758.53}},"equipes":[{"name":"COFEN MARILIA BRENDA","rec":166273.92,"ho":41568.48,"n_op":14,"acordos":691,"ops":[{"name":"caio_shimite","rec":25810.56,"ho":6452.64,"acordos":150,"ligacoes":150,"med_atraso":1497.0,"med_lig_baixa":1.3,"daily":{"2":173.0,"3":135.88,"4":854.2,"5":274.48,"6":3157.44,"9":4451.76,"10":1050.08,"11":498.96,"12":3509.48,"13":2297.04,"16":1547.52,"18":2741.28,"19":3460.28,"20":1144.72,"21":514.44},"tipos":{"BOLETO NEGOCIAÇÃO":2735.76,"CARTÃO DE CRÉDITO":18391.28,"PIX":4683.52},"n_ag":14,"val_ag":2788.95,"gerados":141,"pagos":25,"avista":9,"ate3dias":7,"mais3dias":9,"ticket":1032.42,"media_dias":4.8,"pendentes":116,"agendados":116,"eficiencia":17.7,"ag_futuro":{"2026-03-20":9,"2026-03-23":2,"2026-03-24":1,"2026-03-26":3,"2026-03-27":9,"2026-03-28":11,"2026-03-30":9,"2026-03-31":24,"2026-04-01":2,"2026-04-02":10,"2026-04-03":3,"2026-04-04":6,"2026-04-10":1,"2026-04-14":1,"2026-04-16":1,"2026-04-17":1,"2026-04-20":1,"2026-04-22":2,"2026-04-28":1,"2026-04-30":14,"2026-05-01":1,"2026-05-05":4}},{"name":"STEPHANIE_FAGUNDES","rec":20920.56,"ho":5230.14,"acordos":73,"ligacoes":73,"med_atraso":1741.0,"med_lig_baixa":2.6,"daily":{"2":58.8,"3":5530.04,"4":1581.88,"5":266.76,"6":158.36,"8":288.16,"9":274.4,"10":918.52,"11":1394.32,"12":932.68,"13":291.2,"16":4632.84,"19":60.96,"20":4531.64},"tipos":{"BOLETO NEGOCIAÇÃO":3794.16,"CARTÃO DE CRÉDITO":12355.92,"PIX":4770.48},"n_ag":20,"val_ag":5854.82,"gerados":93,"pagos":21,"avista":5,"ate3dias":7,"mais3dias":9,"ticket":996.22,"media_dias":5.9,"pendentes":72,"agendados":72,"eficiencia":22.6,"ag_futuro":{"2026-03-19":3,"2026-03-20":9,"2026-03-21":1,"2026-03-22":2,"2026-03-23":2,"2026-03-26":6,"2026-03-27":3,"2026-03-28":6,"2026-03-29":4,"2026-03-30":6,"2026-03-31":13,"2026-04-03":1,"2026-04-05":3,"2026-04-06":1,"2026-04-07":1,"2026-04-09":1,"2026-04-10":4,"2026-04-13":1,"2026-04-16":1,"2026-04-20":1,"2026-04-22":1,"2026-04-30":1,"2026-05-01":1}},{"name":"raissa_paloma","rec":19523.52,"ho":4880.88,"acordos":83,"ligacoes":83,"med_atraso":1993.0,"med_lig_baixa":0.3,"daily":{"3":1432.64,"5":2435.76,"6":1133.24,"7":256.52,"9":1732.28,"10":4044.44,"11":2443.24,"12":3542.0,"16":1413.88,"17":620.8,"18":337.2,"20":131.52},"tipos":{"BOLETO NEGOCIAÇÃO":3309.12,"CARTÃO DE CRÉDITO":10648.04,"PIX":5566.36},"n_ag":9,"val_ag":3944.77,"gerados":58,"pagos":20,"avista":8,"ate3dias":7,"mais3dias":5,"ticket":976.18,"media_dias":3.0,"pendentes":38,"agendados":38,"eficiencia":34.5,"ag_futuro":{"2026-03-17":2,"2026-03-19":5,"2026-03-20":4,"2026-03-21":2,"2026-03-22":2,"2026-03-27":1,"2026-03-28":3,"2026-03-29":1,"2026-03-30":2,"2026-03-31":1,"2026-04-01":2,"2026-04-02":1,"2026-04-07":1,"2026-04-09":2,"2026-04-11":1,"2026-04-12":1,"2026-04-15":1,"2026-04-16":1,"2026-04-22":2,"2026-04-25":1,"2026-04-27":2}},{"name":"itallo_cardamoni","rec":19184.04,"ho":4796.01,"acordos":74,"ligacoes":74,"med_atraso":2497.0,"med_lig_baixa":0.3,"daily":{"3":1579.2,"4":88.28,"5":2330.52,"6":282.32,"8":229.52,"9":872.28,"10":7396.32,"11":771.04,"12":2485.4,"16":588.76,"17":560.24,"20":2000.16},"tipos":{"BOLETO NEGOCIAÇÃO":8689.84,"CARTÃO DE CRÉDITO":7949.4,"PIX":2544.8},"n_ag":3,"val_ag":557.26,"gerados":31,"pagos":13,"avista":7,"ate3dias":1,"mais3dias":5,"ticket":1475.7,"media_dias":2.7,"pendentes":18,"agendados":18,"eficiencia":41.9,"ag_futuro":{"2026-03-19":2,"2026-03-21":2,"2026-03-22":2,"2026-03-23":1,"2026-03-26":2,"2026-03-27":1,"2026-03-28":1,"2026-03-30":1,"2026-03-31":1,"2026-04-09":1,"2026-04-16":1,"2026-04-20":1,"2026-04-22":1,"2026-04-27":1}},{"name":"GIOVANA_SOUZA","rec":18458.28,"ho":4614.57,"acordos":58,"ligacoes":58,"med_atraso":1225.0,"med_lig_baixa":2.4,"daily":{"2":777.96,"3":3464.28,"5":849.12,"6":597.44,"9":71.6,"10":2870.4,"11":143.72,"12":265.52,"13":2454.4,"16":1532.04,"18":108.92,"19":2379.32,"20":2636.56,"21":307.0},"tipos":{"BOLETO NEGOCIAÇÃO":3248.96,"CARTÃO DE CRÉDITO":2389.84,"PIX":12819.48},"n_ag":39,"val_ag":6226.36,"gerados":110,"pagos":36,"avista":18,"ate3dias":7,"mais3dias":11,"ticket":512.73,"media_dias":3.6,"pendentes":74,"agendados":74,"eficiencia":32.7,"ag_futuro":{"2026-03-19":5,"2026-03-20":5,"2026-03-21":7,"2026-03-22":4,"2026-03-23":3,"2026-03-24":3,"2026-03-26":3,"2026-03-27":6,"2026-03-28":4,"2026-03-29":2,"2026-03-30":7,"2026-03-31":18,"2026-04-04":1,"2026-04-10":4,"2026-04-11":1,"2026-05-05":1}},{"name":"leticia_romeu","rec":15906.24,"ho":3976.56,"acordos":72,"ligacoes":72,"med_atraso":2161.0,"med_lig_baixa":0.7,"daily":{"2":821.64,"3":526.6,"4":634.6,"5":3553.44,"9":4042.6,"15":278.08,"18":1646.48,"19":4119.36,"21":283.44},"tipos":{"BOLETO NEGOCIAÇÃO":1383.16,"CARTÃO DE CRÉDITO":12649.24,"PIX":1873.84},"n_ag":4,"val_ag":964.28,"gerados":48,"pagos":11,"avista":2,"ate3dias":4,"mais3dias":5,"ticket":1446.02,"media_dias":4.6,"pendentes":37,"agendados":37,"eficiencia":22.9,"ag_futuro":{"2026-03-19":3,"2026-03-20":3,"2026-03-21":2,"2026-03-22":1,"2026-03-23":1,"2026-03-26":3,"2026-03-27":1,"2026-03-28":4,"2026-03-29":1,"2026-03-30":5,"2026-03-31":4,"2026-04-04":1,"2026-04-06":1,"2026-04-10":4,"2026-04-11":3}},{"name":"BIANCA_V_SILVA","rec":11546.76,"ho":2886.69,"acordos":62,"ligacoes":62,"med_atraso":1050.0,"med_lig_baixa":1.5,"daily":{"2":733.32,"3":1070.16,"4":110.6,"5":1229.36,"6":1284.96,"7":130.08,"9":471.68,"12":4175.28,"13":216.84,"16":641.12,"17":124.2,"19":394.68,"20":964.48},"tipos":{"BOLETO NEGOCIAÇÃO":1653.88,"CARTÃO DE CRÉDITO":3645.4,"PIX":6247.48},"n_ag":31,"val_ag":6707.75,"gerados":91,"pagos":15,"avista":4,"ate3dias":4,"mais3dias":7,"ticket":769.78,"media_dias":6.9,"pendentes":76,"agendados":76,"eficiencia":16.5,"ag_futuro":{"2026-03-17":1,"2026-03-18":1,"2026-03-19":6,"2026-03-20":3,"2026-03-21":4,"2026-03-22":6,"2026-03-23":2,"2026-03-24":1,"2026-03-25":5,"2026-03-26":1,"2026-03-27":8,"2026-03-28":9,"2026-03-31":14,"2026-04-01":1,"2026-04-03":1,"2026-04-14":1,"2026-04-15":1,"2026-04-18":3,"2026-04-22":5,"2026-04-24":1,"2026-04-28":1,"2026-04-30":1}},{"name":"carulini_santos","rec":9890.72,"ho":2472.68,"acordos":20,"ligacoes":20,"med_atraso":1729.0,"med_lig_baixa":0.4,"daily":{"5":132.48,"6":139.72,"9":164.72,"10":3956.2,"11":286.36,"13":3556.6,"17":132.24,"20":1522.4},"tipos":{"BOLETO NEGOCIAÇÃO":4021.44,"CARTÃO DE CRÉDITO":3556.6,"PIX":2312.68},"n_ag":3,"val_ag":1866.39,"gerados":37,"pagos":10,"avista":7,"ate3dias":2,"mais3dias":1,"ticket":989.07,"media_dias":1.3,"pendentes":27,"agendados":27,"eficiencia":27.0,"ag_futuro":{"2026-03-19":2,"2026-03-20":4,"2026-03-21":5,"2026-03-22":3,"2026-03-23":1,"2026-03-25":1,"2026-03-26":2,"2026-03-27":2,"2026-03-29":2,"2026-03-30":1,"2026-03-31":1,"2026-04-08":1,"2026-04-11":1,"2026-04-20":1}},{"name":"silva_beatriz","rec":7802.72,"ho":1950.68,"acordos":38,"ligacoes":38,"med_atraso":1911.0,"med_lig_baixa":2.0,"daily":{"2":1501.68,"3":352.28,"5":277.2,"6":957.64,"10":197.32,"11":1681.44,"12":919.8,"13":629.0,"16":137.16,"19":737.4,"20":411.8},"tipos":{"BOLETO NEGOCIAÇÃO":1552.24,"CARTÃO DE CRÉDITO":2716.08,"PIX":3534.4},"n_ag":11,"val_ag":3001.01,"gerados":57,"pagos":17,"avista":6,"ate3dias":5,"mais3dias":6,"ticket":458.98,"media_dias":7.0,"pendentes":40,"agendados":40,"eficiencia":29.8,"ag_futuro":{"2026-03-18":1,"2026-03-20":2,"2026-03-21":3,"2026-03-22":1,"2026-03-23":1,"2026-03-26":3,"2026-03-27":2,"2026-03-28":1,"2026-03-29":1,"2026-03-30":2,"2026-03-31":18,"2026-04-06":1,"2026-04-11":1,"2026-04-30":3}},{"name":"thauany_moura","rec":5242.44,"ho":1310.61,"acordos":20,"ligacoes":20,"med_atraso":1499.0,"med_lig_baixa":0.1,"daily":{"3":258.4,"6":946.56,"9":563.32,"10":1934.44,"13":666.72,"17":108.72,"18":764.28},"tipos":{"BOLETO NEGOCIAÇÃO":1056.72,"CARTÃO DE CRÉDITO":1635.64,"PIX":2550.08},"n_ag":6,"val_ag":3033.44,"gerados":37,"pagos":5,"avista":2,"ate3dias":2,"mais3dias":1,"ticket":1048.49,"media_dias":2.4,"pendentes":32,"agendados":32,"eficiencia":13.5,"ag_futuro":{"2026-03-19":5,"2026-03-20":3,"2026-03-22":1,"2026-03-23":1,"2026-03-25":1,"2026-03-26":1,"2026-03-27":1,"2026-03-28":1,"2026-03-30":2,"2026-03-31":11,"2026-04-02":1,"2026-04-08":1,"2026-04-10":2,"2026-05-05":1}},{"name":"felipe_arruda","rec":4645.36,"ho":1161.34,"acordos":7,"ligacoes":7,"med_atraso":2298.0,"med_lig_baixa":1.9,"daily":{"4":1727.96,"6":488.6,"11":271.44,"12":1668.76,"13":488.6},"tipos":{"BOLETO NEGOCIAÇÃO":1792.32,"CARTÃO DE CRÉDITO":424.24,"PIX":2428.8},"n_ag":1,"val_ag":341.87,"gerados":9,"pagos":2,"avista":0,"ate3dias":2,"mais3dias":0,"ticket":2322.68,"media_dias":1.0,"pendentes":7,"agendados":7,"eficiencia":22.2,"ag_futuro":{"2026-03-20":1,"2026-03-26":1,"2026-03-31":5}},{"name":"KELY_SILVA","rec":4047.6,"ho":1011.9,"acordos":21,"ligacoes":21,"med_atraso":1091.0,"med_lig_baixa":3.5,"daily":{"2":1360.96,"3":306.32,"9":1259.76,"10":419.72,"12":700.84},"tipos":{"BOLETO NEGOCIAÇÃO":1523.8,"CARTÃO DE CRÉDITO":986.24,"PIX":1537.56},"n_ag":3,"val_ag":634.78,"gerados":2,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":1,"ticket":4047.6,"media_dias":30.0,"pendentes":1,"agendados":1,"eficiencia":50.0,"ag_futuro":{"2026-03-19":1}},{"name":"BRENDA_FERREIRA","rec":2037.68,"ho":509.42,"acordos":4,"ligacoes":4,"med_atraso":1894.0,"med_lig_baixa":1.0,"daily":{"3":1533.64,"22":504.04},"tipos":{"BOLETO NEGOCIAÇÃO":504.04,"CARTÃO DE CRÉDITO":1533.64},"n_ag":0,"val_ag":0,"eq":"COFEN MARILIA BRENDA","gerados":4,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":4,"agendados":4,"eficiencia":0.0,"ag_futuro":{"2026-03-29":1,"2026-04-30":3}},{"name":"JESSICA_O_SILVA","rec":1257.44,"ho":314.36,"acordos":9,"ligacoes":9,"med_atraso":813.0,"med_lig_baixa":23.3,"daily":{"2":726.2,"3":128.64,"6":124.08,"11":113.08,"17":165.44},"tipos":{"BOLETO NEGOCIAÇÃO":788.16,"PIX":469.28},"n_ag":4,"val_ag":694.33,"gerados":1,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":1,"ticket":1257.44,"media_dias":32.0,"pendentes":0,"agendados":0,"eficiencia":100.0,"ag_futuro":{}}]},{"name":"COFEN BIRIGUI BRUNA","rec":62570.84,"ho":15642.71,"n_op":10,"acordos":257,"ops":[{"name":"MATHEUS_SOUZA","rec":14337.92,"ho":3584.48,"acordos":60,"ligacoes":60,"med_atraso":2417.0,"med_lig_baixa":3.8,"daily":{"3":2509.44,"5":1836.52,"6":227.56,"9":1257.72,"10":2504.6,"12":516.04,"13":1370.16,"18":831.36,"19":558.4,"20":2726.12},"tipos":{"BOLETO NEGOCIAÇÃO":3789.88,"CARTÃO DE CRÉDITO":6900.76,"PIX":3647.28},"n_ag":5,"val_ag":1784.58,"gerados":46,"pagos":11,"avista":5,"ate3dias":3,"mais3dias":3,"ticket":1303.45,"media_dias":3.1,"pendentes":35,"agendados":35,"eficiencia":23.9,"ag_futuro":{"2026-03-19":7,"2026-03-20":3,"2026-03-21":5,"2026-03-22":3,"2026-03-26":4,"2026-03-27":2,"2026-03-29":1,"2026-03-31":3,"2026-04-01":2,"2026-04-06":1,"2026-05-01":4}},{"name":"KAROLAINE_SILVA","rec":13838.0,"ho":3459.5,"acordos":53,"ligacoes":53,"med_atraso":2714.0,"med_lig_baixa":1.9,"daily":{"2":58.2,"5":3508.88,"9":2487.12,"10":2546.8,"11":1505.2,"12":624.96,"16":278.6,"18":448.16,"20":2380.08},"tipos":{"BOLETO NEGOCIAÇÃO":1933.92,"CARTÃO DE CRÉDITO":7489.04,"PIX":4415.04},"n_ag":8,"val_ag":2263.68,"gerados":46,"pagos":10,"avista":6,"ate3dias":3,"mais3dias":1,"ticket":1383.8,"media_dias":1.0,"pendentes":36,"agendados":36,"eficiencia":21.7,"ag_futuro":{"2026-03-17":1,"2026-03-19":2,"2026-03-20":3,"2026-03-21":1,"2026-03-22":4,"2026-03-26":5,"2026-03-27":1,"2026-03-28":1,"2026-03-29":1,"2026-04-01":1,"2026-04-03":2,"2026-04-04":1,"2026-04-05":1,"2026-04-06":2,"2026-04-09":1,"2026-04-10":1,"2026-04-11":2,"2026-05-01":6}},{"name":"HELTON_ROLDON","rec":8993.84,"ho":2248.46,"acordos":35,"ligacoes":35,"med_atraso":967.0,"med_lig_baixa":0.8,"daily":{"3":590.36,"6":1288.12,"9":271.44,"10":760.24,"11":214.24,"12":229.24,"13":741.2,"16":1629.24,"18":514.0,"19":2608.68,"20":147.08},"tipos":{"BOLETO NEGOCIAÇÃO":4074.44,"CARTÃO DE CRÉDITO":1619.16,"PIX":3300.24},"n_ag":0,"val_ag":0,"gerados":35,"pagos":9,"avista":5,"ate3dias":3,"mais3dias":1,"ticket":999.32,"media_dias":1.7,"pendentes":26,"agendados":26,"eficiencia":25.7,"ag_futuro":{"2026-03-19":7,"2026-03-20":2,"2026-03-21":1,"2026-03-23":4,"2026-03-26":3,"2026-03-27":2,"2026-03-28":2,"2026-03-29":1,"2026-03-30":1,"2026-03-31":1,"2026-04-18":1,"2026-04-22":1}},{"name":"THAYRA_FERREIRASILVA","rec":6611.8,"ho":1652.95,"acordos":22,"ligacoes":22,"med_atraso":1977.0,"med_lig_baixa":0.7,"daily":{"9":1091.04,"11":1382.88,"12":2199.84,"16":314.8,"17":1623.24},"tipos":{"BOLETO NEGOCIAÇÃO":1375.2,"CARTÃO DE CRÉDITO":3295.72,"PIX":1940.88},"n_ag":1,"val_ag":215.74,"gerados":19,"pagos":6,"avista":4,"ate3dias":2,"mais3dias":0,"ticket":1101.97,"media_dias":0.5,"pendentes":13,"agendados":13,"eficiencia":31.6,"ag_futuro":{"2026-03-19":3,"2026-03-23":1,"2026-03-26":1,"2026-03-27":1,"2026-03-29":1,"2026-04-01":1,"2026-04-02":1,"2026-04-05":1,"2026-04-10":2,"2026-04-11":1}},{"name":"RENATARODRIGUES","rec":6444.0,"ho":1611.0,"acordos":28,"ligacoes":28,"med_atraso":1756.0,"med_lig_baixa":0.0,"daily":{"3":173.48,"6":485.4,"9":2889.64,"10":1227.72,"11":370.32,"16":167.28,"17":272.96,"19":857.2},"tipos":{"BOLETO NEGOCIAÇÃO":1795.96,"CARTÃO DE CRÉDITO":3722.4,"PIX":925.64},"n_ag":6,"val_ag":1450.7,"gerados":44,"pagos":5,"avista":2,"ate3dias":2,"mais3dias":1,"ticket":1288.8,"media_dias":1.8,"pendentes":39,"agendados":39,"eficiencia":11.4,"ag_futuro":{"2026-03-19":1,"2026-03-20":4,"2026-03-21":1,"2026-03-22":1,"2026-03-23":1,"2026-03-26":1,"2026-03-27":4,"2026-03-29":1,"2026-03-30":1,"2026-03-31":10,"2026-04-06":1,"2026-04-10":1,"2026-04-13":3,"2026-04-21":1,"2026-04-30":8}},{"name":"MAYSA_OLIVEIRA","rec":5344.08,"ho":1336.02,"acordos":32,"ligacoes":32,"med_atraso":1011.0,"med_lig_baixa":2.6,"daily":{"3":137.24,"9":229.96,"10":1019.36,"11":998.6,"12":603.4,"13":277.2,"16":309.4,"17":1220.28,"18":548.64},"tipos":{"BOLETO NEGOCIAÇÃO":1839.12,"CARTÃO DE CRÉDITO":2106.16,"PIX":1398.8},"n_ag":4,"val_ag":680.73,"gerados":30,"pagos":9,"avista":5,"ate3dias":2,"mais3dias":2,"ticket":593.79,"media_dias":1.9,"pendentes":21,"agendados":21,"eficiencia":30.0,"ag_futuro":{"2026-03-18":1,"2026-03-20":2,"2026-03-22":1,"2026-03-23":3,"2026-03-25":2,"2026-03-27":1,"2026-03-30":2,"2026-03-31":1,"2026-04-02":1,"2026-04-06":3,"2026-04-10":1,"2026-04-11":1,"2026-05-04":2}},{"name":"LYVIA_DIAS","rec":3713.6,"ho":928.4,"acordos":10,"ligacoes":10,"med_atraso":1993.0,"med_lig_baixa":1.0,"daily":{"2":1112.08,"3":231.96,"6":574.16,"9":301.84,"11":1274.12,"17":140.16,"20":79.28},"tipos":{"BOLETO NEGOCIAÇÃO":2775.64,"PIX":937.96},"n_ag":2,"val_ag":438.9,"gerados":49,"pagos":2,"avista":0,"ate3dias":1,"mais3dias":1,"ticket":1856.8,"media_dias":4.5,"pendentes":47,"agendados":47,"eficiencia":4.1,"ag_futuro":{"2026-03-19":9,"2026-03-20":2,"2026-03-21":1,"2026-03-22":1,"2026-03-23":6,"2026-03-24":1,"2026-03-27":3,"2026-03-28":3,"2026-03-30":2,"2026-04-03":2,"2026-04-06":1,"2026-04-10":8,"2026-04-11":4,"2026-04-30":4}},{"name":"RAFAELA_MINHOTO","rec":2403.16,"ho":600.79,"acordos":13,"ligacoes":13,"med_atraso":722.0,"med_lig_baixa":2.8,"daily":{"6":1108.64,"16":230.96,"18":975.2,"21":88.36},"tipos":{"BOLETO NEGOCIAÇÃO":1805.84,"CARTÃO DE CRÉDITO":455.68,"PIX":141.64},"n_ag":2,"val_ag":404.64,"gerados":19,"pagos":2,"avista":2,"ate3dias":0,"mais3dias":0,"ticket":1201.58,"media_dias":0.0,"pendentes":17,"agendados":17,"eficiencia":10.5,"ag_futuro":{"2026-03-19":1,"2026-03-26":2,"2026-03-27":3,"2026-03-30":5,"2026-03-31":6}},{"name":"MARIA_BRAIDOTI","rec":760.68,"ho":190.17,"acordos":3,"ligacoes":3,"med_atraso":2926.0,"med_lig_baixa":0.3,"daily":{"10":127.96,"17":253.68,"19":379.04},"tipos":{"BOLETO NEGOCIAÇÃO":127.96,"PIX":632.72},"n_ag":10,"val_ag":2189.31,"gerados":35,"pagos":4,"avista":2,"ate3dias":2,"mais3dias":0,"ticket":190.17,"media_dias":0.5,"pendentes":31,"agendados":31,"eficiencia":11.4,"ag_futuro":{"2026-03-17":3,"2026-03-19":3,"2026-03-20":2,"2026-03-21":3,"2026-03-23":1,"2026-03-24":2,"2026-03-26":2,"2026-03-27":2,"2026-03-30":2,"2026-03-31":7,"2026-04-01":3,"2026-04-02":1}},{"name":"BRUNA_JUSTIMIANO","rec":123.76,"ho":30.94,"acordos":1,"ligacoes":1,"med_atraso":2537.0,"med_lig_baixa":0.0,"daily":{"11":123.76},"tipos":{"PIX":123.76},"n_ag":0,"val_ag":0,"eq":"COFEN BIRIGUI BRUNA","gerados":1,"pagos":1,"avista":1,"ate3dias":0,"mais3dias":0,"ticket":123.76,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":100.0,"ag_futuro":{}}]},{"name":"COFEN STEPHANIE 2° TURNO","rec":60421.84,"ho":15105.46,"n_op":11,"acordos":206,"ops":[{"name":"larissa_santana","rec":15442.92,"ho":3860.73,"acordos":55,"ligacoes":55,"med_atraso":2747.0,"med_lig_baixa":1.7,"daily":{"2":2129.8,"3":1995.68,"4":1093.08,"6":1380.24,"10":1175.52,"11":1040.6,"16":1660.2,"17":4967.8},"tipos":{"BOLETO NEGOCIAÇÃO":3493.76,"CARTÃO DE CRÉDITO":8448.52,"PIX":3500.64},"n_ag":2,"val_ag":687.08,"gerados":24,"pagos":4,"avista":2,"ate3dias":1,"mais3dias":1,"ticket":3860.73,"media_dias":1.8,"pendentes":20,"agendados":20,"eficiencia":16.7,"ag_futuro":{"2026-03-18":1,"2026-03-19":1,"2026-03-20":5,"2026-03-23":1,"2026-03-26":1,"2026-03-27":1,"2026-03-30":3,"2026-03-31":1,"2026-04-02":1,"2026-04-10":2,"2026-04-30":3}},{"name":"jussara_pereira","rec":10878.96,"ho":2719.74,"acordos":50,"ligacoes":50,"med_atraso":1775.0,"med_lig_baixa":0.7,"daily":{"3":5925.12,"4":380.48,"5":1154.64,"6":1059.84,"9":356.16,"10":1435.28,"17":142.92,"18":145.12,"20":279.4},"tipos":{"BOLETO NEGOCIAÇÃO":805.72,"CARTÃO DE CRÉDITO":8852.96,"PIX":1220.28},"n_ag":3,"val_ag":703.43,"gerados":43,"pagos":10,"avista":4,"ate3dias":1,"mais3dias":5,"ticket":1087.9,"media_dias":5.1,"pendentes":33,"agendados":33,"eficiencia":23.3,"ag_futuro":{"2026-03-17":1,"2026-03-21":5,"2026-03-23":1,"2026-03-28":1,"2026-03-30":1,"2026-03-31":9,"2026-04-10":1,"2026-04-29":1,"2026-04-30":13}},{"name":"aline_pupim","rec":7903.32,"ho":1975.83,"acordos":15,"ligacoes":15,"med_atraso":2097.0,"med_lig_baixa":2.2,"daily":{"5":398.68,"6":271.44,"7":1380.04,"10":88.92,"11":196.92,"12":263.64,"16":840.84,"17":2281.36,"18":213.6,"19":914.56,"20":1053.32},"tipos":{"BOLETO NEGOCIAÇÃO":4691.96,"PIX":3211.36},"n_ag":4,"val_ag":827.29,"gerados":39,"pagos":9,"avista":3,"ate3dias":2,"mais3dias":4,"ticket":878.15,"media_dias":3.6,"pendentes":30,"agendados":30,"eficiencia":23.1,"ag_futuro":{"2026-03-18":1,"2026-03-19":1,"2026-03-20":4,"2026-03-21":1,"2026-03-22":1,"2026-03-23":2,"2026-03-25":2,"2026-03-26":2,"2026-03-27":2,"2026-03-28":3,"2026-03-30":2,"2026-03-31":2,"2026-04-02":2,"2026-04-10":3,"2026-04-11":1,"2026-04-30":1}},{"name":"thais_mayara","rec":7809.32,"ho":1952.33,"acordos":28,"ligacoes":28,"med_atraso":1616.0,"med_lig_baixa":0.8,"daily":{"2":264.8,"6":555.28,"8":654.24,"9":1023.84,"10":173.32,"11":91.52,"12":229.96,"13":3220.48,"17":369.12,"18":565.56,"20":661.2},"tipos":{"BOLETO NEGOCIAÇÃO":374.84,"CARTÃO DE CRÉDITO":4523.72,"PIX":2910.76},"n_ag":3,"val_ag":604.76,"gerados":26,"pagos":6,"avista":2,"ate3dias":3,"mais3dias":1,"ticket":1301.55,"media_dias":2.8,"pendentes":20,"agendados":20,"eficiencia":23.1,"ag_futuro":{"2026-03-20":3,"2026-03-21":2,"2026-03-22":1,"2026-03-23":2,"2026-03-26":3,"2026-03-30":2,"2026-03-31":2,"2026-04-02":3,"2026-04-10":1,"2026-04-12":1}},{"name":"geovanna_almeida","rec":5580.64,"ho":1395.16,"acordos":12,"ligacoes":12,"med_atraso":1923.0,"med_lig_baixa":1.9,"daily":{"2":91.44,"6":473.6,"10":1301.8,"11":359.48,"13":3265.32,"20":89.0},"tipos":{"BOLETO NEGOCIAÇÃO":3869.84,"PIX":1710.8},"n_ag":9,"val_ag":2518.93,"gerados":53,"pagos":17,"avista":7,"ate3dias":4,"mais3dias":6,"ticket":328.27,"media_dias":4.5,"pendentes":36,"agendados":36,"eficiencia":32.1,"ag_futuro":{"2026-03-18":1,"2026-03-20":6,"2026-03-21":5,"2026-03-22":1,"2026-03-23":1,"2026-03-26":1,"2026-03-28":1,"2026-03-31":9,"2026-04-06":1,"2026-04-10":1,"2026-04-11":1,"2026-04-30":3,"2026-05-05":5}},{"name":"ISABELA_MONTEIRO","rec":4297.4,"ho":1074.35,"acordos":21,"ligacoes":21,"med_atraso":978.0,"med_lig_baixa":5.5,"daily":{"1":271.44,"2":430.88,"3":616.16,"5":522.32,"6":137.24,"9":68.64,"11":1776.72,"12":159.68,"13":238.76,"14":75.56},"tipos":{"BOLETO NEGOCIAÇÃO":1091.2,"CARTÃO DE CRÉDITO":274.56,"PIX":2931.64},"n_ag":29,"val_ag":7048.5,"gerados":76,"pagos":20,"avista":4,"ate3dias":3,"mais3dias":13,"ticket":214.87,"media_dias":12.7,"pendentes":56,"agendados":56,"eficiencia":26.3,"ag_futuro":{"2026-03-17":1,"2026-03-18":1,"2026-03-19":1,"2026-03-20":2,"2026-03-24":1,"2026-03-25":1,"2026-03-26":1,"2026-03-28":1,"2026-03-30":1,"2026-04-01":5,"2026-04-02":11,"2026-04-03":15,"2026-04-04":2,"2026-04-10":4,"2026-04-11":1,"2026-04-19":1,"2026-04-22":1,"2026-04-23":1,"2026-04-24":2,"2026-04-26":1,"2026-04-30":2}},{"name":"thalia_thomaz","rec":2586.84,"ho":646.71,"acordos":3,"ligacoes":3,"med_atraso":2164.0,"med_lig_baixa":0.3,"daily":{"3":2331.08,"6":255.76},"tipos":{"BOLETO NEGOCIAÇÃO":2331.08,"PIX":255.76},"n_ag":1,"val_ag":183.87,"gerados":32,"pagos":1,"avista":0,"ate3dias":1,"mais3dias":0,"ticket":2586.84,"media_dias":1.0,"pendentes":31,"agendados":31,"eficiencia":3.1,"ag_futuro":{"2026-03-17":2,"2026-03-18":2,"2026-03-19":1,"2026-03-20":2,"2026-03-21":1,"2026-03-26":2,"2026-03-27":3,"2026-03-29":3,"2026-03-30":3,"2026-04-01":1,"2026-04-04":2,"2026-04-06":1,"2026-04-07":1,"2026-04-10":4,"2026-04-13":1,"2026-04-15":1,"2026-04-30":1}},{"name":"katia_regina","rec":1885.2,"ho":471.3,"acordos":6,"ligacoes":6,"med_atraso":1161.0,"med_lig_baixa":0.5,"daily":{"11":490.0,"16":982.36,"18":141.4,"20":271.44},"tipos":{"BOLETO NEGOCIAÇÃO":975.56,"PIX":909.64},"n_ag":0,"val_ag":0,"gerados":22,"pagos":4,"avista":1,"ate3dias":3,"mais3dias":0,"ticket":471.3,"media_dias":1.2,"pendentes":18,"agendados":18,"eficiencia":18.2,"ag_futuro":{"2026-03-20":1,"2026-03-21":6,"2026-03-26":1,"2026-03-28":2,"2026-03-30":2,"2026-03-31":1,"2026-04-01":1,"2026-04-03":2,"2026-04-11":1,"2026-04-17":1}},{"name":"kauane_azevedo","rec":1781.96,"ho":445.49,"acordos":6,"ligacoes":6,"med_atraso":1214.0,"med_lig_baixa":0.2,"daily":{"11":176.96,"13":220.72,"18":100.52,"19":1007.6,"20":276.16},"tipos":{"CARTÃO DE CRÉDITO":276.16,"PIX":1505.8},"n_ag":7,"val_ag":1836.47,"gerados":11,"pagos":1,"avista":1,"ate3dias":0,"mais3dias":0,"ticket":1781.96,"media_dias":0.0,"pendentes":10,"agendados":10,"eficiencia":9.1,"ag_futuro":{"2026-03-17":1,"2026-03-19":1,"2026-03-21":1,"2026-03-22":2,"2026-03-23":1,"2026-03-24":1,"2026-03-30":2,"2026-04-10":1}},{"name":"thais_c_ferreira","rec":1672.68,"ho":418.17,"acordos":4,"ligacoes":4,"med_atraso":2625.0,"med_lig_baixa":0.0,"daily":{"6":488.52,"9":362.52,"12":821.64},"tipos":{"BOLETO NEGOCIAÇÃO":1184.16,"PIX":488.52},"n_ag":1,"val_ag":273.4,"gerados":34,"pagos":4,"avista":1,"ate3dias":1,"mais3dias":2,"ticket":418.17,"media_dias":3.0,"pendentes":30,"agendados":30,"eficiencia":11.8,"ag_futuro":{"2026-03-19":3,"2026-03-20":5,"2026-03-23":1,"2026-03-25":1,"2026-03-30":8,"2026-03-31":4,"2026-04-02":1,"2026-04-10":2,"2026-04-11":2,"2026-04-30":3}},{"name":"AMABELLY_SANTOS","rec":582.6,"ho":145.65,"acordos":6,"ligacoes":6,"med_atraso":418.0,"med_lig_baixa":0.0,"daily":{"12":499.64,"17":82.96},"tipos":{"CARTÃO DE CRÉDITO":499.64,"PIX":82.96},"n_ag":4,"val_ag":1079.79,"gerados":16,"pagos":1,"avista":1,"ate3dias":0,"mais3dias":0,"ticket":582.6,"media_dias":0.0,"pendentes":15,"agendados":15,"eficiencia":6.2,"ag_futuro":{"2026-03-17":1,"2026-03-19":1,"2026-03-26":1,"2026-03-28":1,"2026-03-30":2,"2026-04-02":1,"2026-04-03":1,"2026-04-05":1,"2026-04-06":1,"2026-04-07":1,"2026-04-10":1,"2026-04-11":1,"2026-04-19":1,"2026-04-24":1}}]},{"name":"COFEN BIRIGUI LUCIANO","rec":46996.52,"ho":11749.13,"n_op":9,"acordos":148,"ops":[{"name":"LEONARDO_NUNES","rec":14298.08,"ho":3574.52,"acordos":43,"ligacoes":43,"med_atraso":2288.0,"med_lig_baixa":0.0,"daily":{"6":320.24,"9":191.92,"10":4988.32,"12":277.2,"13":4956.28,"16":68.84,"17":1216.84,"19":1389.04,"20":889.4},"tipos":{"BOLETO NEGOCIAÇÃO":6201.48,"CARTÃO DE CRÉDITO":6217.32,"PIX":1879.28},"n_ag":0,"val_ag":0,"gerados":24,"pagos":9,"avista":7,"ate3dias":1,"mais3dias":1,"ticket":1588.68,"media_dias":1.0,"pendentes":15,"agendados":15,"eficiencia":37.5,"ag_futuro":{"2026-03-19":1,"2026-03-20":1,"2026-03-21":3,"2026-03-22":1,"2026-03-26":2,"2026-03-28":1,"2026-03-29":1,"2026-03-30":1,"2026-04-09":2,"2026-04-10":2}},{"name":"FRANCISCA_BRITO","rec":12231.12,"ho":3057.78,"acordos":37,"ligacoes":37,"med_atraso":2101.0,"med_lig_baixa":0.0,"daily":{"5":282.64,"6":2612.44,"10":1081.4,"16":378.84,"17":7079.32,"18":529.92,"19":266.56},"tipos":{"BOLETO NEGOCIAÇÃO":59.28,"CARTÃO DE CRÉDITO":11243.8,"PIX":928.04},"n_ag":0,"val_ag":0,"gerados":13,"pagos":3,"avista":3,"ate3dias":0,"mais3dias":0,"ticket":4077.04,"media_dias":0.0,"pendentes":10,"agendados":10,"eficiencia":23.1,"ag_futuro":{"2026-03-19":1,"2026-03-20":1,"2026-03-21":1,"2026-03-28":1,"2026-03-30":1,"2026-04-02":1,"2026-04-07":1,"2026-04-10":1,"2026-04-11":2}},{"name":"MARIA_MOREIRASANTOS","rec":6835.4,"ho":1708.85,"acordos":19,"ligacoes":19,"med_atraso":1391.0,"med_lig_baixa":0.0,"daily":{"6":1078.64,"9":3426.0,"11":1718.16,"12":105.48,"18":507.12},"tipos":{"BOLETO NEGOCIAÇÃO":3709.04,"CARTÃO DE CRÉDITO":1023.8,"PIX":2102.56},"n_ag":6,"val_ag":1772.54,"gerados":32,"pagos":2,"avista":1,"ate3dias":1,"mais3dias":0,"ticket":3417.7,"media_dias":0.5,"pendentes":30,"agendados":30,"eficiencia":6.2,"ag_futuro":{"2026-03-17":1,"2026-03-18":1,"2026-03-19":1,"2026-03-20":2,"2026-03-23":1,"2026-03-26":1,"2026-03-30":5,"2026-04-01":1,"2026-04-02":1,"2026-04-03":2,"2026-04-06":3,"2026-04-08":4,"2026-04-09":6,"2026-05-01":1}},{"name":"HELENA_SANTOS","rec":4900.8,"ho":1225.2,"acordos":2,"ligacoes":2,"med_atraso":3420.0,"med_lig_baixa":2.5,"daily":{"6":225.68,"16":4675.12},"tipos":{"BOLETO NEGOCIAÇÃO":4900.8},"n_ag":0,"val_ag":0,"gerados":12,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":1,"ticket":4900.8,"media_dias":5.0,"pendentes":11,"agendados":11,"eficiencia":8.3,"ag_futuro":{"2026-03-19":1,"2026-03-20":1,"2026-03-30":2,"2026-04-06":2,"2026-04-10":5}},{"name":"ANA_BENTO","rec":2787.04,"ho":696.76,"acordos":6,"ligacoes":6,"med_atraso":1187.0,"med_lig_baixa":2.5,"daily":{"6":111.04,"10":185.12,"11":485.24,"13":1479.0,"16":526.64},"tipos":{"BOLETO NEGOCIAÇÃO":919.8,"PIX":1867.24},"n_ag":0,"val_ag":0,"gerados":19,"pagos":2,"avista":1,"ate3dias":1,"mais3dias":0,"ticket":1393.52,"media_dias":0.5,"pendentes":17,"agendados":17,"eficiencia":10.5,"ag_futuro":{"2026-03-19":1,"2026-03-21":1,"2026-03-25":1,"2026-03-26":2,"2026-03-30":1,"2026-04-07":1,"2026-04-09":1,"2026-04-10":3,"2026-04-11":1,"2026-04-17":1,"2026-04-25":2,"2026-04-28":2}},{"name":"NAYARA_CRUZ","rec":1881.64,"ho":470.41,"acordos":10,"ligacoes":10,"med_atraso":578.0,"med_lig_baixa":0.0,"daily":{"5":441.92,"6":1017.44,"9":279.36,"18":142.92},"tipos":{"BOLETO NEGOCIAÇÃO":1274.4,"CARTÃO DE CRÉDITO":277.44,"PIX":329.8},"n_ag":4,"val_ag":1487.62,"gerados":16,"pagos":1,"avista":1,"ate3dias":0,"mais3dias":0,"ticket":1881.64,"media_dias":0.0,"pendentes":15,"agendados":15,"eficiencia":6.2,"ag_futuro":{"2026-03-19":3,"2026-03-20":1,"2026-03-23":1,"2026-03-30":2,"2026-04-05":2,"2026-04-06":1,"2026-04-10":4,"2026-05-04":1}},{"name":"DEBORA_ANDRIELLY","rec":1459.44,"ho":364.86,"acordos":15,"ligacoes":15,"med_atraso":764.0,"med_lig_baixa":5.1,"daily":{"6":168.64,"11":131.04,"16":92.72,"18":1067.04},"tipos":{"BOLETO NEGOCIAÇÃO":92.72,"CARTÃO DE CRÉDITO":1067.04,"PIX":299.68},"n_ag":5,"val_ag":1249.79,"gerados":19,"pagos":2,"avista":0,"ate3dias":2,"mais3dias":0,"ticket":729.72,"media_dias":2.0,"pendentes":17,"agendados":17,"eficiencia":10.5,"ag_futuro":{"2026-03-19":1,"2026-03-23":1,"2026-03-28":1,"2026-03-30":1,"2026-04-03":1,"2026-04-04":1,"2026-04-05":1,"2026-04-07":1,"2026-04-09":2,"2026-04-10":4,"2026-04-11":1,"2026-04-13":1,"2026-04-26":1}},{"name":"JOAO_MIRANDA","rec":1354.36,"ho":338.59,"acordos":10,"ligacoes":10,"med_atraso":741.0,"med_lig_baixa":0.0,"daily":{"5":1059.56,"9":294.8},"tipos":{"BOLETO NEGOCIAÇÃO":82.56,"CARTÃO DE CRÉDITO":1059.56,"PIX":212.24},"n_ag":0,"val_ag":0,"gerados":18,"pagos":2,"avista":2,"ate3dias":0,"mais3dias":0,"ticket":677.18,"media_dias":0.0,"pendentes":16,"agendados":16,"eficiencia":11.1,"ag_futuro":{"2026-03-19":3,"2026-03-21":1,"2026-03-22":3,"2026-03-23":2,"2026-03-27":1,"2026-03-29":1,"2026-03-30":1,"2026-04-03":1,"2026-04-08":1,"2026-04-10":1,"2026-04-12":1}},{"name":"EDUARDO_SILVA","rec":1248.64,"ho":312.16,"acordos":6,"ligacoes":6,"med_atraso":684.0,"med_lig_baixa":1.7,"daily":{"10":109.52,"11":297.68,"12":215.52,"19":272.96,"20":352.96},"tipos":{"BOLETO NEGOCIAÇÃO":622.16,"PIX":626.48},"n_ag":0,"val_ag":0,"gerados":27,"pagos":4,"avista":1,"ate3dias":2,"mais3dias":1,"ticket":312.16,"media_dias":2.8,"pendentes":23,"agendados":23,"eficiencia":14.8,"ag_futuro":{"2026-03-19":1,"2026-03-20":4,"2026-03-21":7,"2026-03-22":3,"2026-03-26":1,"2026-03-27":4,"2026-03-28":1,"2026-03-30":1,"2026-04-03":1}}]},{"name":"ELITE","rec":25997.24,"ho":6499.31,"n_op":2,"acordos":120,"ops":[{"name":"CLEBER_JUNIOR","rec":14842.16,"ho":3710.54,"acordos":83,"ligacoes":83,"med_atraso":2032.0,"med_lig_baixa":0.2,"daily":{"3":1128.48,"4":503.4,"5":976.96,"11":1356.08,"12":1886.0,"13":1599.84,"17":3002.28,"19":3578.96,"20":510.48,"21":299.68},"tipos":{"BOLETO NEGOCIAÇÃO":1496.72,"CARTÃO DE CRÉDITO":11643.4,"PIX":1702.04},"n_ag":6,"val_ag":1929.26,"gerados":24,"pagos":13,"avista":11,"ate3dias":2,"mais3dias":0,"ticket":1141.7,"media_dias":0.2,"pendentes":11,"agendados":11,"eficiencia":54.2,"ag_futuro":{"2026-03-21":1,"2026-03-23":1,"2026-03-26":1,"2026-03-27":1,"2026-03-30":2,"2026-04-04":1,"2026-04-06":1,"2026-04-10":3}},{"name":"JHONATA_NASCIMENTO","rec":11155.08,"ho":2788.77,"acordos":37,"ligacoes":37,"med_atraso":1314.0,"med_lig_baixa":0.2,"daily":{"4":1189.12,"5":597.96,"6":1466.6,"10":1811.24,"16":526.72,"18":3056.76,"20":2506.68},"tipos":{"BOLETO NEGOCIAÇÃO":3013.64,"CARTÃO DE CRÉDITO":1189.12,"PIX":6952.32},"n_ag":2,"val_ag":761.3,"gerados":31,"pagos":18,"avista":11,"ate3dias":4,"mais3dias":3,"ticket":619.73,"media_dias":2.0,"pendentes":13,"agendados":13,"eficiencia":58.1,"ag_futuro":{"2026-03-20":1,"2026-03-22":1,"2026-03-26":2,"2026-03-29":1,"2026-03-30":2,"2026-04-04":4,"2026-04-05":1,"2026-04-30":1}},{"name":"fabio_aquino","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":0,"med_lig_baixa":0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0,"pendentes":0,"agendados":0,"eficiencia":0,"ag_futuro":{}}]}]};
+const ORIG = {"global":{"total":426575.4,"pp":106472.0,"coren":240077.08,"cofen":80026.32,"daily":{"1":75896.24,"2":29976.19,"3":1037.53,"4":1125.74,"5":687.22,"6":104455.67,"7":109.11}},"equipes":[{"name":"COFEN MARILIA BRENDA","rec":64756.93,"ho":16189.23,"n_op":12,"acordos":232,"ops":[{"name":"caio_shimite","rec":6631.56,"ho":1657.89,"acordos":15,"ligacoes":15,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1750.02,"2":551.42,"6":4330.12},"tipos":{"Boleto":1016.84,"Cartão Padrão":1492.87,"Pix":4121.85},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":442.1,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"STEPHANIE_FAGUNDES","rec":6641.21,"ho":1660.3,"acordos":28,"ligacoes":28,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":3537.92,"2":247.02,"3":306.81,"6":2549.46},"tipos":{"Boleto":247.02,"Cartão Padrão":4760.33,"Pix":1633.86},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":237.19,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"raissa_paloma","rec":10072.3,"ho":2518.07,"acordos":25,"ligacoes":25,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":8380.84,"2":374.41,"6":1317.05},"tipos":{"Boleto":1847.01,"Cartão Padrão":7850.88,"Pix":374.41},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":402.89,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"itallo_cardamoni","rec":8889.53,"ho":2222.38,"acordos":22,"ligacoes":22,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":4995.29,"2":1211.79,"6":2682.45},"tipos":{"Boleto":88.43,"Cartão Padrão":3801.4,"Pix":4999.7},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":404.07,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"GIOVANA_SOUZA","rec":5238.21,"ho":1309.55,"acordos":11,"ligacoes":11,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":391.45,"2":751.58,"6":4095.18},"tipos":{"Boleto":4279.93,"Pix":958.28},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":476.2,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"leticia_romeu","rec":3801.91,"ho":950.48,"acordos":14,"ligacoes":14,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1011.67,"6":2790.24},"tipos":{"Boleto":1011.67,"Cartão Padrão":1062.87,"Pix":1727.37},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":271.56,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"BIANCA_V_SILVA","rec":6424.43,"ho":1606.11,"acordos":31,"ligacoes":31,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1432.51,"2":578.86,"6":4413.06},"tipos":{"Boleto":357.85,"Cartão Padrão":5271.44,"Pix":795.14},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":207.24,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"carulini_santos","rec":4208.94,"ho":1052.23,"acordos":29,"ligacoes":29,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1455.54,"2":216.9,"6":2536.5},"tipos":{"Boleto":587.13,"Cartão Padrão":3067.98,"Pix":553.83},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":145.14,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"silva_beatriz","rec":7128.73,"ho":1782.18,"acordos":43,"ligacoes":43,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":899.45,"2":729.6,"6":5499.68},"tipos":{"Boleto":1790.17,"Cartão Padrão":4725.91,"Pix":612.65},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":165.78,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"thauany_moura","rec":4757.83,"ho":1189.46,"acordos":9,"ligacoes":9,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1364.88,"2":982.69,"6":2410.26},"tipos":{"Boleto":1233.73,"Cartão Padrão":961.93,"Pix":2562.17},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":528.65,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"BRENDA_FERREIRA","rec":584.54,"ho":146.14,"acordos":3,"ligacoes":3,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":320.65,"2":173.48,"6":90.41},"tipos":{"Boleto":320.65,"Pix":263.89},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":194.85,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"JESSICA_O_SILVA","rec":377.74,"ho":94.44,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":286.53,"6":91.21},"tipos":{"Boleto":377.74},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":188.87,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}}]},{"name":"COFEN BIRIGUI BRUNA","rec":32731.68,"ho":8182.92,"n_op":10,"acordos":99,"ops":[{"name":"MATHEUS_SOUZA","rec":3634.18,"ho":908.54,"acordos":27,"ligacoes":27,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1420.6,"2":2213.58},"tipos":{"Boleto":1712.13,"Cartão Padrão":1477.34,"Pix":444.71},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":134.6,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"KAROLAINE_SILVA","rec":1840.17,"ho":460.04,"acordos":8,"ligacoes":8,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":102.62,"6":1737.55},"tipos":{"Cartão Padrão":1452.96,"Pix":387.21},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":230.02,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"HELTON_ROLDON","rec":6382.99,"ho":1595.75,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":5998.37,"6":384.62},"tipos":{"Boleto":5974.14,"Pix":408.85},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":1276.6,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"THAYRA_FERREIRASILVA","rec":578.86,"ho":144.72,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":578.86},"tipos":{"Pix":578.86},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":578.86,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"RENATARODRIGUES","rec":4889.3,"ho":1222.32,"acordos":3,"ligacoes":3,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":4889.3},"tipos":{"Boleto":934.14,"Cartão Padrão":3955.16},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":1629.77,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"MAYSA_OLIVEIRA","rec":5805.03,"ho":1451.26,"acordos":18,"ligacoes":18,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":3572.69,"2":1382.62,"6":849.72},"tipos":{"Boleto":3674.2,"Cartão Padrão":1382.62,"Pix":748.21},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":322.5,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"LYVIA_DIAS","rec":2745.72,"ho":686.43,"acordos":14,"ligacoes":14,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":257.04,"2":1928.51,"6":560.17},"tipos":{"Boleto":257.04,"Cartão Padrão":954.51,"Pix":1534.17},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":196.12,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"RAFAELA_MINHOTO","rec":313.17,"ho":78.29,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":155.01,"6":158.16},"tipos":{"Pix":313.17},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":156.58,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"MARIA_BRAIDOTI","rec":1294.75,"ho":323.69,"acordos":9,"ligacoes":9,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":526.62,"5":687.22,"6":80.91},"tipos":{"Boleto":80.91,"Cartão Padrão":608.0,"Pix":605.84},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":143.86,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"BRUNA_JUSTIMIANO","rec":5247.51,"ho":1311.88,"acordos":12,"ligacoes":12,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":5247.51},"tipos":{"Cartão Padrão":5247.51},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":437.29,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}}]},{"name":"COFEN STEPHANIE 2° TURNO","rec":56237.38,"ho":14059.34,"n_op":11,"acordos":188,"ops":[{"name":"larissa_santana","rec":642.78,"ho":160.7,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":642.78},"tipos":{"Boleto":642.78},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":321.39,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"jussara_pereira","rec":4232.34,"ho":1058.08,"acordos":8,"ligacoes":8,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1161.14,"2":660.31,"6":2410.89},"tipos":{"Boleto":2247.86,"Cartão Padrão":1324.17,"Pix":660.31},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":529.04,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"aline_pupim","rec":15859.45,"ho":3964.86,"acordos":50,"ligacoes":50,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":3522.02,"2":3500.46,"6":8836.97},"tipos":{"Boleto":2444.38,"Cartão Padrão":9187.57,"Pix":4227.5},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":317.19,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"thais_mayara","rec":937.84,"ho":234.46,"acordos":3,"ligacoes":3,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":174.24,"4":546.88,"6":216.72},"tipos":{"Boleto":390.96,"Pix":546.88},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":312.61,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"geovanna_almeida","rec":6167.28,"ho":1541.82,"acordos":19,"ligacoes":19,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":61.26,"2":87.15,"3":203.63,"6":5815.24},"tipos":{"Boleto":1551.81,"Cartão Padrão":1943.3,"Pix":2672.17},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":324.59,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"ISABELA_MONTEIRO","rec":2706.17,"ho":676.54,"acordos":16,"ligacoes":16,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":54.37,"2":1903.35,"6":748.45},"tipos":{"Boleto":610.69,"Cartão Padrão":1347.03,"Pix":748.45},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":169.14,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"thalia_thomaz","rec":4724.69,"ho":1181.17,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":108.0,"2":204.83,"6":4411.86},"tipos":{"Boleto":312.83,"Pix":4411.86},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":944.94,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"katia_regina","rec":9587.64,"ho":2396.91,"acordos":52,"ligacoes":52,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":279.18,"2":403.96,"6":8904.5},"tipos":{"Boleto":106.0,"Cartão Padrão":7680.2,"Pix":1801.44},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":184.38,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"kauane_azevedo","rec":7130.81,"ho":1782.7,"acordos":23,"ligacoes":23,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1549.44,"2":750.31,"6":4831.06},"tipos":{"Boleto":2175.7,"Cartão Padrão":4647.67,"Pix":307.44},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":310.04,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"thais_c_ferreira","rec":2543.66,"ho":635.92,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1437.3,"6":1106.36},"tipos":{"Pix":2543.66},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":508.73,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"AMABELLY_SANTOS","rec":1704.72,"ho":426.18,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":961.93,"6":742.79},"tipos":{"Boleto":325.67,"Cartão Padrão":961.93,"Pix":417.12},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":340.94,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}}]},{"name":"COFEN BIRIGUI LUCIANO","rec":5719.16,"ho":1429.79,"n_op":7,"acordos":20,"ops":[{"name":"LEONARDO_NUNES","rec":381.61,"ho":95.4,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":381.61},"tipos":{"Pix":381.61},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":381.61,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"FRANCISCA_BRITO","rec":1716.4,"ho":429.1,"acordos":4,"ligacoes":4,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":1716.4},"tipos":{"Boleto":758.18,"Cartão Padrão":958.22},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":429.1,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"MARIA_MOREIRASANTOS","rec":1824.31,"ho":456.08,"acordos":7,"ligacoes":7,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1572.28,"6":252.03},"tipos":{"Boleto":428.75,"Cartão Padrão":1395.56},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":260.62,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"NAYARA_CRUZ","rec":602.16,"ho":150.54,"acordos":4,"ligacoes":4,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":602.16},"tipos":{"Cartão Padrão":437.4,"Pix":164.76},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":150.54,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"JOAO_MIRANDA","rec":82.73,"ho":20.68,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":82.73},"tipos":{"Boleto":82.73},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":82.73,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"EDUARDO_SILVA","rec":933.88,"ho":233.47,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":933.88},"tipos":{"Pix":933.88},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":466.94,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"MARIA_RODARTE","rec":178.07,"ho":44.52,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":178.07},"tipos":{"Boleto":178.07},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":178.07,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}}]},{"name":"ELITE","rec":3160.56,"ho":790.14,"n_op":4,"acordos":8,"ops":[{"name":"CLEBER_JUNIOR","rec":307.25,"ho":76.81,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":307.25},"tipos":{"Pix":307.25},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":153.62,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"JHONATA_NASCIMENTO","rec":820.13,"ho":205.03,"acordos":3,"ligacoes":3,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":299.25,"6":520.88},"tipos":{"Boleto":247.48,"Pix":572.65},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":273.38,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"ANA_BENTO","rec":2033.18,"ho":508.3,"acordos":3,"ligacoes":3,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1265.75,"6":767.43},"tipos":{"Boleto":767.43,"Pix":1265.75},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":677.73,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"fabio_aquino","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":0,"med_lig_baixa":0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}}]}]};
 
 // Working state — deep clone so edits don't corrupt original
 let D = JSON.parse(JSON.stringify(ORIG));
 
 // FERIADOS março 2026 — editável
-const FERIADOS_BASE = ['2026-03-03','2026-03-04'];
+const FERIADOS_BASE = ['2026-04-03','2026-04-04'];
 function getFeriados(){try{return JSON.parse(localStorage.getItem('cofen_feriados')||JSON.stringify(FERIADOS_BASE));}catch(e){return FERIADOS_BASE;}}
 function setFeriados(arr){localStorage.setItem('cofen_feriados',JSON.stringify(arr));}
 
@@ -1515,7 +1542,7 @@ function buildCal(gridId){
 }
 
 // ── EDITOR MANUAL DE DIAS ÚTEIS ──
-// Estado dos overrides manuais: { '2026-03-03': true/false }
+// Estado dos overrides manuais: { '2026-04-03': true/false }
 // true = forçar como útil, false = forçar como não-útil
 function getDUOverrides(){try{return JSON.parse(localStorage.getItem('cofen_du_overrides')||'{}');}catch(e){return {};}}
 function setDUOverrides(obj){localStorage.setItem('cofen_du_overrides',JSON.stringify(obj));}
@@ -1589,19 +1616,7 @@ function duResetManual(){
 }
 
 // ── TOTAL REC (with override) ──
-// Sempre inclui o recebimento do dia atual na base de cálculo
 function getTotalRec(){
-  const rdHoje = rdSumToday ? rdSumToday() : 0;
-  if(overrideTotalRec > 0){
-    // Se há override manual, somamos o diário em cima dele
-    return overrideTotalRec + rdHoje;
-  }
-  const base = D.equipes.reduce((s,e)=>s+e.rec,0);
-  return base + rdHoje;
-}
-
-// Retorna apenas a base sem diário (para exibir "Base" nas tabelas)
-function getBaseRec(){
   return overrideTotalRec > 0
     ? overrideTotalRec
     : D.equipes.reduce((s,e)=>s+e.rec,0);
@@ -1744,34 +1759,7 @@ function onOpInput(opName, inp){
   document.getElementById('oprow-'+safeId).classList.add('edited');
 }
 
-function applyOps(){
-  const overrides = {};
-  ALL.forEach(op=>{
-    const safeId = op.name.replace(/[^a-zA-Z0-9]/g,'_');
-    const inp = document.getElementById('opinp-'+safeId);
-    if(!inp) return;
-    const v = parseFloat(inp.value)||0;
-    if(Math.abs(v - op.rec) > 0.01) overrides[op.name] = v;
-  });
 
-  // Apply to D
-  D.equipes.forEach(eq=>{
-    eq.ops.forEach(op=>{
-      if(overrides[op.name] !== undefined){
-        op.rec = overrides[op.name];
-        op.ho  = op.rec * 0.25;
-      }
-    });
-    // Recalc equipe totals
-    eq.rec = eq.ops.reduce((s,o)=>s+o.rec,0);
-    eq.ho  = eq.ops.reduce((s,o)=>s+o.ho,0);
-  });
-
-  localStorage.setItem('cofen_op_overrides', JSON.stringify(overrides));
-  rebuildAll();
-  refreshAll();
-  toast('✅ '+Object.keys(overrides).length+' operadores atualizados!');
-}
 
 function resetOp(opName){
   const origEq = ORIG.equipes.find(e=>e.ops.some(o=>o.name===opName));
@@ -2190,28 +2178,36 @@ function closeM(e){
 function go(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
-  ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos','rotina'].forEach(p=>document.getElementById('pg-'+p).classList.remove('on'));
+  ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos','calend','check'].forEach(p=>document.getElementById('pg-'+p).classList.remove('on'));
   document.getElementById('pg-'+id).classList.add('on');
-  if(id==='geral'){mkGD();mkDist();mkTop5();buildDUManualGrid();}
+  if(id==='geral'){mkGD();mkDist();buildDUManualGrid();}
   if(id==='editor') buildOpEditor();
-  if(id==='equipes') mkEq();
   if(id==='ranking') mkRanking();
   if(id==='diario'){mkDf();mkDe();buildCal('cal-grid2');}
   if(id==='recdia') rdInit();
   if(id==='gestao') gestaoInit();
   if(id==='import') importInit();
   if(id==='acordos') acordosInit();
-  if(id==='rotina') rotinaInit();
+  if(id==='calend') calInit();
+  if(id==='check') checkInit();
 }
 
 // ── REFRESH ALL ──
 function refreshAll(){
   rebuildAll();
   initHero();
-  if(document.getElementById('pg-geral').classList.contains('on')){mkGD();mkDist();mkTop5();}
-  if(document.getElementById('pg-equipes').classList.contains('on')) mkEq();
-  if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
-  if(document.getElementById('pg-recdia').classList.contains('on')) rdUpdateKPIs();
+  // Sempre atualiza todos os componentes — independente de qual aba está visível
+  mkGD(); mkDist(); mkTop5();
+  mkEq();
+  mkRanking();
+  // Atualiza Diário se inicializado
+  if(typeof buildDiario==='function') buildDiario();
+  // Atualiza RecDia KPIs
+  if(typeof rdUpdateKPIs==='function') rdUpdateKPIs();
+  // Atualiza Acordos
+  if(typeof acRenderRanking==='function') acRenderRanking();
+  if(typeof acRenderFechamento==='function') acRenderFechamento();
+  if(typeof acRenderEficiencia==='function') acRenderEficiencia();
 }
 
 // ── TOAST ──
@@ -2252,13 +2248,13 @@ function rdTodayKey(){
   return 'cofen_rd_'+d.getFullYear()+'_'+(d.getMonth()+1)+'_'+d.getDate();
 }
 function rdGetSaved(){try{return JSON.parse(localStorage.getItem(rdTodayKey())||'{}')}catch(e){return {}}}
-function rdSetSaved(map){localStorage.setItem(rdTodayKey(),JSON.stringify(map))}
+
 function rdSumToday(){return Object.values(rdGetSaved()).reduce((s,v)=>s+(parseFloat(v)||0),0)}
 function rdAtivos(){return Object.values(rdGetSaved()).filter(v=>(parseFloat(v)||0)>0).length}
 
 function rdUpdateKPIs(){
   const hoje=rdSumToday(), hojeHO=hoje*0.25;
-  const baseRec=getBaseRec(), accRec=baseRec+hoje, accHO=accRec*0.25;
+  const baseRec=getTotalRec(), accRec=baseRec+hoje, accHO=accRec*0.25;
   const ativos=rdAtivos();
   const metaDia=parseFloat(document.getElementById('rd-meta-dia')?.value||30680);
   const pct=metaDia>0?Math.min(100,hoje/metaDia*100):0;
@@ -2284,11 +2280,6 @@ function rdUpdateKPIs(){
   const ds=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
   s('rd-data-hoje',ds.charAt(0).toUpperCase()+ds.slice(1));
   rdRenderEqBreakdown();
-
-  // Atualiza o Hero e demais seções com o total incluindo diário
-  initHero();
-  if(document.getElementById('pg-equipes').classList.contains('on')) mkEq();
-  if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
 }
 
 function rdUpdateMeta(){rdUpdateKPIs()}
@@ -2687,6 +2678,7 @@ function gTab(id, el){
   if(id==='mover') gestaoMoverInit();
   if(id==='metas') gestaoMetasInit();
   if(id==='novo')  gestaoNovoInit();
+  if(id==='remover') gestaoRemoverInit();
   if(id==='meta-op') metaOpInit();
   if(id==='fotos') fotosInit();
   if(id==='fotos') fotosInit();
@@ -2699,6 +2691,7 @@ function gestaoInit(){
   gestaoNovoInit();
   fotosInit();
   metaOpInit();
+  gestaoRemoverInit();
 }
 
 // ─────────────────────────────
@@ -3057,14 +3050,10 @@ function importParse(raw){
   const lines = raw.trim().split(/\r?\n/);
   if(lines.length < 2) return null;
 
-  // Detect separator: tab or semicolon or comma
   const firstLine = lines[0];
-  const sep = firstLine.includes('\t') ? '\t'
-    : firstLine.includes(';') ? ';' : ',';
-
+  const sep = firstLine.includes('\t') ? '\t' : firstLine.includes(';') ? ';' : ',';
   const headers = firstLine.split(sep).map(h=>h.trim().replace(/^"|"$/g,'').toLowerCase());
 
-  // Find column indexes — flexible matching
   const colIdx = (candidates) => {
     for(const cand of candidates){
       const idx = headers.findIndex(h=>h.includes(cand));
@@ -3073,80 +3062,91 @@ function importParse(raw){
     return -1;
   };
 
-  const iCob  = colIdx(['cobradora','operador','cobrador','nome']);
-  const iRec  = colIdx(['recebido','rec ','valor rec','total rec']);
-  const iHO   = colIdx(['total ho','ho','honorar']);
-  const iEq   = colIdx(['equipe','subgrupo','time','squad']);
+  const iCob = colIdx(['cobradora','operador','cobrador','nome']);
+  const iRec = colIdx(['recebido','rec ','valor rec','total rec','vlr rec']);
+  const iHO  = colIdx(['total ho','ho','honorar']);
 
   if(iCob < 0 || iRec < 0){
     return {error: `Colunas não encontradas. Encontrado: ${headers.join(', ')}. Necessário: "Cobradora" e "Recebido".`};
   }
 
-  // Accumulate per operator
-  const acc = {}; // { opName: { ho, eq } }
+  // Normaliza nome: lowercase, sem espaços/underline/acentos
+  function norm(s){
+    return (s||'').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[\s_.-]+/g,'');
+  }
 
+  // Acumula por operador (nome raw do arquivo)
+  const acc = {};
   for(let i=1; i<lines.length; i++){
-    const row = lines[i].split(sep).map(c=>c.trim().replace(/^"|"$/g,''));
-    if(row.length <= iCob || row.length <= iRec) continue;
-    const opName = row[iCob].trim();
-    if(!opName) continue;
-    const recVal = parseFloat(row[iRec].replace(',','.')) || 0;
-    const hoVal  = iHO>=0 ? (parseFloat(row[iHO].replace(',','.')) || 0) : recVal;
-    const eq     = iEq>=0 ? row[iEq].trim() : '';
-    if(!acc[opName]) acc[opName] = { ho:0, eq };
-    acc[opName].ho += recVal; // "Recebido" = HO
+    const row = lines[i].split(sep).map(v=>v.trim().replace(/^"|"$/g,''));
+    if(row.length <= Math.max(iCob,iRec)) continue;
+    const rawName = row[iCob].trim();
+    if(!rawName) continue;
+    const recVal = parseFloat(row[iRec].replace(/\./g,'').replace(',','.')) || 0;
+    if(!acc[rawName]) acc[rawName] = 0;
+    acc[rawName] += recVal; // Recebido = HO; Total Real = HO / 0.25
   }
 
-  // Fuzzy match — Levenshtein distance simples
-  function levenshtein(a, b){
-    const m=a.length, n=b.length;
-    const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));
-    for(let i=1;i<=m;i++) for(let j=1;j<=n;j++)
-      dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
-    return dp[m][n];
-  }
-  function fuzzyMatch(name){
-    const norm = s=>s.toLowerCase().replace(/[_\s.-]/g,'');
-    const n = norm(name);
-    let best=null, bestDist=Infinity;
-    ALL.forEach(o=>{
-      const d = levenshtein(n, norm(o.name));
-      if(d<bestDist){ bestDist=d; best=o; }
+  // Build lookup: norm(name) -> op object (from D.equipes directly)
+  const lookup = {};
+  D.equipes.forEach(eq=>{
+    eq.ops.forEach(op=>{
+      lookup[norm(op.name)] = op;
     });
-    return bestDist<=3 ? best : null; // tolerância de 3 chars
-  }
+  });
 
-  // Match against ALL operators
-  const found   = [];
-  const missing = [];
+  // Match each raw name to an operator
+  const found = [], missing = [];
 
-  Object.entries(acc).forEach(([name, data])=>{
-    const totalReal = data.ho / 0.25;
-    const normalize = s => s.toLowerCase().replace(/[_\s]/g,'');
-    const matched = ALL.find(o => normalize(o.name) === normalize(name));
+  Object.entries(acc).forEach(([rawName, hoSum])=>{
+    const totalReal = hoSum / 0.25;
+    const normRaw = norm(rawName);
+
+    // 1. Exact normalized match
+    let matched = lookup[normRaw];
+
+    // 2. Partial match (raw name contains op name or vice versa)
+    if(!matched){
+      for(const [key, op] of Object.entries(lookup)){
+        if(normRaw.includes(key) || key.includes(normRaw)){
+          matched = op; break;
+        }
+      }
+    }
+
+    // 3. Levenshtein fuzzy
+    if(!matched){
+      let best=null, bestDist=Infinity;
+      for(const [key, op] of Object.entries(lookup)){
+        const a=normRaw, b=key;
+        const m=a.length, n=b.length;
+        if(Math.abs(m-n)>4) continue;
+        const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));
+        for(let i=1;i<=m;i++) for(let j=1;j<=n;j++)
+          dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+        const d=dp[m][n];
+        if(d<bestDist){bestDist=d;best=op;}
+      }
+      if(bestDist<=3) matched=best;
+    }
 
     if(matched){
       found.push({
-        rawName:  name,
-        opName:   matched.name,
-        eq:       matched.eq,
-        hoImport: data.ho,
-        recImport:totalReal,
-        recCurrent: matched.rec,
-        hoCurrent:  matched.ho,
-        diff: totalReal - matched.rec,
+        rawName, opName:matched.name, eq:matched.eq,
+        hoImport:hoSum, recImport:totalReal,
+        recCurrent:matched.rec, hoCurrent:matched.ho,
+        diff:totalReal-matched.rec,
       });
     } else {
-      const suggestion = fuzzyMatch(name);
-      missing.push({ rawName:name, ho:data.ho, totalReal, eq:data.eq, suggestion });
+      missing.push({rawName, ho:hoSum, totalReal});
     }
   });
 
-  // Sort by totalReal desc
   found.sort((a,b)=>b.recImport-a.recImport);
   missing.sort((a,b)=>b.totalReal-a.totalReal);
-
-  return { found, missing, sep, iCob, iRec, totalLines: lines.length-1 };
+  return {found, missing, sep, iCob, iRec, totalLines:lines.length-1};
 }
 
 // ── PREVIEW (live as user types) ──
@@ -3290,70 +3290,52 @@ function importApply(){
 
   let updated=0, unchanged=0;
 
-  // 1. Atualiza cada operador diretamente no objeto D
+  // Atualizar D.equipes DIRETAMENTE — ALL é cópia via flatMap, atualizar ALL não funciona!
   importParsed.found.forEach(r=>{
-    // Busca o operador em D.equipes (fonte de verdade)
     let found = false;
     D.equipes.forEach(eq=>{
-      eq.ops.forEach(op=>{
-        if(op.name === r.opName){
-          if(Math.abs(r.recImport - op.rec) < 0.01){ unchanged++; }
-          else { updated++; }
-          op.rec = r.recImport;
-          op.ho  = r.hoImport;
-          found = true;
-        }
-      });
+      const opReal = eq.ops.find(o=>o.name===r.opName);
+      if(!opReal) return;
+      found = true;
+      if(Math.abs(r.recImport - opReal.rec) < 0.01){ unchanged++; return; }
+      opReal.rec = r.recImport;
+      opReal.ho  = r.recImport * 0.25;
+      updated++;
     });
-    if(!found) unchanged++;
   });
 
-  // 2. Recalcula TODOS os totais de TODAS as equipes
+  // Recalcular totais de TODAS as equipes
   D.equipes.forEach(eq=>{
     eq.rec = eq.ops.reduce((s,o)=>s+o.rec, 0);
     eq.ho  = eq.ops.reduce((s,o)=>s+o.ho,  0);
-    eq.n_op = eq.ops.length;
   });
 
-  // 3. Zera o override manual de total (o relatório importado É a fonte de verdade agora)
-  overrideTotalRec = 0;
-  localStorage.removeItem('cofen_total');
-  // Atualiza campo do editor se estiver visível
-  const inpTotal = document.getElementById('inp-total');
-  if(inpTotal) inpTotal.value = '';
-
-  // 4. Salva overrides individuais no localStorage
-  const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
-  importParsed.found.forEach(r=>{ ov[r.opName] = r.recImport; });
-  localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
-
-  // 5. Sincroniza via Firebase e BroadcastChannel
-  fbPush('overrides', ov);
-  syncBroadcast('rec_update', JSON.stringify(ov));
-
-  // 6. Reconstrói ALL e atualiza TUDO
+  // Rebuild ALL ordenado → ranking atualizado
   rebuildAll();
+  refreshAll();
 
-  // Força atualização do hero, equipes, ranking e recebimento do dia
-  initHero();
-  mkGD(); mkDist(); mkTop5();
-  mkEq();
-  mkRanking();
-  if(document.getElementById('pg-recdia').classList.contains('on')) rdInit();
-  buildOpEditor();
+  // Salvar no localStorage
+  const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+  importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
+  localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
 
   const totalImportado = importParsed.found.reduce((s,r)=>s+r.recImport,0);
   toast(`✅ ${updated} operadores atualizados! Total: ${fRK(totalImportado)} · HO: ${fRK(totalImportado*0.25)}`);
 
   markImportDone('rec');
 
-  // Update preview with green confirmation
   document.getElementById('import-status').textContent =
     `✅ Importação concluída! ${updated} atualizados, ${unchanged} sem alteração · Total: ${fRK(totalImportado)}`;
   document.getElementById('import-status').style.color='var(--ok)';
 
-  // Refresh preview to show new diffs (all = 0 now)
   importPreview(document.getElementById('import-area').value);
+
+  // Sincronizar para todos via Firebase
+  if(fbDb && fbRoom){
+    const ovFinal = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+    fbPush('overrides', {...ovFinal, _ts: Date.now()});
+    toast('✅ Importado e sincronizado para todos os dispositivos!');
+  }
 }
 
 function importClear(){
@@ -3585,16 +3567,36 @@ function acImportApply(){
   acImportParsed.forEach(r=>{
     const op=ALL.find(o=>o.name===r.opName);
     if(!op) return;
-    op.gerados    = r.g;
-    op['pagos']   = r.p;
-    op['pendentes']= r.g - r.p;
-    op['agendados']= r.ag || (r.g - r.p);
+    op.gerados     = r.g;
+    op['pagos']    = r.p;
+    op['pendentes'] = r.g - r.p;
+    op['agendados'] = r.ag || (r.g - r.p);
     op['eficiencia']= r.g>0 ? parseFloat((r.p/r.g*100).toFixed(1)) : 0;
     if(r.p>0) op['ticket'] = parseFloat((op.rec/r.p).toFixed(2));
   });
+
+  // Atualizar TODOS os componentes
+  rebuildAll();
   acordosInit();
+  acRenderRanking();
+  if(typeof acRenderFechamento==='function') acRenderFechamento();
+  if(typeof acRenderEficiencia==='function') acRenderEficiencia();
+  initHero();
+  mkGD(); mkDist(); mkTop5(); mkEq(); mkRanking();
   markImportDone('ac');
-  toast('✅ Acordos atualizados para '+acImportParsed.length+' operadores!');
+
+  // ── SINCRONIZAR acordos via Firebase ──
+  if(fbDb && fbRoom){
+    const acordosData = {};
+    ALL.forEach(op=>{
+      if(op.gerados||op.pagos){
+        acordosData[op.name]={g:op.gerados||0,p:op.pagos||0,ef:op.eficiencia||0,ag:op.agendados||0};
+      }
+    });
+    fbPush('acordos', {...acordosData, _ts: Date.now()});
+  }
+
+  toast('✅ Acordos atualizados para '+acImportParsed.length+' operadores e sincronizados!');
 }
 
 
@@ -3605,13 +3607,7 @@ function acImportApply(){
 let currentModalOp = null;
 
 function photoGetAll(){ try{return JSON.parse(localStorage.getItem('cofen_photos')||'{}')}catch(e){return {}} }
-function photoSet(opName, url){
-  const all = photoGetAll();
-  if(url) all[opName] = url; else delete all[opName];
-  localStorage.setItem('cofen_photos', JSON.stringify(all));
-  // Sync to shared storage if available
-  if(window.storage){ window.storage.set('photos', JSON.stringify(all), true).catch(()=>{}); }
-}
+
 function photoGet(opName){ return photoGetAll()[opName] || null; }
 
 function photoUpload(){
@@ -3817,17 +3813,11 @@ function syncBroadcast(type, payload){
 
 // Patch rdSetSaved to broadcast
 const _rdSetSaved_orig = rdSetSaved;
-function rdSetSaved(map){
-  _rdSetSaved_orig(map);
-  syncBroadcast('rd_update', JSON.stringify(map));
-}
+
 
 // Patch photoSet to broadcast
 const _photoSet_orig = photoSet;
-function photoSet(opName, url){
-  _photoSet_orig(opName, url);
-  syncBroadcast('photo_update', JSON.stringify(photoGetAll()));
-}
+
 
 // ══════════════════════════════════════════
 // MODO TV
@@ -4106,6 +4096,7 @@ function syncDisconnect(){
   if(fbListeners.metas_eq)  { fbDb?.ref(fbRoom+'/metas_eq').off(); }
   if(fbListeners.metas_op)  { fbDb?.ref(fbRoom+'/metas_op').off(); }
   if(fbListeners.gestao)    { fbDb?.ref(fbRoom+'/gestao').off(); }
+  if(fbListeners.acordos)   { fbDb?.ref(fbRoom+'/acordos').off(); }
   fbListeners={};
   fbApp=null; fbDb=null; fbRoom=null;
   fbSaveCfg({});
@@ -4155,15 +4146,24 @@ function fbStartListening(){
     if(!remote) return;
     const local = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
-    // Apply remote
+    // Atualiza D.equipes diretamente (ALL é cópia via flatMap — não usar!)
+    let changed = false;
     Object.entries(remote).forEach(([nm,val])=>{
-      const op=ALL.find(o=>o.name===nm);
-      if(!op) return;
-      op.rec=val; op.ho=op.rec*0.25;
+      if(nm==='_ts'||nm.startsWith('_')) return;
+      const numVal = parseFloat(val)||0;
+      if(numVal <= 0) return;
+      D.equipes.forEach(eq=>{
+        const opReal = eq.ops.find(o=>o.name===nm);
+        if(!opReal||Math.abs(opReal.rec-numVal)<0.01) return;
+        opReal.rec = numVal;
+        opReal.ho  = numVal * 0.25;
+        changed = true;
+      });
     });
+    if(!changed) return;
     D.equipes.forEach(eq=>{
-      eq.rec=eq.ops.reduce((s,o)=>s+o.rec,0);
-      eq.ho=eq.ops.reduce((s,o)=>s+o.ho,0);
+      eq.rec = eq.ops.reduce((s,o)=>s+o.rec,0);
+      eq.ho  = eq.ops.reduce((s,o)=>s+o.ho, 0);
     });
     rebuildAll();
     refreshAll();
@@ -4245,9 +4245,44 @@ function fbStartListening(){
     const local = gGetOverrides();
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
     gSetOverrides({...local,...remote});
+    // Aplicar removidos do Firebase para este dispositivo
+    if(remote.removidos && remote.removidos.length>0){
+      remote.removidos.forEach(nm=>{
+        D.equipes.forEach(eq=>{
+          const i=eq.ops.findIndex(o=>o.name===nm);
+          if(i>=0){
+            eq.ops.splice(i,1);
+            eq.rec=eq.ops.reduce((s,o)=>s+o.rec,0);
+            eq.ho =eq.ops.reduce((s,o)=>s+o.ho, 0);
+            eq.n_op=eq.ops.length;
+          }
+        });
+      });
+      rebuildAll(); refreshAll();
+    }
     pulseSyncDot();
   });
   fbListeners.gestao = true;
+
+  // ── Acordos (importação) ──
+  fbDb.ref(fbRoom+'/acordos').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    let changed = false;
+    Object.entries(remote).forEach(([nm,val])=>{
+      if(nm==='_ts'||nm.startsWith('_')) return;
+      const op = ALL.find(o=>o.name===nm);
+      if(!op) return;
+      if(val.g !== undefined){ op.gerados=val.g; op.pagos=val.p; op.eficiencia=val.ef||0; op.agendados=val.ag||0; changed=true; }
+    });
+    if(!changed) return;
+    rebuildAll();
+    if(typeof acRenderRanking==='function') acRenderRanking();
+    if(typeof acRenderFechamento==='function') acRenderFechamento();
+    if(typeof acRenderEficiencia==='function') acRenderEficiencia();
+    pulseSyncDot();
+  });
+  fbListeners.acordos = true;
 }
 
 // ── PUSH TO FIREBASE ──
@@ -4266,12 +4301,42 @@ function rdSetSaved(map){
   fbPush('rd', map);
 }
 
-// Patch applyOps to push overrides
-const _applyOps_orig = applyOps;
+// applyOps — lê editor, atualiza D.equipes e sincroniza Firebase
 function applyOps(){
-  _applyOps_orig();
-  const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
-  fbPush('overrides', ov);
+  const overrides = {};
+  // Ler todos os inputs do editor de operadores
+  ALL.forEach(op=>{
+    const inp = document.getElementById('oi-'+op.name);
+    if(!inp) return;
+    const val = parseFloat(inp.value.replace(/[^\d.,]/g,'').replace(',','.')) || 0;
+    if(val > 0) overrides[op.name] = val;
+  });
+
+  // Atualizar D.equipes diretamente (NÃO usar ALL — é cópia!)
+  D.equipes.forEach(eq=>{
+    eq.ops.forEach(op=>{
+      if(overrides[op.name] !== undefined){
+        op.rec = overrides[op.name];
+        op.ho  = op.rec * 0.25;
+      }
+    });
+    eq.rec = eq.ops.reduce((s,o)=>s+o.rec, 0);
+    eq.ho  = eq.ops.reduce((s,o)=>s+o.ho,  0);
+  });
+
+  // Salvar no localStorage
+  const existing = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+  const merged = {...existing, ...overrides};
+  localStorage.setItem('cofen_op_overrides', JSON.stringify(merged));
+
+  // Rebuild ALL e atualizar tudo
+  rebuildAll();
+  refreshAll();
+
+  // Sincronizar Firebase
+  fbPush('overrides', {...merged, _ts: Date.now()});
+
+  toast('✅ Valores aplicados e sincronizados!');
 }
 
 // Patch photoSet to push photos
@@ -4506,6 +4571,471 @@ function restoreImportBadges(){
   if(localStorage.getItem('cofen_import_ac_done')){ const b=document.getElementById('imp-ac-badge'); if(b) b.style.display='block'; }
 }
 
+
+// ══════════════════════════════════════════
+// CALENDÁRIO 2026
+// ══════════════════════════════════════════
+const FERIADOS_2026 = {"2026-01-01": [{"nome": "Confraternização Universal", "tipo": "N", "icon": "🎆", "escopo": "Brasil"}], "2026-01-25": [{"nome": "Aniversário de São Paulo", "tipo": "M", "icon": "🏙️", "escopo": "São Paulo - SP"}], "2026-02-16": [{"nome": "Carnaval", "tipo": "PF", "icon": "🎭", "escopo": "Brasil", "obs": "Ponto Facultativo"}], "2026-02-17": [{"nome": "Carnaval", "tipo": "PF", "icon": "🎭", "escopo": "Brasil", "obs": "Ponto Facultativo"}], "2026-02-18": [{"nome": "Quarta-Feira de Cinzas", "tipo": "PF", "icon": "✝️", "escopo": "Brasil", "obs": "Até 14h"}], "2026-04-08": [{"nome": "Dia Internacional da Mulher", "tipo": "C", "icon": "♀️", "escopo": "Brasil"}], "2026-04-13": [{"nome": "Batalha do Jenipapo", "tipo": "E", "icon": "⚔️", "escopo": "Piauí - PI"}], "2026-04-03": [{"nome": "Paixão de Cristo", "tipo": "N", "icon": "✝️", "escopo": "Brasil"}], "2026-04-05": [{"nome": "Páscoa", "tipo": "PF", "icon": "🐣", "escopo": "Brasil"}], "2026-04-07": [{"nome": "Dia Mundial da Saúde", "tipo": "C", "icon": "🌍", "escopo": "Brasil"}], "2026-04-08": [{"nome": "Aniversário de Cuiabá", "tipo": "M", "icon": "🎂", "escopo": "Cuiabá - MT"}], "2026-04-21": [{"nome": "Tiradentes", "tipo": "N", "icon": "⭐", "escopo": "Brasil"}], "2026-05-01": [{"nome": "Dia do Trabalho", "tipo": "N", "icon": "👷", "escopo": "Brasil"}], "2026-05-12": [{"nome": "Dia Mundial do Enfermeiro", "tipo": "C", "icon": "👩‍⚕️", "escopo": "Brasil / COFEN", "obs": "Início Semana da Enfermagem"}, {"nome": "Dia Internacional da Enfermagem", "tipo": "C", "icon": "🏥", "escopo": "Brasil"}], "2026-05-20": [{"nome": "Dia do Técnico/Auxiliar de Enfermagem", "tipo": "C", "icon": "💉", "escopo": "Brasil", "obs": "Ana Néri"}], "2026-06-04": [{"nome": "Corpus Christi", "tipo": "PF", "icon": "✝️", "escopo": "Brasil", "obs": "Ponto Facultativo Federal"}], "2026-06-13": [{"nome": "Aniversário de São Luís", "tipo": "M", "icon": "🎂", "escopo": "São Luís - MA"}], "2026-07-09": [{"nome": "Revolução Constitucionalista 1932", "tipo": "E", "icon": "⚔️", "escopo": "São Paulo - SP"}], "2026-07-28": [{"nome": "Adesão do Maranhão à Independência", "tipo": "E", "icon": "🌊", "escopo": "Maranhão - MA"}], "2026-08-11": [{"nome": "Dia do Advogado", "tipo": "C", "icon": "⚖️", "escopo": "Brasil"}], "2026-08-22": [{"nome": "Aniversário de Marília", "tipo": "M", "icon": "🎂", "escopo": "Marília - SP", "obs": "Fundação 22/08/1928"}], "2026-08-27": [{"nome": "Dia do Psicólogo", "tipo": "C", "icon": "🧠", "escopo": "Brasil"}], "2026-09-07": [{"nome": "Independência do Brasil", "tipo": "N", "icon": "🇧🇷", "escopo": "Brasil"}], "2026-09-20": [{"nome": "Revolução Farroupilha", "tipo": "E", "icon": "🐎", "escopo": "Rio Grande do Sul - RS"}], "2026-10-12": [{"nome": "Nossa Sra. Aparecida — Padroeira", "tipo": "N", "icon": "🙏", "escopo": "Brasil"}], "2026-10-15": [{"nome": "Dia do Professor", "tipo": "C", "icon": "📚", "escopo": "Brasil"}, {"nome": "Dia do Médico", "tipo": "C", "icon": "👨‍⚕️", "escopo": "Brasil"}], "2026-10-19": [{"nome": "Dia do Piauí — Data Magna", "tipo": "E", "icon": "🌵", "escopo": "Piauí - PI"}], "2026-10-22": [{"nome": "Aniversário de Birigui", "tipo": "M", "icon": "🎂", "escopo": "Birigui - SP"}], "2026-10-24": [{"nome": "Aniversário de Teresina", "tipo": "M", "icon": "🎂", "escopo": "Teresina - PI"}], "2026-10-28": [{"nome": "Dia do Servidor Público", "tipo": "PF", "icon": "🏛️", "escopo": "Brasil", "obs": "Ponto Facultativo Federal"}], "2026-11-02": [{"nome": "Finados", "tipo": "N", "icon": "🕯️", "escopo": "Brasil"}], "2026-11-09": [{"nome": "Criação de Mato Grosso", "tipo": "E", "icon": "🌿", "escopo": "Mato Grosso - MT"}], "2026-11-15": [{"nome": "Proclamação da República", "tipo": "N", "icon": "🇧🇷", "escopo": "Brasil", "obs": "Cai domingo"}], "2026-11-20": [{"nome": "Dia da Consciência Negra", "tipo": "N", "icon": "✊", "escopo": "Brasil"}], "2026-12-08": [{"nome": "Nossa Sra. da Imaculada Conceição", "tipo": "E", "icon": "🙏", "escopo": "PI, MA, MT e outros"}], "2026-12-24": [{"nome": "Véspera de Natal", "tipo": "PF", "icon": "🎄", "escopo": "Brasil", "obs": "Após 14h"}], "2026-12-25": [{"nome": "Natal", "tipo": "N", "icon": "🎄", "escopo": "Brasil"}], "2026-12-31": [{"nome": "Véspera de Ano Novo", "tipo": "PF", "icon": "🎆", "escopo": "Brasil", "obs": "Após 13h"}]};
+const TIPO_CAL = {"N": {"label": "Feriado Nacional", "color": "#EF4444", "bg": "#FEF2F2", "border": "#FCA5A5"}, "PF": {"label": "Ponto Facultativo", "color": "#8B5CF6", "bg": "#F5F3FF", "border": "#C4B5FD"}, "E": {"label": "Feriado Estadual", "color": "#F59E0B", "bg": "#FFFBEB", "border": "#FCD34D"}, "M": {"label": "Feriado Municipal", "color": "#3B82F6", "bg": "#EFF6FF", "border": "#BFDBFE"}, "C": {"label": "Data Comemorativa", "color": "#00A86B", "bg": "#ECFDF5", "border": "#6EE7B7"}};
+
+function getAllAgForDate(ds){
+  let t=0; ALL.forEach(op=>{const ag=op.ag_futuro||{};if(ag[ds])t+=ag[ds];}); return t;
+}
+
+function buildMonthGrid(year,month,filter){
+  const mN=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const dim=new Date(year,month+1,0).getDate(), fd=new Date(year,month,1).getDay(), today=new Date();
+  const wrap=document.createElement('div');
+  wrap.style.cssText='background:var(--w);border:1px solid var(--g200);border-radius:12px;overflow:hidden;box-shadow:var(--sh)';
+  const hdr=document.createElement('div');
+  hdr.style.cssText='background:var(--ppd);padding:9px 12px;display:flex;align-items:center;justify-content:space-between';
+  hdr.innerHTML=`<span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;letter-spacing:1px">${mN[month]}</span><span style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4)">${year}</span>`;
+  wrap.appendChild(hdr);
+  const dn=document.createElement('div');
+  dn.style.cssText='display:grid;grid-template-columns:repeat(7,1fr);background:var(--g50);border-bottom:1px solid var(--g200)';
+  ['D','S','T','Q','Q','S','S'].forEach((d,i)=>{const el=document.createElement('div');el.style.cssText=`padding:4px 2px;text-align:center;font-size:9px;font-weight:800;color:${i===0||i===6?'#EF4444':'var(--g500)'}`;el.textContent=d;dn.appendChild(el);});
+  wrap.appendChild(dn);
+  const grid=document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:repeat(7,1fr)';
+  for(let i=0;i<fd;i++){const e=document.createElement('div');e.style.minHeight='34px';grid.appendChild(e);}
+  for(let d=1;d<=dim;d++){
+    const ds=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dt=new Date(year,month,d), dow=dt.getDay();
+    const isToday=(dt.getDate()===today.getDate()&&dt.getMonth()===today.getMonth()&&dt.getFullYear()===today.getFullYear());
+    const isWE=dow===0||dow===6;
+    let feriados=FERIADOS_2026[ds]||[];
+    if(filter&&filter!=='all'){feriados=feriados.filter(f=>!f.escopo||f.escopo.includes(filter)||f.escopo.includes('Brasil')||f.tipo==='N'||f.tipo==='PF');}
+    const ag=getAllAgForDate(ds), hasFer=feriados.length>0;
+    const tcfg=hasFer?TIPO_CAL[feriados[0].tipo]||TIPO_CAL.C:null;
+    let bg='transparent';
+    if(isToday) bg='var(--pp)'; else if(hasFer&&tcfg) bg=tcfg.bg; else if(isWE) bg='var(--g50)';
+    const cell=document.createElement('div');
+    cell.style.cssText=`padding:3px;min-height:34px;cursor:${hasFer||ag>0?'pointer':'default'};background:${bg};position:relative;border:0.5px solid var(--g100)`;
+    const num=document.createElement('div');
+    num.style.cssText=`font-size:11px;font-weight:${isToday?'900':'700'};text-align:right;padding-right:2px;line-height:1.4;color:${isToday?'#fff':hasFer&&tcfg?tcfg.color:isWE?'#EF4444':'var(--g700)'}`;
+    num.textContent=d; cell.appendChild(num);
+    if(hasFer){const dots=document.createElement('div');dots.style.cssText='display:flex;gap:2px;flex-wrap:wrap;padding:1px 2px';feriados.slice(0,3).forEach(f=>{const cfg=TIPO_CAL[f.tipo]||TIPO_CAL.C;const dot=document.createElement('div');dot.style.cssText=`width:5px;height:5px;border-radius:50%;background:${isToday?'rgba(255,255,255,.8)':cfg.color}`;dots.appendChild(dot);});cell.appendChild(dots);}
+    if(ag>0){const b=document.createElement('div');b.style.cssText='position:absolute;top:2px;left:2px;background:#3B82F6;color:#fff;border-radius:100px;font-size:8px;font-weight:900;padding:1px 4px';b.textContent=ag;cell.appendChild(b);}
+    if(hasFer||ag>0){cell.addEventListener('mouseenter',()=>{if(!isToday)cell.style.opacity='.8';});cell.addEventListener('mouseleave',()=>{cell.style.opacity='1';});cell.addEventListener('click',()=>calDayModal(ds,d,month,year,feriados,ag));}
+    grid.appendChild(cell);
+  }
+  wrap.appendChild(grid); return wrap;
+}
+
+function calRender(){
+  const filter=document.getElementById('cal-city-filter')?.value||'all';
+  const ct=document.getElementById('cal-grid-anual'); if(!ct) return;
+  ct.innerHTML='';
+  for(let m=0;m<12;m++) ct.appendChild(buildMonthGrid(2026,m,filter));
+  calUpdateProximo();
+}
+
+function calDayModal(ds,day,month,year,feriados,agCount){
+  const mN=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const wN=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const dt=new Date(year,month,day);
+  document.getElementById('cdm-date').textContent=`${day} de ${mN[month]} de ${year}`;
+  document.getElementById('cdm-weekday').textContent=wN[dt.getDay()];
+  const fEl=document.getElementById('cdm-feriados');
+  if(feriados.length>0){
+    fEl.innerHTML='<div style="font-size:10px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">📅 Feriados / Datas</div>'+
+      feriados.map(f=>{const cfg=TIPO_CAL[f.tipo]||TIPO_CAL.C;return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:${cfg.bg};border:1px solid ${cfg.border};border-radius:8px;margin-bottom:6px"><div style="font-size:20px;flex-shrink:0">${f.icon||'📅'}</div><div style="flex:1"><div style="font-weight:800;font-size:13px;color:var(--g900)">${f.nome}</div><div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap"><span style="font-size:10px;font-weight:700;color:${cfg.color};background:${cfg.bg};border:1px solid ${cfg.border};padding:2px 8px;border-radius:100px">${cfg.label}</span><span style="font-size:10px;color:var(--g500);font-weight:600">${f.escopo||''}</span></div>${f.obs?`<div style="font-size:11px;color:var(--g500);font-weight:600;margin-top:4px">ℹ️ ${f.obs}</div>`:''}</div></div>`;}).join('');
+  } else {fEl.innerHTML='<div style="font-size:12px;color:var(--g500);padding:8px 0">Sem feriado nesta data.</div>';}
+  const aEl=document.getElementById('cdm-agendamentos');
+  if(agCount>0){
+    const ags=[];ALL.forEach(op=>{const ag=op.ag_futuro||{};if(ag[ds]){const cfg=EQ[op.eq]||{c:'#888',sh:op.eq};ags.push({op:op.name,eq:cfg.sh,n:ag[ds],color:cfg.c});}});
+    aEl.innerHTML=`<div style="font-size:10px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.8px;margin:10px 0 8px">📋 Agendamentos (${agCount} total)</div>`+ags.map(a=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;margin-bottom:5px"><div style="width:28px;height:28px;border-radius:7px;background:${a.color};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:10px;color:#fff">${ini(a.op)}</div><div style="flex:1"><div style="font-weight:800;font-size:12px;color:var(--g900)">${a.op.replace(/_/g,' ')}</div><div style="font-size:10px;color:#3B82F6;font-weight:700">${a.eq}</div></div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#3B82F6">${a.n}</div><div style="font-size:10px;color:var(--g500)">acordo${a.n>1?'s':''}</div></div>`).join('');
+  } else {aEl.innerHTML='';}
+  document.getElementById('cal-day-modal').style.display='flex';
+}
+
+function calUpdateProximo(){
+  const today=new Date();
+  const ts=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  const upcoming=Object.entries(FERIADOS_2026).filter(([k,v])=>k>=ts&&v.some(f=>f.tipo==='N'||f.tipo==='PF')).sort((a,b)=>a[0].localeCompare(b[0]));
+  if(upcoming.length>0){
+    const [ds,fs]=upcoming[0]; const f=fs.find(f=>f.tipo==='N'||f.tipo==='PF');
+    const dt=new Date(ds+'T12:00:00'); const diff=Math.ceil((dt-today)/86400000);
+    const [y,m,d]=ds.split('-'); const mn=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+    const e1=document.getElementById('cal-proximo-nome'), e2=document.getElementById('cal-proximo-data'), e3=document.getElementById('cal-dias-faltam');
+    if(e1)e1.textContent=f.nome.length>20?f.nome.substring(0,18)+'…':f.nome;
+    if(e2)e2.textContent=`${parseInt(d)}/${mn[parseInt(m)-1]}`;
+    if(e3)e3.textContent=diff<=0?'Hoje!':diff;
+  }
+}
+
+function calInit(){ calRender(); }
+
+
+// ══════════════════════════════
+// REMOVER OPERADOR
+// ══════════════════════════════
+function gestaoRemoverInit(){
+  const sel = document.getElementById('remover-op-sel');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">— Selecione o operador —</option>' +
+    [...ALL].sort((a,b)=>a.name.localeCompare(b.name)).map(op=>{
+      const cfg = EQ[op.eq]||{sh:op.eq};
+      return `<option value="${op.name}">${op.name.replace(/_/g,' ')} — ${cfg.sh}</option>`;
+    }).join('');
+
+  sel.onchange = function(){
+    const opName = this.value;
+    const preview = document.getElementById('remover-op-preview');
+    const info    = document.getElementById('remover-op-info');
+    if(!opName){ preview.style.display='none'; return; }
+    const op  = ALL.find(o=>o.name===opName);
+    const cfg = EQ[op?.eq]||{sh:op?.eq||''};
+    if(!op){ preview.style.display='none'; return; }
+    preview.style.display='block';
+    info.innerHTML = `
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div><span style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase">Nome</span><br><b>${op.name.replace(/_/g,' ')}</b></div>
+        <div><span style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase">Equipe</span><br><b style="color:${cfg.c||'var(--pp)'}">${cfg.sh}</b></div>
+        <div><span style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase">Recebimento</span><br><b>${fR(op.rec)}</b></div>
+        <div><span style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase">Acordos</span><br><b>${op.acordos||0}</b></div>
+      </div>`;
+  };
+
+  renderRemovidosLista();
+}
+
+function removerOpApply(){
+  const sel    = document.getElementById('remover-op-sel');
+  const opName = sel?.value;
+  if(!opName){ toast('⚠️ Selecione um operador!'); return; }
+
+  const op = ALL.find(o=>o.name===opName);
+  if(!op){ toast('❌ Operador não encontrado!'); return; }
+
+  if(!confirm(`Remover ${opName.replace(/_/g,' ')} de tudo?
+
+Esta ação remove o operador de todas as abas e sincroniza para todos os dispositivos.`)) return;
+
+  // Remover de D.equipes
+  D.equipes.forEach(eq=>{
+    const idx = eq.ops.findIndex(o=>o.name===opName);
+    if(idx < 0) return;
+    eq.ops.splice(idx, 1);
+    eq.rec  = eq.ops.reduce((s,o)=>s+o.rec, 0);
+    eq.ho   = eq.ops.reduce((s,o)=>s+o.ho,  0);
+    eq.n_op = eq.ops.length;
+  });
+
+  // Remover de overrides localStorage
+  const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+  delete ov[opName];
+  localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
+
+  // Remover de fotos localStorage
+  const photos = JSON.parse(localStorage.getItem('cofen_photos')||'{}');
+  delete photos[opName];
+  localStorage.setItem('cofen_photos', JSON.stringify(photos));
+
+  // Salvar lista de removidos no gestao override
+  const gOv = gGetOverrides();
+  if(!gOv.removidos) gOv.removidos = [];
+  if(!gOv.removidos.includes(opName)) gOv.removidos.push(opName);
+  gSetOverrides(gOv);
+
+  // Sincronizar Firebase
+  fbPush('gestao', gOv);
+  fbPush('overrides', {...ov, _ts: Date.now()});
+  // Remover foto do Firebase
+  if(fbDb && fbRoom){
+    const allPhotos = JSON.parse(localStorage.getItem('cofen_photos')||'{}');
+    fbPush('photos', allPhotos);
+  }
+
+  // Rebuild e refresh tudo
+  rebuildAll();
+  refreshAll();
+  gestaoRemoverInit();
+  sel.value = '';
+  document.getElementById('remover-op-preview').style.display='none';
+
+  toast(`🗑️ ${opName.replace(/_/g,' ')} removido de todas as abas!`);
+}
+
+function renderRemovidosLista(){
+  const gOv = gGetOverrides();
+  const removidos = gOv.removidos || [];
+  const wrap = document.getElementById('remover-lista-wrap');
+  if(!wrap) return;
+  if(removidos.length === 0){ wrap.innerHTML=''; return; }
+  wrap.innerHTML = `
+    <div style="font-size:10px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Operadores removidos (${removidos.length})</div>` +
+    removidos.map(nm=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--g50);border:1px solid var(--g200);border-radius:var(--rm);margin-bottom:6px">
+        <span style="font-size:13px;font-weight:700;color:var(--g700)">${nm.replace(/_/g,' ')}</span>
+        <button onclick="restaurarOp('${nm}')" style="padding:4px 12px;border-radius:var(--rm);border:1.5px solid var(--pp);background:var(--w);color:var(--pp);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">
+          ↩ Restaurar
+        </button>
+      </div>`).join('');
+}
+
+function restaurarOp(opName){
+  // Restaurar remove o nome da lista de removidos e recria com rec=0
+  const gOv = gGetOverrides();
+  gOv.removidos = (gOv.removidos||[]).filter(n=>n!==opName);
+  // Se estava nos novos, reativar
+  const novoEntry = (gOv.novos||[]).find(n=>n.name===opName);
+  if(novoEntry){
+    const eq = D.equipes.find(e=>e.name===novoEntry.eq);
+    if(eq && !eq.ops.find(o=>o.name===opName)){
+      eq.ops.push({name:opName, rec:novoEntry.rec||0, ho:(novoEntry.rec||0)*0.25, acordos:0, ligacoes:0, daily:{}, tipos:{}, n_ag:0, val_ag:0});
+      eq.rec = eq.ops.reduce((s,o)=>s+o.rec,0);
+      eq.ho  = eq.ops.reduce((s,o)=>s+o.ho, 0);
+      eq.n_op= eq.ops.length;
+    }
+  }
+  gSetOverrides(gOv);
+  fbPush('gestao', gOv);
+  rebuildAll(); refreshAll(); gestaoRemoverInit();
+  toast(`↩ ${opName.replace(/_/g,' ')} restaurado!`);
+}
+
+
+// ══════════════════════════════════════════
+// CHECKLIST DO LÍDER
+// ══════════════════════════════════════════
+
+const CHK_SECTIONS = [
+  {
+    id:'abertura', icon:'🌅', title:'Abertura da Operação',
+    items:[
+      {id:'login_sistema',    label:'Fazer login no sistema / CRM e verificar funcionamento'},
+      {id:'presenca',         label:'Confirmar presença de todos os operadores e supervisores'},
+      {id:'metas_dia',        label:'Comunicar meta do dia para a equipe (valor + HO esperado)'},
+      {id:'script_revisao',   label:'Revisar script de abordagem com a equipe (ajustes do dia anterior)'},
+      {id:'carteira_carregada',label:'Verificar se carteira/lista de devedores está carregada no sistema'},
+    ]
+  },
+  {
+    id:'producao', icon:'📞', title:'Acompanhamento de Produção',
+    items:[
+      {id:'ligacoes_1h',      label:'Verificar volume de ligações na 1ª hora e acionar quem está abaixo'},
+      {id:'ranking_am',       label:'Divulgar ranking parcial da manhã para a equipe (motivação)'},
+      {id:'acordos_fechados', label:'Checar acordos fechados e links gerados até o momento'},
+      {id:'pausa_controlada', label:'Gerenciar pausas — ninguém em pausa fora do horário permitido'},
+      {id:'operadores_baixos',label:'Identificar operadores com baixa produção e oferecer apoio/script'},
+    ]
+  },
+  {
+    id:'qualidade', icon:'🎯', title:'Qualidade e Conversão',
+    items:[
+      {id:'monitoria_lig',    label:'Monitorar ao menos 2 ligações ao vivo (escuta ativa)'},
+      {id:'feedback_script',  label:'Dar feedback individual sobre script e técnica de abordagem'},
+      {id:'taxa_conversao',   label:'Verificar taxa de conversão (acordos pagos / links gerados)'},
+      {id:'objecoes_dia',     label:'Levantar principais objeções do dia e alinhar resposta com equipe'},
+    ]
+  },
+  {
+    id:'comunicacao', icon:'📢', title:'Comunicação e Motivação',
+    items:[
+      {id:'msg_motivacional', label:'Enviar mensagem motivacional no grupo da equipe'},
+      {id:'ranking_divulgado',label:'Divulgar ranking atualizado no grupo (pelo menos 1x ao dia)'},
+      {id:'destaque_positivo',label:'Reconhecer publicamente operador destaque do dia'},
+      {id:'alinhamento_sup',  label:'Alinhar com supervisor sobre andamento e eventuais problemas'},
+    ]
+  },
+  {
+    id:'dados', icon:'📊', title:'Gestão de Dados e Relatórios',
+    items:[
+      {id:'importar_rec',     label:'Importar relatório de recebimento no dashboard (atualizar ranking)'},
+      {id:'importar_acordos', label:'Importar relatório de acordos (gerados, pagos, pendentes)'},
+      {id:'meta_equipe_ok',   label:'Verificar se meta por equipe está sendo atingida'},
+      {id:'projecao_mensal',  label:'Verificar projeção mensal e comunicar gap à diretoria se necessário'},
+    ]
+  },
+  {
+    id:'encerramento', icon:'🌙', title:'Encerramento do Dia',
+    items:[
+      {id:'relatorio_final',  label:'Gerar e salvar relatório final do dia'},
+      {id:'ranking_final',    label:'Divulgar ranking final do dia para toda a equipe'},
+      {id:'agendamentos_ok',  label:'Confirmar agendamentos de acordos para os próximos dias'},
+      {id:'pendencias',       label:'Registrar pendências e tarefas para o dia seguinte'},
+      {id:'logoff_sistema',   label:'Garantir logoff correto de todos os operadores no sistema'},
+    ]
+  },
+];
+
+let chkChart = null;
+
+function checkTodayKey(){
+  const d=new Date(); return `chk_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
+}
+
+function checkLoad(){
+  return JSON.parse(localStorage.getItem(checkTodayKey())||'{}');
+}
+
+function checkSave(state){
+  localStorage.setItem(checkTodayKey(), JSON.stringify(state));
+}
+
+function checkCalcPct(state){
+  let total=0, done=0;
+  CHK_SECTIONS.forEach(s=>s.items.forEach(i=>{ total++; if(state[i.id]) done++; }));
+  return {total, done, pct:total>0?Math.round(done/total*100):0};
+}
+
+function checkInit(){
+  const state = checkLoad();
+  const today = new Date();
+  const daysNames=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const monthNames=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const lbl = document.getElementById('chk-date-label');
+  if(lbl) lbl.textContent = `${daysNames[today.getDay()]}, ${today.getDate()} de ${monthNames[today.getMonth()]}`;
+
+  checkRender(state);
+  checkUpdateBar(state);
+  checkBuildChart();
+}
+
+function checkRender(state){
+  const container = document.getElementById('chk-sections');
+  if(!container) return;
+
+  container.innerHTML = CHK_SECTIONS.map(sec=>{
+    const done  = sec.items.filter(i=>state[i.id]).length;
+    const total = sec.items.length;
+    const pct   = Math.round(done/total*100);
+    const color = pct===100?'#4ADE80':pct>=60?'#FCD34D':'var(--g300)';
+
+    const items = sec.items.map(item=>{
+      const checked = !!state[item.id];
+      return `<label style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;
+        border-radius:var(--rm);cursor:pointer;transition:background .15s;
+        background:${checked?'#F0FDF4':'var(--g50)'};border:1px solid ${checked?'#BBF7D0':'var(--g200)'};"
+        onmouseover="this.style.background='${checked?'#DCFCE7':'var(--g100)'}'"
+        onmouseout="this.style.background='${checked?'#F0FDF4':'var(--g50)'}'">
+        <input type="checkbox" ${checked?'checked':''} onchange="checkToggle('${item.id}',this.checked)"
+          style="width:16px;height:16px;flex-shrink:0;margin-top:1px;accent-color:var(--pp);cursor:pointer">
+        <span style="font-size:13px;font-weight:${checked?'700':'600'};color:${checked?'var(--pp)':'var(--g700)'};
+          text-decoration:${checked?'none':'none'};line-height:1.4">${item.label}</span>
+        ${checked?'<span style="margin-left:auto;font-size:16px;flex-shrink:0">✅</span>':''}
+      </label>`;
+    }).join('');
+
+    return `<div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);overflow:hidden;box-shadow:var(--sh)">
+      <div style="padding:12px 18px;background:var(--g50);border-bottom:1px solid var(--g200);
+        display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">${sec.icon}</span>
+          <span style="font-size:13px;font-weight:800;color:var(--g900)">${sec.title}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="background:var(--g200);border-radius:100px;height:6px;width:80px;overflow:hidden">
+            <div style="height:100%;border-radius:100px;background:${color};width:${pct}%;transition:width .5s"></div>
+          </div>
+          <span style="font-size:11px;font-weight:800;color:${color}">${done}/${total}</span>
+        </div>
+      </div>
+      <div style="padding:10px 14px;display:flex;flex-direction:column;gap:6px">${items}</div>
+    </div>`;
+  }).join('');
+}
+
+function checkToggle(id, checked){
+  const state = checkLoad();
+  state[id] = checked;
+  checkSave(state);
+  checkUpdateBar(state);
+  // Re-render só o item afetado (mais rápido)
+  checkRender(state);
+  // Salvar histórico semanal
+  checkSaveWeekly();
+}
+
+function checkUpdateBar(state){
+  const {total, done, pct} = checkCalcPct(state);
+  const bar   = document.getElementById('chk-bar');
+  const big   = document.getElementById('chk-pct-big');
+  const lbl   = document.getElementById('chk-pct-label');
+  const stats = document.getElementById('chk-stats');
+  const color = pct===100?'#4ADE80':pct>=80?'var(--pp)':pct>=50?'#FCD34D':'#EF4444';
+
+  if(bar)   bar.style.width = pct+'%';
+  if(big)   big.textContent = pct+'%';
+  if(lbl)   lbl.textContent = pct+'% concluído';
+
+  if(stats) stats.innerHTML = CHK_SECTIONS.map(sec=>{
+    const d=sec.items.filter(i=>state[i.id]).length, t=sec.items.length;
+    const p=Math.round(d/t*100);
+    const col=p===100?'#4ADE80':p>=60?'#FCD34D':'var(--g400)';
+    return `<div style="display:flex;align-items:center;gap:5px">
+      <span style="font-size:12px">${sec.icon}</span>
+      <span style="font-size:11px;font-weight:700;color:${col}">${d}/${t}</span>
+    </div>`;
+  }).join('');
+}
+
+function checkReset(){
+  if(!confirm('Resetar todo o checklist de hoje?')) return;
+  checkSave({});
+  checkRender({});
+  checkUpdateBar({});
+  toast('↩ Checklist resetado!');
+}
+
+function checkSaveWeekly(){
+  const {pct} = checkCalcPct(checkLoad());
+  const d=new Date();
+  const key=`chk_week_${d.getFullYear()}_${Math.ceil(d.getDate()/7)}`;
+  const week=JSON.parse(localStorage.getItem(key)||'{}');
+  const dayNames=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  week[dayNames[d.getDay()]] = pct;
+  localStorage.setItem(key, JSON.stringify(week));
+}
+
+function checkBuildChart(){
+  const canvas = document.getElementById('chk-chart');
+  if(!canvas) return;
+  if(chkChart){ chkChart.destroy(); chkChart=null; }
+
+  // Build last 7 days data
+  const labels=[], data=[];
+  const dayNames=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  for(let i=6;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const key=`chk_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
+    const state=JSON.parse(localStorage.getItem(key)||'{}');
+    const {pct}=checkCalcPct(state);
+    labels.push((i===0?'Hoje':dayNames[d.getDay()])+' '+d.getDate());
+    data.push(pct);
+  }
+
+  chkChart = new Chart(canvas, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[{
+        label:'% Concluído',
+        data,
+        borderColor:'#00A86B',
+        backgroundColor:'rgba(0,168,107,.1)',
+        borderWidth:2.5,
+        pointBackgroundColor:'#00A86B',
+        pointRadius:5,
+        tension:.35,
+        fill:true,
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}% concluído`}}
+      },
+      scales:{
+        y:{min:0,max:100,ticks:{callback:v=>v+'%',stepSize:25},grid:{color:'rgba(0,0,0,.05)'}},
+        x:{grid:{display:false}}
+      }
+    }
+  });
+}
+
 // ── INIT ──
 loadSavedOverrides();
 loadGestaoOverrides();
@@ -4706,406 +5236,6 @@ setInterval(()=>{
 
 </script>
 
-<!-- ══════════ PAGE: ROTINA SUPERVISOR ══════════ -->
-<div class="page" id="pg-rotina">
-
-  <!-- Hero da Rotina -->
-  <div style="background:linear-gradient(135deg,var(--ppd),#1B4332 55%,#0D3D2B);border-radius:var(--rxl);padding:20px 24px;position:relative;overflow:hidden">
-    <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(0,200,127,.07);pointer-events:none"></div>
-    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">📋 ROTINA DIÁRIA</div>
-    <div style="font-family:Bebas Neue,sans-serif;font-size:24px;letter-spacing:3px;color:#fff;margin-bottom:6px">CHECKLIST DO SUPERVISOR</div>
-    <div style="font-size:12px;color:rgba(255,255,255,.55);font-weight:600;margin-bottom:16px">Acompanhe cada passo do seu dia para garantir a máxima performance da equipe</div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap">
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--rl);padding:12px 18px;min-width:120px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px">Concluídos</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:#4ADE80;letter-spacing:.5px" id="rot-count-done">0</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--rl);padding:12px 18px;min-width:120px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px">Total de Tarefas</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:#fff;letter-spacing:.5px" id="rot-count-total">0</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--rl);padding:12px 18px;flex:1;min-width:200px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px">Progresso do Dia</div>
-        <div style="background:rgba(255,255,255,.12);border-radius:100px;height:8px;overflow:hidden">
-          <div id="rot-progress-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#4ADE80,#00C97F);transition:width .6s cubic-bezier(.4,0,.2,1);width:0%"></div>
-        </div>
-        <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:700;margin-top:6px" id="rot-progress-lbl">0% completo</div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
-        <button onclick="rotinaReset()"
-          style="padding:10px 18px;border-radius:var(--rm);border:1px solid rgba(255,100,100,.3);background:rgba(255,60,60,.12);color:#FCA5A5;font-family:Nunito,sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s"
-          onmouseover="this.style.background='rgba(255,60,60,.25)'" onmouseout="this.style.background='rgba(255,60,60,.12)'">
-          🔄 Reiniciar Dia
-        </button>
-        <button onclick="rotinaCopiar()"
-          style="padding:10px 18px;border-radius:var(--rm);border:none;background:linear-gradient(135deg,var(--pp),var(--pp3));color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;transition:all .2s"
-          onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
-          📋 Copiar Resumo
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Data e turno -->
-  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:12px 18px;box-shadow:var(--sh);display:flex;align-items:center;gap:10px;flex:1;min-width:200px">
-      <div style="font-size:22px">📅</div>
-      <div>
-        <div style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.8px">Data de hoje</div>
-        <div style="font-weight:800;font-size:14px;color:var(--g900)" id="rot-data-hoje">—</div>
-      </div>
-    </div>
-    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:12px 18px;box-shadow:var(--sh);display:flex;align-items:center;gap:10px;flex:1;min-width:200px">
-      <div style="font-size:22px">👤</div>
-      <div>
-        <div style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.8px">Supervisor</div>
-        <input id="rot-supervisor-nome" placeholder="Digite seu nome..." 
-          style="background:transparent;border:none;outline:none;font-weight:800;font-size:14px;color:var(--g900);font-family:Nunito,sans-serif;width:100%"
-          oninput="rotinaSaveNome(this.value)">
-      </div>
-    </div>
-    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:12px 18px;box-shadow:var(--sh);display:flex;align-items:center;gap:10px;flex:1;min-width:200px">
-      <div style="font-size:22px">⏰</div>
-      <div>
-        <div style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.8px">Turno</div>
-        <select id="rot-turno" style="background:transparent;border:none;outline:none;font-weight:800;font-size:14px;color:var(--g900);font-family:Nunito,sans-serif;cursor:pointer" onchange="rotinaInit()">
-          <option value="manha">☀️ Manhã</option>
-          <option value="tarde">🌤 Tarde</option>
-          <option value="integral">🌟 Integral</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- Checklist -->
-  <div id="rot-checklist-container" style="display:flex;flex-direction:column;gap:14px"></div>
-
-  <!-- Observações do dia -->
-  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px;box-shadow:var(--sh)">
-    <div class="sec">📝 Observações do Dia</div>
-    <textarea id="rot-obs" placeholder="Anote aqui situações relevantes do dia, operadores que precisam de atenção, pendências para amanhã..."
-      style="width:100%;min-height:100px;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);padding:12px;font-family:Nunito,sans-serif;font-size:13px;font-weight:600;color:var(--g900);outline:none;resize:vertical;line-height:1.6;transition:all .2s"
-      onfocus="this.style.borderColor='var(--pp)';this.style.background='#fff'"
-      onblur="this.style.borderColor='var(--g200)';this.style.background='var(--g50)'"
-      oninput="rotinaSaveObs(this.value)"></textarea>
-  </div>
-
-</div>
-<!-- ══════════ FIM PAGE: ROTINA ══════════ -->
-
-<script>
-// ══════════════════════════════════════════
-// ROTINA DO SUPERVISOR — CHECKLIST INTERATIVO
-// ══════════════════════════════════════════
-
-const ROTINA_SECTIONS = [
-  {
-    id:'recebimento',
-    icon:'💰',
-    title:'Verificar Recebimento do Dia Anterior',
-    color:'#00A86B',
-    items:[
-      {id:'rec1', text:'Checar o total recebido no dia anterior no dashboard'},
-      {id:'rec2', text:'Enviar resultado individual de cada operador para o grupo'},
-      {id:'rec3', text:'Informar a meta do dia e quanto falta para atingir'},
-      {id:'rec4', text:'Informar a meta da semana e o progresso atual'},
-      {id:'rec5', text:'Informar a meta mínima do mês e a projeção atual'},
-    ]
-  },
-  {
-    id:'agendamentos',
-    icon:'📅',
-    title:'Acompanhamento dos Agendamentos',
-    color:'#3B82F6',
-    items:[
-      {id:'ag1', text:'Verificar quantos acordos foram gerados hoje'},
-      {id:'ag2', text:'Verificar quantos acordos estão sendo pagos (conversão)'},
-      {id:'ag3', text:'Checar agendamentos previstos para hoje e amanhã'},
-      {id:'ag4', text:'Identificar operadores sem geração de acordos'},
-    ]
-  },
-  {
-    id:'presenca',
-    icon:'✅',
-    title:'Confirmar Presença da Equipe',
-    color:'#F59E0B',
-    items:[
-      {id:'pr1', text:'Confirmar presença de todos os operadores no sistema'},
-      {id:'pr2', text:'Registrar e alertar sobre atrasos'},
-      {id:'pr3', text:'Organizar horas a compensar / banco de horas'},
-      {id:'pr4', text:'Informar ausências à coordenação se necessário'},
-    ]
-  },
-  {
-    id:'ranking',
-    icon:'🏆',
-    title:'Divulgar Ranking',
-    color:'#FC5C7D',
-    items:[
-      {id:'rk1', text:'Publicar o ranking atualizado no grupo da equipe'},
-      {id:'rk2', text:'Informar quanto falta para cada operador subir de nível (S/A/B/C)'},
-      {id:'rk3', text:'Destacar quem está logo à frente no ranking'},
-      {id:'rk4', text:'Celebrar destaques e melhorias individuais'},
-    ]
-  },
-  {
-    id:'ligacoes',
-    icon:'🎧',
-    title:'Escutar Ligações',
-    color:'#8B5CF6',
-    items:[
-      {id:'lig1', text:'Escutar pelo menos 1 ligação antes das 10h'},
-      {id:'lig2', text:'Escutar pelo menos 1 ligação no período da tarde'},
-      {id:'lig3', text:'Escutar pelo menos 1 ligação de operador com baixo desempenho'},
-      {id:'lig4', text:'Registrar feedbacks e oportunidades de melhoria'},
-    ]
-  },
-  {
-    id:'abaixo',
-    icon:'📉',
-    title:'Identificar Operadores Abaixo da Média',
-    color:'#EF4444',
-    items:[
-      {id:'ab1', text:'Identificar operadores com recebimento abaixo da média da equipe'},
-      {id:'ab2', text:'Criar plano de recuperação individualizado'},
-      {id:'ab3', text:'Agendar conversa de acompanhamento (feedback 1:1)'},
-      {id:'ab4', text:'Acompanhar evolução ao longo do dia'},
-      {id:'ab5', text:'Registrar progresso ou dificuldades encontradas'},
-    ]
-  }
-];
-
-function rotinaKey(){
-  const d=new Date();
-  return 'cofen_rotina_'+d.getFullYear()+'_'+(d.getMonth()+1)+'_'+d.getDate();
-}
-function rotinaGet(){try{return JSON.parse(localStorage.getItem(rotinaKey())||'{}')}catch(e){return {}}}
-function rotinaSet(obj){localStorage.setItem(rotinaKey(),JSON.stringify(obj))}
-
-function rotinaSaveNome(v){
-  const s=rotinaGet(); s._nome=v; rotinaSet(s);
-}
-function rotinaSaveObs(v){
-  const s=rotinaGet(); s._obs=v; rotinaSet(s);
-}
-
-function rotinaToggle(itemId){
-  const s=rotinaGet();
-  s[itemId]=!s[itemId];
-  rotinaSet(s);
-  // Update visual
-  const cb=document.getElementById('rot-cb-'+itemId);
-  const row=document.getElementById('rot-row-'+itemId);
-  if(cb && row){
-    const done=s[itemId];
-    cb.innerHTML=done?'✓':'';
-    cb.style.background=done?'var(--pp)':'var(--w)';
-    cb.style.borderColor=done?'var(--pp)':'var(--g300)';
-    cb.style.color='#fff';
-    row.style.opacity=done?'.6':'1';
-    row.querySelector('.rot-item-text').style.textDecoration=done?'line-through':'none';
-    row.querySelector('.rot-item-text').style.color=done?'var(--g500)':'var(--g900)';
-  }
-  rotinaUpdateProgress();
-}
-
-function rotinaUpdateProgress(){
-  const s=rotinaGet();
-  let total=0, done=0;
-  ROTINA_SECTIONS.forEach(sec=>{
-    sec.items.forEach(it=>{
-      total++;
-      if(s[it.id]) done++;
-    });
-  });
-  document.getElementById('rot-count-done').textContent=done;
-  document.getElementById('rot-count-total').textContent=total;
-  const pct=total>0?Math.round(done/total*100):0;
-  const bar=document.getElementById('rot-progress-bar');
-  if(bar) bar.style.width=pct+'%';
-  const lbl=document.getElementById('rot-progress-lbl');
-  if(lbl) lbl.textContent=pct+'% completo — '+done+' de '+total+' tarefas';
-  // Color bar based on progress
-  if(bar){
-    if(pct>=100) bar.style.background='linear-gradient(90deg,#4ADE80,#00C97F)';
-    else if(pct>=60) bar.style.background='linear-gradient(90deg,#67E8F9,#3B82F6)';
-    else if(pct>=30) bar.style.background='linear-gradient(90deg,#FCD34D,#F59E0B)';
-    else bar.style.background='linear-gradient(90deg,#FCA5A5,#EF4444)';
-  }
-}
-
-function rotinaInit(){
-  // Data
-  const now=new Date();
-  const ds=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-  const el=document.getElementById('rot-data-hoje');
-  if(el) el.textContent=ds.charAt(0).toUpperCase()+ds.slice(1);
-
-  // Load saved state
-  const s=rotinaGet();
-
-  // Nome supervisor
-  const nomeEl=document.getElementById('rot-supervisor-nome');
-  if(nomeEl && s._nome) nomeEl.value=s._nome;
-
-  // Obs
-  const obsEl=document.getElementById('rot-obs');
-  if(obsEl) obsEl.value=s._obs||'';
-
-  // Build checklist
-  const container=document.getElementById('rot-checklist-container');
-  if(!container) return;
-  container.innerHTML='';
-
-  ROTINA_SECTIONS.forEach(sec=>{
-    const doneInSec=sec.items.filter(it=>s[it.id]).length;
-    const allDone=doneInSec===sec.items.length;
-    const secEl=document.createElement('div');
-    secEl.style.cssText='background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden';
-
-    // Section header
-    const hdr=document.createElement('div');
-    hdr.style.cssText=`display:flex;align-items:center;justify-content:space-between;padding:14px 18px;
-      border-left:4px solid ${sec.color};cursor:pointer;transition:background .2s;
-      background:${allDone?sec.color+'08':'var(--w)'}`;
-    hdr.onclick=()=>{
-      const body=secEl.querySelector('.rot-sec-body');
-      const arrow=secEl.querySelector('.rot-arrow');
-      const isOpen=body.style.display!=='none';
-      body.style.display=isOpen?'none':'block';
-      arrow.textContent=isOpen?'▶':'▼';
-    };
-    hdr.innerHTML=`
-      <div style="display:flex;align-items:center;gap:12px">
-        <div style="width:38px;height:38px;border-radius:10px;background:${sec.color}18;border:1px solid ${sec.color}30;
-          display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${sec.icon}</div>
-        <div>
-          <div style="font-weight:800;font-size:13px;color:var(--g900)">${sec.title}</div>
-          <div style="font-size:10px;font-weight:700;color:${allDone?sec.color:'var(--g500)'};margin-top:2px">
-            ${allDone?'✅ Tudo concluído!':doneInSec+' de '+sec.items.length+' concluídos'}
-          </div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="background:${sec.color}18;border:1px solid ${sec.color}30;border-radius:100px;
-          padding:3px 10px;font-size:11px;font-weight:800;color:${sec.color}">
-          ${doneInSec}/${sec.items.length}
-        </div>
-        <div class="rot-arrow" style="font-size:12px;color:var(--g500);font-weight:700;transition:all .2s">▼</div>
-      </div>`;
-
-    // Section body
-    const body=document.createElement('div');
-    body.className='rot-sec-body';
-    body.style.cssText='border-top:1px solid var(--g200);padding:10px 16px;display:flex;flex-direction:column;gap:4px';
-
-    sec.items.forEach((item,idx)=>{
-      const done=!!s[item.id];
-      const row=document.createElement('div');
-      row.id='rot-row-'+item.id;
-      row.style.cssText=`display:flex;align-items:center;gap:12px;padding:10px 12px;
-        border-radius:var(--rm);cursor:pointer;transition:all .2s;
-        opacity:${done?'.6':'1'};
-        background:${done?sec.color+'06':'transparent'}`;
-      row.onclick=()=>rotinaToggle(item.id);
-      row.onmouseover=function(){if(!s[item.id])this.style.background=sec.color+'0D';};
-      row.onmouseout=function(){this.style.background=s[item.id]?sec.color+'06':'transparent';};
-      row.innerHTML=`
-        <div id="rot-cb-${item.id}" style="width:22px;height:22px;border-radius:6px;border:2px solid ${done?sec.color:'var(--g300)'};
-          background:${done?sec.color:'var(--w)'};display:flex;align-items:center;justify-content:center;
-          flex-shrink:0;font-size:12px;font-weight:900;color:#fff;transition:all .2s">${done?'✓':''}</div>
-        <div style="flex:1">
-          <div class="rot-item-text" style="font-size:13px;font-weight:700;color:${done?'var(--g500)':'var(--g900)'};
-            text-decoration:${done?'line-through':'none'};transition:all .2s;line-height:1.4">${item.text}</div>
-        </div>
-        <div style="font-size:10px;font-weight:700;color:${done?sec.color:'var(--g300)'}">
-          ${done?'✅ Feito':''}
-        </div>`;
-      body.appendChild(row);
-    });
-
-    // "Marcar todos" button
-    const markAllRow=document.createElement('div');
-    markAllRow.style.cssText='display:flex;gap:8px;padding:8px 12px 4px;border-top:1px dashed var(--g200);margin-top:4px';
-    markAllRow.innerHTML=`
-      <button onclick="rotinaMarkAll('${sec.id}',true)" 
-        style="flex:1;padding:7px;border-radius:var(--rm);border:1px solid ${sec.color}44;
-        background:${sec.color}0D;color:${sec.color};font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;transition:all .2s"
-        onmouseover="this.style.background='${sec.color}20'" onmouseout="this.style.background='${sec.color}0D'">
-        ✅ Marcar tudo como feito
-      </button>
-      <button onclick="rotinaMarkAll('${sec.id}',false)"
-        style="padding:7px 12px;border-radius:var(--rm);border:1px solid var(--g200);
-        background:var(--g50);color:var(--g500);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer;transition:all .2s"
-        onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'"
-        onmouseout="this.style.borderColor='var(--g200)';this.style.color='var(--g500)'">
-        ↩ Desmarcar
-      </button>`;
-    body.appendChild(markAllRow);
-
-    secEl.appendChild(hdr);
-    secEl.appendChild(body);
-    container.appendChild(secEl);
-  });
-
-  rotinaUpdateProgress();
-}
-
-function rotinaMarkAll(secId, value){
-  const sec=ROTINA_SECTIONS.find(s=>s.id===secId);
-  if(!sec) return;
-  const s=rotinaGet();
-  sec.items.forEach(it=>{ s[it.id]=value; });
-  rotinaSet(s);
-  rotinaInit(); // rebuild
-  toast(value?'✅ Todas as tarefas marcadas como feitas!':'↩ Tarefas desmarcadas');
-}
-
-function rotinaReset(){
-  if(!confirm('Reiniciar o checklist do dia? Os itens marcados serão perdidos.')) return;
-  const s=rotinaGet();
-  const nome=s._nome||''; const obs=s._obs||'';
-  const novo={_nome:nome,_obs:obs};
-  rotinaSet(novo);
-  rotinaInit();
-  toast('🔄 Checklist reiniciado!');
-}
-
-function rotinaCopiar(){
-  const s=rotinaGet();
-  const now=new Date();
-  const ds=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
-  const nome=s._nome||'Supervisor';
-  const turnoEl=document.getElementById('rot-turno');
-  const turnoMap={manha:'Manhã ☀️',tarde:'Tarde 🌤',integral:'Integral 🌟'};
-  const turno=turnoMap[turnoEl?.value||'manha'];
-
-  let total=0,done=0;
-  ROTINA_SECTIONS.forEach(sec=>sec.items.forEach(it=>{total++;if(s[it.id])done++;}));
-  const pct=total>0?Math.round(done/total*100):0;
-
-  let txt=`📋 ROTINA DO SUPERVISOR — COB COFEN\n`;
-  txt+=`👤 ${nome} | ${turno}\n`;
-  txt+=`📅 ${ds.charAt(0).toUpperCase()+ds.slice(1)}\n`;
-  txt+=`📊 Progresso: ${done}/${total} tarefas (${pct}%)\n\n`;
-
-  ROTINA_SECTIONS.forEach(sec=>{
-    const doneInSec=sec.items.filter(it=>s[it.id]).length;
-    txt+=`${sec.icon} ${sec.title.toUpperCase()} (${doneInSec}/${sec.items.length})\n`;
-    sec.items.forEach(it=>{
-      txt+=(s[it.id]?'  ✅ ':'  ☐ ')+it.text+'\n';
-    });
-    txt+='\n';
-  });
-
-  const obs=s._obs||'';
-  if(obs) txt+=`📝 OBSERVAÇÕES:\n${obs}\n`;
-
-  navigator.clipboard?.writeText(txt).then(()=>toast('📋 Resumo copiado para a área de transferência!'))
-    .catch(()=>toast('⚠️ Não foi possível copiar automaticamente'));
-}
-</script>
-
 <!-- TV MODE OVERLAY -->
 <div id="tv-overlay">
   <div class="tv-header">
@@ -5216,6 +5346,122 @@ function rotinaCopiar(){
     </div>
     <div id="ev-modal-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:0"></div>
   </div>
+</div>
+
+
+<!-- ══════════ PAGE: CALENDÁRIO ══════════ -->
+<div class="page" id="pg-calend">
+
+  <!-- Hero -->
+  <div style="background:linear-gradient(135deg,var(--ppd),#1B4332);border-radius:var(--rxl);padding:16px 22px;display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Feriados & Datas Especiais</div>
+      <div style="font-family:Bebas Neue,sans-serif;font-size:22px;letter-spacing:2px;color:#fff">📆 CALENDÁRIO 2026 — BRASIL COMPLETO</div>
+    </div>
+    <select id="cal-city-filter" onchange="calRender()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:var(--rm);padding:8px 12px;color:#fff;font-family:Nunito,sans-serif;font-weight:700;font-size:12px;outline:none;cursor:pointer">
+      <option value="all">🇧🇷 Todos</option>
+      <option value="SP">São Paulo (SP)</option>
+      <option value="Marília">Marília</option>
+      <option value="Birigui">Birigui</option>
+      <option value="PI">Piauí</option>
+      <option value="MA">Maranhão</option>
+      <option value="MT">Mato Grosso</option>
+    </select>
+  </div>
+
+  <!-- KPIs -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:12px 16px;box-shadow:var(--sh);text-align:center">
+      <div style="font-size:9px;font-weight:700;color:var(--g500);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Feriados Nacionais</div>
+      <div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:var(--danger)">10</div>
+      <div style="font-size:10px;color:var(--g500)">em 2026</div>
+    </div>
+    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:12px 16px;box-shadow:var(--sh);text-align:center">
+      <div style="font-size:9px;font-weight:700;color:var(--g500);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Pontos Facultativos</div>
+      <div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:var(--warn)">9</div>
+      <div style="font-size:10px;color:var(--g500)">federais</div>
+    </div>
+    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:12px 16px;box-shadow:var(--sh);text-align:center">
+      <div style="font-size:9px;font-weight:700;color:var(--g500);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Próximo Feriado</div>
+      <div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--pp)" id="cal-proximo-nome">—</div>
+      <div style="font-size:10px;color:var(--g500)" id="cal-proximo-data">—</div>
+    </div>
+    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:12px 16px;box-shadow:var(--sh);text-align:center">
+      <div style="font-size:9px;font-weight:700;color:var(--g500);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Dias p/ o Próximo</div>
+      <div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:var(--info)" id="cal-dias-faltam">—</div>
+      <div style="font-size:10px;color:var(--g500)">dias</div>
+    </div>
+  </div>
+
+  <!-- Legenda -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:10px 16px;box-shadow:var(--sh);display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+    <span style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px">Legenda:</span>
+    <div style="display:flex;align-items:center;gap:5px"><div style="width:11px;height:11px;border-radius:3px;background:#EF4444"></div><span style="font-size:11px;font-weight:700;color:var(--g700)">Feriado Nacional</span></div>
+    <div style="display:flex;align-items:center;gap:5px"><div style="width:11px;height:11px;border-radius:3px;background:#8B5CF6"></div><span style="font-size:11px;font-weight:700;color:var(--g700)">Ponto Facultativo</span></div>
+    <div style="display:flex;align-items:center;gap:5px"><div style="width:11px;height:11px;border-radius:3px;background:#F59E0B"></div><span style="font-size:11px;font-weight:700;color:var(--g700)">Feriado Estadual</span></div>
+    <div style="display:flex;align-items:center;gap:5px"><div style="width:11px;height:11px;border-radius:3px;background:#3B82F6"></div><span style="font-size:11px;font-weight:700;color:var(--g700)">Feriado Municipal</span></div>
+    <div style="display:flex;align-items:center;gap:5px"><div style="width:11px;height:11px;border-radius:3px;background:#00A86B"></div><span style="font-size:11px;font-weight:700;color:var(--g700)">Data Comemorativa</span></div>
+    <div style="display:flex;align-items:center;gap:5px"><div style="width:11px;height:11px;border-radius:3px;background:#3B82F6;opacity:.5"></div><span style="font-size:11px;font-weight:700;color:var(--g700)">Agendamento de Acordo</span></div>
+  </div>
+
+  <!-- Grade anual -->
+  <div id="cal-grid-anual" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"></div>
+
+</div>
+
+<!-- MODAL DIA CALENDÁRIO -->
+<div id="cal-day-modal" style="position:fixed;inset:0;z-index:7000;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);display:none;align-items:flex-start;justify-content:center;padding:14px;overflow-y:auto" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:var(--w);border-radius:var(--rxl);width:100%;max-width:560px;box-shadow:0 12px 40px rgba(0,0,0,.15);margin:auto">
+    <div style="background:linear-gradient(135deg,var(--ppd),#1B4332);border-radius:var(--rxl) var(--rxl) 0 0;padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:26px;color:#fff;letter-spacing:1px" id="cdm-date">—</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:600;margin-top:2px" id="cdm-weekday">—</div>
+      </div>
+      <button onclick="document.getElementById('cal-day-modal').style.display='none'" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);cursor:pointer;font-size:14px">✕</button>
+    </div>
+    <div style="padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+      <div id="cdm-feriados"></div>
+      <div id="cdm-agendamentos"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ PAGE: CHECKLIST LÍDER ══════════ -->
+<div class="page" id="pg-check">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,var(--ppd),#1B4332);border-radius:var(--rxl);padding:16px 22px">
+    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Rotina Diária</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff;margin-bottom:8px">✅ CHECKLIST DO LÍDER — ACOMPANHAMENTO DIÁRIO</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:var(--rm);padding:6px 14px;font-size:12px;font-weight:700;color:#fff" id="chk-date-label">—</div>
+      <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:var(--rm);padding:6px 14px;font-size:12px;font-weight:700;color:#4ADE80" id="chk-pct-label">0% concluído</div>
+      <button onclick="checkReset()" style="padding:6px 14px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">↩ Resetar Dia</button>
+    </div>
+  </div>
+
+  <!-- Progress bar geral -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:14px 18px;box-shadow:var(--sh)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px">Progresso Geral do Dia</span>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--pp)" id="chk-pct-big">0%</span>
+    </div>
+    <div style="background:var(--g100);border-radius:100px;height:10px;overflow:hidden">
+      <div id="chk-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,var(--pp),var(--pp3));transition:width .5s;width:0%"></div>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap" id="chk-stats"></div>
+  </div>
+
+  <!-- Gráfico de evolução semanal -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px;box-shadow:var(--sh)">
+    <div style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px">📈 Evolução Semanal — % Checklist Concluído</div>
+    <canvas id="chk-chart" height="120"></canvas>
+  </div>
+
+  <!-- Seções do checklist -->
+  <div id="chk-sections" style="display:flex;flex-direction:column;gap:12px"></div>
+
 </div>
 
 </body>
