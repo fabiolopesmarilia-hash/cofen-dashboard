@@ -3448,7 +3448,7 @@ function importPreview(raw){
 
   importParsed = result;
   const fmtLabel = result.modoReal
-    ? '📋 Relatório Original (Valor Recebido + Pague Play)'
+    ? '📋 Relatório Original (Valor Recebido)'
     : '📋 Formato rec_por_equipe (Recebido=HO ÷ 0,25)';
   document.getElementById('import-status').textContent =
     result.totalLines+' linhas · '+result.found.length+' operadores · '+fmtLabel;
