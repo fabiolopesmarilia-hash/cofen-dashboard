@@ -301,14 +301,14 @@ select.ev-inp{cursor:pointer}
 .photo-upload-btn:hover{border-color:var(--pp);color:var(--pp);background:var(--ppl)}
 
 /* ─ TV MODE ─ */
-#tv-overlay{position:fixed;inset:0;z-index:9000;background:#0A1628;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif,sans-serif}
+#tv-overlay{position:fixed;inset:0;z-index:9000;background:#0A1628;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif,sans-serif;overflow:hidden}
 #tv-overlay.on{display:flex}
-.tv-header{position:absolute;top:0;left:0;right:0;padding:20px 32px;display:flex;align-items:center;justify-content:space-between}
+.tv-header{position:absolute;top:0;left:0;right:0;padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
 .tv-brand{font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:3px;color:rgba(255,255,255,.25)}
 .tv-clock{font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:2px;color:rgba(255,255,255,.4)}
 .tv-close{position:absolute;top:16px;right:20px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .tv-close:hover{background:rgba(255,60,60,.3);color:#fff;border-color:rgba(255,60,60,.5)}
-.tv-card{width:100%;max-width:780px;animation:tvIn .6s cubic-bezier(.34,1.4,.64,1)}
+.tv-card{width:100%;max-width:920px;padding:80px 32px 60px;animation:tvIn .6s cubic-bezier(.34,1.4,.64,1)}
 @keyframes tvIn{from{opacity:0;transform:scale(.92) translateY(24px)}to{opacity:1;transform:none}}
 .tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;border:4px solid rgba(255,255,255,.15);flex-shrink:0}
 .tv-photo-placeholder{width:140px;height:140px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:50px;color:#fff;flex-shrink:0;border:4px solid rgba(255,255,255,.1)}
@@ -398,7 +398,6 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('gestao',this)">⚙️ Gestão de Equipes</div>
   <div class="tab"     onclick="go('import',this)">📥 Importar Relatório</div>
   <div class="tab"     onclick="go('acordos',this)">🤝 Acordos</div>
-  <div class="tab"     onclick="go('eficiencia',this)">⚡ Eficiência</div>
   <div class="tab"     onclick="go('calend',this)">📆 Calendário</div>
   <div class="tab"     onclick="go('check',this)">✅ Checklist Líder</div>
 </div>
@@ -584,22 +583,24 @@ select.ev-inp{cursor:pointer}
   </div>
   <div class="g2" id="eq-grid"></div>
   <!-- Painel de checklist por equipe -->
-  <div id="eq-chk-panel" style="display:none;background:var(--w);border:2px solid rgba(0,168,107,.25);border-radius:var(--rxl);box-shadow:var(--sh-md);overflow:hidden">
-    <div id="eq-chk-header" style="background:linear-gradient(135deg,var(--ppd),#1B4332);padding:14px 20px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div id="eq-chk-title" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:2px">✅ CHECKLIST</div>
-        <div id="eq-chk-sub" style="font-size:10px;color:rgba(255,255,255,.45);font-weight:600;margin-top:2px">Rotina diária da equipe</div>
+  <div id="eq-chk-panel" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);overflow-y:auto;padding:20px 16px" onclick="if(event.target===this)eqChkClose()">
+    <div style="max-width:740px;margin:0 auto;background:var(--w);border:2px solid rgba(0,168,107,.25);border-radius:var(--rxl);box-shadow:var(--sh-lg)">
+      <div id="eq-chk-header" style="background:linear-gradient(135deg,var(--ppd),#1B4332);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2">
+        <div>
+          <div id="eq-chk-title" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:2px">✅ CHECKLIST</div>
+          <div id="eq-chk-sub" style="font-size:10px;color:rgba(255,255,255,.45);font-weight:600;margin-top:2px">Rotina diária da equipe</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div id="eq-chk-pct-badge" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#4ADE80">0%</div>
+          <button onclick="eqChkReset()" style="padding:5px 12px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">↩ Resetar</button>
+          <button onclick="eqChkClose()" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);cursor:pointer;font-size:14px">✕</button>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <div id="eq-chk-pct-badge" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#4ADE80">0%</div>
-        <button onclick="eqChkReset()" style="padding:5px 12px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">↩ Resetar</button>
-        <button onclick="eqChkClose()" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);cursor:pointer;font-size:14px">✕</button>
+      <div id="eq-chk-bar-wrap" style="background:rgba(0,0,0,.15);height:6px">
+        <div id="eq-chk-bar" style="height:100%;background:linear-gradient(90deg,#4ADE80,#00C97F);width:0%;transition:width .5s"></div>
       </div>
+      <div id="eq-chk-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:10px"></div>
     </div>
-    <div id="eq-chk-bar-wrap" style="background:rgba(0,0,0,.15);height:6px">
-      <div id="eq-chk-bar" style="height:100%;background:linear-gradient(90deg,#4ADE80,#00C97F);width:0%;transition:width .5s"></div>
-    </div>
-    <div id="eq-chk-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;max-height:520px;overflow-y:auto"></div>
   </div>
 </div>
 
@@ -1059,10 +1060,8 @@ select.ev-inp{cursor:pointer}
         <span style="font-size:14px;flex-shrink:0">💡</span>
         <div style="font-size:11px;color:var(--ppd);font-weight:600;line-height:1.5">
           Coluna <strong style="color:var(--pp)">Cobradora</strong> = nome do operador · Coluna <strong style="color:var(--pp)">Recebido</strong> = HO (25%) · 
-          O sistema detecta <strong>automaticamente o formato</strong>:<br>
-          📋 <strong style="color:var(--pp)">Relatório Original</strong>: colunas <strong>Operador</strong> + <strong>Valor Recebido</strong> + <strong>Pague Play (24,96%)</strong> — valores diretos.
-          📋 <strong style="color:var(--info)">rec_por_equipe</strong>: <strong>Cobradora</strong> + <strong>Recebido</strong> (HO) → Total Real = ÷ 0,25.
-          <span style="color:var(--g500)">Também aceita arquivos CSV/XLS arrastados.</span>
+          O sistema calcula o <strong>Total Real automaticamente</strong> (Recebido ÷ 0,25). 
+          <span style="color:var(--g500)">Também aceita arquivos CSV arrastados diretamente.</span>
         </div>
       </div>
     </div>
@@ -1095,7 +1094,7 @@ select.ev-inp{cursor:pointer}
       </div>
 
       <textarea id="import-area"
-        placeholder="Cole aqui com Ctrl+V, ou arraste um arquivo CSV/XLS...&#10;&#10;Formato Relatório Original (recomendado):&#10;Operador    Valor Recebido    Pague Play (24,96%)&#10;caio_shimite    172.63    43.09&#10;&#10;Formato rec_por_equipe_e_operador (antigo):&#10;Cobradora    Equipe/SubGrupo    Recebido&#10;caio_shimite    COFEN MARILIA BRENDA    43.25"
+        placeholder="Cole aqui com Ctrl+V, ou arraste um arquivo CSV/XLS...&#10;&#10;Cobradora    Equipe/SubGrupo    Recebido    Total HO&#10;caio_shimite    COFEN MARILIA BRENDA    43.25    10.81"
         style="width:100%;height:180px;background:var(--g50);border:1.5px solid var(--g200);
         border-radius:var(--rm);padding:12px;font-family:Courier New,sans-serif,monospace;font-size:12px;
         color:var(--g700);outline:none;resize:vertical;line-height:1.5;transition:all .2s"
@@ -1395,107 +1394,6 @@ select.ev-inp{cursor:pointer}
       </div>
       <div id="ac-import-list" style="max-height:300px;overflow-y:auto"></div>
     </div>
-  </div>
-
-</div>
-
-
-<!-- ══════════ PAGE: EFICIÊNCIA ══════════ -->
-<div class="page" id="pg-eficiencia">
-
-  <!-- HERO -->
-  <div style="background:linear-gradient(135deg,#0F2027,#1B4332 55%,#0D3D2B);border-radius:var(--rxl);padding:18px 24px;position:relative;overflow:hidden">
-    <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(0,200,127,.06);pointer-events:none"></div>
-    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Ranking de Performance</div>
-    <div style="font-family:Bebas Neue,sans-serif;font-size:24px;letter-spacing:3px;color:#fff;margin-bottom:14px">⚡ EFICIÊNCIA — RECEBIMENTO × ACORDOS</div>
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px" id="ef-hero-kpis">
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Acordos Gerados</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:26px;color:#67E8F9;line-height:1" id="ef-h-gerados">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">no mês</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Acordos Pagos</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:26px;color:#4ADE80;line-height:1" id="ef-h-pagos">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">confirmados</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Taxa Conversão</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:26px;color:#FCD34D;line-height:1" id="ef-h-taxa">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">acordos pagos/gerados</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Ticket Médio</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:26px;color:#fff;line-height:1" id="ef-h-ticket">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">por acordo pago</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Pendentes</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:26px;color:#FCA5A5;line-height:1" id="ef-h-pend">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">a receber ainda</div>
-      </div>
-    </div>
-    <!-- Barra de eficiência global -->
-    <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)">
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase">Eficiência Global da Operação</div>
-        <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.8)" id="ef-h-taxa-lbl">—</div>
-      </div>
-      <div style="background:rgba(255,255,255,.12);border-radius:100px;height:7px;overflow:hidden">
-        <div id="ef-h-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#4ADE80,#00C97F);width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- FILTRO DE ORDENAÇÃO + EQUIPE -->
-  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <div style="font-size:10px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px">Ordenar por:</div>
-    <div style="display:flex;gap:5px;flex-wrap:wrap" id="ef-sort-btns">
-      <button class="fbtn on" onclick="efSetSort('eficiencia',this)">⚡ Eficiência</button>
-      <button class="fbtn" onclick="efSetSort('rec',this)">💰 Recebimento</button>
-      <button class="fbtn" onclick="efSetSort('gerados',this)">📋 Gerados</button>
-      <button class="fbtn" onclick="efSetSort('pagos',this)">✅ Pagos</button>
-      <button class="fbtn" onclick="efSetSort('ticket',this)">🎫 Ticket</button>
-    </div>
-    <div style="margin-left:auto;display:flex;gap:5px;flex-wrap:wrap" id="ef-eq-btns"></div>
-  </div>
-
-  <!-- LEGENDA DE TIER -->
-  <div style="display:flex;gap:8px;flex-wrap:wrap;padding:8px 14px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm);box-shadow:var(--sh)">
-    <div style="font-size:10px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px;margin-right:4px">Eficiência:</div>
-    <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;background:#4ADE80"></div><span style="font-size:11px;font-weight:700;color:var(--g700)">Elite ≥40%</span></div>
-    <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;background:#67E8F9"></div><span style="font-size:11px;font-weight:700;color:var(--g700)">Boa 25–40%</span></div>
-    <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;background:#FCD34D"></div><span style="font-size:11px;font-weight:700;color:var(--g700)">Regular 15–25%</span></div>
-    <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;background:#FCA5A5"></div><span style="font-size:11px;font-weight:700;color:var(--g700)">Baixa &lt;15%</span></div>
-    <div style="display:flex;align-items:center;gap:5px;margin-left:12px"><div style="width:10px;height:10px;border-radius:2px;background:var(--g200)"></div><span style="font-size:11px;font-weight:700;color:var(--g500)">Sem acordos importados</span></div>
-  </div>
-
-  <!-- HEADER RANKING -->
-  <div style="display:grid;grid-template-columns:42px 1fr 90px 70px 70px 90px 90px 80px 100px;
-    gap:8px;padding:9px 16px;background:var(--g50);border:1px solid var(--g200);
-    border-radius:var(--rl) var(--rl) 0 0;
-    font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase">
-    <span>Pos.</span>
-    <span>Operador</span>
-    <span style="text-align:right">Recebido</span>
-    <span style="text-align:center">Gerados</span>
-    <span style="text-align:center">Pagos</span>
-    <span style="text-align:center">Eficiência</span>
-    <span style="text-align:right">Ticket Médio</span>
-    <span style="text-align:center">Pendentes</span>
-    <span style="text-align:right">Rec/Acordo</span>
-  </div>
-  <div id="ef-ranking-list" style="background:var(--w);border:1px solid var(--g200);border-top:none;border-radius:0 0 var(--rl) var(--rl);max-height:70vh;overflow-y:auto"></div>
-
-  <!-- AVISO se sem dados -->
-  <div id="ef-sem-dados" style="display:none;background:var(--w);border:1.5px dashed var(--g300);border-radius:var(--rl);padding:32px;text-align:center">
-    <div style="font-size:32px;margin-bottom:10px">📥</div>
-    <div style="font-weight:800;font-size:15px;color:var(--g900);margin-bottom:6px">Nenhum acordo importado ainda</div>
-    <div style="font-size:12px;color:var(--g500);font-weight:600;margin-bottom:14px">Importe o relatório de acordos em <strong>Importar Relatório → Acordos</strong> para ver a eficiência de cada operador.</div>
-    <button onclick="go('import',document.querySelector('.tab:nth-child(8)'))" 
-      style="padding:10px 24px;border-radius:var(--rm);border:none;cursor:pointer;background:linear-gradient(135deg,var(--pp),var(--pp3));color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:13px">
-      📥 Ir para Importar
-    </button>
   </div>
 
 </div>
@@ -1970,7 +1868,7 @@ function mkEq(){
     const chkKey = eqChkKey(eq.name);
     const chkState = JSON.parse(localStorage.getItem(chkKey)||'{}');
     let chkDone=0, chkTotal=0;
-    CHK_SECTIONS.forEach(s=>s.items.forEach(i=>{chkTotal++;if(chkState[i.id])chkDone++;}));
+    getEqChecklist(eq.name).forEach(s=>s.items.forEach(i=>{chkTotal++;if(chkState[i.id])chkDone++;}));
     const chkPct = chkTotal>0?Math.round(chkDone/chkTotal*100):0;
     const chkColor = chkPct===100?'#4ADE80':chkPct>=60?'#FCD34D':'var(--g300)';
     return `<div class="eq-card" style="--ec:${cfg.c};cursor:default">
@@ -2051,12 +1949,12 @@ function eqChkRender(){
   if(!eqChkActive) return;
   const state = eqChkLoad(eqChkActive);
   const cfg   = EQ[eqChkActive]||{c:'var(--pp)'};
+  const sections = getEqChecklist(eqChkActive);
   let total=0, done=0;
-  CHK_SECTIONS.forEach(s=>s.items.forEach(i=>{total++;if(state[i.id])done++;}));
+  sections.forEach(s=>s.items.forEach(i=>{total++;if(state[i.id])done++;}));
   const pct = total>0?Math.round(done/total*100):0;
   const pctColor = pct===100?'#4ADE80':pct>=80?'var(--pp)':pct>=50?'#FCD34D':'#EF4444';
 
-  // Update bar + badge
   const bar = document.getElementById('eq-chk-bar');
   const badge = document.getElementById('eq-chk-pct-badge');
   if(bar) bar.style.width=pct+'%';
@@ -2065,15 +1963,13 @@ function eqChkRender(){
   const body = document.getElementById('eq-chk-body');
   if(!body) return;
 
-  body.innerHTML = CHK_SECTIONS.map(sec=>{
+  body.innerHTML = sections.map(sec=>{
     const secDone = sec.items.filter(i=>state[i.id]).length;
     const secTotal = sec.items.length;
     const secPct = Math.round(secDone/secTotal*100);
     const secColor = secPct===100?'#4ADE80':secPct>=60?'#FCD34D':'var(--g300)';
     const items = sec.items.map(item=>{
       const checked = !!state[item.id];
-      // Use unique id per equipe to avoid collision with global checklist
-      const uid = 'eqchk_'+item.id;
       return `<label style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:var(--rm);cursor:pointer;transition:background .15s;background:${checked?'#F0FDF4':'var(--g50)'};border:1px solid ${checked?'#BBF7D0':'var(--g200)'}">
         <input type="checkbox" ${checked?'checked':''} onchange="eqChkToggle('${item.id}',this.checked)"
           style="width:16px;height:16px;flex-shrink:0;margin-top:1px;accent-color:var(--pp);cursor:pointer">
@@ -2422,7 +2318,7 @@ function closeM(e){
 function go(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
-  ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos','eficiencia','calend','check'].forEach(p=>document.getElementById('pg-'+p).classList.remove('on'));
+  ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos','calend','check'].forEach(p=>document.getElementById('pg-'+p).classList.remove('on'));
   document.getElementById('pg-'+id).classList.add('on');
   if(id==='geral'){mkGD();mkDist();buildDUManualGrid();}
   if(id==='editor') buildOpEditor();
@@ -2432,7 +2328,6 @@ function go(id,el){
   if(id==='gestao') gestaoInit();
   if(id==='import') importInit();
   if(id==='acordos') acordosInit();
-  if(id==='eficiencia') eficienciaInit();
   if(id==='calend') calInit();
   if(id==='check') checkInit();
 }
@@ -2453,8 +2348,6 @@ function refreshAll(){
   if(typeof acRenderRanking==='function') acRenderRanking();
   if(typeof acRenderFechamento==='function') acRenderFechamento();
   if(typeof acRenderEficiencia==='function') acRenderEficiencia();
-  // Refresh eficiencia page if open
-  if(document.getElementById('pg-eficiencia')?.classList.contains('on')) eficienciaInit();
 }
 
 // ── TOAST ──
@@ -2472,14 +2365,12 @@ function tick(){
 // ── LOAD SAVED OVERRIDES ON START ──
 function loadSavedOverrides(){
   const savedOps = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
-  const savedHo  = JSON.parse(localStorage.getItem('cofen_ho_overrides')||'{}');
   if(Object.keys(savedOps).length>0){
     D.equipes.forEach(eq=>{
       eq.ops.forEach(op=>{
         if(savedOps[op.name]!==undefined){
-          op.rec = savedOps[op.name];
-          // Usar HO salvo da planilha se disponível, senão calcular 25%
-          op.ho  = savedHo[op.name]!==undefined ? savedHo[op.name] : op.rec * 0.25;
+          op.rec=savedOps[op.name];
+          op.ho=op.rec*0.25;
         }
       });
       eq.rec=eq.ops.reduce((s,o)=>s+o.rec,0);
@@ -3310,70 +3201,34 @@ function importParse(raw){
     return -1;
   };
 
-  // ── Detectar formato da planilha ──
-  // FORMATO REAL (relatório original do sistema):
-  //   Operador | Valor Recebido | Pague Play (24,96%)
-  //   → iRecReal = "valor recebido" → Total Real direto
-  //   → iHoReal  = "pague play"     → HO direto
-  //
-  // FORMATO ANTIGO (rec_por_equipe_e_operador):
-  //   Cobradora | Recebido (= HO) → Total Real = Recebido / 0.25
-  //
-  const iCob     = colIdx(['operador','cobradora','cobrador','nome']);
-  const iRecReal = colIdx(['valor recebido']);                // coluna "Valor Recebido"
-  const iHoReal  = colIdx(['pague play','pagueplay','24,96','24.96']); // coluna "Pague Play (24,96%)"
-  const iRecAnt  = colIdx(['recebido','rec ','valor rec','total rec','vlr rec']); // formato antigo
+  const iCob = colIdx(['cobradora','operador','cobrador','nome']);
+  const iRec = colIdx(['recebido','rec ','valor rec','total rec','vlr rec']);
+  const iHO  = colIdx(['total ho','ho','honorar']);
 
-  // Modo: se tem "Valor Recebido" explícito → formato real
-  const modoReal = iRecReal >= 0;
-
-  if(iCob < 0){
-    return {error: `Coluna de operador não encontrada. Colunas encontradas: ${headers.join(', ')}`};
-  }
-  if(!modoReal && iRecAnt < 0){
-    return {error: `Coluna de recebimento não encontrada. Encontrado: ${headers.join(', ')}. Necessário: "Valor Recebido" ou "Recebido".`};
+  if(iCob < 0 || iRec < 0){
+    return {error: `Colunas não encontradas. Encontrado: ${headers.join(', ')}. Necessário: "Cobradora" e "Recebido".`};
   }
 
-  // Normaliza nome
+  // Normaliza nome: lowercase, sem espaços/underline/acentos
   function norm(s){
     return (s||'').toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
       .replace(/[\s_.-]+/g,'');
   }
 
-  function parseNum(v){
-    if(!v && v!==0) return 0;
-    return parseFloat(String(v).replace(/\./g,'').replace(',','.')) || 0;
-  }
-
-  // Acumula por operador
-  // acc[rawName] = { rec: total_real, ho: total_ho }
+  // Acumula por operador (nome raw do arquivo)
   const acc = {};
   for(let i=1; i<lines.length; i++){
     const row = lines[i].split(sep).map(v=>v.trim().replace(/^"|"$/g,''));
-    const minLen = modoReal ? Math.max(iCob, iRecReal) : Math.max(iCob, iRecAnt);
-    if(row.length <= minLen) continue;
+    if(row.length <= Math.max(iCob,iRec)) continue;
     const rawName = row[iCob].trim();
-    if(!rawName || rawName.toLowerCase()==='nan' || rawName==='-') continue;
-
-    if(!acc[rawName]) acc[rawName] = {rec:0, ho:0};
-
-    if(modoReal){
-      // Formato real: Valor Recebido = Total Real, Pague Play = HO
-      const recVal = parseNum(row[iRecReal]);
-      const hoVal  = iHoReal >= 0 ? parseNum(row[iHoReal]) : recVal * 0.2496;
-      acc[rawName].rec += recVal;
-      acc[rawName].ho  += hoVal;
-    } else {
-      // Formato antigo: Recebido = HO → Total Real = HO / 0.25
-      const hoVal  = parseNum(row[iRecAnt]);
-      const recVal = hoVal / 0.25;
-      acc[rawName].rec += recVal;
-      acc[rawName].ho  += hoVal;
-    }
+    if(!rawName) continue;
+    const recVal = parseFloat(row[iRec].replace(/\./g,'').replace(',','.')) || 0;
+    if(!acc[rawName]) acc[rawName] = 0;
+    acc[rawName] += recVal; // Recebido = HO; Total Real = HO / 0.25
   }
 
-  // Build lookup
+  // Build lookup: norm(name) -> op object (from D.equipes directly)
   const lookup = {};
   D.equipes.forEach(eq=>{
     eq.ops.forEach(op=>{
@@ -3381,15 +3236,17 @@ function importParse(raw){
     });
   });
 
-  // Match
+  // Match each raw name to an operator
   const found = [], missing = [];
 
-  Object.entries(acc).forEach(([rawName, vals])=>{
-    const {rec: totalReal, ho: hoSum} = vals;
+  Object.entries(acc).forEach(([rawName, hoSum])=>{
+    const totalReal = hoSum / 0.25;
     const normRaw = norm(rawName);
 
+    // 1. Exact normalized match
     let matched = lookup[normRaw];
 
+    // 2. Partial match (raw name contains op name or vice versa)
     if(!matched){
       for(const [key, op] of Object.entries(lookup)){
         if(normRaw.includes(key) || key.includes(normRaw)){
@@ -3398,6 +3255,7 @@ function importParse(raw){
       }
     }
 
+    // 3. Levenshtein fuzzy
     if(!matched){
       let best=null, bestDist=Infinity;
       for(const [key, op] of Object.entries(lookup)){
@@ -3419,7 +3277,6 @@ function importParse(raw){
         hoImport:hoSum, recImport:totalReal,
         recCurrent:matched.rec, hoCurrent:matched.ho,
         diff:totalReal-matched.rec,
-        modoReal,
       });
     } else {
       missing.push({rawName, ho:hoSum, totalReal});
@@ -3428,7 +3285,7 @@ function importParse(raw){
 
   found.sort((a,b)=>b.recImport-a.recImport);
   missing.sort((a,b)=>b.totalReal-a.totalReal);
-  return {found, missing, sep, iCob, modoReal, totalLines:lines.length-1};
+  return {found, missing, sep, iCob, iRec, totalLines:lines.length-1};
 }
 
 // ── PREVIEW (live as user types) ──
@@ -3447,11 +3304,8 @@ function importPreview(raw){
   }
 
   importParsed = result;
-  const fmtLabel = result.modoReal
-    ? '📋 Relatório Original (Valor Recebido)'
-    : '📋 Formato rec_por_equipe (Recebido=HO ÷ 0,25)';
   document.getElementById('import-status').textContent =
-    result.totalLines+' linhas · '+result.found.length+' operadores · '+fmtLabel;
+    result.totalLines+' linhas lidas · '+result.found.length+' operadores encontrados';
   document.getElementById('import-status').style.color = 'var(--ok)';
 
   // Summary
@@ -3584,9 +3438,7 @@ function importApply(){
       found = true;
       if(Math.abs(r.recImport - opReal.rec) < 0.01){ unchanged++; return; }
       opReal.rec = r.recImport;
-      // Formato real: usar HO direto da planilha (Pague Play 24,96%)
-      // Formato antigo: calcular 25% do total real
-      opReal.ho  = r.modoReal ? r.hoImport : r.recImport * 0.25;
+      opReal.ho  = r.recImport * 0.25;
       updated++;
     });
   });
@@ -3601,15 +3453,10 @@ function importApply(){
   rebuildAll();
   refreshAll();
 
-  // Salvar no localStorage (rec + ho por operador)
+  // Salvar no localStorage
   const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
-  const ovHo = JSON.parse(localStorage.getItem('cofen_ho_overrides')||'{}');
-  importParsed.found.forEach(r=>{
-    ov[r.opName] = r.recImport;
-    ovHo[r.opName] = r.modoReal ? r.hoImport : r.recImport * 0.25;
-  });
+  importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
   localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
-  localStorage.setItem('cofen_ho_overrides', JSON.stringify(ovHo));
 
   const totalImportado = importParsed.found.reduce((s,r)=>s+r.recImport,0);
   toast(`✅ ${updated} operadores atualizados! Total: ${fRK(totalImportado)} · HO: ${fRK(totalImportado*0.25)}`);
@@ -3627,10 +3474,8 @@ function importApply(){
 
   // Sincronizar para todos via Firebase
   if(fbDb && fbRoom){
-    const ovFinal   = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
-    const ovHoFinal = JSON.parse(localStorage.getItem('cofen_ho_overrides')||'{}');
-    fbPush('overrides',    {...ovFinal,   _ts: Date.now()});
-    fbPush('ho_overrides', {...ovHoFinal, _ts: Date.now()});
+    const ovFinal = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+    fbPush('overrides', {...ovFinal, _ts: Date.now()});
     toast('✅ Importado e sincronizado para todos os dispositivos!');
   }
 }
@@ -3782,9 +3627,26 @@ function acImportPreview(raw){
   const idx=candidates=>{ for(const cand of candidates){ const i=headers.findIndex(h=>h.includes(cand)); if(i>=0) return i; } return -1; };
   const iCob  = idx(['usuario','cobrador','operador','nome']);
   const iDtPg = idx(['dtpagamento','dt pagamento','pagamento','baixa']);
-  const iDtPv = idx(['dtprev','dt prev','prev.pgto','agendamento','prev pgto']);
+  const iDtPv = idx(['dtprev','dt prev','prev.pgto','agendamento','prev pgto','prevpgto']);
 
   if(iCob<0){ document.getElementById('ac-import-status').textContent='⚠️ Coluna "Usuário" não encontrada'; return; }
+
+  // Detectar data do acordo gerado (vencimento ou data de ligação) p/ calcular avista/ate3dias
+  const iDtAc = idx(['vencimento','dtlig','dt lig','dt.lig','gerado','criado']);
+
+  const isValidDate = v => v && v!=='' && v.toLowerCase()!=='nat' && v.toLowerCase()!=='nan' && v!=='NaT' && v!=='-';
+  // Extrair YYYY-MM-DD de vários formatos
+  const parseDate = v => {
+    if(!v) return null;
+    // YYYY-MM-DD ou YYYY-MM-DD HH:MM:SS
+    let m = v.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(m) return `${m[1]}-${m[2]}-${m[3]}`;
+    // DD/MM/YYYY
+    m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if(m) return `${m[3]}-${m[2]}-${m[1]}`;
+    return null;
+  };
+  const today = new Date().toISOString().slice(0,10);
 
   const normalize=s=>s.toLowerCase().replace(/[_\s]/g,'');
   const acc={};
@@ -3792,18 +3654,42 @@ function acImportPreview(raw){
     const row=lines[i].split(sep).map(v=>v.trim().replace(/^"|"$/g,''));
     if(row.length<=iCob) continue;
     const nm=row[iCob]||''; if(!nm||nm==='nan'||nm==='-') continue;
-    if(!acc[nm]) acc[nm]={g:0,p:0,ag:0};
+    if(!acc[nm]) acc[nm]={g:0,p:0,ag:0,avista:0,ate3d:0,mais3d:0,ag_futuro:{}};
     acc[nm].g++;
     const pgVal = iDtPg>=0 ? row[iDtPg]||'' : '';
     const pvVal = iDtPv>=0 ? row[iDtPv]||'' : '';
-    const isPago = pgVal&&pgVal!==''&&pgVal.toLowerCase()!=='nat'&&pgVal.toLowerCase()!=='nan'&&pgVal!=='NaT';
-    if(isPago) acc[nm].p++;
-    else if(pvVal&&pvVal!==''&&pvVal.toLowerCase()!=='nat'&&pvVal.toLowerCase()!=='nan') acc[nm].ag++;
+    const acVal = iDtAc>=0 ? row[iDtAc]||'' : '';
+    const isPago = isValidDate(pgVal);
+    const hasPrev = isValidDate(pvVal);
+
+    if(isPago){
+      acc[nm].p++;
+      // Calcular avista / ate3dias / mais3dias
+      const dtPg = parseDate(pgVal);
+      const dtAc = parseDate(acVal);
+      if(dtPg && dtAc){
+        const diff = Math.round((new Date(dtPg)-new Date(dtAc))/(86400000));
+        if(diff===0)      acc[nm].avista++;
+        else if(diff<=3)  acc[nm].ate3d++;
+        else              acc[nm].mais3d++;
+      } else {
+        acc[nm].avista++; // sem data base → assume avista
+      }
+    } else if(hasPrev){
+      acc[nm].ag++;
+      // Guardar data futura para ag_futuro
+      const dtPv = parseDate(pvVal);
+      if(dtPv && dtPv >= today){
+        acc[nm].ag_futuro[dtPv] = (acc[nm].ag_futuro[dtPv]||0) + 1;
+      }
+    }
   }
 
   acImportParsed=Object.entries(acc).map(([nm,d])=>{
     const matched=ALL.find(o=>normalize(o.name)===normalize(nm));
-    return {rawName:nm,opName:matched?.name||null,g:d.g,p:d.p,ag:d.ag,matched:!!matched};
+    return {rawName:nm,opName:matched?.name||null,g:d.g,p:d.p,ag:d.ag,
+            avista:d.avista,ate3d:d.ate3d,mais3d:d.mais3d,ag_futuro:d.ag_futuro,
+            matched:!!matched};
   });
   const found=acImportParsed.filter(r=>r.matched);
   const missing=acImportParsed.filter(r=>!r.matched);
@@ -3864,10 +3750,14 @@ function acImportApply(){
   acImportParsed.forEach(r=>{
     const op=ALL.find(o=>o.name===r.opName);
     if(!op) return;
-    op.gerados     = r.g;
-    op['pagos']    = r.p;
+    op.gerados      = r.g;
+    op['pagos']     = r.p;
     op['pendentes'] = r.g - r.p;
-    op['agendados'] = r.ag || (r.g - r.p);
+    op['agendados'] = r.ag;
+    op['avista']    = r.avista  || 0;
+    op['ate3dias']  = r.ate3d   || 0;
+    op['mais3dias'] = r.mais3d  || 0;
+    op['ag_futuro'] = r.ag_futuro || {};
     op['eficiencia']= r.g>0 ? parseFloat((r.p/r.g*100).toFixed(1)) : 0;
     if(r.p>0) op['ticket'] = parseFloat((op.rec/r.p).toFixed(2));
   });
@@ -3878,8 +3768,6 @@ function acImportApply(){
   acRenderRanking();
   if(typeof acRenderFechamento==='function') acRenderFechamento();
   if(typeof acRenderEficiencia==='function') acRenderEficiencia();
-  // Atualizar aba Eficiência se estiver aberta
-  if(document.getElementById('pg-eficiencia')?.classList.contains('on')) eficienciaInit();
   initHero();
   mkGD(); mkDist(); mkTop5(); mkEq(); mkRanking();
   markImportDone('ac');
@@ -3889,7 +3777,8 @@ function acImportApply(){
     const acordosData = {};
     ALL.forEach(op=>{
       if(op.gerados||op.pagos){
-        acordosData[op.name]={g:op.gerados||0,p:op.pagos||0,ef:op.eficiencia||0,ag:op.agendados||0};
+        acordosData[op.name]={g:op.gerados||0,p:op.pagos||0,ef:op.eficiencia||0,ag:op.agendados||0,
+          avista:op.avista||0,ate3d:op.ate3dias||0,mais3d:op.mais3dias||0,ag_futuro:op.ag_futuro||{}};
       }
     });
     fbPush('acordos', {...acordosData, _ts: Date.now()});
@@ -3917,16 +3806,11 @@ function photoFileSelected(inp){
   if(!inp.files||!inp.files[0]) return;
   const file = inp.files[0];
   const reader = new FileReader();
-  reader.onload = async e => {
+  reader.onload = e => {
     const url = e.target.result;
     if(currentModalOp){
-      toast('⏳ Salvando foto...');
-      await photoSet(currentModalOp, url);
+      photoSet(currentModalOp, url);
       renderModalPhoto(currentModalOp, EQ[ALL.find(o=>o.name===currentModalOp)?.eq]||{c:'#888'});
-      // Atualiza a grid de fotos se estiver aberta
-      if(document.getElementById('gsub-fotos')?.style.display!=='none') fotosRenderGrid();
-      // Atualiza ranking se visível
-      if(document.getElementById('pg-ranking')?.classList.contains('on')) mkRanking();
       toast('✅ Foto salva para ' + currentModalOp.replace(/_/g,' ') + '!');
     }
   };
@@ -4040,30 +3924,24 @@ function renderModalPhoto(opName, cfg){
   }
 }
 
-async function photoRemove(opName){
-  await photoSet(opName, null);
+function photoRemove(opName){
+  photoSet(opName, null);
   const cfg = EQ[ALL.find(o=>o.name===opName)?.eq]||{c:'#888'};
   renderModalPhoto(opName, cfg);
-  if(document.getElementById('gsub-fotos')?.style.display!=='none') fotosRenderGrid();
-  if(document.getElementById('pg-ranking')?.classList.contains('on')) mkRanking();
-  toast('🗑 Foto removida!');
+  toast('🗑 Foto removida');
 }
 
-// Load photos from Firebase on init (called after fbAutoConnect)
+// Load photos from shared storage on init
 async function loadSharedPhotos(){
-  // Photos are loaded via Firebase listeners (child_added/child_changed)
-  // This function is kept for compatibility but Firebase handles it
-  // Cleanup very large photos from localStorage to prevent overflow
+  if(!window.storage) return;
   try {
-    const all = photoGetAll();
-    let changed = false;
-    for(const [k,v] of Object.entries(all)){
-      if(v && v.length > 200000){ // >200KB base64 — recompress
-        const compressed = await compressImage(v, 300, 0.65);
-        if(compressed.length < v.length){ all[k]=compressed; changed=true; }
-      }
+    const res = await window.storage.get('photos', true);
+    if(res && res.value){
+      const remote = JSON.parse(res.value);
+      const local  = photoGetAll();
+      const merged = {...local, ...remote};
+      localStorage.setItem('cofen_photos', JSON.stringify(merged));
     }
-    if(changed) localStorage.setItem('cofen_photos', JSON.stringify(all));
   } catch(e){}
 }
 
@@ -4096,12 +3974,8 @@ try {
       if(document.getElementById('pg-recdia')?.classList.contains('on')) rdRender();
     }
     if(e.data.type === 'photo_update'){
-      try{
-        const photos = JSON.parse(e.data.payload||'{}');
-        localStorage.setItem('cofen_photos', JSON.stringify(photos));
-        if(document.getElementById('gsub-fotos')?.style.display!=='none') fotosRenderGrid();
-        if(document.getElementById('pg-ranking')?.classList.contains('on')) mkRanking();
-      }catch(e2){}
+      const photos = JSON.parse(e.data.payload||'{}');
+      localStorage.setItem('cofen_photos', JSON.stringify(photos));
     }
     if(e.data.type === 'meta_update'){
       // Outra aba editou total/meta — aplicar aqui também
@@ -4192,6 +4066,7 @@ function tvUpdateDots(){
 
 function tvShow(idx){
   const op  = tvList[idx];
+  const pos = idx + 1; // posição real no ranking
   const cfg = EQ[op.eq]||{c:'#888',bg:'#1a2330',ico:'⭐',sh:op.eq};
   const photo = photoGet(op.name);
 
@@ -4200,88 +4075,145 @@ function tvShow(idx){
   document.getElementById('tv-clock-display').textContent=
     [now.getHours(),now.getMinutes(),now.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
 
-  // Acordos/eficiência
-  const gerados  = op.gerados   || 0;
-  const pagos    = op.pagos     || 0;
-  const pendentes= op.pendentes || 0;
-  const efPct    = gerados>0?(pagos/gerados*100).toFixed(1):'0';
-  const efColor  = parseFloat(efPct)>=40?'#4ADE80':parseFloat(efPct)>=20?'#FCD34D':'#FCA5A5';
+  // Posição: TOP 1-10 enorme, 11° em diante numerado
+  const isTop10 = pos <= 10;
+  const medals  = ['🥇','🥈','🥉'];
+  const posLabel = pos <= 3  ? medals[pos-1]
+                 : isTop10   ? `TOP ${pos}`
+                 : `${pos}°`;
+  const posSize  = pos === 1 ? '88px'
+                 : pos <= 3  ? '72px'
+                 : isTop10   ? '60px'
+                 : '48px';
+  const posColor = pos===1?'#FFD700':pos===2?'#C0C0C0':pos===3?'#CD7F32'
+                 : isTop10?'#67E8F9':'rgba(255,255,255,.45)';
+  const posGlow  = pos<=3?`0 0 40px ${posColor}88`:pos<=10?`0 0 20px ${posColor}44`:'none';
 
-  // Agendamentos futuros próximos
+  // Tier badge
+  const tier      = op.rec>=20000?'S-TIER':op.rec>=10000?'A — ALTA':op.rec>=5000?'B — BOA':'C — DEV';
+  const tierColor = op.rec>=20000?'#4ADE80':op.rec>=10000?'#67E8F9':op.rec>=5000?'#FCD34D':'#FCA5A5';
+
+  // Foto ou avatar
+  const photoHtml = photo
+    ? `<img src="${photo}" style="width:180px;height:180px;border-radius:24px;object-fit:cover;border:4px solid ${cfg.c};box-shadow:0 0 40px ${cfg.c}55;flex-shrink:0">`
+    : `<div style="width:180px;height:180px;border-radius:24px;background:${cfg.c}22;border:4px solid ${cfg.c};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:60px;color:${cfg.c};flex-shrink:0;box-shadow:0 0 40px ${cfg.c}44">${ini(op.name)}</div>`;
+
+  // Agendamentos futuros
   const agFuturo = op.ag_futuro||{};
   const agDates  = Object.entries(agFuturo).sort((a,b)=>a[0].localeCompare(b[0])).slice(0,4);
   const agTotal  = Object.values(agFuturo).reduce((s,v)=>s+v,0);
 
-  // Tier
-  const tier = op.rec>=20000?'⭐ S-TIER':op.rec>=10000?'A ALTA':op.rec>=5000?'B BOA':'C DEV';
-  const tierColor = op.rec>=20000?'#4ADE80':op.rec>=10000?'#67E8F9':op.rec>=5000?'#FCD34D':'#FCA5A5';
+  // Eficiência
+  const gerados  = op.gerados   || 0;
+  const pagos    = op.pagos     || 0;
+  const pendentes= op.pendentes || 0;
+  const efPct    = gerados>0?(pagos/gerados*100).toFixed(1):'—';
+  const efColor  = parseFloat(efPct)>=40?'#4ADE80':parseFloat(efPct)>=20?'#FCD34D':'#FCA5A5';
 
-  // Photo or avatar
-  const photoHtml = photo
-    ? `<img src="${photo}" class="tv-photo" alt="${op.name}">`
-    : `<div class="tv-photo-placeholder" style="background:${cfg.c}">${ini(op.name)}</div>`;
+  // Formas de pagamento
+  const tiposEntries = Object.entries(op.tipos||{}).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const tiposTotal   = Object.values(op.tipos||{}).reduce((s,v)=>s+v,0);
+  const tColors      = {"Boleto":"#FCD34D","Pix":"#4ADE80","Cartão Padrão":"#67E8F9","Cartão":"#67E8F9"};
+
+  // Ranking vizinho — quem está antes e depois
+  const prev = idx>0             ? tvList[idx-1] : null;
+  const next = idx<tvList.length-1? tvList[idx+1] : null;
 
   document.getElementById('tv-card').innerHTML=`
-    <div style="display:flex;align-items:flex-start;gap:28px;margin-bottom:24px">
-      ${photoHtml}
+    <div style="display:flex;gap:32px;align-items:flex-start;margin-bottom:24px">
+
+      <!-- FOTO + POSIÇÃO -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0">
+        ${photoHtml}
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:${posSize};color:${posColor};line-height:1;text-align:center;text-shadow:${posGlow};letter-spacing:${isTop10?'3px':'1px'}">${posLabel}</div>
+        <div style="font-size:11px;font-weight:700;color:${posColor};background:${posColor}18;border:1px solid ${posColor}44;padding:4px 14px;border-radius:100px;letter-spacing:1.5px;text-transform:uppercase">${tier}</div>
+      </div>
+
+      <!-- NOME + KPIs PRINCIPAIS -->
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
-          <div style="font-size:11px;font-weight:700;color:${tierColor};background:${tierColor}18;
-            border:1px solid ${tierColor}33;padding:3px 10px;border-radius:100px;letter-spacing:1px">${tier}</div>
-          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase">${idx+1} de ${tvList.length}</div>
+          <div style="font-size:10px;font-weight:700;color:${cfg.c};letter-spacing:2px;text-transform:uppercase">${cfg.ico} ${cfg.sh}</div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1px">${idx+1} de ${tvList.length}</div>
         </div>
-        <div class="tv-name">${op.name.replace(/_/g,' ').toUpperCase()}</div>
-        <div class="tv-eq">${cfg.ico} ${cfg.sh}</div>
-      </div>
-    </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;color:#fff;line-height:1;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${op.name.replace(/_/g,' ').toUpperCase()}</div>
 
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
-      <div class="tv-kpi" style="border-color:rgba(74,222,128,.2)">
-        <div class="tv-kpi-l">Total Real</div>
-        <div class="tv-kpi-v" style="color:#4ADE80">${fR(op.rec)}</div>
-      </div>
-      <div class="tv-kpi" style="border-color:rgba(103,232,249,.2)">
-        <div class="tv-kpi-l">HO (25%)</div>
-        <div class="tv-kpi-v" style="color:#67E8F9">${fR(op.ho)}</div>
-      </div>
-      <div class="tv-kpi">
-        <div class="tv-kpi-l">Acordos Gerados</div>
-        <div class="tv-kpi-v" style="color:#fff">${gerados}</div>
-      </div>
-      <div class="tv-kpi" style="border-color:${efColor}33">
-        <div class="tv-kpi-l">Eficiência</div>
-        <div class="tv-kpi-v" style="color:${efColor}">${efPct}%</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:3px">${pagos} pagos / ${pendentes} pend.</div>
-      </div>
-    </div>
+        <!-- 4 KPIs grandes -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+          <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:14px;padding:14px 16px;text-align:center">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">💰 Total Real</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#4ADE80;letter-spacing:.5px;line-height:1">${fR(op.rec)}</div>
+          </div>
+          <div style="background:rgba(103,232,249,.1);border:1px solid rgba(103,232,249,.25);border-radius:14px;padding:14px 16px;text-align:center">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">🎯 HO (25%)</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#67E8F9;letter-spacing:.5px;line-height:1">${fR(op.ho)}</div>
+          </div>
+          <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 16px;text-align:center">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">📋 Acordos</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;letter-spacing:.5px;line-height:1">${op.acordos}</div>
+          </div>
+          <div style="background:${efColor}11;border:1px solid ${efColor}33;border-radius:14px;padding:14px 16px;text-align:center">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">⚡ Eficiência</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${efColor};letter-spacing:.5px;line-height:1">${efPct}${efPct!=='—'?'%':''}</div>
+            ${gerados>0?`<div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">${pagos}p / ${pendentes}pend</div>`:''}
+          </div>
+        </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px">
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">📅 Agendamentos Futuros (${agTotal})</div>
-        ${agDates.length>0
-          ? agDates.map(([dt,n])=>`<div class="tv-ag-row">
-              <span style="color:rgba(255,255,255,.7)">${new Date(dt+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}</span>
-              <span style="color:#67E8F9;font-weight:800">${n} acordo${n>1?'s':''}</span>
-            </div>`).join('')
-          : '<div style="font-size:13px;color:rgba(255,255,255,.25);font-style:italic">Sem agendamentos futuros</div>'}
-      </div>
-      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px">
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">💳 Formas de Pagamento</div>
-        ${Object.entries(op.tipos||{}).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>{
-          const tColors={"PIX":"#4ADE80","CARTÃO DE CRÉDITO":"#67E8F9","BOLETO NEGOCIAÇÃO":"#FCD34D"};
-          const total=Object.values(op.tipos||{}).reduce((s,vv)=>s+vv,0);
-          const pct=total>0?Math.round(v/total*100):0;
-          return `<div class="tv-ag-row">
-            <span style="color:rgba(255,255,255,.7);font-size:12px">${k.replace('NEGOCIAÇÃO','').trim()}</span>
-            <span style="color:${tColors[k]||'#fff'};font-weight:800">${pct}%</span>
-          </div>`;
-        }).join('')}
+        <!-- Detalhes menores: agendamentos + formas de pagamento + ranking vizinhos -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+
+          <!-- Agendamentos -->
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">📅 Agend. Futuros (${agTotal})</div>
+            ${agDates.length>0
+              ? agDates.map(([dt,n])=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+                  <span style="color:rgba(255,255,255,.6);font-size:12px">${new Date(dt+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}</span>
+                  <span style="color:#67E8F9;font-weight:800;font-size:12px">${n}ac</span>
+                </div>`).join('')
+              : '<div style="font-size:12px;color:rgba(255,255,255,.2);font-style:italic">Sem agendamentos</div>'}
+          </div>
+
+          <!-- Formas de pgto -->
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💳 Formas de Pgto</div>
+            ${tiposEntries.length>0
+              ? tiposEntries.map(([k,v])=>{
+                  const pct=tiposTotal>0?Math.round(v/tiposTotal*100):0;
+                  return `<div style="margin-bottom:6px">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                      <span style="color:rgba(255,255,255,.6);font-size:11px">${k.replace('NEGOCIAÇÃO','').replace('Padrão','').trim()}</span>
+                      <span style="color:${tColors[k]||'#fff'};font-weight:800;font-size:11px">${pct}%</span>
+                    </div>
+                    <div style="height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden">
+                      <div style="height:100%;width:${pct}%;background:${tColors[k]||cfg.c};border-radius:99px"></div>
+                    </div>
+                  </div>`;
+                }).join('')
+              : '<div style="font-size:12px;color:rgba(255,255,255,.2)">Sem dados</div>'}
+          </div>
+
+          <!-- Posição no ranking: quem está antes/depois -->
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">🏆 Ranking</div>
+            ${prev?`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-radius:7px;background:rgba(255,255,255,.04);margin-bottom:5px">
+              <span style="font-size:10px;color:rgba(255,255,255,.35)">${idx}° ${prev.name.replace(/_/g,' ')}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700">${fRK(prev.rec)}</span>
+            </div>`:''}
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-radius:8px;background:${cfg.c}22;border:1px solid ${cfg.c}55;margin-bottom:5px">
+              <span style="font-size:12px;color:${cfg.c};font-weight:800">${posLabel} VOCÊ</span>
+              <span style="font-size:13px;color:#4ADE80;font-weight:900">${fRK(op.rec)}</span>
+            </div>
+            ${next?`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-radius:7px;background:rgba(255,255,255,.04)">
+              <span style="font-size:10px;color:rgba(255,255,255,.35)">${idx+2}° ${next.name.replace(/_/g,' ')}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700">${fRK(next.rec)}</span>
+            </div>`:''}
+          </div>
+
+        </div>
       </div>
     </div>`;
 
   tvUpdateDots();
 
-  // Reset + animate progress bar
   const bar = document.getElementById('tv-bar');
   bar.style.transition='none';
   bar.style.width='0%';
@@ -4459,7 +4391,6 @@ function fbStartListening(){
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
     // Atualiza D.equipes diretamente (ALL é cópia via flatMap — não usar!)
     let changed = false;
-    const savedHoFb = JSON.parse(localStorage.getItem('cofen_ho_overrides')||'{}');
     Object.entries(remote).forEach(([nm,val])=>{
       if(nm==='_ts'||nm.startsWith('_')) return;
       const numVal = parseFloat(val)||0;
@@ -4468,8 +4399,7 @@ function fbStartListening(){
         const opReal = eq.ops.find(o=>o.name===nm);
         if(!opReal||Math.abs(opReal.rec-numVal)<0.01) return;
         opReal.rec = numVal;
-        // Usar HO salvo se disponível, senão 25%
-        opReal.ho  = savedHoFb[nm]!==undefined ? savedHoFb[nm] : numVal * 0.25;
+        opReal.ho  = numVal * 0.25;
         changed = true;
       });
     });
@@ -4485,40 +4415,13 @@ function fbStartListening(){
   });
   fbListeners.overrides = true;
 
-  // ── Fotos — escuta cada foto individualmente (evita sobrescrever tudo) ──
-  fbDb.ref(fbRoom+'/photos').on('child_added', snap=>{
-    const key = snap.key;
-    const val = snap.val();
-    if(!key||!val) return;
-    const all = photoGetAll();
-    const realKey = Object.keys(all).find(k=>k.replace(/[^a-zA-Z0-9_]/g,'_')===key) || key;
-    if(all[realKey]===val) return;
-    all[realKey]=val;
-    try{ localStorage.setItem('cofen_photos', JSON.stringify(all)); }catch(e){}
-    // Atualiza grid de fotos se aberta
-    if(document.getElementById('gsub-fotos')?.style.display!=='none') fotosRenderGrid();
-    if(document.getElementById('pg-ranking')?.classList.contains('on')) mkRanking();
-    pulseSyncDot();
-  });
-  fbDb.ref(fbRoom+'/photos').on('child_changed', snap=>{
-    const key = snap.key, val = snap.val();
-    if(!key||!val) return;
-    const all = photoGetAll();
-    const realKey = Object.keys(all).find(k=>k.replace(/[^a-zA-Z0-9_]/g,'_')===key) || key;
-    all[realKey]=val;
-    try{ localStorage.setItem('cofen_photos', JSON.stringify(all)); }catch(e){}
-    if(document.getElementById('gsub-fotos')?.style.display!=='none') fotosRenderGrid();
-    if(document.getElementById('pg-ranking')?.classList.contains('on')) mkRanking();
-    pulseSyncDot();
-  });
-  fbDb.ref(fbRoom+'/photos').on('child_removed', snap=>{
-    const key = snap.key;
-    if(!key) return;
-    const all = photoGetAll();
-    const realKey = Object.keys(all).find(k=>k.replace(/[^a-zA-Z0-9_]/g,'_')===key) || key;
-    delete all[realKey];
-    try{ localStorage.setItem('cofen_photos', JSON.stringify(all)); }catch(e){}
-    if(document.getElementById('gsub-fotos')?.style.display!=='none') fotosRenderGrid();
+  // ── Fotos ──
+  fbDb.ref(fbRoom+'/photos').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    const local = photoGetAll();
+    if(JSON.stringify(remote)===JSON.stringify(local)) return;
+    localStorage.setItem('cofen_photos', JSON.stringify({...local,...remote}));
     pulseSyncDot();
   });
   fbListeners.photos = true;
@@ -4578,29 +4481,6 @@ function fbStartListening(){
   });
   fbListeners.metas_op = true;
 
-  // ── HO Overrides (do relatório original) ──
-  fbDb.ref(fbRoom+'/ho_overrides').on('value', snap=>{
-    const remote = snap.val();
-    if(!remote) return;
-    const local = JSON.parse(localStorage.getItem('cofen_ho_overrides')||'{}');
-    if(JSON.stringify(remote)===JSON.stringify(local)) return;
-    const merged = {...local, ...remote};
-    localStorage.setItem('cofen_ho_overrides', JSON.stringify(merged));
-    // Aplicar HO nos operadores
-    let changed2 = false;
-    D.equipes.forEach(eq=>{
-      eq.ops.forEach(op=>{
-        if(merged[op.name]!==undefined && Math.abs(op.ho - merged[op.name]) > 0.01){
-          op.ho = merged[op.name];
-          changed2 = true;
-        }
-      });
-      if(changed2) eq.ho = eq.ops.reduce((s,o)=>s+o.ho, 0);
-    });
-    if(changed2){ rebuildAll(); refreshAll(); pulseSyncDot(); }
-  });
-  fbListeners.ho_overrides = true;
-
   // ── Gestão (movimentação de operadores) ──
   fbDb.ref(fbRoom+'/gestao').on('value', snap=>{
     const remote = snap.val();
@@ -4652,7 +4532,9 @@ function fbStartListening(){
       if(nm==='_ts'||nm.startsWith('_')) return;
       const op = ALL.find(o=>o.name===nm);
       if(!op) return;
-      if(val.g !== undefined){ op.gerados=val.g; op.pagos=val.p; op.eficiencia=val.ef||0; op.agendados=val.ag||0; changed=true; }
+      if(val.g !== undefined){ op.gerados=val.g; op.pagos=val.p; op.eficiencia=val.ef||0; op.agendados=val.ag||0;
+        op.avista=val.avista||0; op.ate3dias=val.ate3d||0; op.mais3dias=val.mais3d||0;
+        op.ag_futuro=val.ag_futuro||{}; changed=true; }
     });
     if(!changed) return;
     rebuildAll();
@@ -4718,62 +4600,13 @@ function applyOps(){
   toast('✅ Valores aplicados e sincronizados!');
 }
 
-// comprime imagem para max 400x400 e qualidade 0.75 antes de salvar
-async function compressImage(dataUrl, maxSize, quality){
-  return new Promise(resolve=>{
-    const img=new Image();
-    img.onload=()=>{
-      const cv=document.createElement('canvas');
-      let w=img.width, h=img.height;
-      if(w>maxSize||h>maxSize){
-        if(w>h){h=Math.round(h*maxSize/w);w=maxSize;}
-        else{w=Math.round(w*maxSize/h);h=maxSize;}
-      }
-      cv.width=w; cv.height=h;
-      const ctx=cv.getContext('2d');
-      ctx.drawImage(img,0,0,w,h);
-      resolve(cv.toDataURL('image/jpeg',quality));
-    };
-    img.onerror=()=>resolve(dataUrl);
-    img.src=dataUrl;
-  });
-}
-
 // photoSet — salva foto localmente + Firebase + BroadcastChannel
-async function photoSet(opName, url){
-  try {
-    let finalUrl = url;
-    if(url && url.startsWith('data:')){
-      // Comprime para max 400px e qualidade 0.75 (economiza ~80% do tamanho)
-      finalUrl = await compressImage(url, 400, 0.75);
-    }
-    const all = photoGetAll();
-    if(finalUrl) all[opName]=finalUrl; else delete all[opName];
-    try {
-      localStorage.setItem('cofen_photos', JSON.stringify(all));
-    } catch(storageErr){
-      // localStorage cheio — tentar limpar fotos antigas e salvar só essa
-      console.warn('localStorage cheio, comprimindo mais:', storageErr);
-      if(finalUrl) {
-        finalUrl = await compressImage(url, 200, 0.6);
-        all[opName] = finalUrl;
-      }
-      try { localStorage.setItem('cofen_photos', JSON.stringify(all)); }
-      catch(e2) { toast('⚠️ Armazenamento cheio! Remova fotos antigas primeiro.'); return; }
-    }
-    syncBroadcast('photo_update', JSON.stringify(all));
-    // Envia para Firebase apenas a foto individual (não todas) para evitar limite
-    if(fbDb && fbRoom){
-      if(finalUrl){
-        fbDb.ref(fbRoom+'/photos/'+opName.replace(/[^a-zA-Z0-9_]/g,'_')).set(finalUrl).catch(e=>console.warn('FB photo err:',e));
-      } else {
-        fbDb.ref(fbRoom+'/photos/'+opName.replace(/[^a-zA-Z0-9_]/g,'_')).remove().catch(e=>console.warn('FB photo remove err:',e));
-      }
-    }
-  } catch(err) {
-    console.error('Erro ao salvar foto:', err);
-    toast('❌ Erro ao salvar foto: '+err.message);
-  }
+function photoSet(opName, url){
+  const all = photoGetAll();
+  if(url) all[opName]=url; else delete all[opName];
+  localStorage.setItem('cofen_photos', JSON.stringify(all));
+  syncBroadcast('photo_update', JSON.stringify(all));
+  fbPush('photos', all);
 }
 
 // ── AUTO-CONNECT FIXO — Firebase e sala já configurados ──
@@ -4867,14 +4700,6 @@ function fotosSetEq(eq){
   fotosInit();
 }
 
-async function fotosRemovePhoto(opName){
-  if(!confirm('Remover foto de '+opName.replace(/_/g,' ')+'?')) return;
-  await photoSet(opName, null);
-  fotosRenderGrid();
-  if(document.getElementById('pg-ranking')?.classList.contains('on')) mkRanking();
-  toast('🗑 Foto de '+opName.replace(/_/g,' ')+' removida!');
-}
-
 function fotosRenderGrid(){
   const grid = document.getElementById('fotos-grid');
   if(!grid) return;
@@ -4902,7 +4727,7 @@ function fotosRenderGrid(){
       + '<div style="font-size:10px;color:'+cfg.c+';font-weight:700">'+cfg.sh+'</div>'
       + '<div style="font-size:9px;color:var(--g500);margin-top:2px">'+fR(op.rec)+'</div>'
       + '</div>'
-      + (hasPhoto ? '<div style="position:absolute;top:6px;right:6px;display:flex;gap:4px;align-items:center"><div style="background:rgba(0,0,0,.55);border-radius:100px;padding:2px 7px;font-size:9px;font-weight:700;color:#fff">✅ Foto</div><button onclick="event.stopPropagation();fotosRemovePhoto(\''+op.name+'\')" style="width:20px;height:20px;border-radius:50%;border:none;background:rgba(239,68,68,.85);color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:900">×</button></div>' : '')
+      + (hasPhoto ? '<div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);border-radius:100px;padding:2px 7px;font-size:9px;font-weight:700;color:#fff">✅ Foto</div>' : '')
       + '<div style="position:absolute;bottom:54px;left:0;right:0;text-align:center;background:rgba(0,0,0,.6);padding:5px 0;color:#fff;font-size:10px;font-weight:700;opacity:0;transition:opacity .2s" class="fh-lbl">'
       + (hasPhoto?'📷 Trocar foto':'📷 Adicionar foto')+'</div>'
       + '</div>';
@@ -4926,16 +4751,14 @@ function fotosSelectOp(opName){
 function fotosFileSelected(inp){
   if(!inp.files||!inp.files[0]||!fotosClickOp) return;
   const file = inp.files[0];
-  const opName = fotosClickOp; // salvar antes de zerar
-  fotosClickOp = null;
   const reader = new FileReader();
-  reader.onload = async e => {
-    toast('⏳ Salvando foto...');
-    await photoSet(opName, e.target.result);
+  reader.onload = e => {
+    photoSet(fotosClickOp, e.target.result);
     fotosRenderGrid();
     // Refresh ranking & modal if open
-    if(document.getElementById('pg-ranking')?.classList.contains('on')) mkRanking();
-    toast('✅ Foto salva para ' + opName.replace(/_/g,' ') + '!');
+    if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
+    toast('✅ Foto salva para ' + fotosClickOp.replace(/_/g,' ') + '!');
+    fotosClickOp = null;
   };
   reader.readAsDataURL(file);
   inp.value='';
@@ -5178,10 +5001,10 @@ Esta ação remove o operador de todas as abas e sincroniza para todos os dispos
   // Sincronizar Firebase
   fbPush('gestao', gOv);
   fbPush('overrides', {...ov, _ts: Date.now()});
-  // Remover foto do Firebase (deleta só a chave individual)
+  // Remover foto do Firebase
   if(fbDb && fbRoom){
-    const safeKey = opName.replace(/[^a-zA-Z0-9_]/g,'_');
-    fbDb.ref(fbRoom+'/photos/'+safeKey).remove().catch(e=>console.warn('FB photo remove err:',e));
+    const allPhotos = JSON.parse(localStorage.getItem('cofen_photos')||'{}');
+    fbPush('photos', allPhotos);
   }
 
   // Rebuild e refresh tudo
@@ -5237,65 +5060,207 @@ function restaurarOp(opName){
 // CHECKLIST DO LÍDER
 // ══════════════════════════════════════════
 
+// ── CHECKLISTS PERSONALIZADOS POR EQUIPE ──
+const CHK_BY_EQ = {
+
+  // ── MARÍLIA BRENDA ──
+  'COFEN MARILIA BRENDA': [
+    { id:'abertura', icon:'🌅', title:'Abertura — Marília Brenda', items:[
+      {id:'mb_login',        label:'Login no CRM e verificar lista de devedores do dia'},
+      {id:'mb_presenca',     label:'Confirmar presença de todos os 12 operadores'},
+      {id:'mb_meta_dia',     label:'Comunicar meta do dia (valor + HO esperado) no grupo'},
+      {id:'mb_script',       label:'Revisão rápida do script com foco nas objeções de ontem'},
+      {id:'mb_carteira',     label:'Verificar se carteira está carregada e distribuída corretamente'},
+    ]},
+    { id:'producao', icon:'📞', title:'Produção — Marília Brenda', items:[
+      {id:'mb_lig_1h',       label:'Checar volume de ligações na 1ª hora (meta: mín 10 por op)'},
+      {id:'mb_ranking_manha',label:'Divulgar ranking parcial da manhã no grupo da equipe'},
+      {id:'mb_acordos',      label:'Conferir acordos fechados e links gerados até as 12h'},
+      {id:'mb_pausas',       label:'Gerenciar pausas — ninguém fora do horário permitido'},
+      {id:'mb_ops_baixos',   label:'Identificar operadores com baixa produção e dar suporte'},
+      {id:'mb_sprint_tarde', label:'Acionar sprint da tarde: meta individual de 3 acordos/op'},
+    ]},
+    { id:'qualidade', icon:'🎯', title:'Qualidade — Marília Brenda', items:[
+      {id:'mb_monitoria',    label:'Monitorar ao menos 2 ligações ao vivo (escuta ativa)'},
+      {id:'mb_feedback',     label:'Dar feedback individual para os 3 operadores mais baixos'},
+      {id:'mb_conversao',    label:'Checar taxa de conversão: acordos pagos / links gerados'},
+      {id:'mb_objecoes',     label:'Coletar objeções do dia e alinhar respostas novas'},
+    ]},
+    { id:'comunicacao', icon:'📢', title:'Comunicação — Marília Brenda', items:[
+      {id:'mb_msg_mot',      label:'Enviar mensagem motivacional no grupo (manhã e tarde)'},
+      {id:'mb_destaque',     label:'Reconhecer publicamente o destaque do dia'},
+      {id:'mb_alinhamento',  label:'Alinhar com Brenda (liderança) sobre andamento e bloqueios'},
+      {id:'mb_ranking_tarde',label:'Divulgar ranking atualizado às 15h no grupo'},
+    ]},
+    { id:'encerramento', icon:'🌙', title:'Encerramento — Marília Brenda', items:[
+      {id:'mb_relatorio',    label:'Importar relatório de recebimento e acordos no dashboard'},
+      {id:'mb_meta_bate',    label:'Confirmar se meta da equipe foi atingida'},
+      {id:'mb_ranking_final',label:'Divulgar ranking final do dia para toda a equipe'},
+      {id:'mb_agendamentos', label:'Confirmar agendamentos de acordos para próximos dias'},
+      {id:'mb_pendencias',   label:'Registrar pendências e tarefas para o dia seguinte'},
+      {id:'mb_logoff',       label:'Garantir logoff correto de todos os operadores'},
+    ]},
+  ],
+
+  // ── BIRIGUI BRUNA ──
+  'COFEN BIRIGUI BRUNA': [
+    { id:'abertura', icon:'🌅', title:'Abertura — Birigui Bruna', items:[
+      {id:'bb_login',        label:'Login no sistema e verificar funcionamento do CRM'},
+      {id:'bb_presenca',     label:'Confirmar presença dos 10 operadores de Birigui'},
+      {id:'bb_meta_dia',     label:'Comunicar meta do dia e HO esperado para a equipe'},
+      {id:'bb_script',       label:'Alinhamento de script: foco em BOLETO e PIX para Birigui'},
+      {id:'bb_carteira',     label:'Carteira/lista de cobrança carregada e priorizada'},
+    ]},
+    { id:'producao', icon:'📞', title:'Produção — Birigui Bruna', items:[
+      {id:'bb_lig_1h',       label:'Volume de ligações na 1ª hora — acionar quem está parado'},
+      {id:'bb_ranking_manha',label:'Ranking parcial da manhã divulgado no grupo de Birigui'},
+      {id:'bb_acordos',      label:'Checar acordos fechados e links enviados até as 12h'},
+      {id:'bb_pausas',       label:'Pausas controladas e dentro do horário permitido'},
+      {id:'bb_ops_baixos',   label:'Suporte aos operadores abaixo da média (script/apoio)'},
+    ]},
+    { id:'qualidade', icon:'🎯', title:'Qualidade — Birigui Bruna', items:[
+      {id:'bb_monitoria',    label:'Monitorar ligações ao vivo — foco em negociação de valor'},
+      {id:'bb_feedback',     label:'Feedback individual para operadores com taxa baixa'},
+      {id:'bb_conversao',    label:'Checar taxa de conversão da equipe de Birigui'},
+      {id:'bb_objecoes',     label:'Listar objeções do dia e definir resposta padrão'},
+    ]},
+    { id:'comunicacao', icon:'📢', title:'Comunicação — Birigui Bruna', items:[
+      {id:'bb_msg_mot',      label:'Mensagem motivacional no grupo de Birigui (manhã)'},
+      {id:'bb_destaque',     label:'Reconhecer destaque do dia publicamente na equipe'},
+      {id:'bb_alinhamento',  label:'Alinhamento com supervisora Bruna sobre metas e bloqueios'},
+      {id:'bb_ranking_tarde',label:'Divulgar ranking da tarde antes das 16h'},
+    ]},
+    { id:'encerramento', icon:'🌙', title:'Encerramento — Birigui Bruna', items:[
+      {id:'bb_relatorio',    label:'Atualizar dashboard com recebimento e acordos do dia'},
+      {id:'bb_meta_bate',    label:'Verificar se a meta da equipe de Birigui foi batida'},
+      {id:'bb_ranking_final',label:'Ranking final divulgado no grupo'},
+      {id:'bb_agendamentos', label:'Confirmar agendamentos futuros dos operadores'},
+      {id:'bb_logoff',       label:'Logoff de todos os operadores confirmado'},
+    ]},
+  ],
+
+  // ── BIRIGUI LUCIANO ──
+  'COFEN BIRIGUI LUCIANO': [
+    { id:'abertura', icon:'🌅', title:'Abertura — Birigui Luciano', items:[
+      {id:'bl_login',        label:'Login no CRM e checar funcionamento do sistema'},
+      {id:'bl_presenca',     label:'Confirmar presença dos 7 operadores do turno de Luciano'},
+      {id:'bl_meta_dia',     label:'Meta do dia comunicada com valor e HO para cada op'},
+      {id:'bl_script',       label:'Script do dia revisado — foco em clientes de alto atraso'},
+      {id:'bl_carteira',     label:'Carteira de devedores carregada e segmentada por prioridade'},
+    ]},
+    { id:'producao', icon:'📞', title:'Produção — Birigui Luciano', items:[
+      {id:'bl_lig_1h',       label:'Checar ligações na 1ª hora e intervir com quem está parado'},
+      {id:'bl_ranking_manha',label:'Ranking parcial divulgado no grupo de Luciano'},
+      {id:'bl_acordos',      label:'Acordos gerados e links pagos verificados'},
+      {id:'bl_pausas',       label:'Controle de pausas — nenhum op ausente sem justificativa'},
+      {id:'bl_ops_baixos',   label:'Identificar operadores abaixo da média e reforçar suporte'},
+    ]},
+    { id:'qualidade', icon:'🎯', title:'Qualidade — Birigui Luciano', items:[
+      {id:'bl_monitoria',    label:'Escuta ativa de ao menos 2 ligações'},
+      {id:'bl_feedback',     label:'Feedback de script para operadores com menor conversão'},
+      {id:'bl_conversao',    label:'Taxa de conversão da equipe de Luciano verificada'},
+      {id:'bl_perfil_dev',   label:'Checar operadores em desenvolvimento — acompanhamento próximo'},
+    ]},
+    { id:'comunicacao', icon:'📢', title:'Comunicação — Birigui Luciano', items:[
+      {id:'bl_msg_mot',      label:'Mensagem motivacional enviada no grupo'},
+      {id:'bl_destaque',     label:'Destaque do dia reconhecido publicamente'},
+      {id:'bl_alinhamento',  label:'Alinhamento com Luciano (supervisor) sobre produção'},
+      {id:'bl_ranking_tarde',label:'Ranking da tarde enviado no grupo'},
+    ]},
+    { id:'encerramento', icon:'🌙', title:'Encerramento — Birigui Luciano', items:[
+      {id:'bl_relatorio',    label:'Dashboard atualizado com recebimentos do dia'},
+      {id:'bl_meta_bate',    label:'Meta da equipe verificada — gap comunicado se necessário'},
+      {id:'bl_ranking_final',label:'Ranking final do dia divulgado'},
+      {id:'bl_pendencias',   label:'Pendências e tarefas para amanhã registradas'},
+      {id:'bl_logoff',       label:'Todos os operadores com logoff confirmado'},
+    ]},
+  ],
+
+  // ── STEPHANIE 2° TURNO ──
+  'COFEN STEPHANIE 2° TURNO': [
+    { id:'abertura', icon:'🌅', title:'Abertura — Stephanie 2° Turno', items:[
+      {id:'st_login',        label:'Login no sistema e verificar carteira do 2° turno'},
+      {id:'st_presenca',     label:'Confirmar presença dos 11 operadores do 2° turno'},
+      {id:'st_meta_dia',     label:'Meta do 2° turno comunicada (complementar ao 1° turno)'},
+      {id:'st_script',       label:'Script adaptado para clientes abordados no 1° turno'},
+      {id:'st_saldo_manha',  label:'Verificar saldo do 1° turno e definir gap a preencher'},
+    ]},
+    { id:'producao', icon:'📞', title:'Produção — Stephanie 2° Turno', items:[
+      {id:'st_lig_1h',       label:'Volume de ligações na 1ª hora do turno (mín 8 por op)'},
+      {id:'st_ranking',      label:'Ranking parcial do turno divulgado no grupo'},
+      {id:'st_acordos',      label:'Checar acordos fechados até as 17h'},
+      {id:'st_pausas',       label:'Pausas controladas — turno da tarde exige mais atenção'},
+      {id:'st_ops_baixos',   label:'Reforço para operadores com baixa produção no turno'},
+      {id:'st_sprint_final', label:'Sprint final antes do fechamento — últimos 45 min'},
+    ]},
+    { id:'qualidade', icon:'🎯', title:'Qualidade — Stephanie 2° Turno', items:[
+      {id:'st_monitoria',    label:'Monitorar ligações ao vivo no 2° turno'},
+      {id:'st_feedback',     label:'Feedback imediato para quem está abaixo do ritmo'},
+      {id:'st_conversao',    label:'Checar taxa de conversão do turno vs média histórica'},
+      {id:'st_objecoes',     label:'Objeções específicas do 2° turno mapeadas e respondidas'},
+    ]},
+    { id:'comunicacao', icon:'📢', title:'Comunicação — Stephanie 2° Turno', items:[
+      {id:'st_msg_mot',      label:'Mensagem motivacional no início do turno'},
+      {id:'st_destaque',     label:'Destaque do turno reconhecido'},
+      {id:'st_alinhamento',  label:'Alinhamento com Stephanie (supervisora) sobre meta do turno'},
+      {id:'st_ranking_tarde',label:'Ranking final do turno enviado antes do fechamento'},
+    ]},
+    { id:'encerramento', icon:'🌙', title:'Encerramento — Stephanie 2° Turno', items:[
+      {id:'st_relatorio',    label:'Relatório final importado no dashboard'},
+      {id:'st_meta_total',   label:'Meta total do dia (1°+2° turno) verificada'},
+      {id:'st_ranking_final',label:'Ranking final divulgado para toda a equipe'},
+      {id:'st_agendamentos', label:'Agendamentos para dias seguintes confirmados'},
+      {id:'st_pendencias',   label:'Pendências registradas para o próximo dia'},
+      {id:'st_logoff',       label:'Logoff de todos os operadores do 2° turno confirmado'},
+    ]},
+  ],
+};
+
+// Checklist genérico (usado pelo painel global de checklist e equipes sem personalizado)
 const CHK_SECTIONS = [
-  {
-    id:'abertura', icon:'🌅', title:'Abertura da Operação',
-    items:[
-      {id:'login_sistema',    label:'Fazer login no sistema / CRM e verificar funcionamento'},
-      {id:'presenca',         label:'Confirmar presença de todos os operadores e supervisores'},
-      {id:'metas_dia',        label:'Comunicar meta do dia para a equipe (valor + HO esperado)'},
-      {id:'script_revisao',   label:'Revisar script de abordagem com a equipe (ajustes do dia anterior)'},
-      {id:'carteira_carregada',label:'Verificar se carteira/lista de devedores está carregada no sistema'},
-    ]
-  },
-  {
-    id:'producao', icon:'📞', title:'Acompanhamento de Produção',
-    items:[
-      {id:'ligacoes_1h',      label:'Verificar volume de ligações na 1ª hora e acionar quem está abaixo'},
-      {id:'ranking_am',       label:'Divulgar ranking parcial da manhã para a equipe (motivação)'},
-      {id:'acordos_fechados', label:'Checar acordos fechados e links gerados até o momento'},
-      {id:'pausa_controlada', label:'Gerenciar pausas — ninguém em pausa fora do horário permitido'},
-      {id:'operadores_baixos',label:'Identificar operadores com baixa produção e oferecer apoio/script'},
-    ]
-  },
-  {
-    id:'qualidade', icon:'🎯', title:'Qualidade e Conversão',
-    items:[
-      {id:'monitoria_lig',    label:'Monitorar ao menos 2 ligações ao vivo (escuta ativa)'},
-      {id:'feedback_script',  label:'Dar feedback individual sobre script e técnica de abordagem'},
-      {id:'taxa_conversao',   label:'Verificar taxa de conversão (acordos pagos / links gerados)'},
-      {id:'objecoes_dia',     label:'Levantar principais objeções do dia e alinhar resposta com equipe'},
-    ]
-  },
-  {
-    id:'comunicacao', icon:'📢', title:'Comunicação e Motivação',
-    items:[
-      {id:'msg_motivacional', label:'Enviar mensagem motivacional no grupo da equipe'},
-      {id:'ranking_divulgado',label:'Divulgar ranking atualizado no grupo (pelo menos 1x ao dia)'},
-      {id:'destaque_positivo',label:'Reconhecer publicamente operador destaque do dia'},
-      {id:'alinhamento_sup',  label:'Alinhar com supervisor sobre andamento e eventuais problemas'},
-    ]
-  },
-  {
-    id:'dados', icon:'📊', title:'Gestão de Dados e Relatórios',
-    items:[
-      {id:'importar_rec',     label:'Importar relatório de recebimento no dashboard (atualizar ranking)'},
-      {id:'importar_acordos', label:'Importar relatório de acordos (gerados, pagos, pendentes)'},
-      {id:'meta_equipe_ok',   label:'Verificar se meta por equipe está sendo atingida'},
-      {id:'projecao_mensal',  label:'Verificar projeção mensal e comunicar gap à diretoria se necessário'},
-    ]
-  },
-  {
-    id:'encerramento', icon:'🌙', title:'Encerramento do Dia',
-    items:[
-      {id:'relatorio_final',  label:'Gerar e salvar relatório final do dia'},
-      {id:'ranking_final',    label:'Divulgar ranking final do dia para toda a equipe'},
-      {id:'agendamentos_ok',  label:'Confirmar agendamentos de acordos para os próximos dias'},
-      {id:'pendencias',       label:'Registrar pendências e tarefas para o dia seguinte'},
-      {id:'logoff_sistema',   label:'Garantir logoff correto de todos os operadores no sistema'},
-    ]
-  },
+  { id:'abertura', icon:'🌅', title:'Abertura da Operação', items:[
+    {id:'login_sistema',     label:'Fazer login no sistema / CRM e verificar funcionamento'},
+    {id:'presenca',          label:'Confirmar presença de todos os operadores e supervisores'},
+    {id:'metas_dia',         label:'Comunicar meta do dia para a equipe (valor + HO esperado)'},
+    {id:'script_revisao',    label:'Revisar script de abordagem com a equipe (ajustes do dia anterior)'},
+    {id:'carteira_carregada',label:'Verificar se carteira/lista de devedores está carregada no sistema'},
+  ]},
+  { id:'producao', icon:'📞', title:'Acompanhamento de Produção', items:[
+    {id:'ligacoes_1h',       label:'Verificar volume de ligações na 1ª hora e acionar quem está abaixo'},
+    {id:'ranking_am',        label:'Divulgar ranking parcial da manhã para a equipe (motivação)'},
+    {id:'acordos_fechados',  label:'Checar acordos fechados e links gerados até o momento'},
+    {id:'pausa_controlada',  label:'Gerenciar pausas — ninguém em pausa fora do horário permitido'},
+    {id:'operadores_baixos', label:'Identificar operadores com baixa produção e oferecer apoio/script'},
+  ]},
+  { id:'qualidade', icon:'🎯', title:'Qualidade e Conversão', items:[
+    {id:'monitoria_lig',     label:'Monitorar ao menos 2 ligações ao vivo (escuta ativa)'},
+    {id:'feedback_script',   label:'Dar feedback individual sobre script e técnica de abordagem'},
+    {id:'taxa_conversao',    label:'Verificar taxa de conversão (acordos pagos / links gerados)'},
+    {id:'objecoes_dia',      label:'Levantar principais objeções do dia e alinhar resposta com equipe'},
+  ]},
+  { id:'comunicacao', icon:'📢', title:'Comunicação e Motivação', items:[
+    {id:'msg_motivacional',  label:'Enviar mensagem motivacional no grupo da equipe'},
+    {id:'ranking_divulgado', label:'Divulgar ranking atualizado no grupo (pelo menos 1x ao dia)'},
+    {id:'destaque_positivo', label:'Reconhecer publicamente operador destaque do dia'},
+    {id:'alinhamento_sup',   label:'Alinhar com supervisor sobre andamento e eventuais problemas'},
+  ]},
+  { id:'dados', icon:'📊', title:'Gestão de Dados e Relatórios', items:[
+    {id:'importar_rec',      label:'Importar relatório de recebimento no dashboard (atualizar ranking)'},
+    {id:'importar_acordos',  label:'Importar relatório de acordos (gerados, pagos, pendentes)'},
+    {id:'meta_equipe_ok',    label:'Verificar se meta por equipe está sendo atingida'},
+    {id:'projecao_mensal',   label:'Verificar projeção mensal e comunicar gap à diretoria se necessário'},
+  ]},
+  { id:'encerramento', icon:'🌙', title:'Encerramento do Dia', items:[
+    {id:'relatorio_final',   label:'Gerar e salvar relatório final do dia'},
+    {id:'ranking_final',     label:'Divulgar ranking final do dia para toda a equipe'},
+    {id:'agendamentos_ok',   label:'Confirmar agendamentos de acordos para os próximos dias'},
+    {id:'pendencias',        label:'Registrar pendências e tarefas para o dia seguinte'},
+    {id:'logoff_sistema',    label:'Garantir logoff correto de todos os operadores no sistema'},
+  ]},
 ];
+
+// Retorna o checklist correto para a equipe
+function getEqChecklist(eqName){ return CHK_BY_EQ[eqName] || CHK_SECTIONS; }
 
 let chkChart = null;
 
@@ -5474,259 +5439,6 @@ function checkBuildChart(){
 }
 
 // ── INIT ──
-
-// ══════════════════════════════════════════
-// EFICIÊNCIA — RANKING CRUZADO REC × ACORDOS
-// ══════════════════════════════════════════
-let efSortKey  = 'eficiencia'; // eficiencia | rec | gerados | pagos | ticket
-let efFilterEq = 'all';
-
-function efColor(pct){
-  if(pct >= 40) return '#4ADE80';
-  if(pct >= 25) return '#67E8F9';
-  if(pct >= 15) return '#FCD34D';
-  return '#FCA5A5';
-}
-function efTier(pct){
-  if(pct >= 40) return {cls:'ts', lbl:'⚡ Elite'};
-  if(pct >= 25) return {cls:'tb', lbl:'✅ Boa'};
-  if(pct >= 15) return {cls:'ta', lbl:'⚠️ Regular'};
-  return {cls:'tc', lbl:'🔴 Baixa'};
-}
-
-function eficienciaInit(){
-  // Build equipe filter
-  const eqBtns = document.getElementById('ef-eq-btns');
-  if(eqBtns){
-    eqBtns.innerHTML = ['all',...D.equipes.map(e=>e.name)].map(eq=>{
-      const cfg = eq==='all'?{sh:'Todas Equipes',c:'var(--pp)'}:(EQ[eq]||{sh:eq,c:'#888'});
-      const on  = efFilterEq===eq;
-      return `<button class="fbtn ${on?'on':''}" onclick="efSetEq('${eq}',this)"
-        style="${on?'border-color:'+cfg.c+';background:'+cfg.c+'18;color:'+cfg.c:''}">${cfg.sh}</button>`;
-    }).join('');
-  }
-  efRenderRanking();
-}
-
-function efSetSort(key, btn){
-  efSortKey = key;
-  document.querySelectorAll('#ef-sort-btns .fbtn').forEach(b=>b.classList.remove('on'));
-  if(btn) btn.classList.add('on');
-  efRenderRanking();
-}
-
-function efSetEq(eq, btn){
-  efFilterEq = eq;
-  document.querySelectorAll('#ef-eq-btns .fbtn').forEach(b=>b.classList.remove('on'));
-  if(btn) btn.classList.add('on');
-  efRenderRanking();
-}
-
-function efRenderRanking(){
-  const list = document.getElementById('ef-ranking-list');
-  const semDados = document.getElementById('ef-sem-dados');
-  if(!list) return;
-
-  // Filtrar por equipe
-  let ops = efFilterEq==='all' ? [...ALL] : ALL.filter(o=>o.eq===efFilterEq);
-
-  // Verificar se há dados de acordos importados
-  const temAcordos = ops.some(o=>(o.gerados||0)>0);
-
-  if(!temAcordos){
-    list.innerHTML='';
-    if(semDados) semDados.style.display='block';
-    // Ainda mostra hero com só recebimento
-    efUpdateHero(ops);
-    return;
-  }
-  if(semDados) semDados.style.display='none';
-
-  // Calcular eficiência de cada operador
-  // ef% = pagos / gerados * 100
-  // Rec/Acordo = rec / pagos (ticket médio real)
-  ops = ops.map(op=>{
-    const g   = op.gerados||0;
-    const p   = op.pagos||0;
-    const pend= op.pendentes||(g-p);
-    const ef  = g>0 ? parseFloat((p/g*100).toFixed(1)) : 0;
-    const tk  = op.ticket || (p>0 ? op.rec/p : 0);
-    const recAc = p>0 ? op.rec/p : 0;
-    return {...op, _g:g, _p:p, _pend:pend, _ef:ef, _tk:tk, _recAc:recAc};
-  });
-
-  // Ordenar
-  const sortFns = {
-    eficiencia: (a,b) => b._ef - a._ef,
-    rec:        (a,b) => b.rec - a.rec,
-    gerados:    (a,b) => b._g  - a._g,
-    pagos:      (a,b) => b._p  - a._p,
-    ticket:     (a,b) => b._tk - a._tk,
-  };
-  ops.sort(sortFns[efSortKey] || sortFns.eficiencia);
-
-  // Atualizar hero
-  efUpdateHero(ops);
-
-  // Max values para barras
-  const maxRec = Math.max(...ops.map(o=>o.rec), 1);
-  const maxG   = Math.max(...ops.map(o=>o._g), 1);
-
-  list.innerHTML = ops.map((op, i)=>{
-    const cfg   = EQ[op.eq]||{c:'#888',sh:op.eq};
-    const photo = photoGet(op.name);
-    const r     = i+1;
-    const ef    = op._ef;
-    const efCol = efColor(ef);
-    const tier  = efTier(ef);
-    const barW  = maxRec>0 ? Math.round(op.rec/maxRec*100) : 0;
-    const gBarW = maxG>0   ? Math.round(op._g/maxG*100) : 0;
-    const efBarW= Math.min(100, ef*2); // 50% ef = full bar
-    const hasAcordos = op._g > 0;
-    const medal = r===1?'🥇':r===2?'🥈':r===3?'🥉':'';
-
-    const avatarHTML = photo
-      ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;object-position:top">`
-      : `<span style="font-weight:900;font-size:11px;color:#fff">${ini(op.name)}</span>`;
-
-    return `<div style="display:grid;grid-template-columns:42px 1fr 90px 70px 70px 90px 90px 80px 100px;
-      gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--g100);
-      cursor:pointer;transition:background .2s;
-      background:${r<=3?'rgba(0,168,107,.025)':'var(--w)'}"
-      onclick="openM('${op.name}')"
-      onmouseover="this.style.background='var(--g50)'"
-      onmouseout="this.style.background='${r<=3?'rgba(0,168,107,.025)':'var(--w)'}'">
-
-      <!-- Pos -->
-      <div style="font-family:Bebas Neue,sans-serif;font-size:18px;
-        color:${r===1?'#4ADE80':r===2?'var(--g300)':r===3?'#CD7F32':'var(--g300)'};text-align:center">
-        ${medal||r+'°'}
-      </div>
-
-      <!-- Operador -->
-      <div style="display:flex;align-items:center;gap:9px;min-width:0">
-        <div style="width:34px;height:34px;border-radius:9px;overflow:hidden;flex-shrink:0;
-          background:${cfg.c};display:flex;align-items:center;justify-content:center">
-          ${avatarHTML}
-        </div>
-        <div style="min-width:0;flex:1">
-          <div style="font-weight:800;font-size:12px;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${op.name.replace(/_/g,' ')}</div>
-          <div style="display:flex;align-items:center;gap:5px;margin-top:2px">
-            <div style="font-size:9px;color:${cfg.c};font-weight:700">${cfg.sh}</div>
-            ${hasAcordos?`<span class="tier ${tier.cls}" style="padding:1px 6px;font-size:9px">${tier.lbl}</span>`:'<span style="font-size:9px;color:var(--g300);font-style:italic">sem dados</span>'}
-          </div>
-        </div>
-      </div>
-
-      <!-- Recebido -->
-      <div style="text-align:right">
-        <div style="font-family:Bebas Neue,sans-serif;font-size:13px;color:var(--pp)">${fR(op.rec)}</div>
-        <div style="background:var(--g100);border-radius:100px;height:3px;overflow:hidden;margin-top:3px">
-          <div style="width:${barW}%;height:100%;border-radius:100px;background:${cfg.c};transition:width 1s"></div>
-        </div>
-      </div>
-
-      <!-- Gerados -->
-      <div style="text-align:center">
-        ${hasAcordos?`
-        <div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:#67E8F9">${op._g}</div>
-        <div style="font-size:9px;color:var(--g500);font-weight:600">gerados</div>`
-        :`<div style="font-size:11px;color:var(--g300)">—</div>`}
-      </div>
-
-      <!-- Pagos -->
-      <div style="text-align:center">
-        ${hasAcordos?`
-        <div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:#4ADE80">${op._p}</div>
-        <div style="font-size:9px;color:var(--g500);font-weight:600">${op._pend} pend.</div>`
-        :`<div style="font-size:11px;color:var(--g300)">—</div>`}
-      </div>
-
-      <!-- Eficiência -->
-      <div style="text-align:center">
-        ${hasAcordos?`
-        <div style="font-family:Bebas Neue,sans-serif;font-size:20px;color:${efCol};line-height:1">${ef.toFixed(1)}%</div>
-        <div style="background:var(--g100);border-radius:100px;height:5px;overflow:hidden;margin:3px auto 0;width:60px">
-          <div style="width:${efBarW}%;height:100%;border-radius:100px;background:${efCol};transition:width 1.2s"></div>
-        </div>`
-        :`<div style="font-size:11px;color:var(--g300)">—</div>`}
-      </div>
-
-      <!-- Ticket Médio -->
-      <div style="text-align:right">
-        ${hasAcordos&&op._p>0?`
-        <div style="font-family:Bebas Neue,sans-serif;font-size:13px;color:var(--info)">${fR(op._tk)}</div>
-        <div style="font-size:9px;color:var(--g500);font-weight:600">por pago</div>`
-        :`<div style="font-size:11px;color:var(--g300)">—</div>`}
-      </div>
-
-      <!-- Pendentes -->
-      <div style="text-align:center">
-        ${hasAcordos?`
-        <div style="font-family:Bebas Neue,sans-serif;font-size:18px;
-          color:${op._pend>5?'#FCA5A5':'var(--g500)'}">${op._pend}</div>
-        <div style="font-size:9px;color:var(--g500);font-weight:600">em aberto</div>`
-        :`<div style="font-size:11px;color:var(--g300)">—</div>`}
-      </div>
-
-      <!-- Rec por Acordo -->
-      <div style="text-align:right">
-        ${hasAcordos&&op._p>0?`
-        <div style="font-family:Bebas Neue,sans-serif;font-size:13px;color:var(--pp)">${fR(op._recAc)}</div>
-        <div style="font-size:9px;color:var(--g500);font-weight:600">rec/acordo</div>`
-        :`<div style="font-size:11px;color:var(--g300)">—</div>`}
-      </div>
-
-    </div>`;
-  }).join('');
-
-  // Rodapé totais
-  const totRec  = ops.reduce((s,o)=>s+o.rec,0);
-  const totG    = ops.reduce((s,o)=>s+o._g,0);
-  const totP    = ops.reduce((s,o)=>s+o._p,0);
-  const totPend = ops.reduce((s,o)=>s+o._pend,0);
-  const totEf   = totG>0?(totP/totG*100):0;
-  const totTk   = totP>0?totRec/totP:0;
-
-  list.innerHTML += `<div style="display:grid;grid-template-columns:42px 1fr 90px 70px 70px 90px 90px 80px 100px;
-    gap:8px;padding:11px 16px;background:var(--ppd);align-items:center">
-    <span></span>
-    <span style="font-weight:900;font-size:12px;color:#fff">TOTAL / MÉDIA</span>
-    <span style="font-family:Bebas Neue,sans-serif;font-size:14px;color:#4ADE80;text-align:right">${fR(totRec)}</span>
-    <span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:#67E8F9;text-align:center">${totG}</span>
-    <span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:#4ADE80;text-align:center">${totP}</span>
-    <span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${efColor(totEf)};text-align:center">${totEf.toFixed(1)}%</span>
-    <span style="font-family:Bebas Neue,sans-serif;font-size:14px;color:#67E8F9;text-align:right">${totTk>0?fR(totTk):'—'}</span>
-    <span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:#FCA5A5;text-align:center">${totPend}</span>
-    <span></span>
-  </div>`;
-}
-
-function efUpdateHero(ops){
-  const totG   = ops.reduce((s,o)=>s+(o.gerados||0),0);
-  const totP   = ops.reduce((s,o)=>s+(o.pagos||0),0);
-  const totPend= ops.reduce((s,o)=>s+(o.pendentes||((o.gerados||0)-(o.pagos||0))),0);
-  const totRec = ops.reduce((s,o)=>s+o.rec,0);
-  const taxa   = totG>0?(totP/totG*100):0;
-  const ticket = totP>0?totRec/totP:0;
-  const barPct = Math.min(100, taxa*2); // 50% taxa = barra cheia
-
-  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
-  s('ef-h-gerados', totG.toLocaleString('pt-BR'));
-  s('ef-h-pagos',   totP.toLocaleString('pt-BR'));
-  s('ef-h-taxa',    taxa.toFixed(1)+'%');
-  s('ef-h-ticket',  totP>0?fRK(ticket):'—');
-  s('ef-h-pend',    totPend.toLocaleString('pt-BR'));
-  s('ef-h-taxa-lbl',taxa.toFixed(1)+'% de conversão (acordos pagos / gerados)');
-
-  const bar = document.getElementById('ef-h-bar');
-  if(bar){
-    const col = taxa>=40?'linear-gradient(90deg,#4ADE80,#00C97F)':taxa>=25?'linear-gradient(90deg,#67E8F9,#3B82F6)':taxa>=15?'linear-gradient(90deg,#FCD34D,#F59E0B)':'linear-gradient(90deg,#FCA5A5,#EF4444)';
-    bar.style.background = col;
-    setTimeout(()=>{ bar.style.width=barPct+'%'; }, 100);
-  }
-}
-
 loadSavedOverrides();
 loadGestaoOverrides();
 loadSharedPhotos();
