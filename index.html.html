@@ -301,14 +301,14 @@ select.ev-inp{cursor:pointer}
 .photo-upload-btn:hover{border-color:var(--pp);color:var(--pp);background:var(--ppl)}
 
 /* ─ TV MODE ─ */
-#tv-overlay{position:fixed;inset:0;z-index:9000;background:#0A1628;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif,sans-serif}
+#tv-overlay{position:fixed;inset:0;z-index:9000;background:#0A1628;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif,sans-serif;overflow:hidden}
 #tv-overlay.on{display:flex}
-.tv-header{position:absolute;top:0;left:0;right:0;padding:20px 32px;display:flex;align-items:center;justify-content:space-between}
+.tv-header{position:absolute;top:0;left:0;right:0;padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
 .tv-brand{font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:3px;color:rgba(255,255,255,.25)}
 .tv-clock{font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:2px;color:rgba(255,255,255,.4)}
 .tv-close{position:absolute;top:16px;right:20px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .tv-close:hover{background:rgba(255,60,60,.3);color:#fff;border-color:rgba(255,60,60,.5)}
-.tv-card{width:100%;max-width:780px;animation:tvIn .6s cubic-bezier(.34,1.4,.64,1)}
+.tv-card{width:100%;max-width:920px;padding:0 24px;animation:tvIn .6s cubic-bezier(.34,1.4,.64,1)}
 @keyframes tvIn{from{opacity:0;transform:scale(.92) translateY(24px)}to{opacity:1;transform:none}}
 .tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;border:4px solid rgba(255,255,255,.15);flex-shrink:0}
 .tv-photo-placeholder{width:140px;height:140px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:50px;color:#fff;flex-shrink:0;border:4px solid rgba(255,255,255,.1)}
@@ -575,11 +575,33 @@ select.ev-inp{cursor:pointer}
 
 <!-- ══════════ PAGE: EQUIPES ══════════ -->
 <div class="page" id="pg-equipes">
-  <div style="font-size:12px;color:var(--g500);font-weight:600;background:var(--ppl);border:1px solid rgba(0,168,107,.2);border-radius:var(--rm);padding:9px 14px;display:flex;align-items:center;gap:8px">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--pp)" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    Clique em qualquer equipe para ver o ranking detalhado por operador
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <div style="flex:1;font-size:12px;color:var(--g500);font-weight:600;background:var(--ppl);border:1px solid rgba(0,168,107,.2);border-radius:var(--rm);padding:9px 14px;display:flex;align-items:center;gap:8px">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--pp)" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Clique em <strong style="color:var(--pp)">Ver ranking →</strong> para operadores · Clique em <strong style="color:var(--pp)">✅ Checklist</strong> para abrir o checklist da equipe
+    </div>
   </div>
   <div class="g2" id="eq-grid"></div>
+  <!-- Painel de checklist por equipe -->
+  <div id="eq-chk-panel" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);overflow-y:auto;padding:20px 16px" onclick="if(event.target===this)eqChkClose()">
+    <div style="max-width:740px;margin:0 auto;background:var(--w);border:2px solid rgba(0,168,107,.25);border-radius:var(--rxl);box-shadow:var(--sh-lg);overflow:hidden">
+      <div id="eq-chk-header" style="background:linear-gradient(135deg,var(--ppd),#1B4332);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2">
+        <div>
+          <div id="eq-chk-title" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:2px">✅ CHECKLIST</div>
+          <div id="eq-chk-sub" style="font-size:10px;color:rgba(255,255,255,.45);font-weight:600;margin-top:2px">Rotina diária da equipe</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div id="eq-chk-pct-badge" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#4ADE80">0%</div>
+          <button onclick="eqChkReset()" style="padding:5px 12px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">↩ Resetar</button>
+          <button onclick="eqChkClose()" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);cursor:pointer;font-size:14px">✕</button>
+        </div>
+      </div>
+      <div id="eq-chk-bar-wrap" style="background:rgba(0,0,0,.15);height:6px">
+        <div id="eq-chk-bar" style="height:100%;background:linear-gradient(90deg,#4ADE80,#00C97F);width:0%;transition:width .5s"></div>
+      </div>
+      <div id="eq-chk-body" style="padding:16px 20px;display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ══════════ PAGE: RANKING ══════════ -->
@@ -1842,8 +1864,18 @@ function mkEq(){
   document.getElementById('eq-grid').innerHTML=D.equipes.map(eq=>{
     const cfg=EQ[eq.name]||{c:'#888',bg:'#eee',ico:'📌',sh:eq.name};
     const pct=(eq.rec/totalRec*100).toFixed(1);
-    return `<div class="eq-card" style="--ec:${cfg.c}" onclick="openEq('${eq.name}')">
-      <div class="eq-tip">Ver operadores →</div>
+    // Checklist progress for this team
+    const chkKey = eqChkKey(eq.name);
+    const chkState = JSON.parse(localStorage.getItem(chkKey)||'{}');
+    let chkDone=0, chkTotal=0;
+    getEqChecklist(eq.name).forEach(s=>s.items.forEach(i=>{chkTotal++;if(chkState[i.id])chkDone++;}));
+    const chkPct = chkTotal>0?Math.round(chkDone/chkTotal*100):0;
+    const chkColor = chkPct===100?'#4ADE80':chkPct>=60?'#FCD34D':'var(--g300)';
+    return `<div class="eq-card" style="--ec:${cfg.c};cursor:default">
+      <div style="position:absolute;top:11px;right:11px;display:flex;gap:5px">
+        <button onclick="event.stopPropagation();openEq('${eq.name}')" style="font-size:9px;color:${cfg.c};font-weight:700;background:${cfg.c}15;border:1px solid ${cfg.c}44;padding:3px 7px;border-radius:100px;cursor:pointer;white-space:nowrap">Ver ranking →</button>
+        <button onclick="event.stopPropagation();eqChkOpen('${eq.name.replace(/'/g,"\'")}')" style="font-size:9px;color:#4ADE80;font-weight:700;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.3);padding:3px 7px;border-radius:100px;cursor:pointer;white-space:nowrap">✅ Checklist ${chkPct}%</button>
+      </div>
       <div class="eq-hdr">
         <div class="eq-ico" style="background:${cfg.bg}">${cfg.ico}</div>
         <div><div class="eq-nm">${cfg.sh}</div><div class="eq-op">${eq.n_op} operadores · ${eq.acordos} acordos</div></div>
@@ -1869,6 +1901,113 @@ function mkEq(){
 }
 
 function openEq(n){ go('ranking',document.querySelector('.tabs .tab:nth-child(4)')); rkFilter=n; mkRanking(); }
+
+// ══════════════════════════════════════════
+// CHECKLIST POR EQUIPE
+// ══════════════════════════════════════════
+let eqChkActive = null;
+
+function eqChkKey(eqName){
+  const d=new Date();
+  return `chk_eq_${eqName.replace(/[^a-zA-Z0-9]/g,'_')}_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
+}
+
+function eqChkLoad(eqName){ try{return JSON.parse(localStorage.getItem(eqChkKey(eqName))||'{}')}catch{return{}} }
+function eqChkSave(eqName, state){ localStorage.setItem(eqChkKey(eqName), JSON.stringify(state)); }
+
+function eqChkOpen(eqName){
+  eqChkActive = eqName;
+  const cfg = EQ[eqName]||{c:'var(--pp)',sh:eqName,ico:'📋'};
+  // Update header
+  document.getElementById('eq-chk-title').textContent = '✅ CHECKLIST — '+cfg.sh.toUpperCase();
+  document.getElementById('eq-chk-sub').textContent = cfg.ico+' Rotina diária · '+new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+  document.getElementById('eq-chk-header').style.background = 'linear-gradient(135deg,'+cfg.c+'dd,'+cfg.c+'88)';
+  document.getElementById('eq-chk-bar').style.background = 'linear-gradient(90deg,#4ADE80,'+cfg.c+')';
+  // Render body
+  eqChkRender();
+  // Show panel
+  const panel = document.getElementById('eq-chk-panel');
+  panel.style.display='block';
+  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function eqChkClose(){
+  document.getElementById('eq-chk-panel').style.display='none';
+  eqChkActive=null;
+  mkEq(); // refresh cards to update % badges
+}
+
+function eqChkReset(){
+  if(!eqChkActive) return;
+  if(!confirm('Resetar checklist desta equipe para hoje?')) return;
+  eqChkSave(eqChkActive,{});
+  eqChkRender();
+  toast('↩ Checklist resetado!');
+}
+
+function eqChkRender(){
+  if(!eqChkActive) return;
+  const state = eqChkLoad(eqChkActive);
+  const cfg   = EQ[eqChkActive]||{c:'var(--pp)'};
+  const sections = getEqChecklist(eqChkActive);
+  let total=0, done=0;
+  sections.forEach(s=>s.items.forEach(i=>{total++;if(state[i.id])done++;}));
+  const pct = total>0?Math.round(done/total*100):0;
+  const pctColor = pct===100?'#4ADE80':pct>=80?'var(--pp)':pct>=50?'#FCD34D':'#EF4444';
+
+  const bar = document.getElementById('eq-chk-bar');
+  const badge = document.getElementById('eq-chk-pct-badge');
+  if(bar) bar.style.width=pct+'%';
+  if(badge){ badge.textContent=pct+'%'; badge.style.color=pctColor; }
+
+  const body = document.getElementById('eq-chk-body');
+  if(!body) return;
+
+  body.innerHTML = sections.map(sec=>{
+    const secDone = sec.items.filter(i=>state[i.id]).length;
+    const secTotal = sec.items.length;
+    const secPct = Math.round(secDone/secTotal*100);
+    const secColor = secPct===100?'#4ADE80':secPct>=60?'#FCD34D':'var(--g300)';
+    const items = sec.items.map(item=>{
+      const checked = !!state[item.id];
+      return `<label style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:var(--rm);cursor:pointer;transition:background .15s;background:${checked?'#F0FDF4':'var(--g50)'};border:1px solid ${checked?'#BBF7D0':'var(--g200)'}">
+        <input type="checkbox" ${checked?'checked':''} onchange="eqChkToggle('${item.id}',this.checked)"
+          style="width:16px;height:16px;flex-shrink:0;margin-top:1px;accent-color:var(--pp);cursor:pointer">
+        <span style="font-size:13px;font-weight:${checked?'700':'600'};color:${checked?'var(--pp)':'var(--g700)'};line-height:1.4">${item.label}</span>
+        ${checked?'<span style="margin-left:auto;font-size:16px;flex-shrink:0">✅</span>':''}
+      </label>`;
+    }).join('');
+
+    return `<div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);overflow:hidden">
+      <div style="padding:10px 16px;background:var(--g50);border-bottom:1px solid var(--g200);display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="font-size:16px">${sec.icon}</span>
+          <span style="font-size:13px;font-weight:800;color:var(--g900)">${sec.title}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="background:var(--g200);border-radius:100px;height:5px;width:70px;overflow:hidden">
+            <div style="height:100%;border-radius:100px;background:${secColor};width:${secPct}%;transition:width .5s"></div>
+          </div>
+          <span style="font-size:11px;font-weight:800;color:${secColor}">${secDone}/${secTotal}</span>
+        </div>
+      </div>
+      <div style="padding:10px 14px;display:flex;flex-direction:column;gap:6px">${items}</div>
+    </div>`;
+  }).join('');
+}
+
+function eqChkToggle(itemId, checked){
+  if(!eqChkActive) return;
+  const state = eqChkLoad(eqChkActive);
+  state[itemId] = checked;
+  eqChkSave(eqChkActive, state);
+  eqChkRender();
+  // Also sync via Firebase if connected
+  if(fbDb && fbRoom){
+    const key = 'chk_eq_'+eqChkActive.replace(/[^a-zA-Z0-9]/g,'_');
+    fbPush(key, state);
+  }
+}
 
 // ══════════════════════════════════════════
 // META INDIVIDUAL POR OPERADOR
@@ -2681,7 +2820,6 @@ function gTab(id, el){
   if(id==='novo')  gestaoNovoInit();
   if(id==='remover') gestaoRemoverInit();
   if(id==='meta-op') metaOpInit();
-  if(id==='fotos') fotosInit();
   if(id==='fotos') fotosInit();
 }
 
@@ -3819,9 +3957,6 @@ function syncBroadcast(type, payload){
 const _rdSetSaved_orig = rdSetSaved;
 
 
-// Patch photoSet to broadcast
-const _photoSet_orig = photoSet;
-
 
 // ══════════════════════════════════════════
 // MODO TV
@@ -3885,6 +4020,7 @@ function tvUpdateDots(){
 
 function tvShow(idx){
   const op  = tvList[idx];
+  const pos = idx + 1; // posição real no ranking
   const cfg = EQ[op.eq]||{c:'#888',bg:'#1a2330',ico:'⭐',sh:op.eq};
   const photo = photoGet(op.name);
 
@@ -3893,88 +4029,136 @@ function tvShow(idx){
   document.getElementById('tv-clock-display').textContent=
     [now.getHours(),now.getMinutes(),now.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
 
-  // Acordos/eficiência
-  const gerados  = op.gerados   || 0;
-  const pagos    = op.pagos     || 0;
-  const pendentes= op.pendentes || 0;
-  const efPct    = gerados>0?(pagos/gerados*100).toFixed(1):'0';
-  const efColor  = parseFloat(efPct)>=40?'#4ADE80':parseFloat(efPct)>=20?'#FCD34D':'#FCA5A5';
+  // Posição + medalha
+  const medals=['🥇','🥈','🥉'];
+  const posLabel = pos<=3 ? medals[pos-1] : pos+'°';
+  const posColor = pos===1?'#FFD700':pos===2?'#C0C0C0':pos===3?'#CD7F32':pos<=10?'#67E8F9':'rgba(255,255,255,.5)';
 
-  // Agendamentos futuros próximos
+  // Tier badge
+  const tier      = op.rec>=20000?'S-TIER':op.rec>=10000?'A — ALTA':op.rec>=5000?'B — BOA':'C — DEV';
+  const tierColor = op.rec>=20000?'#4ADE80':op.rec>=10000?'#67E8F9':op.rec>=5000?'#FCD34D':'#FCA5A5';
+
+  // Foto ou avatar
+  const photoHtml = photo
+    ? `<img src="${photo}" style="width:180px;height:180px;border-radius:24px;object-fit:cover;border:4px solid ${cfg.c};box-shadow:0 0 40px ${cfg.c}55;flex-shrink:0">`
+    : `<div style="width:180px;height:180px;border-radius:24px;background:${cfg.c}22;border:4px solid ${cfg.c};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:60px;color:${cfg.c};flex-shrink:0;box-shadow:0 0 40px ${cfg.c}44">${ini(op.name)}</div>`;
+
+  // Agendamentos futuros
   const agFuturo = op.ag_futuro||{};
   const agDates  = Object.entries(agFuturo).sort((a,b)=>a[0].localeCompare(b[0])).slice(0,4);
   const agTotal  = Object.values(agFuturo).reduce((s,v)=>s+v,0);
 
-  // Tier
-  const tier = op.rec>=20000?'⭐ S-TIER':op.rec>=10000?'A ALTA':op.rec>=5000?'B BOA':'C DEV';
-  const tierColor = op.rec>=20000?'#4ADE80':op.rec>=10000?'#67E8F9':op.rec>=5000?'#FCD34D':'#FCA5A5';
+  // Eficiência
+  const gerados  = op.gerados   || 0;
+  const pagos    = op.pagos     || 0;
+  const pendentes= op.pendentes || 0;
+  const efPct    = gerados>0?(pagos/gerados*100).toFixed(1):'—';
+  const efColor  = parseFloat(efPct)>=40?'#4ADE80':parseFloat(efPct)>=20?'#FCD34D':'#FCA5A5';
 
-  // Photo or avatar
-  const photoHtml = photo
-    ? `<img src="${photo}" class="tv-photo" alt="${op.name}">`
-    : `<div class="tv-photo-placeholder" style="background:${cfg.c}">${ini(op.name)}</div>`;
+  // Formas de pagamento
+  const tiposEntries = Object.entries(op.tipos||{}).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const tiposTotal   = Object.values(op.tipos||{}).reduce((s,v)=>s+v,0);
+  const tColors      = {"Boleto":"#FCD34D","Pix":"#4ADE80","Cartão Padrão":"#67E8F9","Cartão":"#67E8F9"};
+
+  // Ranking vizinho — quem está antes e depois
+  const prev = idx>0             ? tvList[idx-1] : null;
+  const next = idx<tvList.length-1? tvList[idx+1] : null;
 
   document.getElementById('tv-card').innerHTML=`
-    <div style="display:flex;align-items:flex-start;gap:28px;margin-bottom:24px">
-      ${photoHtml}
+    <div style="display:flex;gap:32px;align-items:flex-start;margin-bottom:24px">
+
+      <!-- FOTO + POSIÇÃO -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0">
+        ${photoHtml}
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:64px;color:${posColor};line-height:1;text-align:center;text-shadow:0 0 30px ${posColor}66">${posLabel}</div>
+        <div style="font-size:11px;font-weight:700;color:${posColor};background:${posColor}18;border:1px solid ${posColor}44;padding:4px 14px;border-radius:100px;letter-spacing:1.5px;text-transform:uppercase">${tier}</div>
+      </div>
+
+      <!-- NOME + KPIs PRINCIPAIS -->
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
-          <div style="font-size:11px;font-weight:700;color:${tierColor};background:${tierColor}18;
-            border:1px solid ${tierColor}33;padding:3px 10px;border-radius:100px;letter-spacing:1px">${tier}</div>
-          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase">${idx+1} de ${tvList.length}</div>
+          <div style="font-size:10px;font-weight:700;color:${cfg.c};letter-spacing:2px;text-transform:uppercase">${cfg.ico} ${cfg.sh}</div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1px">${idx+1} de ${tvList.length}</div>
         </div>
-        <div class="tv-name">${op.name.replace(/_/g,' ').toUpperCase()}</div>
-        <div class="tv-eq">${cfg.ico} ${cfg.sh}</div>
-      </div>
-    </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;color:#fff;line-height:1;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${op.name.replace(/_/g,' ').toUpperCase()}</div>
 
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
-      <div class="tv-kpi" style="border-color:rgba(74,222,128,.2)">
-        <div class="tv-kpi-l">Total Real</div>
-        <div class="tv-kpi-v" style="color:#4ADE80">${fR(op.rec)}</div>
-      </div>
-      <div class="tv-kpi" style="border-color:rgba(103,232,249,.2)">
-        <div class="tv-kpi-l">HO (25%)</div>
-        <div class="tv-kpi-v" style="color:#67E8F9">${fR(op.ho)}</div>
-      </div>
-      <div class="tv-kpi">
-        <div class="tv-kpi-l">Acordos Gerados</div>
-        <div class="tv-kpi-v" style="color:#fff">${gerados}</div>
-      </div>
-      <div class="tv-kpi" style="border-color:${efColor}33">
-        <div class="tv-kpi-l">Eficiência</div>
-        <div class="tv-kpi-v" style="color:${efColor}">${efPct}%</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:3px">${pagos} pagos / ${pendentes} pend.</div>
-      </div>
-    </div>
+        <!-- 4 KPIs grandes -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+          <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:14px;padding:14px 16px;text-align:center">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">💰 Total Real</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#4ADE80;letter-spacing:.5px;line-height:1">${fR(op.rec)}</div>
+          </div>
+          <div style="background:rgba(103,232,249,.1);border:1px solid rgba(103,232,249,.25);border-radius:14px;padding:14px 16px;text-align:center">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">🎯 HO (25%)</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#67E8F9;letter-spacing:.5px;line-height:1">${fR(op.ho)}</div>
+          </div>
+          <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 16px;text-align:center">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">📋 Acordos</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;letter-spacing:.5px;line-height:1">${op.acordos}</div>
+          </div>
+          <div style="background:${efColor}11;border:1px solid ${efColor}33;border-radius:14px;padding:14px 16px;text-align:center">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">⚡ Eficiência</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${efColor};letter-spacing:.5px;line-height:1">${efPct}${efPct!=='—'?'%':''}</div>
+            ${gerados>0?`<div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">${pagos}p / ${pendentes}pend</div>`:''}
+          </div>
+        </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px">
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">📅 Agendamentos Futuros (${agTotal})</div>
-        ${agDates.length>0
-          ? agDates.map(([dt,n])=>`<div class="tv-ag-row">
-              <span style="color:rgba(255,255,255,.7)">${new Date(dt+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}</span>
-              <span style="color:#67E8F9;font-weight:800">${n} acordo${n>1?'s':''}</span>
-            </div>`).join('')
-          : '<div style="font-size:13px;color:rgba(255,255,255,.25);font-style:italic">Sem agendamentos futuros</div>'}
-      </div>
-      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px">
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">💳 Formas de Pagamento</div>
-        ${Object.entries(op.tipos||{}).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>{
-          const tColors={"PIX":"#4ADE80","CARTÃO DE CRÉDITO":"#67E8F9","BOLETO NEGOCIAÇÃO":"#FCD34D"};
-          const total=Object.values(op.tipos||{}).reduce((s,vv)=>s+vv,0);
-          const pct=total>0?Math.round(v/total*100):0;
-          return `<div class="tv-ag-row">
-            <span style="color:rgba(255,255,255,.7);font-size:12px">${k.replace('NEGOCIAÇÃO','').trim()}</span>
-            <span style="color:${tColors[k]||'#fff'};font-weight:800">${pct}%</span>
-          </div>`;
-        }).join('')}
+        <!-- Detalhes menores: agendamentos + formas de pagamento + ranking vizinhos -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+
+          <!-- Agendamentos -->
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">📅 Agend. Futuros (${agTotal})</div>
+            ${agDates.length>0
+              ? agDates.map(([dt,n])=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+                  <span style="color:rgba(255,255,255,.6);font-size:12px">${new Date(dt+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}</span>
+                  <span style="color:#67E8F9;font-weight:800;font-size:12px">${n}ac</span>
+                </div>`).join('')
+              : '<div style="font-size:12px;color:rgba(255,255,255,.2);font-style:italic">Sem agendamentos</div>'}
+          </div>
+
+          <!-- Formas de pgto -->
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💳 Formas de Pgto</div>
+            ${tiposEntries.length>0
+              ? tiposEntries.map(([k,v])=>{
+                  const pct=tiposTotal>0?Math.round(v/tiposTotal*100):0;
+                  return `<div style="margin-bottom:6px">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                      <span style="color:rgba(255,255,255,.6);font-size:11px">${k.replace('NEGOCIAÇÃO','').replace('Padrão','').trim()}</span>
+                      <span style="color:${tColors[k]||'#fff'};font-weight:800;font-size:11px">${pct}%</span>
+                    </div>
+                    <div style="height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden">
+                      <div style="height:100%;width:${pct}%;background:${tColors[k]||cfg.c};border-radius:99px"></div>
+                    </div>
+                  </div>`;
+                }).join('')
+              : '<div style="font-size:12px;color:rgba(255,255,255,.2)">Sem dados</div>'}
+          </div>
+
+          <!-- Posição no ranking: quem está antes/depois -->
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">🏆 Ranking</div>
+            ${prev?`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-radius:7px;background:rgba(255,255,255,.04);margin-bottom:5px">
+              <span style="font-size:10px;color:rgba(255,255,255,.35)">${idx}° ${prev.name.replace(/_/g,' ')}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700">${fRK(prev.rec)}</span>
+            </div>`:''}
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-radius:8px;background:${cfg.c}22;border:1px solid ${cfg.c}55;margin-bottom:5px">
+              <span style="font-size:12px;color:${cfg.c};font-weight:800">${posLabel} VOCÊ</span>
+              <span style="font-size:13px;color:#4ADE80;font-weight:900">${fRK(op.rec)}</span>
+            </div>
+            ${next?`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-radius:7px;background:rgba(255,255,255,.04)">
+              <span style="font-size:10px;color:rgba(255,255,255,.35)">${idx+2}° ${next.name.replace(/_/g,' ')}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700">${fRK(next.rec)}</span>
+            </div>`:''}
+          </div>
+
+        </div>
       </div>
     </div>`;
 
   tvUpdateDots();
 
-  // Reset + animate progress bar
   const bar = document.getElementById('tv-bar');
   bar.style.transition='none';
   bar.style.width='0%';
@@ -4268,6 +4452,22 @@ function fbStartListening(){
   });
   fbListeners.gestao = true;
 
+  // ── Checklist por equipe ──
+  D.equipes.forEach(eq=>{
+    const key = 'chk_eq_'+eq.name.replace(/[^a-zA-Z0-9]/g,'_');
+    fbDb.ref(fbRoom+'/'+key).on('value', snap=>{
+      const remote = snap.val();
+      if(!remote) return;
+      const localKey = eqChkKey(eq.name);
+      const local = JSON.parse(localStorage.getItem(localKey)||'{}');
+      if(JSON.stringify(remote)===JSON.stringify(local)) return;
+      localStorage.setItem(localKey, JSON.stringify({...local,...remote}));
+      if(eqChkActive===eq.name) eqChkRender();
+      mkEq();
+      pulseSyncDot();
+    });
+  });
+
   // ── Acordos (importação) ──
   fbDb.ref(fbRoom+'/acordos').on('value', snap=>{
     const remote = snap.val();
@@ -4343,8 +4543,7 @@ function applyOps(){
   toast('✅ Valores aplicados e sincronizados!');
 }
 
-// Patch photoSet to push photos
-const _photoSet_fb = photoSet;
+// photoSet — salva foto localmente + Firebase + BroadcastChannel
 function photoSet(opName, url){
   const all = photoGetAll();
   if(url) all[opName]=url; else delete all[opName];
@@ -4804,65 +5003,207 @@ function restaurarOp(opName){
 // CHECKLIST DO LÍDER
 // ══════════════════════════════════════════
 
+// ── CHECKLISTS PERSONALIZADOS POR EQUIPE ──
+const CHK_BY_EQ = {
+
+  // ── MARÍLIA BRENDA ──
+  'COFEN MARILIA BRENDA': [
+    { id:'abertura', icon:'🌅', title:'Abertura — Marília Brenda', items:[
+      {id:'mb_login',        label:'Login no CRM e verificar lista de devedores do dia'},
+      {id:'mb_presenca',     label:'Confirmar presença de todos os 12 operadores'},
+      {id:'mb_meta_dia',     label:'Comunicar meta do dia (valor + HO esperado) no grupo'},
+      {id:'mb_script',       label:'Revisão rápida do script com foco nas objeções de ontem'},
+      {id:'mb_carteira',     label:'Verificar se carteira está carregada e distribuída corretamente'},
+    ]},
+    { id:'producao', icon:'📞', title:'Produção — Marília Brenda', items:[
+      {id:'mb_lig_1h',       label:'Checar volume de ligações na 1ª hora (meta: mín 10 por op)'},
+      {id:'mb_ranking_manha',label:'Divulgar ranking parcial da manhã no grupo da equipe'},
+      {id:'mb_acordos',      label:'Conferir acordos fechados e links gerados até as 12h'},
+      {id:'mb_pausas',       label:'Gerenciar pausas — ninguém fora do horário permitido'},
+      {id:'mb_ops_baixos',   label:'Identificar operadores com baixa produção e dar suporte'},
+      {id:'mb_sprint_tarde', label:'Acionar sprint da tarde: meta individual de 3 acordos/op'},
+    ]},
+    { id:'qualidade', icon:'🎯', title:'Qualidade — Marília Brenda', items:[
+      {id:'mb_monitoria',    label:'Monitorar ao menos 2 ligações ao vivo (escuta ativa)'},
+      {id:'mb_feedback',     label:'Dar feedback individual para os 3 operadores mais baixos'},
+      {id:'mb_conversao',    label:'Checar taxa de conversão: acordos pagos / links gerados'},
+      {id:'mb_objecoes',     label:'Coletar objeções do dia e alinhar respostas novas'},
+    ]},
+    { id:'comunicacao', icon:'📢', title:'Comunicação — Marília Brenda', items:[
+      {id:'mb_msg_mot',      label:'Enviar mensagem motivacional no grupo (manhã e tarde)'},
+      {id:'mb_destaque',     label:'Reconhecer publicamente o destaque do dia'},
+      {id:'mb_alinhamento',  label:'Alinhar com Brenda (liderança) sobre andamento e bloqueios'},
+      {id:'mb_ranking_tarde',label:'Divulgar ranking atualizado às 15h no grupo'},
+    ]},
+    { id:'encerramento', icon:'🌙', title:'Encerramento — Marília Brenda', items:[
+      {id:'mb_relatorio',    label:'Importar relatório de recebimento e acordos no dashboard'},
+      {id:'mb_meta_bate',    label:'Confirmar se meta da equipe foi atingida'},
+      {id:'mb_ranking_final',label:'Divulgar ranking final do dia para toda a equipe'},
+      {id:'mb_agendamentos', label:'Confirmar agendamentos de acordos para próximos dias'},
+      {id:'mb_pendencias',   label:'Registrar pendências e tarefas para o dia seguinte'},
+      {id:'mb_logoff',       label:'Garantir logoff correto de todos os operadores'},
+    ]},
+  ],
+
+  // ── BIRIGUI BRUNA ──
+  'COFEN BIRIGUI BRUNA': [
+    { id:'abertura', icon:'🌅', title:'Abertura — Birigui Bruna', items:[
+      {id:'bb_login',        label:'Login no sistema e verificar funcionamento do CRM'},
+      {id:'bb_presenca',     label:'Confirmar presença dos 10 operadores de Birigui'},
+      {id:'bb_meta_dia',     label:'Comunicar meta do dia e HO esperado para a equipe'},
+      {id:'bb_script',       label:'Alinhamento de script: foco em BOLETO e PIX para Birigui'},
+      {id:'bb_carteira',     label:'Carteira/lista de cobrança carregada e priorizada'},
+    ]},
+    { id:'producao', icon:'📞', title:'Produção — Birigui Bruna', items:[
+      {id:'bb_lig_1h',       label:'Volume de ligações na 1ª hora — acionar quem está parado'},
+      {id:'bb_ranking_manha',label:'Ranking parcial da manhã divulgado no grupo de Birigui'},
+      {id:'bb_acordos',      label:'Checar acordos fechados e links enviados até as 12h'},
+      {id:'bb_pausas',       label:'Pausas controladas e dentro do horário permitido'},
+      {id:'bb_ops_baixos',   label:'Suporte aos operadores abaixo da média (script/apoio)'},
+    ]},
+    { id:'qualidade', icon:'🎯', title:'Qualidade — Birigui Bruna', items:[
+      {id:'bb_monitoria',    label:'Monitorar ligações ao vivo — foco em negociação de valor'},
+      {id:'bb_feedback',     label:'Feedback individual para operadores com taxa baixa'},
+      {id:'bb_conversao',    label:'Checar taxa de conversão da equipe de Birigui'},
+      {id:'bb_objecoes',     label:'Listar objeções do dia e definir resposta padrão'},
+    ]},
+    { id:'comunicacao', icon:'📢', title:'Comunicação — Birigui Bruna', items:[
+      {id:'bb_msg_mot',      label:'Mensagem motivacional no grupo de Birigui (manhã)'},
+      {id:'bb_destaque',     label:'Reconhecer destaque do dia publicamente na equipe'},
+      {id:'bb_alinhamento',  label:'Alinhamento com supervisora Bruna sobre metas e bloqueios'},
+      {id:'bb_ranking_tarde',label:'Divulgar ranking da tarde antes das 16h'},
+    ]},
+    { id:'encerramento', icon:'🌙', title:'Encerramento — Birigui Bruna', items:[
+      {id:'bb_relatorio',    label:'Atualizar dashboard com recebimento e acordos do dia'},
+      {id:'bb_meta_bate',    label:'Verificar se a meta da equipe de Birigui foi batida'},
+      {id:'bb_ranking_final',label:'Ranking final divulgado no grupo'},
+      {id:'bb_agendamentos', label:'Confirmar agendamentos futuros dos operadores'},
+      {id:'bb_logoff',       label:'Logoff de todos os operadores confirmado'},
+    ]},
+  ],
+
+  // ── BIRIGUI LUCIANO ──
+  'COFEN BIRIGUI LUCIANO': [
+    { id:'abertura', icon:'🌅', title:'Abertura — Birigui Luciano', items:[
+      {id:'bl_login',        label:'Login no CRM e checar funcionamento do sistema'},
+      {id:'bl_presenca',     label:'Confirmar presença dos 7 operadores do turno de Luciano'},
+      {id:'bl_meta_dia',     label:'Meta do dia comunicada com valor e HO para cada op'},
+      {id:'bl_script',       label:'Script do dia revisado — foco em clientes de alto atraso'},
+      {id:'bl_carteira',     label:'Carteira de devedores carregada e segmentada por prioridade'},
+    ]},
+    { id:'producao', icon:'📞', title:'Produção — Birigui Luciano', items:[
+      {id:'bl_lig_1h',       label:'Checar ligações na 1ª hora e intervir com quem está parado'},
+      {id:'bl_ranking_manha',label:'Ranking parcial divulgado no grupo de Luciano'},
+      {id:'bl_acordos',      label:'Acordos gerados e links pagos verificados'},
+      {id:'bl_pausas',       label:'Controle de pausas — nenhum op ausente sem justificativa'},
+      {id:'bl_ops_baixos',   label:'Identificar operadores abaixo da média e reforçar suporte'},
+    ]},
+    { id:'qualidade', icon:'🎯', title:'Qualidade — Birigui Luciano', items:[
+      {id:'bl_monitoria',    label:'Escuta ativa de ao menos 2 ligações'},
+      {id:'bl_feedback',     label:'Feedback de script para operadores com menor conversão'},
+      {id:'bl_conversao',    label:'Taxa de conversão da equipe de Luciano verificada'},
+      {id:'bl_perfil_dev',   label:'Checar operadores em desenvolvimento — acompanhamento próximo'},
+    ]},
+    { id:'comunicacao', icon:'📢', title:'Comunicação — Birigui Luciano', items:[
+      {id:'bl_msg_mot',      label:'Mensagem motivacional enviada no grupo'},
+      {id:'bl_destaque',     label:'Destaque do dia reconhecido publicamente'},
+      {id:'bl_alinhamento',  label:'Alinhamento com Luciano (supervisor) sobre produção'},
+      {id:'bl_ranking_tarde',label:'Ranking da tarde enviado no grupo'},
+    ]},
+    { id:'encerramento', icon:'🌙', title:'Encerramento — Birigui Luciano', items:[
+      {id:'bl_relatorio',    label:'Dashboard atualizado com recebimentos do dia'},
+      {id:'bl_meta_bate',    label:'Meta da equipe verificada — gap comunicado se necessário'},
+      {id:'bl_ranking_final',label:'Ranking final do dia divulgado'},
+      {id:'bl_pendencias',   label:'Pendências e tarefas para amanhã registradas'},
+      {id:'bl_logoff',       label:'Todos os operadores com logoff confirmado'},
+    ]},
+  ],
+
+  // ── STEPHANIE 2° TURNO ──
+  'COFEN STEPHANIE 2° TURNO': [
+    { id:'abertura', icon:'🌅', title:'Abertura — Stephanie 2° Turno', items:[
+      {id:'st_login',        label:'Login no sistema e verificar carteira do 2° turno'},
+      {id:'st_presenca',     label:'Confirmar presença dos 11 operadores do 2° turno'},
+      {id:'st_meta_dia',     label:'Meta do 2° turno comunicada (complementar ao 1° turno)'},
+      {id:'st_script',       label:'Script adaptado para clientes abordados no 1° turno'},
+      {id:'st_saldo_manha',  label:'Verificar saldo do 1° turno e definir gap a preencher'},
+    ]},
+    { id:'producao', icon:'📞', title:'Produção — Stephanie 2° Turno', items:[
+      {id:'st_lig_1h',       label:'Volume de ligações na 1ª hora do turno (mín 8 por op)'},
+      {id:'st_ranking',      label:'Ranking parcial do turno divulgado no grupo'},
+      {id:'st_acordos',      label:'Checar acordos fechados até as 17h'},
+      {id:'st_pausas',       label:'Pausas controladas — turno da tarde exige mais atenção'},
+      {id:'st_ops_baixos',   label:'Reforço para operadores com baixa produção no turno'},
+      {id:'st_sprint_final', label:'Sprint final antes do fechamento — últimos 45 min'},
+    ]},
+    { id:'qualidade', icon:'🎯', title:'Qualidade — Stephanie 2° Turno', items:[
+      {id:'st_monitoria',    label:'Monitorar ligações ao vivo no 2° turno'},
+      {id:'st_feedback',     label:'Feedback imediato para quem está abaixo do ritmo'},
+      {id:'st_conversao',    label:'Checar taxa de conversão do turno vs média histórica'},
+      {id:'st_objecoes',     label:'Objeções específicas do 2° turno mapeadas e respondidas'},
+    ]},
+    { id:'comunicacao', icon:'📢', title:'Comunicação — Stephanie 2° Turno', items:[
+      {id:'st_msg_mot',      label:'Mensagem motivacional no início do turno'},
+      {id:'st_destaque',     label:'Destaque do turno reconhecido'},
+      {id:'st_alinhamento',  label:'Alinhamento com Stephanie (supervisora) sobre meta do turno'},
+      {id:'st_ranking_tarde',label:'Ranking final do turno enviado antes do fechamento'},
+    ]},
+    { id:'encerramento', icon:'🌙', title:'Encerramento — Stephanie 2° Turno', items:[
+      {id:'st_relatorio',    label:'Relatório final importado no dashboard'},
+      {id:'st_meta_total',   label:'Meta total do dia (1°+2° turno) verificada'},
+      {id:'st_ranking_final',label:'Ranking final divulgado para toda a equipe'},
+      {id:'st_agendamentos', label:'Agendamentos para dias seguintes confirmados'},
+      {id:'st_pendencias',   label:'Pendências registradas para o próximo dia'},
+      {id:'st_logoff',       label:'Logoff de todos os operadores do 2° turno confirmado'},
+    ]},
+  ],
+};
+
+// Checklist genérico (usado pelo painel global de checklist e equipes sem personalizado)
 const CHK_SECTIONS = [
-  {
-    id:'abertura', icon:'🌅', title:'Abertura da Operação',
-    items:[
-      {id:'login_sistema',    label:'Fazer login no sistema / CRM e verificar funcionamento'},
-      {id:'presenca',         label:'Confirmar presença de todos os operadores e supervisores'},
-      {id:'metas_dia',        label:'Comunicar meta do dia para a equipe (valor + HO esperado)'},
-      {id:'script_revisao',   label:'Revisar script de abordagem com a equipe (ajustes do dia anterior)'},
-      {id:'carteira_carregada',label:'Verificar se carteira/lista de devedores está carregada no sistema'},
-    ]
-  },
-  {
-    id:'producao', icon:'📞', title:'Acompanhamento de Produção',
-    items:[
-      {id:'ligacoes_1h',      label:'Verificar volume de ligações na 1ª hora e acionar quem está abaixo'},
-      {id:'ranking_am',       label:'Divulgar ranking parcial da manhã para a equipe (motivação)'},
-      {id:'acordos_fechados', label:'Checar acordos fechados e links gerados até o momento'},
-      {id:'pausa_controlada', label:'Gerenciar pausas — ninguém em pausa fora do horário permitido'},
-      {id:'operadores_baixos',label:'Identificar operadores com baixa produção e oferecer apoio/script'},
-    ]
-  },
-  {
-    id:'qualidade', icon:'🎯', title:'Qualidade e Conversão',
-    items:[
-      {id:'monitoria_lig',    label:'Monitorar ao menos 2 ligações ao vivo (escuta ativa)'},
-      {id:'feedback_script',  label:'Dar feedback individual sobre script e técnica de abordagem'},
-      {id:'taxa_conversao',   label:'Verificar taxa de conversão (acordos pagos / links gerados)'},
-      {id:'objecoes_dia',     label:'Levantar principais objeções do dia e alinhar resposta com equipe'},
-    ]
-  },
-  {
-    id:'comunicacao', icon:'📢', title:'Comunicação e Motivação',
-    items:[
-      {id:'msg_motivacional', label:'Enviar mensagem motivacional no grupo da equipe'},
-      {id:'ranking_divulgado',label:'Divulgar ranking atualizado no grupo (pelo menos 1x ao dia)'},
-      {id:'destaque_positivo',label:'Reconhecer publicamente operador destaque do dia'},
-      {id:'alinhamento_sup',  label:'Alinhar com supervisor sobre andamento e eventuais problemas'},
-    ]
-  },
-  {
-    id:'dados', icon:'📊', title:'Gestão de Dados e Relatórios',
-    items:[
-      {id:'importar_rec',     label:'Importar relatório de recebimento no dashboard (atualizar ranking)'},
-      {id:'importar_acordos', label:'Importar relatório de acordos (gerados, pagos, pendentes)'},
-      {id:'meta_equipe_ok',   label:'Verificar se meta por equipe está sendo atingida'},
-      {id:'projecao_mensal',  label:'Verificar projeção mensal e comunicar gap à diretoria se necessário'},
-    ]
-  },
-  {
-    id:'encerramento', icon:'🌙', title:'Encerramento do Dia',
-    items:[
-      {id:'relatorio_final',  label:'Gerar e salvar relatório final do dia'},
-      {id:'ranking_final',    label:'Divulgar ranking final do dia para toda a equipe'},
-      {id:'agendamentos_ok',  label:'Confirmar agendamentos de acordos para os próximos dias'},
-      {id:'pendencias',       label:'Registrar pendências e tarefas para o dia seguinte'},
-      {id:'logoff_sistema',   label:'Garantir logoff correto de todos os operadores no sistema'},
-    ]
-  },
+  { id:'abertura', icon:'🌅', title:'Abertura da Operação', items:[
+    {id:'login_sistema',     label:'Fazer login no sistema / CRM e verificar funcionamento'},
+    {id:'presenca',          label:'Confirmar presença de todos os operadores e supervisores'},
+    {id:'metas_dia',         label:'Comunicar meta do dia para a equipe (valor + HO esperado)'},
+    {id:'script_revisao',    label:'Revisar script de abordagem com a equipe (ajustes do dia anterior)'},
+    {id:'carteira_carregada',label:'Verificar se carteira/lista de devedores está carregada no sistema'},
+  ]},
+  { id:'producao', icon:'📞', title:'Acompanhamento de Produção', items:[
+    {id:'ligacoes_1h',       label:'Verificar volume de ligações na 1ª hora e acionar quem está abaixo'},
+    {id:'ranking_am',        label:'Divulgar ranking parcial da manhã para a equipe (motivação)'},
+    {id:'acordos_fechados',  label:'Checar acordos fechados e links gerados até o momento'},
+    {id:'pausa_controlada',  label:'Gerenciar pausas — ninguém em pausa fora do horário permitido'},
+    {id:'operadores_baixos', label:'Identificar operadores com baixa produção e oferecer apoio/script'},
+  ]},
+  { id:'qualidade', icon:'🎯', title:'Qualidade e Conversão', items:[
+    {id:'monitoria_lig',     label:'Monitorar ao menos 2 ligações ao vivo (escuta ativa)'},
+    {id:'feedback_script',   label:'Dar feedback individual sobre script e técnica de abordagem'},
+    {id:'taxa_conversao',    label:'Verificar taxa de conversão (acordos pagos / links gerados)'},
+    {id:'objecoes_dia',      label:'Levantar principais objeções do dia e alinhar resposta com equipe'},
+  ]},
+  { id:'comunicacao', icon:'📢', title:'Comunicação e Motivação', items:[
+    {id:'msg_motivacional',  label:'Enviar mensagem motivacional no grupo da equipe'},
+    {id:'ranking_divulgado', label:'Divulgar ranking atualizado no grupo (pelo menos 1x ao dia)'},
+    {id:'destaque_positivo', label:'Reconhecer publicamente operador destaque do dia'},
+    {id:'alinhamento_sup',   label:'Alinhar com supervisor sobre andamento e eventuais problemas'},
+  ]},
+  { id:'dados', icon:'📊', title:'Gestão de Dados e Relatórios', items:[
+    {id:'importar_rec',      label:'Importar relatório de recebimento no dashboard (atualizar ranking)'},
+    {id:'importar_acordos',  label:'Importar relatório de acordos (gerados, pagos, pendentes)'},
+    {id:'meta_equipe_ok',    label:'Verificar se meta por equipe está sendo atingida'},
+    {id:'projecao_mensal',   label:'Verificar projeção mensal e comunicar gap à diretoria se necessário'},
+  ]},
+  { id:'encerramento', icon:'🌙', title:'Encerramento do Dia', items:[
+    {id:'relatorio_final',   label:'Gerar e salvar relatório final do dia'},
+    {id:'ranking_final',     label:'Divulgar ranking final do dia para toda a equipe'},
+    {id:'agendamentos_ok',   label:'Confirmar agendamentos de acordos para os próximos dias'},
+    {id:'pendencias',        label:'Registrar pendências e tarefas para o dia seguinte'},
+    {id:'logoff_sistema',    label:'Garantir logoff correto de todos os operadores no sistema'},
+  ]},
 ];
+
+// Retorna o checklist correto para a equipe
+function getEqChecklist(eqName){ return CHK_BY_EQ[eqName] || CHK_SECTIONS; }
 
 let chkChart = null;
 
