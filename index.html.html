@@ -607,6 +607,13 @@ select.ev-inp{cursor:pointer}
 <!-- ══════════ PAGE: RANKING ══════════ -->
 <div class="page" id="pg-ranking">
   <div class="fbtns" id="fbtns"></div>
+  <!-- Legenda Feedback -->
+  <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm);box-shadow:var(--sh);flex-wrap:wrap">
+    <span style="font-size:10px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px">Feedback Mensal:</span>
+    <div style="display:flex;align-items:center;gap:5px"><span style="background:#D1FAE5;border:1.5px solid #6EE7B7;color:#065F46;border-radius:100px;padding:2px 10px;font-size:10px;font-weight:800">✅ FB 09/04</span><span style="font-size:11px;color:var(--g500)">= Feito — clique para desmarcar</span></div>
+    <div style="display:flex;align-items:center;gap:5px"><span style="background:#FEF9C3;border:1.5px dashed #FCD34D;color:#92400E;border-radius:100px;padding:2px 10px;font-size:10px;font-weight:800">○ Feedback</span><span style="font-size:11px;color:var(--g500)">= Pendente — clique para marcar</span></div>
+    <span style="font-size:10px;color:var(--g500);margin-left:auto">Zera automaticamente dia 01 de cada mês</span>
+  </div>
   <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Agend.</span></div>
   <div class="rk-list" id="rk-list"></div>
 </div>
@@ -2048,6 +2055,7 @@ function calcProjecao(rec, metaInd){
 // ── RANKING ──
 let rkFilter='all';
 function mkRanking(){
+  const feedbackAll = feedbackGetAll();
   document.getElementById('fbtns').innerHTML=
     `<button class="fbtn ${rkFilter==='all'?'on':''}" onclick="setF('all',this)">🏆 Todos</button>`+
     D.equipes.map(eq=>{
@@ -2069,6 +2077,12 @@ function mkRanking(){
     const projCol  = projData.color;
     const projLabel = projData.label;
     const projPct   = projData.pct;
+    // ── Feedback mensal ──
+    const fbDone = !!feedbackAll[op.name];
+    const fbDate = fbDone ? new Date(feedbackAll[op.name]).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : '';
+    const fbBtnStyle = fbDone
+      ? 'background:#D1FAE5;border:1.5px solid #6EE7B7;color:#065F46;cursor:pointer;'
+      : 'background:#FEF9C3;border:1.5px dashed #FCD34D;color:#92400E;cursor:pointer;';
 
     return `<div class="rk-row ${cls}" style="animation-delay:${i*.025}s;--ra:${cfg.c}" onclick="openM('${op.name}')">
       <div class="r-pos">${r<=3?['🥇','🥈','🥉'][r-1]:r+'°'}</div>
@@ -2076,7 +2090,17 @@ function mkRanking(){
         <div style="width:32px;height:32px;border-radius:8px;overflow:hidden;flex-shrink:0;background:${cfg.c};display:flex;align-items:center;justify-content:center">
         ${photoGet(op.name)?`<img src="${photoGet(op.name)}" style="width:100%;height:100%;object-fit:cover">`:`<span style="font-weight:900;font-size:11px;color:#fff">${ini(op.name)}</span>`}
       </div>
-        <div><div class="r-n">${op.name.replace(/_/g,' ')}</div><div class="r-t">${cfg.sh}</div></div>
+        <div>
+          <div class="r-n" style="display:flex;align-items:center;gap:5px">
+            ${op.name.replace(/_/g,' ')}
+            <button onclick="event.stopPropagation();feedbackToggle('${op.name.replace(/'/g,"\\'")}')"
+              title="${fbDone?'Feedback feito em '+fbDate+' — clique para desmarcar':'Marcar feedback do mês'}"
+              style="padding:1px 6px;border-radius:100px;font-size:9px;font-weight:800;${fbBtnStyle}transition:all .2s;flex-shrink:0;line-height:1.6">
+              ${fbDone?'✅ FB '+fbDate:'○ Feedback'}
+            </button>
+          </div>
+          <div class="r-t">${cfg.sh}</div>
+        </div>
       </div>
       <div class="r-bar-w">
         <div class="r-val">${fR(op.rec)}</div>
@@ -2500,6 +2524,7 @@ function rdRender(){
   const saved=rdGetSaved();
   const isGeral=rdActiveEq==='geral';
   const list=isGeral?ALL:ALL.filter(o=>o.eq===rdActiveEq);
+  const feedbackAll = feedbackGetAll();
 
   document.getElementById('rd-list').innerHTML=list.map(op=>{
     const cfg=EQ[op.eq]||{c:'#888',sh:op.eq};
@@ -2509,6 +2534,7 @@ function rdRender(){
     const histKey=rdTodayKey()+'_hist_'+sid;
     let hist=[]; try{hist=JSON.parse(localStorage.getItem(histKey)||'[]')}catch{}
     const histHtml=hist.slice(-3).map(h=>`<span style="font-size:9px;color:var(--g500)">${h.hora}</span><span style="font-size:9px;color:var(--pp);font-weight:800;margin-left:2px">+${fR(h.v)}</span>`).join(' &nbsp;');
+    const fbDone = !!feedbackAll[op.name];
     return `<div id="rdrow-${sid}"
       style="display:grid;grid-template-columns:32px 1fr 130px 110px 145px 130px 130px;
       gap:8px;align-items:center;padding:9px 18px;
@@ -2517,7 +2543,10 @@ function rdRender(){
       <div style="width:28px;height:28px;border-radius:7px;background:${cfg.c};
         display:flex;align-items:center;justify-content:center;font-weight:900;font-size:10px;color:#fff">${ini(op.name)}</div>
       <div>
-        <div style="font-weight:800;font-size:12px;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${op.name.replace(/_/g,' ')}</div>
+        <div style="font-weight:800;font-size:12px;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px">
+          ${op.name.replace(/_/g,' ')}
+          ${fbDone?'<span style="background:#D1FAE5;border:1px solid #6EE7B7;color:#065F46;border-radius:100px;padding:1px 6px;font-size:9px;font-weight:800;flex-shrink:0">✅ FB</span>':''}
+        </div>
         ${isGeral?`<div style="font-size:10px;color:${cfg.c};font-weight:700">${cfg.sh}</div>`:''}
         ${histHtml?`<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px">${histHtml}</div>`:''}
       </div>
@@ -3109,8 +3138,16 @@ function removeNovo(idx){
     eqObj.ho=eqObj.ops.reduce((s,o)=>s+o.ho,0);
     eqObj.n_op=eqObj.ops.length;
   }
+  // FIX: Remove from daily receive data
+  const rdMap=rdGetSaved();
+  if(rdMap[n.name]!==undefined){ delete rdMap[n.name]; localStorage.setItem(rdTodayKey(),JSON.stringify(rdMap)); }
+  // Remove from lista de removidos persistence
+  if(!ov.removidos) ov.removidos=[];
+  if(!ov.removidos.includes(n.name)) ov.removidos.push(n.name);
   ov.novos.splice(idx,1);
   gSetOverrides(ov);
+  fbPush('gestao', ov);
+  fbPush('rd', rdGetSaved());
   rebuildAll(); refreshAll(); renderNovoAdicionados();
   toast('↩ Operador removido!');
 }
@@ -4544,6 +4581,9 @@ function fbStartListening(){
     pulseSyncDot();
   });
   fbListeners.acordos = true;
+
+  // ── Feedback mensal ──
+  fbListenFeedback();
 }
 
 // ── PUSH TO FIREBASE ──
@@ -4968,9 +5008,7 @@ function removerOpApply(){
   const op = ALL.find(o=>o.name===opName);
   if(!op){ toast('❌ Operador não encontrado!'); return; }
 
-  if(!confirm(`Remover ${opName.replace(/_/g,' ')} de tudo?
-
-Esta ação remove o operador de todas as abas e sincroniza para todos os dispositivos.`)) return;
+  if(!confirm(`Remover ${opName.replace(/_/g,' ')} de tudo?\n\nEsta ação remove o operador do ranking, equipes, recebimento diário e sincroniza para todos os dispositivos.`)) return;
 
   // Remover de D.equipes
   D.equipes.forEach(eq=>{
@@ -4987,13 +5025,40 @@ Esta ação remove o operador de todas as abas e sincroniza para todos os dispos
   delete ov[opName];
   localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
 
-  // Remover de fotos localStorage
+  // Remover do recebimento do dia (rdTodayKey) — FIX: operador saía do ranking mas não do diário
+  const rdMap = rdGetSaved();
+  if(rdMap[opName] !== undefined){
+    delete rdMap[opName];
+    localStorage.setItem(rdTodayKey(), JSON.stringify(rdMap));
+  }
+  // Remover de todas as chaves de recebimento do dia deste mês
+  const now = new Date();
+  for(let d=1; d<=31; d++){
+    const key = 'cofen_rd_'+now.getFullYear()+'_'+(now.getMonth()+1)+'_'+d;
+    try{
+      const saved = JSON.parse(localStorage.getItem(key)||'null');
+      if(saved && saved[opName] !== undefined){
+        delete saved[opName];
+        localStorage.setItem(key, JSON.stringify(saved));
+      }
+    }catch(e){}
+    // histórico de entradas do dia
+    const histKey = key+'_hist_'+opName.replace(/[^a-zA-Z0-9]/g,'_');
+    localStorage.removeItem(histKey);
+  }
+
+  // Remover fotos localStorage
   const photos = JSON.parse(localStorage.getItem('cofen_photos')||'{}');
   delete photos[opName];
   localStorage.setItem('cofen_photos', JSON.stringify(photos));
 
-  // Salvar lista de removidos no gestao override
+  // Remover metas individuais
+  const metasOp = getMetasOp();
+  if(metasOp[opName]){ delete metasOp[opName]; setMetasOp(metasOp); }
+
+  // Remover de novos adicionados (se for um adicionado manualmente)
   const gOv = gGetOverrides();
+  if(gOv.novos) gOv.novos = gOv.novos.filter(n=>n.name!==opName);
   if(!gOv.removidos) gOv.removidos = [];
   if(!gOv.removidos.includes(opName)) gOv.removidos.push(opName);
   gSetOverrides(gOv);
@@ -5001,10 +5066,11 @@ Esta ação remove o operador de todas as abas e sincroniza para todos os dispos
   // Sincronizar Firebase
   fbPush('gestao', gOv);
   fbPush('overrides', {...ov, _ts: Date.now()});
-  // Remover foto do Firebase
+  fbPush('rd', rdGetSaved());
   if(fbDb && fbRoom){
     const allPhotos = JSON.parse(localStorage.getItem('cofen_photos')||'{}');
     fbPush('photos', allPhotos);
+    fbPush('metas_op', metasOp);
   }
 
   // Rebuild e refresh tudo
@@ -5014,7 +5080,7 @@ Esta ação remove o operador de todas as abas e sincroniza para todos os dispos
   sel.value = '';
   document.getElementById('remover-op-preview').style.display='none';
 
-  toast(`🗑️ ${opName.replace(/_/g,' ')} removido de todas as abas!`);
+  toast(`🗑️ ${opName.replace(/_/g,' ')} removido de ranking, equipes e recebimento diário!`);
 }
 
 function renderRemovidosLista(){
@@ -5443,6 +5509,88 @@ loadSavedOverrides();
 loadGestaoOverrides();
 loadSharedPhotos();
 restoreImportBadges();
+
+// ══════════════════════════════════════════
+// FIX 3 — RESET AUTOMÁTICO DIA 01 DE CADA MÊS
+// Zera recebimentos base (op_overrides), total override, recebimento do dia, acordos e feedback
+// ══════════════════════════════════════════
+(function checkMonthlyReset(){
+  const now      = new Date();
+  const thisMonth = now.getFullYear() + '_' + (now.getMonth()+1);
+  const lastReset = localStorage.getItem('cofen_last_reset_month');
+
+  if(now.getDate() === 1 && lastReset !== thisMonth){
+    // Zerar recebimentos base dos operadores
+    localStorage.removeItem('cofen_op_overrides');
+    // Zerar total override e manter meta
+    const meta = localStorage.getItem('cofen_meta') || '';
+    localStorage.removeItem('cofen_total');
+    // Zerar todos os recebimentos diários do mês anterior
+    const prev = now.getMonth()===0
+      ? {y:now.getFullYear()-1, m:12}
+      : {y:now.getFullYear(), m:now.getMonth()};
+    const daysInPrev = new Date(prev.y, prev.m, 0).getDate();
+    for(let d=1; d<=daysInPrev; d++){
+      localStorage.removeItem('cofen_rd_'+prev.y+'_'+prev.m+'_'+d);
+    }
+    // Zerar acordo overrides do mês anterior
+    localStorage.removeItem('cofen_acordos_override');
+    // Zerar feedback mensal (mês anterior)
+    const prevMonthKey = 'cofen_feedback_'+prev.y+'_'+prev.m;
+    localStorage.removeItem(prevMonthKey);
+    // Registrar que reset foi feito
+    localStorage.setItem('cofen_last_reset_month', thisMonth);
+    console.log('[COFEN] Reset mensal automático executado para '+thisMonth);
+    // Reconstrói estado limpo
+    D = JSON.parse(JSON.stringify(ORIG));
+    overrideTotalRec = 0;
+    rebuildAll();
+    setTimeout(()=>{ toast('🔄 Reset mensal automático — Bem-vindo a '+['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][now.getMonth()]+'!'); }, 1500);
+  }
+})();
+
+// ══════════════════════════════════════════
+// FIX 2 — FEEDBACK MENSAL POR OPERADOR
+// O supervisor marca ✅ feedback feito naquele mês; zera automaticamente no dia 01
+// ══════════════════════════════════════════
+function feedbackMonthKey(){
+  const d = new Date();
+  return 'cofen_feedback_'+d.getFullYear()+'_'+(d.getMonth()+1);
+}
+function feedbackGetAll(){ try{ return JSON.parse(localStorage.getItem(feedbackMonthKey())||'{}'); }catch(e){ return {}; } }
+function feedbackSave(obj){ localStorage.setItem(feedbackMonthKey(), JSON.stringify(obj)); }
+
+function feedbackToggle(opName){
+  const all = feedbackGetAll();
+  if(all[opName]){ delete all[opName]; }
+  else { all[opName] = new Date().toISOString(); }
+  feedbackSave(all);
+  // Sync Firebase
+  if(fbDb && fbRoom){ fbPush('feedback', {...all, _ts: Date.now()}); }
+  // Rebuild affected views
+  if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
+  if(document.getElementById('pg-gestao').classList.contains('on')) gestaoRemoverInit();
+  const done = all[opName];
+  toast(done ? `✅ Feedback marcado para ${opName.replace(/_/g,' ')}!` : `↩ Feedback desmarcado para ${opName.replace(/_/g,' ')}`);
+}
+
+// Listen Firebase feedback sync
+function fbListenFeedback(){
+  if(!fbDb||!fbRoom||fbListeners.feedback) return;
+  fbDb.ref(fbRoom+'/feedback').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    const local = feedbackGetAll();
+    if(JSON.stringify(remote)===JSON.stringify(local)) return;
+    const merged = {...local};
+    Object.entries(remote).forEach(([k,v])=>{ if(k!=='_ts') merged[k]=v; });
+    feedbackSave(merged);
+    if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
+    pulseSyncDot();
+  });
+  fbListeners.feedback = true;
+}
+
 tick(); setInterval(tick,1000);
 buildCal('cal-grid');
 buildDUManualGrid();
