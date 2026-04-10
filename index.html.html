@@ -1473,19 +1473,27 @@ const ini=n=>{const p=n.replace(/_/g," ").split(" ");return p.length>=2?(p[0][0]
 // All operators sorted
 let ALL = [];
 function rebuildAll(){
+  // NÃO modifica D — apenas filtra ao montar ALL
+  // Modificar D causava perda permanente de operadores a cada chamada
   const _BLOCKED=["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_FAGUNDES", "CLEBER_JUNIOR", "JHONATA_NASCIMENTO", "ANA_BENTO"];
   const _BLOCKED_TEAMS=["ELITE"];
   const _gOvR=gGetOverrides();
-  const _allRemoved=[...(_gOvR.removidos||[]),..._BLOCKED];
+  const _allRemoved=new Set([...(_gOvR.removidos||[]),..._BLOCKED]);
+  ALL=D.equipes
+    .filter(e=>!_BLOCKED_TEAMS.includes(e.name))
+    .flatMap(e=>e.ops
+      .filter(o=>!_allRemoved.has(o.name))
+      .map(o=>({...o,eq:e.name}))
+    )
+    .sort((a,b)=>b.rec-a.rec);
+  // Recalcula totais das equipes sem remover ops do D
   D.equipes.forEach(eq=>{
-    eq.ops=eq.ops.filter(o=>!_allRemoved.includes(o.name));
-    eq.rec=eq.ops.reduce((s,o)=>s+o.rec,0);
-    eq.ho=eq.ops.reduce((s,o)=>s+o.ho,0);
-    eq.n_op=eq.ops.length;
-    eq.acordos=eq.ops.reduce((s,o)=>s+(o.acordos||0),0);
+    const visibleOps=eq.ops.filter(o=>!_allRemoved.has(o.name));
+    eq.rec=visibleOps.reduce((s,o)=>s+o.rec,0);
+    eq.ho=visibleOps.reduce((s,o)=>s+o.ho,0);
+    eq.n_op=visibleOps.length;
+    eq.acordos=visibleOps.reduce((s,o)=>s+(o.acordos||0),0);
   });
-  D.equipes=D.equipes.filter(e=>e.ops.length>0&&!_BLOCKED_TEAMS.includes(e.name));
-  ALL=D.equipes.flatMap(e=>e.ops.map(o=>({...o,eq:e.name}))).sort((a,b)=>b.rec-a.rec);
 }
 rebuildAll();
 
@@ -2380,12 +2388,17 @@ function refreshAll(){
   mkRanking();
   // Atualiza Diário se inicializado
   if(typeof buildDiario==='function') buildDiario();
-  // Atualiza RecDia KPIs
+  // Atualiza RecDia KPIs e lista
   if(typeof rdUpdateKPIs==='function') rdUpdateKPIs();
+  if(typeof rdRender==='function') rdRender();
+  if(typeof rdBuildSubTabs==='function') rdBuildSubTabs();
   // Atualiza Acordos
   if(typeof acRenderRanking==='function') acRenderRanking();
   if(typeof acRenderFechamento==='function') acRenderFechamento();
   if(typeof acRenderEficiencia==='function') acRenderEficiencia();
+  // FIX: Mantém lista de mover e remover sempre sincronizadas com estado atual
+  if(typeof gestaoMoverInit==='function' && document.getElementById('gsub-mover')?.style.display!=='none') gestaoMoverInit();
+  if(typeof gestaoRemoverInit==='function' && document.getElementById('gsub-remover')?.style.display!=='none') gestaoRemoverInit();
 }
 
 // ── TOAST ──
@@ -2880,14 +2893,31 @@ function gestaoInit(){
 // MOVER OPERADORES
 // ─────────────────────────────
 function gestaoMoverInit(){
-  // Populate operator select
+  // Populate operator select — agrupado: com recebimento/agendamento primeiro
   const selOp = document.getElementById('mv-op');
   const curVal = selOp.value;
-  selOp.innerHTML = '<option value="">— Selecione o operador —</option>' +
-    [...ALL].sort((a,b)=>a.name.localeCompare(b.name)).map(op=>{
+  const rdSaved = rdGetSaved ? rdGetSaved() : {};
+  const comAtividade = [...ALL].filter(op=>op.rec>0||op.n_ag>0||(parseFloat(rdSaved[op.name]||0)>0)).sort((a,b)=>a.name.localeCompare(b.name));
+  const semAtividade = [...ALL].filter(op=>!(op.rec>0||op.n_ag>0||(parseFloat(rdSaved[op.name]||0)>0))).sort((a,b)=>a.name.localeCompare(b.name));
+  let html = '<option value="">— Selecione o operador —</option>';
+  if(comAtividade.length>0){
+    html += '<optgroup label="✅ Com recebimento / agendamentos">';
+    html += comAtividade.map(op=>{
+      const eq = EQ[op.eq]||{sh:op.eq};
+      const rec = op.rec>0 ? ' ('+fRK(op.rec)+')' : '';
+      return `<option value="${op.name}">${op.name.replace(/_/g,' ')} — ${eq.sh}${rec}</option>`;
+    }).join('');
+    html += '</optgroup>';
+  }
+  if(semAtividade.length>0){
+    html += '<optgroup label="⚪ Sem recebimento ainda">';
+    html += semAtividade.map(op=>{
       const eq = EQ[op.eq]||{sh:op.eq};
       return `<option value="${op.name}">${op.name.replace(/_/g,' ')} — ${eq.sh}</option>`;
     }).join('');
+    html += '</optgroup>';
+  }
+  selOp.innerHTML = html;
   if(curVal) selOp.value = curVal;
 
   // Populate equipe select
@@ -2963,7 +2993,11 @@ function mvApply(){
 
   rebuildAll();
   refreshAll();
+  // FIX: Atualiza todas as listas interligadas após mover operador
   gestaoMoverInit();
+  gestaoRemoverInit();
+  if(typeof rdBuildSubTabs==='function') rdBuildSubTabs();
+  if(typeof rdRender==='function') rdRender();
   toast(`✅ ${opName.replace(/_/g,' ')} → ${toCfg.sh}!`);
 
   // Reset selects
@@ -3174,6 +3208,7 @@ function gestaoSave(){
 // ── Load gestao overrides on start ──
 function loadGestaoOverrides(){
   const ov=gGetOverrides();
+  // Removidos são tratados no rebuildAll() via filtro — não precisa mutar D aqui
   // Re-apply moves
   if(ov.moves && ov.moves.length>0){
     ov.moves.forEach(mv=>{
@@ -4063,8 +4098,11 @@ let tvIdx=0, tvTimer=null, tvPaused=false, tvList=[];
 const TV_INTERVAL = 8000; // 8s per operator
 
 function tvStart(){
-  // Build list sorted by total real desc
-  tvList = [...ALL].sort((a,b)=>b.rec-a.rec);
+  // Build list sorted by total real desc — filtra removidos com segurança
+  let _removidosTV = [];
+  try{ _removidosTV = (gGetOverrides().removidos)||[]; }catch(e){ _removidosTV=[]; }
+  tvList = [...ALL].filter(o=>!_removidosTV.includes(o.name)).sort((a,b)=>b.rec-a.rec);
+  if(tvList.length===0){ toast('⚠️ Nenhum operador para exibir no Modo TV!'); return; }
   tvIdx  = 0;
   tvPaused = false;
   document.getElementById('tv-overlay').classList.add('on');
@@ -4118,6 +4156,7 @@ function tvUpdateDots(){
 
 function tvShow(idx){
   const op  = tvList[idx];
+  if(!op){ return; } // segurança: lista vazia ou idx inválido
   const pos = idx + 1; // posição real no ranking
   const cfg = EQ[op.eq]||{c:'#888',bg:'#1a2330',ico:'⭐',sh:op.eq};
   const photo = photoGet(op.name);
@@ -4190,9 +4229,9 @@ function tvShow(idx){
         <div style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;color:#fff;line-height:1;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${op.name.replace(/_/g,' ').toUpperCase()}</div>
 
         <!-- Badge de Feedback Mensal -->
-        ${fbIsDone(op.name)
-          ? '<div class="tv-fb-badge tv-fb-done" style="margin-bottom:14px">&#x2705; Feedback feito este m&ecirc;s</div>'
-          : '<div class="tv-fb-badge tv-fb-pending" style="margin-bottom:14px">&#x23F3; Feedback pendente</div>'
+        ${(()=>{ try{ return !!feedbackGetAll()[op.name]; }catch(e){ return false; } })()
+          ? '<div style="display:inline-block;margin-bottom:14px;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.4);border-radius:100px;padding:4px 16px;font-size:11px;font-weight:800;color:#4ADE80;letter-spacing:1px">&#x2705; Feedback feito este m&#xEA;s</div>'
+          : '<div style="display:inline-block;margin-bottom:14px;background:rgba(252,211,77,.1);border:1px solid rgba(252,211,77,.3);border-radius:100px;padding:4px 16px;font-size:11px;font-weight:800;color:#FCD34D;letter-spacing:1px">&#x23F3; Feedback pendente</div>'
         }
 
         <!-- 4 KPIs grandes -->
