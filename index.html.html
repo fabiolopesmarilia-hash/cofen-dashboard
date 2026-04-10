@@ -1475,7 +1475,7 @@ let ALL = [];
 function rebuildAll(){
   // NÃO modifica D — apenas filtra ao montar ALL
   // Modificar D causava perda permanente de operadores a cada chamada
-  const _BLOCKED=["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_FAGUNDES", "CLEBER_JUNIOR", "JHONATA_NASCIMENTO", "ANA_BENTO"];
+  const _BLOCKED=["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_BERNARDES", "CLEBER_JUNIOR", "JHONATA_NASCIMENTO", "ANA_BENTO"];
   const _BLOCKED_TEAMS=["ELITE"];
   const _gOvR=gGetOverrides();
   const _allRemoved=new Set([...(_gOvR.removidos||[]),..._BLOCKED]);
@@ -3233,7 +3233,7 @@ function loadGestaoOverrides(){
   if(ov.novos && ov.novos.length>0){
     ov.novos.forEach(n=>{
       if(ALL.find(o=>o.name===n.name)) return;
-      const _BLK=["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_FAGUNDES", "CLEBER_JUNIOR", "JHONATA_NASCIMENTO", "ANA_BENTO"]; if(_BLK.includes(n.name)) return;
+      const _BLK=["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_BERNARDES", "CLEBER_JUNIOR", "JHONATA_NASCIMENTO", "ANA_BENTO"]; if(_BLK.includes(n.name)) return;
       const eqObj=D.equipes.find(e=>e.name===n.eq);
       if(!eqObj) return;
       const ho=n.rec*0.25;
@@ -5571,7 +5571,7 @@ loadGestaoOverrides();
 (function(){
   const _gOv=gGetOverrides();
   if(!_gOv.removidos) _gOv.removidos=[];
-  ["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_FAGUNDES", "CLEBER_JUNIOR", "JHONATA_NASCIMENTO", "ANA_BENTO"].forEach(n=>{ if(!_gOv.removidos.includes(n)) _gOv.removidos.push(n); });
+  ["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_BERNARDES", "CLEBER_JUNIOR", "JHONATA_NASCIMENTO", "ANA_BENTO"].forEach(n=>{ if(!_gOv.removidos.includes(n)) _gOv.removidos.push(n); });
   gSetOverrides(_gOv);
 })();
 loadSharedPhotos();
