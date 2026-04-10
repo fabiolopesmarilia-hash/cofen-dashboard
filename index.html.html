@@ -4255,6 +4255,50 @@ function tvShow(idx){
           </div>
         </div>
 
+        <!-- RECEBIMENTO POR DIA DO MÊS -->
+        ${(()=>{
+          const dailyEntries = Object.entries(op.daily||{}).map(([d,v])=>([parseInt(d),v])).sort((a,b)=>a[0]-b[0]);
+          if(dailyEntries.length===0) return '';
+          const maxV = Math.max(...dailyEntries.map(([,v])=>v), 1);
+          const monthNames=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+          const now = new Date();
+          const monthLabel = monthNames[now.getMonth()]+' '+now.getFullYear();
+          const totalDias = dailyEntries.reduce((s,[,v])=>s+v, 0);
+          const melhorDia = dailyEntries.reduce((best,cur)=>cur[1]>best[1]?cur:best, dailyEntries[0]);
+          const bars = dailyEntries.map(([d,v])=>{
+            const pct = Math.round(v/maxV*100);
+            const barColor = v===melhorDia[1]?'#FFD700': v>=maxV*0.7?'#4ADE80': v>=maxV*0.4?'#67E8F9':'rgba(255,255,255,.5)';
+            return '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0">'
+              + '<div style="font-family:Bebas Neue,sans-serif;font-size:9px;color:rgba(255,255,255,.5);text-align:center;white-space:nowrap">'+fRK(v).replace('R$ ','')+'</div>'
+              + '<div style="width:100%;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;height:50px;display:flex;align-items:flex-end">'
+              +   '<div style="width:100%;height:'+pct+'%;background:'+barColor+';border-radius:4px 4px 0 0;transition:height .4s;min-height:3px"></div>'
+              + '</div>'
+              + '<div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.5);text-align:center">'+d+'</div>'
+              + '</div>';
+          }).join('');
+          return '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 16px;margin-bottom:16px">'
+            + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
+            +   '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase">📊 Recebimento por Dia — '+monthLabel+'</div>'
+            +   '<div style="display:flex;gap:14px">'
+            +     '<div style="text-align:right"><div style="font-size:9px;color:rgba(255,255,255,.3)">Total</div><div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:#4ADE80">'+fRK(totalDias)+'</div></div>'
+            +     '<div style="text-align:right"><div style="font-size:9px;color:rgba(255,255,255,.3)">Melhor dia</div><div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:#FFD700">Dia '+melhorDia[0]+' · '+fRK(melhorDia[1])+'</div></div>'
+            +     '<div style="text-align:right"><div style="font-size:9px;color:rgba(255,255,255,.3)">Dias ativos</div><div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:#67E8F9">'+dailyEntries.length+'d</div></div>'
+            +   '</div>'
+            + '</div>'
+            + '<div style="display:flex;gap:4px;align-items:flex-end;height:80px">'+bars+'</div>'
+            + '<div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">'
+            + dailyEntries.map(([d,v])=>{
+                const isTop = v===melhorDia[1];
+                return '<div style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.05);border-radius:6px;padding:3px 8px;border:1px solid rgba(255,255,255,'+(isTop?'.25':'.06')+')">'
+                  +'<span style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4)">Dia '+d+'</span>'
+                  +'<span style="font-family:Bebas Neue,sans-serif;font-size:12px;color:'+(isTop?'#FFD700':'#4ADE80')+'">'+fRK(v)+'</span>'
+                  +(isTop?'<span style="font-size:9px">🏆</span>':'')
+                  +'</div>';
+              }).join('')
+            + '</div>'
+            + '</div>';
+        })()}
+
         <!-- Detalhes menores: agendamentos + formas de pagamento + ranking vizinhos -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
 
