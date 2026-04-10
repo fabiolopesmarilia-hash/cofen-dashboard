@@ -252,14 +252,6 @@ select.ev-inp{cursor:pointer}
 .mg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .mc{background:var(--g50);border-radius:var(--rm);padding:13px}
 .mc-t{font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
-.det-tbl{width:100%;border-collapse:collapse;font-size:11px}
-.det-tbl th{background:var(--g50);border-bottom:1.5px solid var(--g200);padding:6px 8px;font-size:9px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase;text-align:left;position:sticky;top:0;z-index:1}
-.det-tbl td{padding:6px 8px;border-bottom:1px solid var(--g100);color:var(--g700);font-weight:600;vertical-align:middle}
-.det-tbl tr:hover td{background:var(--g50)}
-.det-tbl td.num{text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.3px}
-.det-tbl td.ok{color:var(--ok)}.det-tbl td.am{color:var(--warn)}.det-tbl td.info{color:var(--info)}.det-tbl td.rd{color:var(--danger)}
-.det-scroll{max-height:260px;overflow-y:auto;border:1px solid var(--g200);border-radius:var(--rm)}
-.det-empty{text-align:center;padding:24px;color:var(--g300);font-size:12px;font-weight:700}
 .dbars{display:flex;gap:3px;align-items:flex-end;height:72px;padding-top:6px}
 .db-w{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
 .db{width:100%;border-radius:3px 3px 0 0;min-height:1px;transition:height .8s cubic-bezier(.4,0,.2,1)}
@@ -832,11 +824,6 @@ select.ev-inp{cursor:pointer}
       border-bottom:2px solid transparent;margin-bottom:-2px">
       🗑️ Remover Operador
     </div>
-    <div class="gtab" id="gtab-pendentes" onclick="gTab('pendentes',this)"
-      style="padding:11px 18px;font-weight:800;font-size:12px;cursor:pointer;color:var(--g500);
-      border-bottom:2px solid transparent;margin-bottom:-2px;position:relative">
-      ⏳ Pendentes <span id="pendentes-badge" style="display:none;position:absolute;top:6px;right:6px;background:#EF4444;color:#fff;font-size:9px;font-weight:900;border-radius:100px;padding:1px 5px;min-width:16px;text-align:center">0</span>
-    </div>
   </div>
 
   <!-- ── SUB: MOVER OPERADORES ── -->
@@ -995,18 +982,6 @@ select.ev-inp{cursor:pointer}
       🗑️ Remover Operador Permanentemente
     </button>
     <div id="remover-lista-wrap" style="margin-top:20px"></div>
-  </div>
-
-  <!-- ── SUB: PENDENTES ── -->
-  <div id="gsub-pendentes" class="gsub" style="display:none;background:var(--w);border:1px solid var(--g200);border-radius:0 0 var(--rl) var(--rl);padding:20px;box-shadow:var(--sh)">
-    <div style="font-size:12px;color:var(--g700);font-weight:700;margin-bottom:16px;background:#FFFBEB;border:1.5px solid #FCD34D;border-radius:var(--rm);padding:10px 14px;line-height:1.7">
-      ⏳ <strong>Operadores pendentes de alocação</strong><br>
-      <span style="color:var(--g500);font-weight:600">Apareceram no relatório importado mas ainda não estão em nenhuma equipe. Aloque ou remova permanentemente.</span>
-    </div>
-    <div id="pendentes-lista" style="display:flex;flex-direction:column;gap:8px"></div>
-    <div id="pendentes-empty" style="text-align:center;padding:32px 0;color:var(--g500);font-size:13px;font-weight:700">
-      ✅ Nenhum operador pendente no momento.
-    </div>
   </div>
 
   <!-- ── SUB: FOTOS ── -->
@@ -1458,20 +1433,6 @@ select.ev-inp{cursor:pointer}
       <div class="mc"><div class="mc-t">Total Real por Dia</div><div class="dbars" id="m-daily"></div></div>
       <div class="mc"><div class="mc-t">📈 Evolução Semanal</div><div style="height:140px;position:relative"><canvas id="m-weekly-chart"></canvas></div></div>
       <div class="mc"><div class="mc-t">Forma de Pagamento (Total Real)</div><div class="tlist" id="m-tipos"></div></div>
-      <div class="mc" id="m-recebimentos-wrap" style="display:none">
-        <div class="mc-t">📄 Recebimentos do Mês — NrDocumento · DtPgto · Total HO</div>
-        <div class="det-scroll"><table class="det-tbl" id="m-recebimentos-tbl">
-          <thead><tr><th>Nr.Documento</th><th>Dt.Pgto</th><th style="text-align:right">Valor Recebido</th><th style="text-align:right">Total HO</th><th>Forma Pgto</th></tr></thead>
-          <tbody id="m-recebimentos-body"></tbody>
-        </table></div>
-      </div>
-      <div class="mc" id="m-agendamentos-wrap" style="display:none">
-        <div class="mc-t">📅 Agendamentos do Mês (01–31) — Cód.Cliente · Valores</div>
-        <div class="det-scroll"><table class="det-tbl" id="m-agendamentos-tbl">
-          <thead><tr><th>Cód.Cliente</th><th>Dt.Prev.Pgto</th><th style="text-align:right">Valor Aberto</th><th style="text-align:right">Valor a Vencer</th><th style="text-align:right">Valor Recebido</th><th>Status</th></tr></thead>
-          <tbody id="m-agendamentos-body"></tbody>
-        </table></div>
-      </div>
     </div>
   </div>
 </div>
@@ -1525,12 +1486,6 @@ function rebuildAll(){
   });
   D.equipes=D.equipes.filter(e=>e.ops.length>0&&!_BLOCKED_TEAMS.includes(e.name));
   ALL=D.equipes.flatMap(e=>e.ops.map(o=>({...o,eq:e.name}))).sort((a,b)=>b.rec-a.rec);
-  // Limpar da fila de pendentes qualquer op que já está no sistema
-  try{
-    const _pAll=pendGetAll();
-    const _newP=_pAll.filter(p=>!ALL.find(o=>o.name===p.name));
-    if(_newP.length!==_pAll.length) pendSaveAll(_newP);
-  }catch(e){}
 }
 rebuildAll();
 
@@ -2225,94 +2180,6 @@ function mkDe(){
 }
 
 // ── MODAL ──
-
-// ══════════════════════════════════════════════════════════════
-// DETALHES DE RECEBIMENTOS E AGENDAMENTOS POR OPERADOR
-// ══════════════════════════════════════════════════════════════
-const DET_KEY = 'cofen_detalhes_v1';
-function detGetOp(opName){
-  try{ return (JSON.parse(localStorage.getItem(DET_KEY)||'{}'))[opName] || []; }catch{ return []; }
-}
-function detSaveAll(obj){ localStorage.setItem(DET_KEY, JSON.stringify(obj)); }
-
-function fmtDate(s){
-  if(!s) return '—';
-  // YYYY-MM-DD or YYYY-MM-DD HH:MM:SS
-  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if(m) return m[3]+'/'+m[2]+'/'+m[1];
-  // DD/MM/YYYY
-  const m2 = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
-  if(m2) return s.slice(0,10);
-  return s.slice(0,10);
-}
-
-function renderModalDetalhes(opName){
-  const linhas = detGetOp(opName);
-  const wrapRec = document.getElementById('m-recebimentos-wrap');
-  const wrapAg  = document.getElementById('m-agendamentos-wrap');
-  const bodyRec = document.getElementById('m-recebimentos-body');
-  const bodyAg  = document.getElementById('m-agendamentos-body');
-  if(!wrapRec || !wrapAg) return;
-
-  // Separar recebimentos (pagos) e agendamentos (a vencer)
-  const pagos = linhas.filter(l => l.isPago);
-  const agend = linhas.filter(l => l.hasAg && !l.isPago);
-
-  // ── Tabela de Recebimentos ──────────────────────────────────
-  if(pagos.length > 0){
-    wrapRec.style.display = 'block';
-    // Ordenar por data de pagamento
-    const sorted = [...pagos].sort((a,b) => (a.dtPg||'').localeCompare(b.dtPg||''));
-    const totalRec  = sorted.reduce((s,l) => s + (l.rec||0), 0);
-    const totalHO   = sorted.reduce((s,l) => s + (l.ho||0), 0);
-    bodyRec.innerHTML = sorted.map(l => `
-      <tr>
-        <td style="font-size:10px;color:var(--g500)">${l.nrDoc||'—'}</td>
-        <td>${fmtDate(l.dtPg)}</td>
-        <td class="num ok">${fR(l.rec)}</td>
-        <td class="num info">${fR(l.ho)}</td>
-        <td style="font-size:10px">${l.forma||'—'}</td>
-      </tr>`).join('') +
-      `<tr style="background:var(--g50);font-weight:900">
-        <td colspan="2" style="font-size:10px;font-weight:800;color:var(--g700);text-transform:uppercase">TOTAL (${sorted.length} receb.)</td>
-        <td class="num ok" style="font-weight:900">${fR(totalRec)}</td>
-        <td class="num info" style="font-weight:900">${fR(totalHO)}</td>
-        <td></td>
-      </tr>`;
-  } else {
-    wrapRec.style.display = 'block';
-    bodyRec.innerHTML = '<tr><td colspan="5" class="det-empty">Nenhum recebimento importado para este mês.</td></tr>';
-  }
-
-  // ── Tabela de Agendamentos ──────────────────────────────────
-  if(agend.length > 0 || pagos.length > 0){
-    wrapAg.style.display = 'block';
-    // Mostrar TODOS os registros com Cód.Cliente (CPF), valores
-    // Agendamentos = sem pagamento + tem dt.prev
-    // Recebidos = tem pagamento
-    const todos = [...agend].sort((a,b) => (a.dtPrev||a.dtPg||'').localeCompare(b.dtPrev||b.dtPg||''));
-
-    if(todos.length > 0){
-      bodyAg.innerHTML = todos.map(l => {
-        const statusLabel = l.isPago ? 'Recebido' : 'A Vencer';
-        const statusCls   = l.isPago ? 'ok' : 'am';
-        return `<tr>
-          <td style="font-size:10px">${l.cpf||'—'}</td>
-          <td>${fmtDate(l.dtPrev||l.dtPg)}</td>
-          <td class="num">${l.valAb > 0 ? fR(l.valAb) : '—'}</td>
-          <td class="num am">${!l.isPago && l.rec > 0 ? fR(l.rec) : l.valVc > 0 ? fR(l.valVc) : '—'}</td>
-          <td class="num ok">${l.isPago && l.rec > 0 ? fR(l.rec) : '—'}</td>
-          <td><span style="font-size:10px;font-weight:800;color:var(--${l.isPago?'ok':'warn'})">${statusLabel}</span></td>
-        </tr>`;
-      }).join('');
-    } else {
-      bodyAg.innerHTML = '<tr><td colspan="6" class="det-empty">Nenhum agendamento encontrado.</td></tr>';
-    }
-  } else {
-    wrapAg.style.display = 'none';
-  }
-}
-
 function openM(opName){
   const op=ALL.find(o=>o.name===opName);if(!op)return;
   const cfg=EQ[op.eq]||{c:'#888',sh:op.eq};
@@ -2476,9 +2343,6 @@ function openM(opName){
 
   // ── Gráfico evolução semanal ──
   renderWeeklyChart(op);
-
-  // ── Detalhes: recebimentos + agendamentos ──
-  renderModalDetalhes(opName);
 
   document.getElementById('mov').classList.add('on');
 }
@@ -3000,7 +2864,6 @@ function gTab(id, el){
   if(id==='remover') gestaoRemoverInit();
   if(id==='meta-op') metaOpInit();
   if(id==='fotos') fotosInit();
-  if(id==='pendentes') pendRenderLista();
 }
 
 // ── INIT ──
@@ -3011,7 +2874,6 @@ function gestaoInit(){
   fotosInit();
   metaOpInit();
   gestaoRemoverInit();
-  pendUpdateBadge();
 }
 
 // ─────────────────────────────
@@ -3391,16 +3253,9 @@ function importParse(raw){
     return -1;
   };
 
-  const iCob   = colIdx(['cobradora','operador','cobrador','nome']);
-  const iRec   = colIdx(['recebido','rec ','valor rec','total rec','vlr rec','valor recebido']);
-  const iHO    = colIdx(['total ho','ho','honorar','coren (56','coren(56']);
-  const iNrDoc = colIdx(['nr.documento','nrdocumento','nr documento','documento','doc']);
-  const iDtPg  = colIdx(['dt.pagamento','dtpagamento','dt pagamento','dt.baixa','dtbaixa','dt baixa','data pag','datapag']);
-  const iDtPrev= colIdx(['dt.prev','dtprev','dt prev','prev.pgto','prevpgto','agendamento']);
-  const iForma = colIdx(['forma pgto','formapgto','forma de pagamento','pgto','tipo pgto','tipo pagamento']);
-  const iCPF   = colIdx(['cpf','cod.cliente','cód.cliente','cod cliente','cod.receber','cód.receber','cliente']);
-  const iValAb = colIdx(['valor aberto','vlr aberto','v.aberto','aberto']);
-  const iValVc = colIdx(['valor a vencer','vlr vencer','a vencer','vencer']);
+  const iCob = colIdx(['cobradora','operador','cobrador','nome']);
+  const iRec = colIdx(['recebido','rec ','valor rec','total rec','vlr rec']);
+  const iHO  = colIdx(['total ho','ho','honorar']);
 
   if(iCob < 0 || iRec < 0){
     return {error: `Colunas não encontradas. Encontrado: ${headers.join(', ')}. Necessário: "Cobradora" e "Recebido".`};
@@ -3413,35 +3268,16 @@ function importParse(raw){
       .replace(/[\s_.-]+/g,'');
   }
 
-  // Acumula por operador (nome raw do arquivo) + captura linhas individuais
+  // Acumula por operador (nome raw do arquivo)
   const acc = {};
-  const linhas = {}; // detalhes linha a linha por operador
   for(let i=1; i<lines.length; i++){
     const row = lines[i].split(sep).map(v=>v.trim().replace(/^"|"$/g,''));
     if(row.length <= Math.max(iCob,iRec)) continue;
     const rawName = row[iCob].trim();
-    if(!rawName || rawName==='nan' || rawName==='-') continue;
-    const recVal = parseFloat((row[iRec]||'0').replace(/\./g,'').replace(',','.')) || 0;
+    if(!rawName) continue;
+    const recVal = parseFloat(row[iRec].replace(/\./g,'').replace(',','.')) || 0;
     if(!acc[rawName]) acc[rawName] = 0;
-    acc[rawName] += recVal;
-    // Capturar detalhes da linha
-    if(!linhas[rawName]) linhas[rawName] = [];
-    const dtPg   = iDtPg   >= 0 ? row[iDtPg]||''   : '';
-    const dtPrev = iDtPrev >= 0 ? row[iDtPrev]||'' : '';
-    const nrDoc  = iNrDoc  >= 0 ? row[iNrDoc]||''  : '';
-    const forma  = iForma  >= 0 ? row[iForma]||''  : '';
-    const cpf    = iCPF    >= 0 ? row[iCPF]||''    : '';
-    const valAb  = iValAb  >= 0 ? parseFloat((row[iValAb]||'0').replace(/\./g,'').replace(',','.')) : 0;
-    const valVc  = iValVc  >= 0 ? parseFloat((row[iValVc]||'0').replace(/\./g,'').replace(',','.')) : 0;
-    const hoVal  = iHO     >= 0 ? parseFloat((row[iHO]||'0').replace(/\./g,'').replace(',','.')) : recVal * 0.25 * 0.25;
-    const isPago = dtPg && dtPg!=='' && dtPg.toLowerCase()!=='nat' && dtPg!=='-';
-    const hasAg  = dtPrev && dtPrev!=='' && dtPrev.toLowerCase()!=='nat' && dtPrev!=='-';
-    linhas[rawName].push({
-      nrDoc, dtPg, dtPrev, forma, cpf,
-      rec: recVal, ho: hoVal,
-      valAb, valVc,
-      isPago, hasAg
-    });
+    acc[rawName] += recVal; // Recebido = HO; Total Real = HO / 0.25
   }
 
   // Build lookup: norm(name) -> op object (from D.equipes directly)
@@ -3493,10 +3329,9 @@ function importParse(raw){
         hoImport:hoSum, recImport:totalReal,
         recCurrent:matched.rec, hoCurrent:matched.ho,
         diff:totalReal-matched.rec,
-        linhas: linhas[rawName] || [],
       });
     } else {
-      missing.push({rawName, ho:hoSum, totalReal, linhas: linhas[rawName] || []});
+      missing.push({rawName, ho:hoSum, totalReal});
     }
   });
 
@@ -3675,37 +3510,10 @@ function importApply(){
   importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
   localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
 
-  // Salvar detalhes de recebimentos/agendamentos por operador
-  try{
-    const detKey = 'cofen_detalhes_v1';
-    const det = JSON.parse(localStorage.getItem(detKey)||'{}');
-    importParsed.found.forEach(r=>{
-      if(r.linhas && r.linhas.length > 0){
-        det[r.opName] = r.linhas;
-      }
-    });
-    localStorage.setItem(detKey, JSON.stringify(det));
-    // Sync Firebase
-    if(fbDb && fbRoom) fbPush('detalhes', det);
-  }catch(e){ console.warn('Erro ao salvar detalhes:', e); }
-
   const totalImportado = importParsed.found.reduce((s,r)=>s+r.recImport,0);
   toast(`✅ ${updated} operadores atualizados! Total: ${fRK(totalImportado)} · HO: ${fRK(totalImportado*0.25)}`);
 
   markImportDone('rec');
-
-  // Salvar operadores "missing" como pendentes para alocação na gestão
-  if(importParsed.missing && importParsed.missing.length > 0){
-    const gOv = gGetOverrides();
-    const removidos = gOv.removidos || [];
-    const validMissing = importParsed.missing.filter(m => {
-      const name = (m.rawName||'').trim().replace(/\s+/g,'_').toUpperCase();
-      return name.length > 0 && !removidos.includes(name);
-    });
-    if(validMissing.length > 0){
-      pendAdd(validMissing);
-    }
-  }
 
   document.getElementById('import-status').textContent =
     `✅ Importação concluída! ${updated} atualizados, ${unchanged} sem alteração · Total: ${fRK(totalImportado)}`;
@@ -3985,18 +3793,6 @@ function acImportPreview(raw){
 
   document.getElementById('ac-import-list').innerHTML = listHTML;
 
-  // Enviar para pendentes os missing que têm pelo menos 1 acordo ou agendamento
-  const acMissing = missing.filter(m => (m.g||0) > 0 || (m.ag||0) > 0);
-  if(acMissing.length > 0){
-    pendAdd(acMissing.map(m => ({
-      rawName: m.rawName,
-      totalReal: 0, // acordos não têm valor financeiro direto
-      eq: '',
-      hasAcordos: m.g || 0,
-      hasAg: m.ag || 0
-    })));
-  }
-
   acImportParsed=found; // only keep matched
   document.getElementById('ac-import-preview').style.display='block';
 }
@@ -4261,212 +4057,6 @@ const _rdSetSaved_orig = rdSetSaved;
 
 
 // ══════════════════════════════════════════
-
-// ══════════════════════════════════════════════════════════════
-// FILA DE PENDENTES — operadores do relatório sem equipe
-// ══════════════════════════════════════════════════════════════
-const PEND_KEY = 'cofen_pendentes_v1';
-
-function pendGetAll(){
-  try{ return JSON.parse(localStorage.getItem(PEND_KEY)||'[]'); }catch{ return []; }
-}
-function pendSaveAll(arr){
-  localStorage.setItem(PEND_KEY, JSON.stringify(arr));
-  pendUpdateBadge();
-}
-
-function pendUpdateBadge(){
-  const n = pendGetAll().length;
-  const badge = document.getElementById('pendentes-badge');
-  const tab   = document.getElementById('gtab-pendentes');
-  if(badge){
-    badge.textContent = n;
-    badge.style.display = n > 0 ? 'inline-block' : 'none';
-  }
-  if(tab){
-    tab.style.color = n > 0 ? '#EF4444' : 'var(--g500)';
-    if(n > 0) tab.style.fontWeight = '900';
-  }
-}
-
-function pendAdd(missingList){
-  // missingList: array de {rawName, totalReal, eq (string do coren)}
-  const all = pendGetAll();
-  const gOv = gGetOverrides();
-  const removidos = gOv.removidos || [];
-  let added = 0;
-  missingList.forEach(m => {
-    const name = m.rawName.trim().replace(/\s+/g,'_').toUpperCase();
-    // Não adicionar se já está no sistema, já é pendente, ou foi removido
-    if(ALL.find(o=>o.name===name)) return;
-    if(all.find(p=>p.name===name)) return;
-    if(removidos.includes(name)) return;
-    all.push({ name, rawName: m.rawName, rec: m.totalReal||0, eq: m.eq||'',
-      hasAcordos: m.hasAcordos||0, hasAg: m.hasAg||0, ts: Date.now() });
-    added++;
-  });
-  if(added > 0){
-    pendSaveAll(all);
-    toast('⏳ '+added+' operador(es) adicionado(s) à fila de pendentes! Acesse Gestão → Pendentes.');
-    // Piscar aba gestão
-    const gTab = document.querySelector('.tab[onclick*="gestao"]');
-    if(gTab){ gTab.style.background='#FFFBEB'; setTimeout(()=>{ gTab.style.background=''; },2000); }
-  }
-}
-
-function pendRenderLista(){
-  const all = pendGetAll();
-  const lista = document.getElementById('pendentes-lista');
-  const empty = document.getElementById('pendentes-empty');
-  if(!lista) return;
-
-  pendUpdateBadge();
-
-  if(all.length === 0){
-    lista.innerHTML = '';
-    if(empty) empty.style.display = 'block';
-    return;
-  }
-  if(empty) empty.style.display = 'none';
-
-  // Cabeçalho com contagem e botão limpar tudo
-  const headerHtml = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-    <div style="font-size:11px;font-weight:800;color:var(--g700);letter-spacing:.5px">${all.length} operador(es) aguardando alocação</div>
-    <button onclick="pendIgnorarTodos()" style="padding:5px 12px;border-radius:var(--rm);border:1.5px solid var(--danger);background:var(--w);color:var(--danger);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">🗑 Ignorar todos</button>
-  </div>`;
-
-  lista.innerHTML = headerHtml + all.map((p, i) => {
-    const eqOptions = D.equipes.map(eq => {
-      const cfg = EQ[eq.name]||{sh:eq.name};
-      return `<option value="${eq.name}">${cfg.sh||eq.name}</option>`;
-    }).join('');
-
-    return `<div id="pend-row-${i}" style="display:grid;grid-template-columns:1fr 180px 160px 120px 100px;gap:10px;align-items:center;
-      padding:12px 14px;background:var(--g50);border:1.5px solid #FCD34D;border-radius:var(--rm)">
-      <div>
-        <div style="font-weight:800;font-size:13px;color:var(--g900)">${p.rawName||p.name}</div>
-        <div style="font-size:10px;color:var(--g500);font-weight:600;margin-top:2px">
-          ${p.rec>0 ? 'Rec.: <span style="color:var(--pp);font-weight:800">'+fR(p.rec)+'</span>' : ''}
-          ${p.hasAcordos>0 ? '&nbsp;· <span style="color:var(--ok);font-weight:800">'+p.hasAcordos+' acordos</span>' : ''}
-          ${p.hasAg>0 ? '&nbsp;· <span style="color:var(--warn);font-weight:800">'+p.hasAg+' agend.</span>' : ''}
-          &nbsp;·&nbsp;${new Date(p.ts).toLocaleDateString('pt-BR')}
-        </div>
-      </div>
-      <select id="pend-eq-${i}"
-        style="background:var(--w);border:1.5px solid var(--g200);border-radius:var(--rm);
-        padding:8px 10px;font-family:Nunito,sans-serif;font-size:12px;font-weight:700;color:var(--g900);outline:none;width:100%">
-        <option value="">— Equipe —</option>
-        ${eqOptions}
-      </select>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--pp);text-align:center">${fR(p.rec)}</div>
-      <button onclick="pendAlocar(${i})"
-        style="padding:8px 14px;border-radius:var(--rm);border:none;cursor:pointer;
-        background:linear-gradient(135deg,var(--pp),var(--pp3));color:#fff;
-        font-family:Nunito,sans-serif;font-weight:800;font-size:12px">
-        ✔ Alocar
-      </button>
-      <button onclick="pendRemover(${i})"
-        style="padding:8px 12px;border-radius:var(--rm);border:1.5px solid #EF4444;cursor:pointer;
-        background:var(--w);color:#EF4444;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;transition:all .2s"
-        onmouseover="this.style.background='#FEF2F2'"
-        onmouseout="this.style.background='var(--w)'">
-        🗑 Remover
-      </button>
-    </div>`;
-  }).join('');
-}
-
-function pendAlocar(idx){
-  const all = pendGetAll();
-  const p = all[idx];
-  if(!p){ toast('❌ Pendente não encontrado!'); return; }
-
-  const selEl = document.getElementById('pend-eq-'+idx);
-  const eqNm  = selEl?.value;
-  if(!eqNm){ toast('⚠️ Selecione a equipe antes de alocar!'); return; }
-
-  // Verificar se já existe no sistema
-  if(ALL.find(o=>o.name===p.name)){
-    // Já existe — só mover
-    toast('ℹ️ Operador já existe. Use "Mover Operadores" para trocar de equipe.');
-    return;
-  }
-
-  // Nome normalizado
-  const nome = p.name;
-  const eqObj = D.equipes.find(e=>e.name===eqNm);
-  if(!eqObj){ toast('❌ Equipe não encontrada!'); return; }
-
-  const rec = p.rec || 0;
-  const ho  = rec * 0.25;
-  const newOp = {
-    name:nome, rec, ho, acordos:0, ligacoes:0,
-    med_atraso:0, med_lig_baixa:0, daily:{}, tipos:{}, n_ag:0, val_ag:0, eq:eqNm
-  };
-
-  eqObj.ops.push(newOp);
-  eqObj.ops.sort((a,b)=>b.rec-a.rec);
-  eqObj.rec  += rec;
-  eqObj.ho   += ho;
-  eqObj.n_op  = eqObj.ops.length;
-  eqObj.acordos = eqObj.ops.reduce((s,o)=>s+(o.acordos||0),0);
-
-  // Persist no gestao
-  const gOv = gGetOverrides();
-  if(!gOv.novos) gOv.novos = [];
-  gOv.novos = gOv.novos.filter(n=>n.name!==nome); // evitar duplicata
-  gOv.novos.push({ name:nome, eq:eqNm, rec, ts:Date.now() });
-  gSetOverrides(gOv);
-  fbPush('gestao', gOv);
-
-  // Persist no overrides
-  const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
-  ov[nome] = rec;
-  localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
-  fbPush('overrides', {...ov, _ts:Date.now()});
-
-  // Remover da fila de pendentes
-  all.splice(idx,1);
-  pendSaveAll(all);
-
-  rebuildAll();
-  refreshAll();
-  pendRenderLista();
-  gestaoRemoverInit();
-
-  const cfg = EQ[eqNm]||{sh:eqNm};
-  toast('✅ '+nome.replace(/_/g,' ')+' alocado em '+cfg.sh+'!');
-}
-
-function pendRemover(idx){
-  const all = pendGetAll();
-  const p = all[idx];
-  if(!p) return;
-
-  if(!confirm('Remover '+p.rawName+' permanentemente?\n\nEle não aparecerá em nenhuma equipe nem ranking.')) return;
-
-  // Adicionar à lista de removidos
-  const gOv = gGetOverrides();
-  if(!gOv.removidos) gOv.removidos = [];
-  if(!gOv.removidos.includes(p.name)) gOv.removidos.push(p.name);
-  gSetOverrides(gOv);
-  fbPush('gestao', gOv);
-
-  // Remover da fila
-  all.splice(idx,1);
-  pendSaveAll(all);
-
-  pendRenderLista();
-  toast('🗑️ '+p.rawName+' removido permanentemente.');
-}
-
-function pendIgnorarTodos(){
-  if(!confirm('Ignorar todos os pendentes?\nEles serão removidos da fila mas NÃO adicionados ao sistema.')) return;
-  pendSaveAll([]);
-  pendRenderLista();
-  toast('🗑️ Fila de pendentes limpa.');
-}
-
 // MODO TV
 // ══════════════════════════════════════════
 let tvIdx=0, tvTimer=null, tvPaused=false, tvList=[];
@@ -4803,7 +4393,6 @@ function syncDisconnect(){
   if(fbListeners.rd)        { fbDb?.ref(fbRoom+'/rd').off(); }
   if(fbListeners.overrides) { fbDb?.ref(fbRoom+'/overrides').off(); }
   if(fbListeners.photos)    { fbDb?.ref(fbRoom+'/photos').off(); }
-  if(fbListeners.detalhes)  { fbDb?.ref(fbRoom+'/detalhes').off(); }
   if(fbListeners.meta)      { fbDb?.ref(fbRoom+'/meta').off(); }
   if(fbListeners.metas_eq)  { fbDb?.ref(fbRoom+'/metas_eq').off(); }
   if(fbListeners.metas_op)  { fbDb?.ref(fbRoom+'/metas_op').off(); }
@@ -4894,21 +4483,6 @@ function fbStartListening(){
     pulseSyncDot();
   });
   fbListeners.photos = true;
-
-  // ── Detalhes de Recebimentos/Agendamentos por Operador ──
-  fbDb.ref(fbRoom+'/detalhes').on('value', snap=>{
-    const remote = snap.val();
-    if(!remote) return;
-    const local = JSON.parse(localStorage.getItem(DET_KEY)||'{}');
-    if(JSON.stringify(remote)===JSON.stringify(local)) return;
-    localStorage.setItem(DET_KEY, JSON.stringify({...local,...remote}));
-    // Re-render modal if open
-    if(currentModalOp && document.getElementById('mov')?.classList.contains('on')){
-      renderModalDetalhes(currentModalOp);
-    }
-    pulseSyncDot();
-  });
-  fbListeners.detalhes = true;
 
   // ── Meta / Total Real Recebido ──
   fbDb.ref(fbRoom+'/meta').on('value', snap=>{
@@ -5527,18 +5101,7 @@ function removerOpApply(){
   sel.value = '';
   document.getElementById('remover-op-preview').style.display='none';
 
-  // Remover detalhes do operador
-  try{
-    const det = JSON.parse(localStorage.getItem(DET_KEY)||'{}');
-    if(det[opName]){ delete det[opName]; localStorage.setItem(DET_KEY, JSON.stringify(det)); }
-  }catch(e){}
-
-  // Remover da fila de pendentes (caso estivesse lá)
-  const pendAll = pendGetAll();
-  const newPendAll = pendAll.filter(p => p.name !== opName);
-  if(newPendAll.length !== pendAll.length) pendSaveAll(newPendAll);
-
-  toast(`🗑️ ${opName.replace(/_/g,' ')} removido de TODOS os lugares!`);
+  toast(`🗑️ ${opName.replace(/_/g,' ')} removido de ranking, equipes e recebimento diário!`);
 }
 
 function renderRemovidosLista(){
@@ -5965,7 +5528,6 @@ function checkBuildChart(){
 // ── INIT ──
 loadSavedOverrides();
 loadGestaoOverrides();
-pendUpdateBadge();
 // Garantir lista de removidos permanentes
 (function(){
   const _gOv=gGetOverrides();
@@ -6001,8 +5563,6 @@ restoreImportBadges();
     }
     // Zerar acordo overrides do mês anterior
     localStorage.removeItem('cofen_acordos_override');
-    // Zerar detalhes de recebimentos/agendamentos do mês anterior
-    localStorage.removeItem(DET_KEY);
     // Zerar feedback mensal (mês anterior)
     const prevMonthKey = 'cofen_feedback_'+prev.y+'_'+prev.m;
     localStorage.removeItem(prevMonthKey);
