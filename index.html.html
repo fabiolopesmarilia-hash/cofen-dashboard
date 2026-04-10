@@ -308,7 +308,7 @@ select.ev-inp{cursor:pointer}
 .tv-clock{font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:2px;color:rgba(255,255,255,.4)}
 .tv-close{position:absolute;top:16px;right:20px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .tv-close:hover{background:rgba(255,60,60,.3);color:#fff;border-color:rgba(255,60,60,.5)}
-.tv-card{width:100%;max-width:920px;padding:80px 32px 60px;animation:tvIn .6s cubic-bezier(.34,1.4,.64,1)}
+.tv-card{width:100%;height:100%;padding:0;animation:tvIn .6s cubic-bezier(.34,1.4,.64,1)}
 @keyframes tvIn{from{opacity:0;transform:scale(.92) translateY(24px)}to{opacity:1;transform:none}}
 .tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;border:4px solid rgba(255,255,255,.15);flex-shrink:0}
 .tv-photo-placeholder{width:140px;height:140px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:50px;color:#fff;flex-shrink:0;border:4px solid rgba(255,255,255,.1)}
@@ -762,7 +762,7 @@ select.ev-inp{cursor:pointer}
     </div>
 
     <!-- Lista operadores (filtrada pela sub-tab ativa) -->
-    <div id="rd-list" style="max-height:480px;overflow-y:auto"></div>
+    <div id="rd-list" style="max-height:calc(100vh - 420px);overflow-y:auto;min-height:200px"></div>
 
     <!-- Rodapé totais -->
     <div style="display:grid;grid-template-columns:32px 1fr 130px 110px 145px 130px 130px;
@@ -2550,7 +2550,16 @@ function rdUpdateEqKpis(eqName){
 function rdRender(){
   const saved=rdGetSaved();
   const isGeral=rdActiveEq==='geral';
-  const list=isGeral?ALL:ALL.filter(o=>o.eq===rdActiveEq);
+  // Ordena: quem tem entrada HOJE aparece primeiro (topo), depois por recebimento base
+  const _rdBase = isGeral?ALL:ALL.filter(o=>o.eq===rdActiveEq);
+  const list = [..._rdBase].sort((a,b)=>{
+    const vA = parseFloat(saved[a.name]||0);
+    const vB = parseFloat(saved[b.name]||0);
+    if(vA>0 && vB===0) return -1;  // A tem hoje, B não → A sobe
+    if(vB>0 && vA===0) return  1;  // B tem hoje, A não → B sobe
+    if(vA>0 && vB>0)   return vB-vA; // Ambos têm: maior hoje sobe
+    return b.rec - a.rec;            // Nenhum: ordem normal
+  });
   const feedbackAll = feedbackGetAll();
 
   document.getElementById('rd-list').innerHTML=list.map(op=>{
@@ -4156,8 +4165,8 @@ function tvUpdateDots(){
 
 function tvShow(idx){
   const op  = tvList[idx];
-  if(!op){ return; } // segurança: lista vazia ou idx inválido
-  const pos = idx + 1; // posição real no ranking
+  if(!op){ return; }
+  const pos = idx + 1;
   const cfg = EQ[op.eq]||{c:'#888',bg:'#1a2330',ico:'⭐',sh:op.eq};
   const photo = photoGet(op.name);
 
@@ -4166,191 +4175,203 @@ function tvShow(idx){
   document.getElementById('tv-clock-display').textContent=
     [now.getHours(),now.getMinutes(),now.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
 
-  // Posição: TOP 1-10 enorme, 11° em diante numerado
-  const isTop10 = pos <= 10;
+  // Posição
   const medals  = ['🥇','🥈','🥉'];
-  const posLabel = pos <= 3  ? medals[pos-1]
-                 : isTop10   ? `TOP ${pos}`
-                 : `${pos}°`;
-  const posSize  = pos === 1 ? '88px'
-                 : pos <= 3  ? '72px'
-                 : isTop10   ? '60px'
-                 : '48px';
-  const posColor = pos===1?'#FFD700':pos===2?'#C0C0C0':pos===3?'#CD7F32'
-                 : isTop10?'#67E8F9':'rgba(255,255,255,.45)';
-  const posGlow  = pos<=3?`0 0 40px ${posColor}88`:pos<=10?`0 0 20px ${posColor}44`:'none';
+  const posLabel = pos<=3 ? medals[pos-1] : `${pos}°`;
+  const posColor = pos===1?'#FFD700':pos===2?'#C0C0C0':pos===3?'#CD7F32':pos<=10?'#67E8F9':'rgba(255,255,255,.55)';
+  const posGlow  = pos<=3?`0 0 60px ${posColor}99`:pos<=10?`0 0 30px ${posColor}55`:'none';
 
-  // Tier badge
+  // Tier
   const tier      = op.rec>=20000?'S-TIER':op.rec>=10000?'A — ALTA':op.rec>=5000?'B — BOA':'C — DEV';
   const tierColor = op.rec>=20000?'#4ADE80':op.rec>=10000?'#67E8F9':op.rec>=5000?'#FCD34D':'#FCA5A5';
 
-  // Foto ou avatar
-  const photoHtml = photo
-    ? `<img src="${photo}" style="width:180px;height:180px;border-radius:24px;object-fit:cover;border:4px solid ${cfg.c};box-shadow:0 0 40px ${cfg.c}55;flex-shrink:0">`
-    : `<div style="width:180px;height:180px;border-radius:24px;background:${cfg.c}22;border:4px solid ${cfg.c};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:60px;color:${cfg.c};flex-shrink:0;box-shadow:0 0 40px ${cfg.c}44">${ini(op.name)}</div>`;
+  // Eficiência
+  const gerados  = op.gerados  ||0;
+  const pagos    = op.pagos    ||0;
+  const pendentes= op.pendentes||0;
+  const efPct    = gerados>0?(pagos/gerados*100).toFixed(1):'—';
+  const efColor  = parseFloat(efPct)>=40?'#4ADE80':parseFloat(efPct)>=20?'#FCD34D':'#FCA5A5';
 
   // Agendamentos futuros
   const agFuturo = op.ag_futuro||{};
-  const agDates  = Object.entries(agFuturo).sort((a,b)=>a[0].localeCompare(b[0])).slice(0,4);
+  const agDates  = Object.entries(agFuturo).sort((a,b)=>a[0].localeCompare(b[0])).slice(0,3);
   const agTotal  = Object.values(agFuturo).reduce((s,v)=>s+v,0);
-
-  // Eficiência
-  const gerados  = op.gerados   || 0;
-  const pagos    = op.pagos     || 0;
-  const pendentes= op.pendentes || 0;
-  const efPct    = gerados>0?(pagos/gerados*100).toFixed(1):'—';
-  const efColor  = parseFloat(efPct)>=40?'#4ADE80':parseFloat(efPct)>=20?'#FCD34D':'#FCA5A5';
 
   // Formas de pagamento
   const tiposEntries = Object.entries(op.tipos||{}).sort((a,b)=>b[1]-a[1]).slice(0,3);
   const tiposTotal   = Object.values(op.tipos||{}).reduce((s,v)=>s+v,0);
   const tColors      = {"Boleto":"#FCD34D","Pix":"#4ADE80","Cartão Padrão":"#67E8F9","Cartão":"#67E8F9"};
 
-  // Ranking vizinho — quem está antes e depois
-  const prev = idx>0             ? tvList[idx-1] : null;
+  // Ranking vizinhos
+  const prev = idx>0              ? tvList[idx-1] : null;
   const next = idx<tvList.length-1? tvList[idx+1] : null;
 
-  document.getElementById('tv-card').innerHTML=`
-    <div style="display:flex;gap:32px;align-items:flex-start;margin-bottom:24px">
+  // ── FOTO: ocupa 45% da largura, tela cheia na altura ──
+  const photoHtml = photo
+    ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;display:block;">`
+    : `<div style="width:100%;height:100%;background:linear-gradient(160deg,${cfg.c}22,${cfg.c}08);
+         display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:130px;color:${cfg.c};
+          opacity:.7;line-height:1;text-shadow:0 0 80px ${cfg.c}55">${ini(op.name)}</div>
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:3px;text-transform:uppercase">Sem foto</div>
+       </div>`;
 
-      <!-- FOTO + POSIÇÃO -->
-      <div style="display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0">
+  // ── DIÁRIO: barras de recebimento ──
+  const dailyBlock = (()=>{
+    const dailyEntries = Object.entries(op.daily||{}).map(([d,v])=>([parseInt(d),v])).sort((a,b)=>a[0]-b[0]);
+    if(dailyEntries.length===0) return '<div style="font-size:13px;color:rgba(255,255,255,.2);font-style:italic;padding:8px 0">Sem dados de recebimento por dia</div>';
+    const maxV = Math.max(...dailyEntries.map(([,v])=>v),1);
+    const melhorDia = dailyEntries.reduce((b,c)=>c[1]>b[1]?c:b, dailyEntries[0]);
+    const bars = dailyEntries.map(([d,v])=>{
+      const pct = Math.round(v/maxV*100);
+      const bc  = v===melhorDia[1]?'#FFD700':v>=maxV*.7?'#4ADE80':v>=maxV*.4?'#67E8F9':'rgba(255,255,255,.4)';
+      return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0">
+        <div style="font-size:8px;color:rgba(255,255,255,.4);white-space:nowrap">${fRK(v).replace('R$ ','')}</div>
+        <div style="width:100%;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;height:44px;display:flex;align-items:flex-end">
+          <div style="width:100%;height:${pct}%;background:${bc};border-radius:3px 3px 0 0;min-height:3px"></div>
+        </div>
+        <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.45)">${d}</div>
+      </div>`;
+    }).join('');
+    return `<div style="display:flex;gap:3px;align-items:flex-end;height:70px">${bars}</div>`;
+  })();
+
+  // ── MONTAR HTML: layout 2 colunas fullscreen ──
+  document.getElementById('tv-card').innerHTML=`
+    <div style="display:flex;width:100%;height:100vh;overflow:hidden">
+
+      <!-- ══ COLUNA ESQUERDA: FOTO GIGANTE ══ -->
+      <div style="width:45%;flex-shrink:0;position:relative;overflow:hidden">
         ${photoHtml}
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:${posSize};color:${posColor};line-height:1;text-align:center;text-shadow:${posGlow};letter-spacing:${isTop10?'3px':'1px'}">${posLabel}</div>
-        <div style="font-size:11px;font-weight:700;color:${posColor};background:${posColor}18;border:1px solid ${posColor}44;padding:4px 14px;border-radius:100px;letter-spacing:1.5px;text-transform:uppercase">${tier}</div>
+
+        <!-- Overlay degradê para integrar com a direita -->
+        <div style="position:absolute;inset:0;background:linear-gradient(to right,transparent 60%,#0A1628 100%);pointer-events:none"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 70%,#0A162888 100%);pointer-events:none"></div>
+
+        <!-- POSIÇÃO sobreposta na foto, canto inferior esquerdo -->
+        <div style="position:absolute;bottom:90px;left:28px;right:0">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:90px;color:${posColor};
+            line-height:1;text-shadow:${posGlow},0 4px 24px rgba(0,0,0,.8);letter-spacing:4px">
+            ${posLabel}
+          </div>
+          <div style="font-size:13px;font-weight:700;color:${tierColor};letter-spacing:3px;
+            text-transform:uppercase;text-shadow:0 2px 8px rgba(0,0,0,.8)">
+            ${tier}
+          </div>
+        </div>
+
+        <!-- Badge equipe sobre a foto -->
+        <div style="position:absolute;top:80px;left:28px;
+          background:${cfg.c}33;border:1px solid ${cfg.c}66;border-radius:100px;
+          padding:5px 14px;font-size:11px;font-weight:700;color:${cfg.c};letter-spacing:1.5px;text-transform:uppercase;
+          backdrop-filter:blur(8px);text-shadow:0 1px 4px rgba(0,0,0,.5)">
+          ${cfg.ico} ${cfg.sh}
+        </div>
       </div>
 
-      <!-- NOME + KPIs PRINCIPAIS -->
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
-          <div style="font-size:10px;font-weight:700;color:${cfg.c};letter-spacing:2px;text-transform:uppercase">${cfg.ico} ${cfg.sh}</div>
-          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1px">${idx+1} de ${tvList.length}</div>
-        </div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;color:#fff;line-height:1;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${op.name.replace(/_/g,' ').toUpperCase()}</div>
+      <!-- ══ COLUNA DIREITA: INFORMAÇÕES ══ -->
+      <div style="flex:1;display:flex;flex-direction:column;padding:76px 36px 60px 28px;overflow-y:auto;gap:14px">
 
-        <!-- Badge de Feedback Mensal -->
-        ${(()=>{ try{ return !!feedbackGetAll()[op.name]; }catch(e){ return false; } })()
-          ? '<div style="display:inline-block;margin-bottom:14px;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.4);border-radius:100px;padding:4px 16px;font-size:11px;font-weight:800;color:#4ADE80;letter-spacing:1px">&#x2705; Feedback feito este m&#xEA;s</div>'
-          : '<div style="display:inline-block;margin-bottom:14px;background:rgba(252,211,77,.1);border:1px solid rgba(252,211,77,.3);border-radius:100px;padding:4px 16px;font-size:11px;font-weight:800;color:#FCD34D;letter-spacing:1px">&#x23F3; Feedback pendente</div>'
-        }
-
-        <!-- 4 KPIs grandes -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
-          <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:14px;padding:14px 16px;text-align:center">
-            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">💰 Total Real</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#4ADE80;letter-spacing:.5px;line-height:1">${fR(op.rec)}</div>
+        <!-- NOME GRANDE -->
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:54px;letter-spacing:2px;
+            color:#fff;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+            text-shadow:0 2px 16px rgba(0,0,0,.6)">
+            ${op.name.replace(/_/g,' ').toUpperCase()}
           </div>
-          <div style="background:rgba(103,232,249,.1);border:1px solid rgba(103,232,249,.25);border-radius:14px;padding:14px 16px;text-align:center">
-            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">🎯 HO (25%)</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#67E8F9;letter-spacing:.5px;line-height:1">${fR(op.ho)}</div>
-          </div>
-          <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 16px;text-align:center">
-            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">📋 Acordos</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;letter-spacing:.5px;line-height:1">${op.acordos}</div>
-          </div>
-          <div style="background:${efColor}11;border:1px solid ${efColor}33;border-radius:14px;padding:14px 16px;text-align:center">
-            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">⚡ Eficiência</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${efColor};letter-spacing:.5px;line-height:1">${efPct}${efPct!=='—'?'%':''}</div>
-            ${gerados>0?`<div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">${pagos}p / ${pendentes}pend</div>`:''}
+          <div style="display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap">
+            <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px">
+              ${idx+1} de ${tvList.length} operadores
+            </div>
+            <!-- Feedback badge -->
+            ${(()=>{ try{ return !!feedbackGetAll()[op.name]; }catch(e){ return false; } })()
+              ? '<div style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.4);border-radius:100px;padding:3px 12px;font-size:10px;font-weight:800;color:#4ADE80;letter-spacing:1px">✅ Feedback OK</div>'
+              : '<div style="background:rgba(252,211,77,.1);border:1px solid rgba(252,211,77,.3);border-radius:100px;padding:3px 12px;font-size:10px;font-weight:800;color:#FCD34D;letter-spacing:1px">⏳ Feedback pendente</div>'
+            }
           </div>
         </div>
 
-        <!-- RECEBIMENTO POR DIA DO MÊS -->
-        ${(()=>{
-          const dailyEntries = Object.entries(op.daily||{}).map(([d,v])=>([parseInt(d),v])).sort((a,b)=>a[0]-b[0]);
-          if(dailyEntries.length===0) return '';
-          const maxV = Math.max(...dailyEntries.map(([,v])=>v), 1);
-          const monthNames=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-          const now = new Date();
-          const monthLabel = monthNames[now.getMonth()]+' '+now.getFullYear();
-          const totalDias = dailyEntries.reduce((s,[,v])=>s+v, 0);
-          const melhorDia = dailyEntries.reduce((best,cur)=>cur[1]>best[1]?cur:best, dailyEntries[0]);
-          const bars = dailyEntries.map(([d,v])=>{
-            const pct = Math.round(v/maxV*100);
-            const barColor = v===melhorDia[1]?'#FFD700': v>=maxV*0.7?'#4ADE80': v>=maxV*0.4?'#67E8F9':'rgba(255,255,255,.5)';
-            return '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0">'
-              + '<div style="font-family:Bebas Neue,sans-serif;font-size:9px;color:rgba(255,255,255,.5);text-align:center;white-space:nowrap">'+fRK(v).replace('R$ ','')+'</div>'
-              + '<div style="width:100%;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;height:50px;display:flex;align-items:flex-end">'
-              +   '<div style="width:100%;height:'+pct+'%;background:'+barColor+';border-radius:4px 4px 0 0;transition:height .4s;min-height:3px"></div>'
-              + '</div>'
-              + '<div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.5);text-align:center">'+d+'</div>'
-              + '</div>';
-          }).join('');
-          return '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 16px;margin-bottom:16px">'
-            + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
-            +   '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase">📊 Recebimento por Dia — '+monthLabel+'</div>'
-            +   '<div style="display:flex;gap:14px">'
-            +     '<div style="text-align:right"><div style="font-size:9px;color:rgba(255,255,255,.3)">Total</div><div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:#4ADE80">'+fRK(totalDias)+'</div></div>'
-            +     '<div style="text-align:right"><div style="font-size:9px;color:rgba(255,255,255,.3)">Melhor dia</div><div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:#FFD700">Dia '+melhorDia[0]+' · '+fRK(melhorDia[1])+'</div></div>'
-            +     '<div style="text-align:right"><div style="font-size:9px;color:rgba(255,255,255,.3)">Dias ativos</div><div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:#67E8F9">'+dailyEntries.length+'d</div></div>'
-            +   '</div>'
-            + '</div>'
-            + '<div style="display:flex;gap:4px;align-items:flex-end;height:80px">'+bars+'</div>'
-            + '<div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">'
-            + dailyEntries.map(([d,v])=>{
-                const isTop = v===melhorDia[1];
-                return '<div style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.05);border-radius:6px;padding:3px 8px;border:1px solid rgba(255,255,255,'+(isTop?'.25':'.06')+')">'
-                  +'<span style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4)">Dia '+d+'</span>'
-                  +'<span style="font-family:Bebas Neue,sans-serif;font-size:12px;color:'+(isTop?'#FFD700':'#4ADE80')+'">'+fRK(v)+'</span>'
-                  +(isTop?'<span style="font-size:9px">🏆</span>':'')
-                  +'</div>';
-              }).join('')
-            + '</div>'
-            + '</div>';
-        })()}
+        <!-- 4 KPIs GRANDES -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+          <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:14px;padding:14px 12px;text-align:center">
+            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px">💰 Total Real</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#4ADE80;line-height:1">${fR(op.rec)}</div>
+          </div>
+          <div style="background:rgba(103,232,249,.1);border:1px solid rgba(103,232,249,.25);border-radius:14px;padding:14px 12px;text-align:center">
+            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px">🎯 HO (25%)</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#67E8F9;line-height:1">${fR(op.ho)}</div>
+          </div>
+          <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 12px;text-align:center">
+            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px">📋 Acordos</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;line-height:1">${op.acordos||0}</div>
+          </div>
+          <div style="background:${efColor}11;border:1px solid ${efColor}33;border-radius:14px;padding:14px 12px;text-align:center">
+            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px">⚡ Eficiência</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:${efColor};line-height:1">${efPct}${efPct!=='—'?'%':''}</div>
+            ${gerados>0?`<div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px">${pagos}p/${pendentes}p</div>`:''}
+          </div>
+        </div>
 
-        <!-- Detalhes menores: agendamentos + formas de pagamento + ranking vizinhos -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <!-- RECEBIMENTO POR DIA (barras) -->
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">
+            📊 Recebimento por Dia
+          </div>
+          ${dailyBlock}
+        </div>
+
+        <!-- 3 CARDS MENORES: Ranking / Agendamentos / Formas de Pgto -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+
+          <!-- Posição no ranking -->
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">🏆 Ranking</div>
+            ${prev?`<div style="display:flex;justify-content:space-between;padding:4px 7px;border-radius:6px;background:rgba(255,255,255,.04);margin-bottom:4px">
+              <span style="font-size:10px;color:rgba(255,255,255,.3)">${idx}° ${prev.name.replace(/_/g,' ')}</span>
+              <span style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700">${fRK(prev.rec)}</span>
+            </div>`:''}
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 9px;border-radius:8px;background:${cfg.c}22;border:1px solid ${cfg.c}55;margin-bottom:4px">
+              <span style="font-size:12px;color:${cfg.c};font-weight:800">${posLabel} VOCÊ</span>
+              <span style="font-size:13px;color:#4ADE80;font-weight:900">${fRK(op.rec)}</span>
+            </div>
+            ${next?`<div style="display:flex;justify-content:space-between;padding:4px 7px;border-radius:6px;background:rgba(255,255,255,.04)">
+              <span style="font-size:10px;color:rgba(255,255,255,.3)">${idx+2}° ${next.name.replace(/_/g,' ')}</span>
+              <span style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700">${fRK(next.rec)}</span>
+            </div>`:'' }
+          </div>
 
           <!-- Agendamentos -->
           <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px">
             <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">📅 Agend. Futuros (${agTotal})</div>
             ${agDates.length>0
               ? agDates.map(([dt,n])=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)">
-                  <span style="color:rgba(255,255,255,.6);font-size:12px">${new Date(dt+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}</span>
-                  <span style="color:#67E8F9;font-weight:800;font-size:12px">${n}ac</span>
+                  <span style="color:rgba(255,255,255,.6);font-size:11px">${new Date(dt+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}</span>
+                  <span style="color:#67E8F9;font-weight:800;font-size:11px">${n}ac</span>
                 </div>`).join('')
-              : '<div style="font-size:12px;color:rgba(255,255,255,.2);font-style:italic">Sem agendamentos</div>'}
+              : '<div style="font-size:11px;color:rgba(255,255,255,.2);font-style:italic">Sem agendamentos</div>'}
           </div>
 
-          <!-- Formas de pgto -->
+          <!-- Formas de pagamento -->
           <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px">
             <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💳 Formas de Pgto</div>
             ${tiposEntries.length>0
               ? tiposEntries.map(([k,v])=>{
                   const pct=tiposTotal>0?Math.round(v/tiposTotal*100):0;
-                  return `<div style="margin-bottom:6px">
-                    <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-                      <span style="color:rgba(255,255,255,.6);font-size:11px">${k.replace('NEGOCIAÇÃO','').replace('Padrão','').trim()}</span>
-                      <span style="color:${tColors[k]||'#fff'};font-weight:800;font-size:11px">${pct}%</span>
+                  return `<div style="margin-bottom:5px">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+                      <span style="color:rgba(255,255,255,.6);font-size:10px">${k.replace('NEGOCIAÇÃO','').replace('Padrão','').trim()}</span>
+                      <span style="color:${tColors[k]||'#fff'};font-weight:800;font-size:10px">${pct}%</span>
                     </div>
                     <div style="height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden">
                       <div style="height:100%;width:${pct}%;background:${tColors[k]||cfg.c};border-radius:99px"></div>
                     </div>
                   </div>`;
                 }).join('')
-              : '<div style="font-size:12px;color:rgba(255,255,255,.2)">Sem dados</div>'}
+              : '<div style="font-size:11px;color:rgba(255,255,255,.2)">Sem dados</div>'}
           </div>
-
-          <!-- Posição no ranking: quem está antes/depois -->
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px">
-            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">🏆 Ranking</div>
-            ${prev?`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-radius:7px;background:rgba(255,255,255,.04);margin-bottom:5px">
-              <span style="font-size:10px;color:rgba(255,255,255,.35)">${idx}° ${prev.name.replace(/_/g,' ')}</span>
-              <span style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700">${fRK(prev.rec)}</span>
-            </div>`:''}
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-radius:8px;background:${cfg.c}22;border:1px solid ${cfg.c}55;margin-bottom:5px">
-              <span style="font-size:12px;color:${cfg.c};font-weight:800">${posLabel} VOCÊ</span>
-              <span style="font-size:13px;color:#4ADE80;font-weight:900">${fRK(op.rec)}</span>
-            </div>
-            ${next?`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-radius:7px;background:rgba(255,255,255,.04)">
-              <span style="font-size:10px;color:rgba(255,255,255,.35)">${idx+2}° ${next.name.replace(/_/g,' ')}</span>
-              <span style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700">${fRK(next.rec)}</span>
-            </div>`:''}
-          </div>
-
         </div>
-      </div>
+
+      </div><!-- fim coluna direita -->
     </div>`;
 
   tvUpdateDots();
