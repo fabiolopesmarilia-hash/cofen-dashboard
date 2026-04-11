@@ -4219,21 +4219,73 @@ function tvShow(idx){
   // ── DIÁRIO: barras de recebimento ──
   const dailyBlock = (()=>{
     const dailyEntries = Object.entries(op.daily||{}).map(([d,v])=>([parseInt(d),v])).sort((a,b)=>a[0]-b[0]);
-    if(dailyEntries.length===0) return '<div style="font-size:13px;color:rgba(255,255,255,.2);font-style:italic;padding:8px 0">Sem dados de recebimento por dia</div>';
-    const maxV = Math.max(...dailyEntries.map(([,v])=>v),1);
-    const melhorDia = dailyEntries.reduce((b,c)=>c[1]>b[1]?c:b, dailyEntries[0]);
-    const bars = dailyEntries.map(([d,v])=>{
-      const pct = Math.round(v/maxV*100);
-      const bc  = v===melhorDia[1]?'#FFD700':v>=maxV*.7?'#4ADE80':v>=maxV*.4?'#67E8F9':'rgba(255,255,255,.4)';
-      return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0">
-        <div style="font-size:8px;color:rgba(255,255,255,.4);white-space:nowrap">${fRK(v).replace('R$ ','')}</div>
-        <div style="width:100%;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;height:44px;display:flex;align-items:flex-end">
-          <div style="width:100%;height:${pct}%;background:${bc};border-radius:3px 3px 0 0;min-height:3px"></div>
+    if(dailyEntries.length===0) return '<div style="font-size:13px;color:rgba(255,255,255,.2);font-style:italic;padding:10px 0">Nenhum recebimento registrado por dia</div>';
+
+    const maxV     = Math.max(...dailyEntries.map(([,v])=>v), 1);
+    const totalDias= dailyEntries.reduce((s,[,v])=>s+v, 0);
+    const melhorDia= dailyEntries.reduce((b,cur)=>cur[1]>b[1]?cur:b, dailyEntries[0]);
+
+    // Dias da semana em pt-BR para Abril 2026
+    // 1 Apr 2026 = quarta-feira (dow=3)
+    const DIAS_SEMANA = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+    const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+    // Detecta mês/ano a partir do contexto (dashboard é Abril 2026)
+    const MES_ANO = { mes: 3, ano: 2026 }; // mes=3 = Abril (0-indexed)
+
+    const rows = dailyEntries.map(([d,v])=>{
+      const dt      = new Date(MES_ANO.ano, MES_ANO.mes, d);
+      const diaSem  = DIAS_SEMANA[dt.getDay()];
+      const dataFmt = `${String(d).padStart(2,'0')}/${String(MES_ANO.mes+1).padStart(2,'0')}/${MES_ANO.ano}`;
+      const isMelhor= v === melhorDia[1];
+      const barPct  = Math.round(v/maxV*100);
+      const valColor= isMelhor ? '#FFD700' : v>=maxV*.7 ? '#4ADE80' : v>=maxV*.4 ? '#67E8F9' : 'rgba(255,255,255,.75)';
+      const rowBg   = isMelhor ? 'rgba(255,215,0,.08)' : 'rgba(255,255,255,.03)';
+      const rowBorder = isMelhor ? 'rgba(255,215,0,.3)' : 'rgba(255,255,255,.07)';
+
+      return `<div style="display:grid;grid-template-columns:110px 1fr auto;gap:12px;align-items:center;
+          padding:9px 14px;border-radius:10px;background:${rowBg};border:1px solid ${rowBorder};
+          margin-bottom:5px;">
+
+        <!-- DATA + DIA DA SEMANA -->
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:rgba(255,255,255,.85);
+            letter-spacing:.5px;line-height:1">${dataFmt}</div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);
+            text-transform:capitalize;letter-spacing:.3px;margin-top:1px">${diaSem}</div>
         </div>
-        <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.45)">${d}</div>
+
+        <!-- BARRA PROPORCIONAL -->
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:8px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden">
+            <div style="height:100%;width:${barPct}%;background:${valColor};border-radius:100px;
+              box-shadow:${isMelhor?'0 0 8px #FFD70088':'none'};transition:width .6s"></div>
+          </div>
+          ${isMelhor ? '<span style="font-size:11px;flex-shrink:0">🏆</span>' : ''}
+        </div>
+
+        <!-- VALOR -->
+        <div style="text-align:right;min-width:90px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${valColor};
+            letter-spacing:.5px;line-height:1">${fR(v)}</div>
+          ${isMelhor ? '<div style="font-size:9px;color:#FFD700;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Melhor dia</div>' : ''}
+        </div>
       </div>`;
     }).join('');
-    return `<div style="display:flex;gap:3px;align-items:flex-end;height:70px">${bars}</div>`;
+
+    // Totalizador
+    const totalRow = `<div style="display:flex;justify-content:space-between;align-items:center;
+        padding:9px 14px;border-radius:10px;background:rgba(0,168,107,.12);
+        border:1px solid rgba(0,168,107,.3);margin-top:6px">
+      <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase">
+        📊 Total — ${dailyEntries.length} dia${dailyEntries.length>1?'s':''}
+      </div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;letter-spacing:.5px">
+        ${fR(totalDias)}
+      </div>
+    </div>`;
+
+    return `<div style="max-height:260px;overflow-y:auto;padding-right:4px">${rows}${totalRow}</div>`;
   })();
 
   // ── MONTAR HTML: layout 2 colunas fullscreen ──
@@ -4315,7 +4367,7 @@ function tvShow(idx){
         <!-- RECEBIMENTO POR DIA (barras) -->
         <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px">
           <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">
-            📊 Recebimento por Dia
+            📊 Recebimento por Dia — Histórico completo
           </div>
           ${dailyBlock}
         </div>
