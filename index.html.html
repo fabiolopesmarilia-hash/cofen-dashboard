@@ -194,11 +194,11 @@ select.ev-inp{cursor:pointer}
 .eq-tip{position:absolute;top:11px;right:11px;font-size:9px;color:var(--pp);
   font-weight:700;background:var(--ppl);padding:3px 7px;border-radius:100px;border:1px solid rgba(0,168,107,.2)}
 /* ─ RANKING ─ */
-.rk-hdr{display:grid;grid-template-columns:42px 1fr 130px 100px 130px 120px 70px 65px;
+.rk-hdr{display:grid;grid-template-columns:42px 1fr 130px 100px 130px 120px 70px 80px 60px;
   gap:8px;padding:7px 13px;font-size:10px;font-weight:700;color:var(--g500);
   letter-spacing:1px;text-transform:uppercase}
 .rk-list{display:flex;flex-direction:column;gap:4px}
-.rk-row{display:grid;grid-template-columns:42px 1fr 130px 100px 130px 120px 70px 65px;
+.rk-row{display:grid;grid-template-columns:42px 1fr 130px 100px 130px 120px 70px 80px 60px;
   gap:10px;align-items:center;background:var(--w);border:1px solid var(--g200);
   border-radius:var(--rm);padding:9px 13px;transition:all .25s;cursor:pointer;
   position:relative;overflow:hidden;animation:rIn .35s ease both}
@@ -289,7 +289,7 @@ select.ev-inp{cursor:pointer}
 @media(max-width:900px){
   .hkpis{grid-template-columns:repeat(3,1fr)}
   .g2,.g3{grid-template-columns:1fr}
-  .rk-hdr,.rk-row{grid-template-columns:36px 1fr 110px 90px 100px}
+  .rk-hdr,.rk-row{grid-template-columns:36px 1fr 110px 80px 80px 60px}
   .mk-row{grid-template-columns:1fr 1fr}
   .ep-row{flex-direction:column}
 }
@@ -617,7 +617,7 @@ select.ev-inp{cursor:pointer}
     <div style="display:flex;align-items:center;gap:5px"><span style="background:#FEF9C3;border:1.5px dashed #FCD34D;color:#92400E;border-radius:100px;padding:2px 10px;font-size:10px;font-weight:800">○ Feedback</span><span style="font-size:11px;color:var(--g500)">= Pendente — clique para marcar</span></div>
     <span style="font-size:10px;color:var(--g500);margin-left:auto">Zera automaticamente dia 01 de cada mês</span>
   </div>
-  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Agend.</span></div>
+  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
   <div class="rk-list" id="rk-list"></div>
 </div>
 
@@ -1448,6 +1448,49 @@ const ORIG = {"global":{"total":426575.4,"pp":106472.0,"coren":240077.08,"cofen"
 // Working state — deep clone so edits don't corrupt original
 let D = JSON.parse(JSON.stringify(ORIG));
 
+// ── EFICIÊNCIA: cor e label (>50% verde, 40-50% azul, <40% vermelho) ──
+function efColor(pct){
+  const p = parseFloat(pct);
+  if(isNaN(p) || p <= 0) return '#888';
+  if(p >= 50) return '#4ADE80';
+  if(p >= 40) return '#3B82F6';
+  return '#EF4444';
+}
+function efBadge(gerados, pagos){
+  if(!gerados) return '<span style="font-size:10px;color:#888;font-weight:600">—</span>';
+  const pct = (pagos/gerados*100).toFixed(1);
+  const c = efColor(pct);
+  const bg = parseFloat(pct)>=50?'rgba(74,222,128,.12)':parseFloat(pct)>=40?'rgba(59,130,246,.12)':'rgba(239,68,68,.12)';
+  return `<span style="background:${bg};border:1px solid ${c}55;border-radius:100px;
+    padding:2px 8px;font-size:10px;font-weight:800;color:${c}">${pct}%</span><span style="font-size:9px;color:#888;margin-left:3px">(${pagos}/${gerados})</span>`;
+}
+// Bloco acordos por data com totais diários
+function agFuturoBlock(agFuturo, agFuturoVal, ticket){
+  const entries = Object.entries(agFuturo||{}).sort((a,b)=>a[0].localeCompare(b[0]));
+  if(!entries.length) return '<div style="font-size:11px;color:rgba(255,255,255,.2);font-style:italic">Nenhum agendamento futuro</div>';
+  const valPorData = agFuturoVal || {};
+  return entries.map(([dt, qtd])=>{
+    const [y,m,d] = dt.split('-');
+    const dtFmt = `${d}/${m}/${y}`;
+    const totalDia = valPorData[dt] ? valPorData[dt] : (ticket && ticket > 0 ? ticket * qtd : 0);
+    const itens = valPorData[dt+'_list'] ? valPorData[dt+'_list'] : null;
+    const itensTxt = itens ? itens.map(v=>fR(v)).join(' + ') + ' = ' : '';
+    return `<div style="display:flex;justify-content:space-between;align-items:center;
+      padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);margin-bottom:4px">
+      <div>
+        <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.7)">📅 ${dtFmt}</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">${qtd} acordo${qtd>1?'s':''}</div>
+      </div>
+      <div style="text-align:right">
+        ${itensTxt?`<div style="font-size:9px;color:rgba(255,255,255,.3);margin-bottom:2px">${itensTxt}</div>`:''}
+        ${totalDia>0?`<div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#67E8F9">${fR(totalDia)}</div>`:'<div style="font-size:10px;color:#888">—</div>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+
 // FERIADOS março 2026 — editável
 const FERIADOS_BASE = ['2026-04-03','2026-04-04'];
 function getFeriados(){try{return JSON.parse(localStorage.getItem('cofen_feriados')||JSON.stringify(FERIADOS_BASE));}catch(e){return FERIADOS_BASE;}}
@@ -2140,6 +2183,7 @@ function mkRanking(){
         </div>` : `<div style="font-size:10px;color:var(--g300)">—</div>`}
       </div>
       <div class="r-ac">${op.acordos}</div>
+      <div style="padding:2px 0">${efBadge(op.gerados||0, op.pagos||0)}</div>
       <div class="r-ag">${op.n_ag>0?'+'+op.n_ag:'—'}</div>
     </div>`;
   }).join('');
@@ -3321,7 +3365,7 @@ function importParse(raw){
     if(!rawName) continue;
     const recVal = parseFloat(row[iRec].replace(/\./g,'').replace(',','.')) || 0;
     if(!acc[rawName]) acc[rawName] = 0;
-    acc[rawName] += recVal; // Recebido = HO; Total Real = HO / 0.25
+    acc[rawName] += recVal; // Recebido = Total Real (valor direto)
   }
 
   // Build lookup: norm(name) -> op object (from D.equipes directly)
@@ -3335,8 +3379,8 @@ function importParse(raw){
   // Match each raw name to an operator
   const found = [], missing = [];
 
-  Object.entries(acc).forEach(([rawName, hoSum])=>{
-    const totalReal = hoSum / 0.25;
+  Object.entries(acc).forEach(([rawName, recSum])=>{
+    const totalReal = recSum; // valor real direto (sem multiplicação)
     const normRaw = norm(rawName);
 
     // 1. Exact normalized match
@@ -3370,12 +3414,12 @@ function importParse(raw){
     if(matched){
       found.push({
         rawName, opName:matched.name, eq:matched.eq,
-        hoImport:hoSum, recImport:totalReal,
+        hoImport:totalReal * 0.25, recImport:totalReal,
         recCurrent:matched.rec, hoCurrent:matched.ho,
         diff:totalReal-matched.rec,
       });
     } else {
-      missing.push({rawName, ho:hoSum, totalReal});
+      missing.push({rawName, ho:totalReal * 0.25, totalReal});
     }
   });
 
@@ -3724,6 +3768,7 @@ function acImportPreview(raw){
   const iCob  = idx(['usuario','cobrador','operador','nome']);
   const iDtPg = idx(['dtpagamento','dt pagamento','pagamento','baixa']);
   const iDtPv = idx(['dtprev','dt prev','prev.pgto','agendamento','prev pgto','prevpgto']);
+  const iSaldo= idx(['saldo','valor','divida','vl ','vlr','saldo divida','vl.div','total divida']);
 
   if(iCob<0){ document.getElementById('ac-import-status').textContent='⚠️ Coluna "Usuário" não encontrada'; return; }
 
@@ -3750,7 +3795,7 @@ function acImportPreview(raw){
     const row=lines[i].split(sep).map(v=>v.trim().replace(/^"|"$/g,''));
     if(row.length<=iCob) continue;
     const nm=row[iCob]||''; if(!nm||nm==='nan'||nm==='-') continue;
-    if(!acc[nm]) acc[nm]={g:0,p:0,ag:0,avista:0,ate3d:0,mais3d:0,ag_futuro:{}};
+    if(!acc[nm]) acc[nm]={g:0,p:0,ag:0,avista:0,ate3d:0,mais3d:0,ag_futuro:{},ag_futuro_val:{}};
     acc[nm].g++;
     const pgVal = iDtPg>=0 ? row[iDtPg]||'' : '';
     const pvVal = iDtPv>=0 ? row[iDtPv]||'' : '';
@@ -3777,6 +3822,16 @@ function acImportPreview(raw){
       const dtPv = parseDate(pvVal);
       if(dtPv && dtPv >= today){
         acc[nm].ag_futuro[dtPv] = (acc[nm].ag_futuro[dtPv]||0) + 1;
+        // Capturar valor do acordo (saldo/dívida)
+        if(iSaldo >= 0){
+          const rawSaldo = row[iSaldo]||'';
+          const saldoVal = parseFloat(rawSaldo.replace(/\./g,'').replace(',','.').replace(/[^0-9.]/g,'')) || 0;
+          if(saldoVal > 0){
+            if(!acc[nm].ag_futuro_val[dtPv]) acc[nm].ag_futuro_val[dtPv] = {total:0, list:[]};
+            acc[nm].ag_futuro_val[dtPv].total += saldoVal;
+            acc[nm].ag_futuro_val[dtPv].list.push(saldoVal);
+          }
+        }
       }
     }
   }
@@ -3784,7 +3839,7 @@ function acImportPreview(raw){
   acImportParsed=Object.entries(acc).map(([nm,d])=>{
     const matched=ALL.find(o=>normalize(o.name)===normalize(nm));
     return {rawName:nm,opName:matched?.name||null,g:d.g,p:d.p,ag:d.ag,
-            avista:d.avista,ate3d:d.ate3d,mais3d:d.mais3d,ag_futuro:d.ag_futuro,
+            avista:d.avista,ate3d:d.ate3d,mais3d:d.mais3d,ag_futuro:d.ag_futuro,ag_futuro_val:d.ag_futuro_val||{},
             matched:!!matched};
   });
   const found=acImportParsed.filter(r=>r.matched);
@@ -3801,7 +3856,7 @@ function acImportPreview(raw){
     const op=ALL.find(o=>o.name===r.opName);
     const cfg=EQ[op?.eq]||{c:'#888',sh:''};
     const ef=r.g>0?(r.p/r.g*100).toFixed(1):'0';
-    const efCol=parseFloat(ef)>=40?'var(--ok)':parseFloat(ef)>=20?'var(--warn)':'var(--danger)';
+    const efCol=parseFloat(ef)>=50?'#4ADE80':parseFloat(ef)>=40?'#3B82F6':'#EF4444';
     return `<div style="display:grid;grid-template-columns:1fr 70px 70px 70px 75px;gap:10px;
       padding:9px 16px;border-bottom:1px solid var(--g100);align-items:center;
       background:${r.p>0?'#F0FDF4':'var(--w)'}">
@@ -3854,6 +3909,7 @@ function acImportApply(){
     op['ate3dias']  = r.ate3d   || 0;
     op['mais3dias'] = r.mais3d  || 0;
     op['ag_futuro'] = r.ag_futuro || {};
+        op['ag_futuro_val'] = r.ag_futuro_val || {};
     op['eficiencia']= r.g>0 ? parseFloat((r.p/r.g*100).toFixed(1)) : 0;
     if(r.p>0) op['ticket'] = parseFloat((op.rec/r.p).toFixed(2));
   });
@@ -3874,7 +3930,7 @@ function acImportApply(){
     ALL.forEach(op=>{
       if(op.gerados||op.pagos){
         acordosData[op.name]={g:op.gerados||0,p:op.pagos||0,ef:op.eficiencia||0,ag:op.agendados||0,
-          avista:op.avista||0,ate3d:op.ate3dias||0,mais3d:op.mais3dias||0,ag_futuro:op.ag_futuro||{}};
+          avista:op.avista||0,ate3d:op.ate3dias||0,mais3d:op.mais3dias||0,ag_futuro:op.ag_futuro||{},ag_futuro_val:op.ag_futuro_val||{}};
       }
     });
     fbPush('acordos', {...acordosData, _ts: Date.now()});
@@ -4190,7 +4246,7 @@ function tvShow(idx){
   const pagos    = op.pagos    ||0;
   const pendentes= op.pendentes||0;
   const efPct    = gerados>0?(pagos/gerados*100).toFixed(1):'—';
-  const efColor  = parseFloat(efPct)>=40?'#4ADE80':parseFloat(efPct)>=20?'#FCD34D':'#FCA5A5';
+  const efC = efColor(efPct);
 
   // Agendamentos futuros
   const agFuturo = op.ag_futuro||{};
@@ -4357,10 +4413,10 @@ function tvShow(idx){
             <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px">📋 Acordos</div>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;line-height:1">${op.acordos||0}</div>
           </div>
-          <div style="background:${efColor}11;border:1px solid ${efColor}33;border-radius:14px;padding:14px 12px;text-align:center">
+          <div style="background:${efC}11;border:1px solid ${efC}33;border-radius:14px;padding:14px 12px;text-align:center">
             <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px">⚡ Eficiência</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:${efColor};line-height:1">${efPct}${efPct!=='—'?'%':''}</div>
-            ${gerados>0?`<div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px">${pagos}p/${pendentes}p</div>`:''}
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:${efC};line-height:1">${efPct}${typeof efPct==='string'&&efPct!=='—'?'%':''}</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px">${gerados>0?pagos+'p/'+gerados+'g':'Sem acordos'}</div>
           </div>
         </div>
 
@@ -4370,6 +4426,40 @@ function tvShow(idx){
             📊 Recebimento por Dia — Histórico completo
           </div>
           ${dailyBlock}
+        </div>
+
+        <!-- ACORDOS POR DATA -->
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase">
+              🤝 Agendamentos por Data
+            </div>
+            <div style="display:flex;gap:12px;font-size:10px;font-weight:700">
+              <span style="color:#4ADE80">🟢 &gt;50% ótimo</span>
+              <span style="color:#3B82F6">🔵 40-50% bom</span>
+              <span style="color:#EF4444">🔴 &lt;40% atenção</span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">📅 Próximos Agendamentos</div>
+              ${agFuturoBlock(agFuturo, op.ag_futuro_val||{}, op.ticket||0)}
+            </div>
+            <div>
+              <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">📊 Resumo Eficiência</div>
+              <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:12px;text-align:center">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:52px;color:${efC};line-height:1;letter-spacing:2px">
+                  ${efPct}${typeof efPct==='string'&&efPct!=='—'?'%':''}
+                </div>
+                <div style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700;margin-top:4px">
+                  ${gerados} gerados · ${pagos} pagos · ${pendentes} pendentes
+                </div>
+                <div style="margin-top:8px;background:rgba(255,255,255,.08);border-radius:100px;height:6px;overflow:hidden">
+                  <div style="height:100%;width:${gerados>0?Math.min(100,pagos/gerados*100):0}%;background:${efC};border-radius:100px;transition:width 1s"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- 3 CARDS MENORES: Ranking / Agendamentos / Formas de Pgto -->
@@ -4746,7 +4836,7 @@ function fbStartListening(){
       if(nm==='_ts'||nm.startsWith('_')) return;
       const op = ALL.find(o=>o.name===nm);
       if(!op) return;
-      if(val.g !== undefined){ op.gerados=val.g; op.pagos=val.p; op.eficiencia=val.ef||0; op.agendados=val.ag||0;
+      if(val.g !== undefined){ op.gerados=val.g; op.pagos=val.p; op.eficiencia=val.ef||0; op.agendados=val.ag||0; op['ag_futuro_val']=val.ag_futuro_val||{};
         op.avista=val.avista||0; op.ate3dias=val.ate3d||0; op.mais3dias=val.mais3d||0;
         op.ag_futuro=val.ag_futuro||{}; changed=true; }
     });
