@@ -4455,7 +4455,7 @@ function tvShow(idx){
 
   // Agendamentos futuros
   const agFuturo = op.ag_futuro||{};
-  const agDates  = Object.entries(agFuturo).sort((a,b)=>a[0].localeCompare(b[0])).slice(0,3);
+  const agDates  = Object.entries(agFuturo).sort((a,b)=>a[0].localeCompare(b[0])); // todos os agendamentos
   const agTotal  = Object.values(agFuturo).reduce((s,v)=>s+v,0);
 
   // Formas de pagamento
@@ -4477,75 +4477,63 @@ function tvShow(idx){
         <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:3px;text-transform:uppercase">Sem foto</div>
        </div>`;
 
-  // ── DIÁRIO: barras de recebimento ──
+  // ── DIÁRIO: barras de recebimento — TODOS os 30 dias de Abril ──
   const dailyBlock = (()=>{
-    const dailyEntries = Object.entries(op.daily||{}).map(([d,v])=>([parseInt(d),v])).sort((a,b)=>a[0]-b[0]);
-    if(dailyEntries.length===0) return '<div style="font-size:13px;color:rgba(255,255,255,.2);font-style:italic;padding:10px 0">Nenhum recebimento registrado por dia</div>';
-
-    const maxV     = Math.max(...dailyEntries.map(([,v])=>v), 1);
-    const totalDias= dailyEntries.reduce((s,[,v])=>s+v, 0);
-    const melhorDia= dailyEntries.reduce((b,cur)=>cur[1]>b[1]?cur:b, dailyEntries[0]);
-
-    // Dias da semana em pt-BR para Abril 2026
-    // 1 Apr 2026 = quarta-feira (dow=3)
-    const DIAS_SEMANA = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
-    const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-
-    // Detecta mês/ano a partir do contexto (dashboard é Abril 2026)
     const MES_ANO = { mes: 3, ano: 2026 }; // mes=3 = Abril (0-indexed)
+    const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    const dailyMap = op.daily||{};
 
-    const rows = dailyEntries.map(([d,v])=>{
-      const dt      = new Date(MES_ANO.ano, MES_ANO.mes, d);
-      const diaSem  = DIAS_SEMANA[dt.getDay()];
-      const dataFmt = `${String(d).padStart(2,'0')}/${String(MES_ANO.mes+1).padStart(2,'0')}/${MES_ANO.ano}`;
-      const isMelhor= v === melhorDia[1];
-      const barPct  = Math.round(v/maxV*100);
-      const valColor= isMelhor ? '#FFD700' : v>=maxV*.7 ? '#4ADE80' : v>=maxV*.4 ? '#67E8F9' : 'rgba(255,255,255,.75)';
-      const rowBg   = isMelhor ? 'rgba(255,215,0,.08)' : 'rgba(255,255,255,.03)';
-      const rowBorder = isMelhor ? 'rgba(255,215,0,.3)' : 'rgba(255,255,255,.07)';
+    // Montar todos os 30 dias de Abril
+    const allDays = [];
+    for(let d=1; d<=30; d++){
+      allDays.push([d, dailyMap[String(d)] || dailyMap[d] || 0]);
+    }
+
+    const totalMes = allDays.reduce((s,[,v])=>s+v, 0);
+    const maxV     = Math.max(...allDays.map(([,v])=>v), 1);
+    const melhorDia= allDays.reduce((b,cur)=>cur[1]>b[1]?cur:b, allDays[0]);
+    const diasComValor = allDays.filter(([,v])=>v>0).length;
+
+    const rows = allDays.map(([d,v])=>{
+      const dt       = new Date(MES_ANO.ano, MES_ANO.mes, d);
+      const diaSem   = DIAS_SEMANA[dt.getDay()];
+      const dataFmt  = `${String(d).padStart(2,'0')}/04/2026`;
+      const temValor = v > 0;
+      const isMelhor = temValor && v === melhorDia[1] && melhorDia[1] > 0;
+      const barPct   = Math.round(v/maxV*100);
+      const valColor = isMelhor ? '#FFD700' : v>=maxV*.7 ? '#4ADE80' : v>=maxV*.4 ? '#67E8F9' : temValor ? 'rgba(255,255,255,.75)' : 'rgba(255,255,255,.18)';
+      const rowBg    = isMelhor ? 'rgba(255,215,0,.08)' : temValor ? 'rgba(255,255,255,.03)' : 'rgba(255,255,255,.01)';
+      const rowBorder= isMelhor ? 'rgba(255,215,0,.3)'  : temValor ? 'rgba(255,255,255,.07)' : 'rgba(255,255,255,.03)';
+      const opacityRow = temValor ? '1' : '0.4';
 
       return `<div style="display:grid;grid-template-columns:80px 1fr auto;gap:8px;align-items:center;
-          padding:7px 10px;border-radius:10px;background:${rowBg};border:1px solid ${rowBorder};">
-
-        <!-- DATA + DIA DA SEMANA -->
+          padding:6px 10px;border-radius:10px;background:${rowBg};border:1px solid ${rowBorder};opacity:${opacityRow};">
         <div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:rgba(255,255,255,.85);
-            letter-spacing:.5px;line-height:1">${dataFmt}</div>
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);
-            text-transform:capitalize;letter-spacing:.3px;margin-top:1px">${diaSem}</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,.85);letter-spacing:.5px;line-height:1">${dataFmt}</div>
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);text-transform:capitalize;letter-spacing:.3px;margin-top:1px">${diaSem}</div>
         </div>
-
-        <!-- BARRA PROPORCIONAL -->
         <div style="display:flex;align-items:center;gap:5px">
-          <div style="flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden">
-            <div style="height:100%;width:${barPct}%;background:${valColor};border-radius:100px;
-              box-shadow:${isMelhor?'0 0 6px #FFD70088':'none'};transition:width .6s"></div>
+          <div style="flex:1;height:5px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden">
+            <div style="height:100%;width:${barPct}%;background:${valColor};border-radius:100px;box-shadow:${isMelhor?'0 0 6px #FFD70088':'none'};transition:width .6s"></div>
           </div>
-          ${isMelhor ? '<span style="font-size:10px;flex-shrink:0">🏆</span>' : ''}
+          ${isMelhor ? '<span style="font-size:9px;flex-shrink:0">🏆</span>' : ''}
         </div>
-
-        <!-- VALOR -->
-        <div style="text-align:right;min-width:75px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${valColor};
-            letter-spacing:.5px;line-height:1">${fR(v)}</div>
+        <div style="text-align:right;min-width:80px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:${valColor};letter-spacing:.5px;line-height:1">${temValor ? fR(v) : 'R$ 0,00'}</div>
           ${isMelhor ? '<div style="font-size:8px;color:#FFD700;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Melhor dia</div>' : ''}
         </div>
       </div>`;
     }).join('');
 
-    // Totalizador
     const totalRow = `<div style="display:flex;justify-content:space-between;align-items:center;
-        padding:9px 14px;border-radius:10px;background:rgba(0,168,107,.12);
-        border:1px solid rgba(0,168,107,.3);margin-top:6px">
+        padding:9px 14px;border-radius:10px;background:rgba(0,168,107,.12);border:1px solid rgba(0,168,107,.3);margin-top:6px">
       <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase">
-        📊 Total — ${dailyEntries.length} dia${dailyEntries.length>1?'s':''}
+        📊 Total Mês — ${diasComValor} dia${diasComValor!==1?'s':''}  com recebimento
       </div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;letter-spacing:.5px">
-        ${fR(totalDias)}
-      </div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;letter-spacing:.5px">${fR(totalMes)}</div>
     </div>`;
 
-    return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding-right:4px">${rows}<div style="grid-column:1/-1">${totalRow}</div></div>`;
+    return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;padding-right:4px">${rows}<div style="grid-column:1/-1">${totalRow}</div></div>`;
   })();
 
   // ── MONTAR HTML: layout 2 colunas fullscreen ──
@@ -4620,7 +4608,7 @@ function tvShow(idx){
           <div style="background:${efC}11;border:1px solid ${efC}33;border-radius:14px;padding:14px 12px;text-align:center">
             <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px">⚡ Eficiência</div>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:${efC};line-height:1">${efPct}${typeof efPct==='string'&&efPct!=='—'?'%':''}</div>
-            <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px">${gerados>0?pagos+'p/'+gerados+'g ('+op.acordos+' total)':(op.acordos>0?op.acordos+' acordos · sem importação':'—')}</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px">${gerados>0 ? pagos+'p/'+gerados+'g · '+op.acordos+' acordos' : op.acordos>0 ? op.acordos+' acordos · diretos' : '—'}</div>
           </div>
         </div>
 
@@ -4638,11 +4626,11 @@ function tvShow(idx){
             <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase">
               🤝 Acordos & Pagamentos
             </div>
-            ${gerados>0?`<div style="display:flex;gap:12px;font-size:10px;font-weight:700">
+            <div style="display:flex;gap:12px;font-size:10px;font-weight:700">
               <span style="color:#4ADE80">🟢 &gt;50% ótimo</span>
               <span style="color:#3B82F6">🔵 40-50% bom</span>
               <span style="color:#EF4444">🔴 &lt;40% atenção</span>
-            </div>`:'<div style="font-size:10px;color:rgba(255,255,255,.25);font-weight:600">💳 Acordos diretos (pagamento imediato)</div>'}
+            </div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
             <!-- COLUNA 1: Agendamentos futuros (sempre) -->
@@ -4676,13 +4664,18 @@ function tvShow(idx){
             </div>
             <!-- COLUNA 3: Resumo Eficiência / Acordos -->
             <div>
-              <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">📊 ${gerados>0?'Resumo Eficiência':'Resumo dos Acordos'}</div>
+              <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">📊 Resumo Eficiência</div>
               <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:12px;text-align:center">
-                ${gerados>0
-                  ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:${efC};line-height:1;letter-spacing:2px">${efPct}%</div>
-                     <div style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700;margin-top:4px">${pagos} pagos de ${gerados} gerados · ${pendentes} pend.</div>
+                ${(()=>{
+                  const _ef = gerados>0 ? efPct+'%' : '—';
+                  const _barW = gerados>0 ? Math.min(100,pagos/gerados*100) : 0;
+                  const _desc = gerados>0
+                    ? pagos+' pagos de '+gerados+' gerados · '+pendentes+' pend.'
+                    : op.acordos>0 ? op.acordos+' acordos · diretos (sem importação)' : 'Sem dados de eficiência';
+                  return `<div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:${efC};line-height:1;letter-spacing:2px">${_ef}</div>
+                     <div style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700;margin-top:4px">${_desc}</div>
                      <div style="margin-top:8px;background:rgba(255,255,255,.08);border-radius:100px;height:6px;overflow:hidden">
-                       <div style="height:100%;width:${Math.min(100,pagos/gerados*100)}%;background:${efC};border-radius:100px;transition:width 1s"></div>
+                       <div style="height:100%;width:${_barW}%;background:${efC};border-radius:100px;transition:width 1s"></div>
                      </div>
                      <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;text-align:center">
                        <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:6px">
@@ -4691,26 +4684,14 @@ function tvShow(idx){
                        </div>
                        <div style="background:rgba(252,211,77,.1);border:1px solid rgba(252,211,77,.2);border-radius:8px;padding:6px">
                          <div style="font-size:9px;color:rgba(255,255,255,.4);font-weight:700;margin-bottom:2px">Agendados</div>
-                         <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#FCD34D">${op.agendados||0}</div>
-                       </div>
-                     </div>`
-                  : `<div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:#4ADE80;line-height:1;letter-spacing:2px">${op.acordos||0}</div>
-                     <div style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700;margin-top:4px">acordos realizados</div>
-                     <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;text-align:center">
-                       <div style="background:rgba(103,232,249,.1);border:1px solid rgba(103,232,249,.2);border-radius:8px;padding:6px">
-                         <div style="font-size:9px;color:rgba(255,255,255,.4);font-weight:700;margin-bottom:2px">Ticket Médio</div>
-                         <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:#67E8F9">${fR(op.acordos>0?op.rec/op.acordos:0)}</div>
-                       </div>
-                       <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:6px">
-                         <div style="font-size:9px;color:rgba(255,255,255,.4);font-weight:700;margin-bottom:2px">Ligações</div>
-                         <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#4ADE80">${op.ligacoes||op.acordos||0}</div>
+                         <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#FCD34D">${op.agendados||op.acordos||0}</div>
                        </div>
                      </div>
                      <div style="margin-top:8px;padding:6px 10px;background:rgba(255,255,255,.04);border-radius:8px">
-                       <div style="font-size:9px;color:rgba(255,255,255,.3);font-weight:700;margin-bottom:3px">Recebimento Total</div>
-                       <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#4ADE80">${fR(op.rec)}</div>
-                     </div>`
-                }
+                       <div style="font-size:9px;color:rgba(255,255,255,.3);font-weight:700;margin-bottom:3px">Ticket Médio</div>
+                       <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9">${fR(op.acordos>0?op.rec/op.acordos:0)}</div>
+                     </div>`;
+                })()}
               </div>
             </div>
           </div>
