@@ -4504,32 +4504,31 @@ function tvShow(idx){
       const rowBg   = isMelhor ? 'rgba(255,215,0,.08)' : 'rgba(255,255,255,.03)';
       const rowBorder = isMelhor ? 'rgba(255,215,0,.3)' : 'rgba(255,255,255,.07)';
 
-      return `<div style="display:grid;grid-template-columns:110px 1fr auto;gap:12px;align-items:center;
-          padding:9px 14px;border-radius:10px;background:${rowBg};border:1px solid ${rowBorder};
-          margin-bottom:5px;">
+      return `<div style="display:grid;grid-template-columns:80px 1fr auto;gap:8px;align-items:center;
+          padding:7px 10px;border-radius:10px;background:${rowBg};border:1px solid ${rowBorder};">
 
         <!-- DATA + DIA DA SEMANA -->
         <div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:rgba(255,255,255,.85);
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:rgba(255,255,255,.85);
             letter-spacing:.5px;line-height:1">${dataFmt}</div>
-          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);
             text-transform:capitalize;letter-spacing:.3px;margin-top:1px">${diaSem}</div>
         </div>
 
         <!-- BARRA PROPORCIONAL -->
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="flex:1;height:8px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:5px">
+          <div style="flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden">
             <div style="height:100%;width:${barPct}%;background:${valColor};border-radius:100px;
-              box-shadow:${isMelhor?'0 0 8px #FFD70088':'none'};transition:width .6s"></div>
+              box-shadow:${isMelhor?'0 0 6px #FFD70088':'none'};transition:width .6s"></div>
           </div>
-          ${isMelhor ? '<span style="font-size:11px;flex-shrink:0">🏆</span>' : ''}
+          ${isMelhor ? '<span style="font-size:10px;flex-shrink:0">🏆</span>' : ''}
         </div>
 
         <!-- VALOR -->
-        <div style="text-align:right;min-width:90px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${valColor};
+        <div style="text-align:right;min-width:75px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${valColor};
             letter-spacing:.5px;line-height:1">${fR(v)}</div>
-          ${isMelhor ? '<div style="font-size:9px;color:#FFD700;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Melhor dia</div>' : ''}
+          ${isMelhor ? '<div style="font-size:8px;color:#FFD700;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Melhor dia</div>' : ''}
         </div>
       </div>`;
     }).join('');
@@ -4546,7 +4545,7 @@ function tvShow(idx){
       </div>
     </div>`;
 
-    return `<div style="max-height:260px;overflow-y:auto;padding-right:4px">${rows}${totalRow}</div>`;
+    return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding-right:4px">${rows}<div style="grid-column:1/-1">${totalRow}</div></div>`;
   })();
 
   // ── MONTAR HTML: layout 2 colunas fullscreen ──
@@ -4645,41 +4644,42 @@ function tvShow(idx){
               <span style="color:#EF4444">🔴 &lt;40% atenção</span>
             </div>`:'<div style="font-size:10px;color:rgba(255,255,255,.25);font-weight:600">💳 Acordos diretos (pagamento imediato)</div>'}
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <!-- COLUNA ESQUERDA: Agendamentos futuros OU Formas de pagamento detalhadas -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <!-- COLUNA 1: Agendamentos futuros (sempre) -->
             <div>
-              ${agTotal>0
-                ? `<div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">📅 Próximos Agendamentos (${agTotal})</div>
-                   ${agFuturoBlock(agFuturo, op.ag_futuro_val||{}, op.ticket||0)}`
-                : `<div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">💳 Formas de Pagamento</div>
-                   ${(()=>{
-                     const allTipos = Object.entries(op.tipos||{}).sort((a,b)=>b[1]-a[1]);
-                     const totTv = allTipos.reduce((s,[,v])=>s+v,0);
-                     if(!allTipos.length) return '<div style="font-size:12px;color:rgba(255,255,255,.2);font-style:italic">Sem dados</div>';
-                     return allTipos.map(([k,v])=>{
-                       const pct = totTv>0?Math.round(v/totTv*100):0;
-                       const ab = k.toLowerCase().includes('pix')?'PIX':k.toLowerCase().includes('boleto')?'BOL':k.toLowerCase().includes('cart')?'CRT':k.slice(0,3).toUpperCase();
-                       const col = k.toLowerCase().includes('pix')?'#4ADE80':k.toLowerCase().includes('boleto')?'#FCD34D':'#67E8F9';
-                       return `<div style="padding:7px 10px;border-radius:10px;background:${col}10;border:1px solid ${col}30;margin-bottom:5px">
-                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-                           <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.7)">${ab}</span>
-                           <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:${col}">${fR(v)}</span>
-                         </div>
-                         <div style="background:rgba(255,255,255,.08);border-radius:100px;height:5px;overflow:hidden">
-                           <div style="width:${pct}%;height:100%;border-radius:100px;background:${col}"></div>
-                         </div>
-                         <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px;text-align:right">${pct}% do total</div>
-                       </div>`;
-                     }).join('');
-                   })()}`
-              }
+              <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">📅 Próximos Agendamentos (${agTotal})</div>
+              ${agFuturoBlock(agFuturo, op.ag_futuro_val||{}, op.ticket||0)}
             </div>
-            <!-- COLUNA DIREITA: Resumo Eficiência OU Resumo Geral dos acordos -->
+            <!-- COLUNA 2: Formas de Pagamento (sempre) -->
+            <div>
+              <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">💳 Formas de Pagamento</div>
+              ${(()=>{
+                const allTipos = Object.entries(op.tipos||{}).sort((a,b)=>b[1]-a[1]);
+                const totTv = allTipos.reduce((s,[,v])=>s+v,0);
+                if(!allTipos.length) return '<div style="font-size:12px;color:rgba(255,255,255,.2);font-style:italic">Sem dados de pagamento</div>';
+                return allTipos.map(([k,v])=>{
+                  const pct = totTv>0?Math.round(v/totTv*100):0;
+                  const ab = k.toLowerCase().includes('pix')?'PIX':k.toLowerCase().includes('boleto')?'BOL':k.toLowerCase().includes('cart')?'CRT':k.slice(0,3).toUpperCase();
+                  const col = k.toLowerCase().includes('pix')?'#4ADE80':k.toLowerCase().includes('boleto')?'#FCD34D':'#67E8F9';
+                  return `<div style="padding:7px 10px;border-radius:10px;background:${col}10;border:1px solid ${col}30;margin-bottom:5px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                      <span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.8)">${ab}</span>
+                      <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:${col}">${fR(v)}</span>
+                    </div>
+                    <div style="background:rgba(255,255,255,.08);border-radius:100px;height:5px;overflow:hidden">
+                      <div style="width:${pct}%;height:100%;border-radius:100px;background:${col}"></div>
+                    </div>
+                    <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px;text-align:right">${pct}% do total</div>
+                  </div>`;
+                }).join('');
+              })()}
+            </div>
+            <!-- COLUNA 3: Resumo Eficiência / Acordos -->
             <div>
               <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">📊 ${gerados>0?'Resumo Eficiência':'Resumo dos Acordos'}</div>
               <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:12px;text-align:center">
                 ${gerados>0
-                  ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:52px;color:${efC};line-height:1;letter-spacing:2px">${efPct}%</div>
+                  ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:${efC};line-height:1;letter-spacing:2px">${efPct}%</div>
                      <div style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700;margin-top:4px">${pagos} pagos de ${gerados} gerados · ${pendentes} pend.</div>
                      <div style="margin-top:8px;background:rgba(255,255,255,.08);border-radius:100px;height:6px;overflow:hidden">
                        <div style="height:100%;width:${Math.min(100,pagos/gerados*100)}%;background:${efC};border-radius:100px;transition:width 1s"></div>
