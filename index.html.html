@@ -4173,23 +4173,30 @@ function photoUpload(){
 function photoFileSelected(inp){
   if(!inp.files||!inp.files[0]) return;
   const opName = currentModalOp;
-  if(!opName) return;
+  if(!opName){ toast('❌ Selecione um operador primeiro!'); return; }
   const file = inp.files[0];
+  // Verifica tipo
+  if(!file.type.startsWith('image/')){
+    toast('❌ Selecione uma imagem (JPG, PNG, etc)');
+    return;
+  }
   const reader = new FileReader();
   reader.onload = e => {
-    const url = e.target.result;
-    photoSet(opName, url);
-    renderModalPhoto(opName, EQ[ALL.find(o=>o.name===opName)?.eq]||{c:'#888'});
-    // Atualiza grid de fotos se estiver aberto
-    if(document.getElementById('fotos-grid')) fotosRenderGrid();
-    // Atualiza ranking se aberto
-    if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
-    // Atualiza modo TV se ativo e exibindo este operador
-    tvBuildList();
-    const _tvOv4 = document.getElementById('tv-overlay');
-    if(_tvOv4 && _tvOv4.classList.contains('on') && tvList[tvIdx]?.name === opName) tvShow(tvIdx);
-    toast('\u2705 Foto salva para ' + opName.replace(/_/g,' ') + '!');
+    const rawUrl = e.target.result;
+    // photoSet já comprime internamente
+    photoSet(opName, rawUrl);
+    // Aguarda a compressão terminar (photoSet é assíncrono internamente)
+    setTimeout(()=>{
+      renderModalPhoto(opName, EQ[ALL.find(o=>o.name===opName)?.eq]||{c:'#888'});
+      if(document.getElementById('fotos-grid')) fotosRenderGrid();
+      if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
+      tvBuildList();
+      const _tvOv4 = document.getElementById('tv-overlay');
+      if(_tvOv4 && _tvOv4.classList.contains('on') && tvList[tvIdx]?.name === opName) tvShow(tvIdx);
+      toast('✅ Foto salva para ' + opName.replace(/_/g,' ') + '!');
+    }, 300);
   };
+  reader.onerror = ()=>{ toast('❌ Erro ao ler o arquivo. Tente novamente.'); };
   reader.readAsDataURL(file);
   inp.value='';
 }
@@ -5202,12 +5209,60 @@ function applyOps(){
 }
 
 // photoSet — salva foto localmente + Firebase + BroadcastChannel
+// Comprime a imagem antes de salvar (max 400x400, qualidade 0.75)
+// Evita estourar o localStorage (limite ~5MB por origem)
+function photoCompress(dataUrl, cb){
+  const img = new Image();
+  img.onload = function(){
+    const MAX = 400;
+    let w = img.width, h = img.height;
+    if(w > MAX || h > MAX){
+      if(w > h){ h = Math.round(h * MAX / w); w = MAX; }
+      else      { w = Math.round(w * MAX / h); h = MAX; }
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+    cb(canvas.toDataURL('image/jpeg', 0.75));
+  };
+  img.onerror = function(){ cb(dataUrl); }; // fallback: salva original
+  img.src = dataUrl;
+}
+
 function photoSet(opName, url){
-  const all = photoGetAll();
-  if(url) all[opName]=url; else delete all[opName];
-  localStorage.setItem('cofen_photos', JSON.stringify(all));
-  syncBroadcast('photo_update', JSON.stringify(all));
-  fbPush('photos', all);
+  function _save(finalUrl){
+    const all = photoGetAll();
+    if(finalUrl) all[opName]=finalUrl; else delete all[opName];
+    try {
+      localStorage.setItem('cofen_photos', JSON.stringify(all));
+    } catch(e){
+      // localStorage cheio — tenta remover foto mais antiga e tentar de novo
+      toast('⚠️ Armazenamento quase cheio! Removendo fotos antigas...');
+      const keys = Object.keys(all).filter(k=>k!==opName);
+      if(keys.length > 0){
+        delete all[keys[0]]; // remove a primeira foto
+        try {
+          localStorage.setItem('cofen_photos', JSON.stringify(all));
+          toast('✅ Foto salva! Uma foto antiga foi removida para liberar espaço.');
+        } catch(e2){
+          toast('❌ Sem espaço! Remova fotos antigas na aba Gestão → Fotos.');
+          return;
+        }
+      } else {
+        toast('❌ Sem espaço para salvar a foto. Tente uma imagem menor.');
+        return;
+      }
+    }
+    syncBroadcast('photo_update', JSON.stringify(photoGetAll()));
+    fbPush('photos', photoGetAll());
+  }
+  
+  if(url){
+    photoCompress(url, _save);
+  } else {
+    _save(null);
+  }
 }
 
 // ── AUTO-CONNECT FIXO — Firebase e sala já configurados ──
@@ -5390,19 +5445,30 @@ function fotosFileSelected(inp){
   if(!inp.files||!inp.files[0]||!fotosClickOp) return;
   const opName = fotosClickOp;
   const file = inp.files[0];
+  if(!file.type.startsWith('image/')){
+    toast('❌ Selecione uma imagem (JPG, PNG, etc)');
+    fotosClickOp = null;
+    return;
+  }
   const reader = new FileReader();
   reader.onload = e => {
+    // photoSet comprime e salva internamente (assíncrono via canvas)
     photoSet(opName, e.target.result);
-    fotosRenderGrid();
-    if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
-    if(currentModalOp === opName){
-      const cfg = EQ[ALL.find(o=>o.name===opName)?.eq]||{c:'#888'};
-      renderModalPhoto(opName, cfg);
-    }
-    if(tvActive && tvList[tvIdx]?.name === opName) tvShow(tvIdx);
-    toast('\u2705 Foto salva para ' + opName.replace(/_/g,' ') + '!');
+    // Aguarda compressão antes de atualizar UI
+    setTimeout(()=>{
+      fotosRenderGrid();
+      if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
+      if(currentModalOp === opName){
+        const cfg = EQ[ALL.find(o=>o.name===opName)?.eq]||{c:'#888'};
+        renderModalPhoto(opName, cfg);
+      }
+      const _tvOvF = document.getElementById('tv-overlay');
+      if(_tvOvF && _tvOvF.classList.contains('on') && tvList[tvIdx]?.name === opName) tvShow(tvIdx);
+      toast('✅ Foto salva para ' + opName.replace(/_/g,' ') + '!');
+    }, 400);
     fotosClickOp = null;
   };
+  reader.onerror = ()=>{ toast('❌ Erro ao ler arquivo.'); fotosClickOp = null; };
   reader.readAsDataURL(file);
   inp.value='';
 }
