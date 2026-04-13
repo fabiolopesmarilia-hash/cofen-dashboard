@@ -1543,7 +1543,7 @@ let ALL = [];
 function rebuildAll(){
   // NÃO modifica D — apenas filtra ao montar ALL
   // Modificar D causava perda permanente de operadores a cada chamada
-  const _BLOCKED=["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_BERNARDES", "CLEBER_JUNIOR", "JHONATA_NASCIMENTO", "ANA_BENTO"];
+  const _BLOCKED=["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_BERNARDES", "CLEBER_JUNIOR", "JHONATA_NASCIMENTO"];
   const _BLOCKED_TEAMS=["ELITE"];
   const _gOvR=gGetOverrides();
   const _allRemoved=new Set([...(_gOvR.removidos||[]),..._BLOCKED]);
@@ -3127,11 +3127,19 @@ function mvApply(){
 
   rebuildAll();
   refreshAll();
-  // FIX: Atualiza todas as listas interligadas após mover operador
+  // Atualiza todas as listas interligadas após mover operador
   gestaoMoverInit();
   gestaoRemoverInit();
   if(typeof rdBuildSubTabs==='function') rdBuildSubTabs();
   if(typeof rdRender==='function') rdRender();
+  // Recalcula modo TV — reconstrói lista e atualiza slide atual se ativo
+  tvBuildList();
+  tvBuildDots();
+  const tvOverlay = document.getElementById('tv-overlay');
+  if(tvOverlay && tvOverlay.classList.contains('on')){
+    if(tvIdx >= tvList.length) tvIdx = 0;
+    tvShowCurrent();
+  }
   toast(`✅ ${opName.replace(/_/g,' ')} → ${toCfg.sh}!`);
 
   // Reset selects
@@ -3367,7 +3375,7 @@ function loadGestaoOverrides(){
   if(ov.novos && ov.novos.length>0){
     ov.novos.forEach(n=>{
       if(ALL.find(o=>o.name===n.name)) return;
-      const _BLK=["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_BERNARDES", "CLEBER_JUNIOR", "JHONATA_NASCIMENTO", "ANA_BENTO"]; if(_BLK.includes(n.name)) return;
+      const _BLK=["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_BERNARDES", "CLEBER_JUNIOR", "JHONATA_NASCIMENTO"]; if(_BLK.includes(n.name)) return;
       const eqObj=D.equipes.find(e=>e.name===n.eq);
       if(!eqObj) return;
       const ho=n.rec*0.25;
@@ -4156,20 +4164,31 @@ function photoGetAll(){ try{return JSON.parse(localStorage.getItem('cofen_photos
 function photoGet(opName){ return photoGetAll()[opName] || null; }
 
 function photoUpload(){
-  document.getElementById('m-photo-file').click();
+  const inp = document.getElementById('m-photo-file');
+  if(!inp) return;
+  inp.value = ''; // garante disparo do onchange mesmo para o mesmo arquivo
+  inp.click();
 }
 
 function photoFileSelected(inp){
   if(!inp.files||!inp.files[0]) return;
+  const opName = currentModalOp;
+  if(!opName) return;
   const file = inp.files[0];
   const reader = new FileReader();
   reader.onload = e => {
     const url = e.target.result;
-    if(currentModalOp){
-      photoSet(currentModalOp, url);
-      renderModalPhoto(currentModalOp, EQ[ALL.find(o=>o.name===currentModalOp)?.eq]||{c:'#888'});
-      toast('✅ Foto salva para ' + currentModalOp.replace(/_/g,' ') + '!');
-    }
+    photoSet(opName, url);
+    renderModalPhoto(opName, EQ[ALL.find(o=>o.name===opName)?.eq]||{c:'#888'});
+    // Atualiza grid de fotos se estiver aberto
+    if(document.getElementById('fotos-grid')) fotosRenderGrid();
+    // Atualiza ranking se aberto
+    if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
+    // Atualiza modo TV se ativo e exibindo este operador
+    tvBuildList();
+    const _tvOv4 = document.getElementById('tv-overlay');
+    if(_tvOv4 && _tvOv4.classList.contains('on') && tvList[tvIdx]?.name === opName) tvShow(tvIdx);
+    toast('\u2705 Foto salva para ' + opName.replace(/_/g,' ') + '!');
   };
   reader.readAsDataURL(file);
   inp.value='';
@@ -5303,59 +5322,85 @@ function fotosRenderGrid(){
   if(!grid) return;
   const list = fotosActiveEq==='all' ? ALL : ALL.filter(o=>o.eq===fotosActiveEq);
   const photos = photoGetAll();
-  grid.innerHTML = list.map(op=>{
-    const cfg     = EQ[op.eq]||{c:'#888',sh:op.eq};
-    const photo   = photos[op.name];
-    const hasPhoto = !!photo;
-    const avatar = hasPhoto
-      ? '<img src="'+photo+'" style="width:100%;height:100%;object-fit:cover;object-position:top">'
-      : '<div style="width:52px;height:52px;border-radius:50%;background:'+cfg.c+';display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#fff">'+ini(op.name)+'</div>';
-    return '<div onclick="fotosSelectOp(\''+op.name+'\')"'
-      + ' title="'+(hasPhoto?'Trocar':'Adicionar')+' foto de '+op.name.replace(/_/g,' ')+'"'
-      + ' style="border-radius:var(--rl);overflow:hidden;cursor:pointer;transition:all .25s;'
-      + 'border:2px solid '+(hasPhoto?cfg.c:'var(--g200)')+';position:relative;'
-      + 'box-shadow:'+(hasPhoto?'0 4px 14px '+cfg.c+'33':'var(--sh)')+'"'
-      + ' onmouseover="this.style.transform=\'scale(1.04)\';this.style.boxShadow=\'0 8px 24px rgba(0,0,0,.15)\'"'
-      + ' onmouseout="this.style.transform=\'\';this.style.boxShadow=\''+(hasPhoto?'0 4px 14px '+cfg.c+'33':'var(--sh)')+'\';">'
-      + '<div style="height:130px;background:'+(hasPhoto?'#000':cfg.c+'18')+';display:flex;align-items:center;justify-content:center;overflow:hidden">'
-      + avatar
-      + '</div>'
-      + '<div style="padding:8px 10px;background:var(--w)">'
-      + '<div style="font-weight:800;font-size:11px;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+op.name.replace(/_/g,' ')+'</div>'
-      + '<div style="font-size:10px;color:'+cfg.c+';font-weight:700">'+cfg.sh+'</div>'
-      + '<div style="font-size:9px;color:var(--g500);margin-top:2px">'+fR(op.rec)+'</div>'
-      + '</div>'
-      + (hasPhoto ? '<div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);border-radius:100px;padding:2px 7px;font-size:9px;font-weight:700;color:#fff">✅ Foto</div>' : '')
-      + '<div style="position:absolute;bottom:54px;left:0;right:0;text-align:center;background:rgba(0,0,0,.6);padding:5px 0;color:#fff;font-size:10px;font-weight:700;opacity:0;transition:opacity .2s" class="fh-lbl">'
-      + (hasPhoto?'📷 Trocar foto':'📷 Adicionar foto')+'</div>'
-      + '</div>';
-  }).join('');
 
-  // hover labels
-  grid.querySelectorAll('div[onclick]').forEach(card=>{
-    const lbl = card.querySelector('.fh-lbl');
-    if(!lbl) return;
-    card.addEventListener('mouseenter',()=>lbl.style.opacity='1');
-    card.addEventListener('mouseleave',()=>lbl.style.opacity='0');
+  // Reconstrói via DOM para evitar bugs de escaping em nomes com caracteres especiais
+  grid.innerHTML = '';
+  list.forEach(op=>{
+    const cfg      = EQ[op.eq]||{c:'#888',sh:op.eq};
+    const photo    = photos[op.name];
+    const hasPhoto = !!photo;
+
+    const card = document.createElement('div');
+    card.style.cssText = 'border-radius:var(--rl);overflow:hidden;cursor:pointer;transition:all .25s;'
+      + 'border:2px solid '+(hasPhoto?cfg.c:'var(--g200)')+';position:relative;'
+      + 'box-shadow:'+(hasPhoto?'0 4px 14px '+cfg.c+'33':'var(--sh)');
+    card.title = (hasPhoto?'Trocar':'Adicionar')+' foto de '+op.name.replace(/_/g,' ');
+
+    const imgBox = document.createElement('div');
+    imgBox.style.cssText = 'height:130px;background:'+(hasPhoto?'#000':cfg.c+'18')+';display:flex;align-items:center;justify-content:center;overflow:hidden';
+    if(hasPhoto){
+      const img = document.createElement('img');
+      img.src = photo;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:top';
+      imgBox.appendChild(img);
+    } else {
+      const av = document.createElement('div');
+      av.style.cssText = 'width:52px;height:52px;border-radius:50%;background:'+cfg.c+';display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#fff';
+      av.textContent = ini(op.name);
+      imgBox.appendChild(av);
+    }
+    card.appendChild(imgBox);
+
+    const info = document.createElement('div');
+    info.style.cssText = 'padding:8px 10px;background:var(--w)';
+    info.innerHTML = '<div style="font-weight:800;font-size:11px;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+op.name.replace(/_/g,' ')+'</div>'
+      + '<div style="font-size:10px;color:'+cfg.c+';font-weight:700">'+cfg.sh+'</div>'
+      + '<div style="font-size:9px;color:var(--g500);margin-top:2px">'+fR(op.rec)+'</div>';
+    card.appendChild(info);
+
+    if(hasPhoto){
+      const badge = document.createElement('div');
+      badge.style.cssText = 'position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);border-radius:100px;padding:2px 7px;font-size:9px;font-weight:700;color:#fff';
+      badge.textContent = '\u2705 Foto';
+      card.appendChild(badge);
+    }
+
+    const lbl = document.createElement('div');
+    lbl.style.cssText = 'position:absolute;bottom:54px;left:0;right:0;text-align:center;background:rgba(0,0,0,.6);padding:5px 0;color:#fff;font-size:10px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none';
+    lbl.textContent = hasPhoto?'\ud83d\udcf7 Trocar foto':'\ud83d\udcf7 Adicionar foto';
+    card.appendChild(lbl);
+
+    card.addEventListener('mouseenter',()=>{ lbl.style.opacity='1'; card.style.transform='scale(1.04)'; card.style.boxShadow='0 8px 24px rgba(0,0,0,.15)'; });
+    card.addEventListener('mouseleave',()=>{ lbl.style.opacity='0'; card.style.transform=''; card.style.boxShadow=hasPhoto?'0 4px 14px '+cfg.c+'33':'var(--sh)'; });
+    card.addEventListener('click',()=>{ fotosSelectOp(op.name); });
+
+    grid.appendChild(card);
   });
 }
 
 function fotosSelectOp(opName){
   fotosClickOp = opName;
   const inp = document.getElementById('fotos-file-input');
-  if(inp) inp.click();
+  if(!inp) return;
+  inp.value = '';
+  inp.click();
 }
 
 function fotosFileSelected(inp){
   if(!inp.files||!inp.files[0]||!fotosClickOp) return;
+  const opName = fotosClickOp;
   const file = inp.files[0];
   const reader = new FileReader();
   reader.onload = e => {
-    photoSet(fotosClickOp, e.target.result);
+    photoSet(opName, e.target.result);
     fotosRenderGrid();
-    // Refresh ranking & modal if open
     if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
-    toast('✅ Foto salva para ' + fotosClickOp.replace(/_/g,' ') + '!');
+    if(currentModalOp === opName){
+      const cfg = EQ[ALL.find(o=>o.name===opName)?.eq]||{c:'#888'};
+      renderModalPhoto(opName, cfg);
+    }
+    if(tvActive && tvList[tvIdx]?.name === opName) tvShow(tvIdx);
+    toast('\u2705 Foto salva para ' + opName.replace(/_/g,' ') + '!');
     fotosClickOp = null;
   };
   reader.readAsDataURL(file);
@@ -5635,6 +5680,15 @@ function removerOpApply(){
   rebuildAll();
   refreshAll();
   gestaoRemoverInit();
+  gestaoMoverInit();
+  // Atualiza modo TV se ativo
+  tvBuildList();
+  tvBuildDots();
+  const _tvOv2 = document.getElementById('tv-overlay');
+  if(_tvOv2 && _tvOv2.classList.contains('on')){
+    if(tvIdx >= tvList.length) tvIdx = 0;
+    tvShowCurrent();
+  }
   sel.value = '';
   document.getElementById('remover-op-preview').style.display='none';
 
@@ -5675,7 +5729,15 @@ function restaurarOp(opName){
   }
   gSetOverrides(gOv);
   fbPush('gestao', gOv);
-  rebuildAll(); refreshAll(); gestaoRemoverInit();
+  rebuildAll(); refreshAll(); gestaoRemoverInit(); gestaoMoverInit();
+  // Atualiza modo TV se ativo
+  tvBuildList();
+  tvBuildDots();
+  const _tvOv3 = document.getElementById('tv-overlay');
+  if(_tvOv3 && _tvOv3.classList.contains('on')){
+    if(tvIdx >= tvList.length) tvIdx = 0;
+    tvShowCurrent();
+  }
   toast(`↩ ${opName.replace(/_/g,' ')} restaurado!`);
 }
 
@@ -6069,7 +6131,7 @@ loadGestaoOverrides();
 (function(){
   const _gOv=gGetOverrides();
   if(!_gOv.removidos) _gOv.removidos=[];
-  ["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_BERNARDES", "CLEBER_JUNIOR", "JHONATA_NASCIMENTO", "ANA_BENTO"].forEach(n=>{ if(!_gOv.removidos.includes(n)) _gOv.removidos.push(n); });
+  ["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_BERNARDES", "CLEBER_JUNIOR", "JHONATA_NASCIMENTO"].forEach(n=>{ if(!_gOv.removidos.includes(n)) _gOv.removidos.push(n); });
   gSetOverrides(_gOv);
 })();
 loadSharedPhotos();
