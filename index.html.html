@@ -410,22 +410,83 @@ select.ev-inp{cursor:pointer}
   <div class="hero">
     <div class="htitle">Recebimento Global · Abril 2026</div>
     <div class="hmonth">ABRIL 2026 — COB COFEN</div>
+    <!-- ── KPIs LINHA 1: Total Real Recebido ── -->
     <div class="hkpis">
       <div class="hkpi"><div class="hkpi-l">Total Real Recebido</div><div class="hkpi-v ok" id="h-total">—</div><div class="hkpi-s">Cobrança Jurídica</div></div>
       <div class="hkpi"><div class="hkpi-l">HO (25%)</div><div class="hkpi-v tl" id="h-ho">—</div><div class="hkpi-s">Honorários PaguePlay</div></div>
-      <div class="hkpi"><div class="hkpi-l">Falta p/ Meta</div><div class="hkpi-v am" id="h-falta">—</div><div class="hkpi-s" id="h-meta-s">Meta: R$ 800K</div></div>
+      <div class="hkpi"><div class="hkpi-l">Falta p/ Meta 1</div><div class="hkpi-v am" id="h-falta">—</div><div class="hkpi-s" id="h-meta-s">Meta: R$ 800K</div></div>
       <div class="hkpi"><div class="hkpi-l">Média Real/DU</div><div class="hkpi-v" id="h-media">—</div><div class="hkpi-s" id="h-du-s">13 D.U. passados</div></div>
       <div class="hkpi"><div class="hkpi-l">Precisa/DU</div><div class="hkpi-v am" id="h-need">—</div><div class="hkpi-s" id="h-restam-s">7 D.U. restantes</div></div>
       <div class="hkpi"><div class="hkpi-l">Acordos</div><div class="hkpi-v ok" id="h-ac">—</div><div class="hkpi-s">Total baixas</div></div>
     </div>
-    <!-- Barra de progresso da meta -->
-    <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase">Progresso da Meta</div>
+
+    <!-- ── SUBTOTAIS POR COREN ── -->
+    <div id="h-corens-wrap" style="margin-top:10px;padding:10px 14px;background:rgba(255,255,255,.06);border-radius:var(--rl);border:1px solid rgba(255,255,255,.1);display:none">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">📍 Subtotal por COREN</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <div style="text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-MT</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9;letter-spacing:.5px" id="h-coren-mt">—</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-PI</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9;letter-spacing:.5px" id="h-coren-pi">—</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-MA</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9;letter-spacing:.5px" id="h-coren-ma">—</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-CE</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9;letter-spacing:.5px" id="h-coren-ce">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BARRA META 1: Total Real Recebido ── -->
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase">🎯 Meta 1 — Total Real Recebido</div>
         <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.7)" id="h-meta-pct">—</div>
       </div>
-      <div style="background:rgba(255,255,255,.12);border-radius:100px;height:7px;overflow:hidden">
+      <div style="background:rgba(255,255,255,.12);border-radius:100px;height:6px;overflow:hidden">
         <div id="h-meta-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#4ADE80,#00C97F);width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
+      </div>
+    </div>
+
+    <!-- ── KPIs LINHA 2: Total Arrecadado ── -->
+    <div id="h-arrecadado-wrap" style="margin-top:12px;padding:12px 14px;background:rgba(251,191,36,.07);border-radius:var(--rl);border:1px solid rgba(251,191,36,.2)">
+      <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.7);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💼 Total Arrecadado — Valor que entra para a empresa</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:10px">
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Arrecadado</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#FCD34D;letter-spacing:.5px" id="h-arrecadado">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">HO Arrecadado (25%)</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#67E8F9;letter-spacing:.5px" id="h-arrecadado-ho">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Falta p/ Meta 2</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#FCA5A5;letter-spacing:.5px" id="h-arrecadado-falta">—</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.3)" id="h-arrecadado-meta-s">Meta 2: —</div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Média/DU</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:.5px" id="h-arrecadado-media">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Precisa/DU</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#FCD34D;letter-spacing:.5px" id="h-arrecadado-need">—</div>
+        </div>
+      </div>
+      <!-- Barra meta 2 -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.6);letter-spacing:1.5px;text-transform:uppercase">🎯 Meta 2 — Total Arrecadado</div>
+        <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.6)" id="h-arrecadado-pct">—</div>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:100px;height:6px;overflow:hidden">
+        <div id="h-arrecadado-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#FCD34D,#F59E0B);width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
       </div>
     </div>
   </div>
@@ -531,22 +592,78 @@ select.ev-inp{cursor:pointer}
       </div>
     </div>
     <div class="ep-body">
+      <!-- ── TOTAL REAL + META 1 ── -->
       <div class="ep-row">
         <div class="ep-group">
           <label class="ep-label">💰 Total Real Recebido (R$)</label>
           <input class="ep-input yellow" type="number" id="inp-total" placeholder="Ex: 362260.36" step="0.01" min="0" oninput="liveCalc()">
         </div>
         <div class="ep-group">
-          <label class="ep-label">🎯 Meta Mensal (R$)</label>
+          <label class="ep-label">🎯 Meta 1 — Total Recebido (R$)</label>
           <input class="ep-input" type="number" id="inp-meta" value="800000" step="1000" min="0" oninput="liveCalc()">
         </div>
         <button class="btn-calc" onclick="applyTotal()">⚡ Aplicar e Recalcular</button>
         <button class="btn-outline" onclick="resetTotal()">↩ Resetar</button>
       </div>
-      <!-- Resultados em tempo real -->
+
+      <!-- ── SUBTOTAIS POR COREN (abaixo do Total Real) ── -->
+      <div style="background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rl);padding:14px 16px;margin-bottom:10px">
+        <div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">
+          📍 Subtotal por COREN — preenchido manualmente
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px">
+          <div class="ep-group" style="flex:none">
+            <label class="ep-label">COREN-MT (R$)</label>
+            <input class="ep-input" type="number" id="inp-coren-mt" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
+          </div>
+          <div class="ep-group" style="flex:none">
+            <label class="ep-label">COREN-PI (R$)</label>
+            <input class="ep-input" type="number" id="inp-coren-pi" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
+          </div>
+          <div class="ep-group" style="flex:none">
+            <label class="ep-label">COREN-MA (R$)</label>
+            <input class="ep-input" type="number" id="inp-coren-ma" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
+          </div>
+          <div class="ep-group" style="flex:none">
+            <label class="ep-label">COREN-CE (R$)</label>
+            <input class="ep-input" type="number" id="inp-coren-ce" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
+          </div>
+        </div>
+        <div id="res-corens" style="display:flex;gap:12px;margin-top:8px;font-size:11px;font-weight:700;color:var(--g500)">
+          Soma CORENs: <span id="res-corens-soma" style="color:var(--info)">—</span>
+        </div>
+      </div>
+
+      <!-- ── TOTAL ARRECADADO + META 2 ── -->
+      <div style="background:#FFFBEB;border:1.5px solid #FCD34D;border-radius:var(--rl);padding:14px 16px;margin-bottom:10px">
+        <div style="font-size:10px;font-weight:800;color:#92400E;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">
+          💼 Total Arrecadado — Valor que entra para a empresa (meta separada)
+        </div>
+        <div class="ep-row" style="margin-bottom:10px">
+          <div class="ep-group">
+            <label class="ep-label" style="color:#92400E">💼 Total Arrecadado (R$)</label>
+            <input class="ep-input yellow" type="number" id="inp-arrecadado" placeholder="Ex: 520000.00" step="0.01" min="0" oninput="liveCalcArrecadado()">
+          </div>
+          <div class="ep-group">
+            <label class="ep-label" style="color:#92400E">🎯 Meta 2 — Total Arrecadado (R$)</label>
+            <input class="ep-input" type="number" id="inp-meta-arrecadado" placeholder="Ex: 1000000" step="1000" min="0" oninput="liveCalcArrecadado()">
+          </div>
+          <button class="btn-calc" style="background:linear-gradient(135deg,#F59E0B,#D97706)" onclick="applyArrecadado()">⚡ Aplicar</button>
+          <button class="btn-outline" onclick="resetArrecadado()">↩ Resetar</button>
+        </div>
+        <!-- Resultados Arrecadado em tempo real -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px" id="res-arrecadado-cards">
+          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">HO (25%)</div><div class="res-v" style="color:#F59E0B" id="res-arrecadado-ho">—</div><div class="res-s">Honorários sobre arrecadado</div></div>
+          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">Falta p/ Meta 2</div><div class="res-v rd" id="res-arrecadado-falta">—</div><div class="res-s" id="res-arrecadado-meta-lbl">Meta 2: —</div></div>
+          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">Média/DU</div><div class="res-v info" id="res-arrecadado-media">—</div><div class="res-s" id="res-arrecadado-du-lbl">— D.U. passados</div></div>
+          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">Precisa/DU Restante</div><div class="res-v am" id="res-arrecadado-need">—</div><div class="res-s" id="res-arrecadado-rest-lbl">— D.U. restam</div></div>
+        </div>
+      </div>
+
+      <!-- Resultados Meta 1 em tempo real -->
       <div class="res-grid" id="res-cards">
         <div class="res-card"><div class="res-l">HO (25%)</div><div class="res-v ok" id="res-ho">—</div><div class="res-s">Honorários PaguePlay</div></div>
-        <div class="res-card"><div class="res-l">Falta p/ Meta</div><div class="res-v rd" id="res-falta">—</div><div class="res-s" id="res-meta-lbl">Meta: R$ 800K</div></div>
+        <div class="res-card"><div class="res-l">Falta p/ Meta 1</div><div class="res-v rd" id="res-falta">—</div><div class="res-s" id="res-meta-lbl">Meta 1: R$ 800K</div></div>
         <div class="res-card"><div class="res-l">Média Real/DU</div><div class="res-v info" id="res-media">—</div><div class="res-s" id="res-du-lbl">13 D.U. passados</div></div>
         <div class="res-card"><div class="res-l">Precisa/DU Restante</div><div class="res-v am" id="res-need">—</div><div class="res-s" id="res-rest-lbl">7 D.U. restam</div></div>
       </div>
@@ -1522,9 +1639,19 @@ function getFeriados(){try{return JSON.parse(localStorage.getItem('cofen_feriado
 function setFeriados(arr){localStorage.setItem('cofen_feriados',JSON.stringify(arr));}
 
 // ─ Config ─
-const META_DEFAULT = 800000;
-let meta = parseFloat(localStorage.getItem('cofen_meta') || META_DEFAULT);
-let overrideTotalRec = parseFloat(localStorage.getItem('cofen_total') || '0');
+const META_DEFAULT        = 800000;
+let meta            = parseFloat(localStorage.getItem('cofen_meta')         || META_DEFAULT);
+let overrideTotalRec= parseFloat(localStorage.getItem('cofen_total')        || '0');
+
+// ── CORENS: subtotais por estado (preenchidos manualmente) ──
+let corenMT = parseFloat(localStorage.getItem('cofen_coren_mt') || '0');
+let corenPI = parseFloat(localStorage.getItem('cofen_coren_pi') || '0');
+let corenMA = parseFloat(localStorage.getItem('cofen_coren_ma') || '0');
+let corenCE = parseFloat(localStorage.getItem('cofen_coren_ce') || '0');
+
+// ── TOTAL ARRECADADO: valor que entra para a empresa (diferente do Total Real) ──
+let totalArrecadado    = parseFloat(localStorage.getItem('cofen_arrecadado')    || '0');
+let metaArrecadado     = parseFloat(localStorage.getItem('cofen_meta_arrecadado')|| '1000000');
 
 const EQ={
   "COFEN MARILIA BRENDA":   {c:"#00A86B",bg:"#E6F7F1",ico:"🏙",sh:"Marília Brenda"},
@@ -1751,25 +1878,60 @@ function initHero(){
   const need     = DU.restam>0 ? falta/DU.restam : 0;
   const totalAc  = D.equipes.reduce((s,e)=>s+e.acordos,0);
 
-  document.getElementById('h-total').textContent = fRK(totalRec);
-  document.getElementById('h-ho').textContent    = fRK(totalHO);
+  // ── Meta 1: Total Real Recebido ──
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  s('h-total', fRK(totalRec));
+  s('h-ho',    fRK(totalHO));
   document.getElementById('h-falta').textContent = falta>0 ? fRK(falta) : '✅ Meta!';
   document.getElementById('h-falta').className   = 'hkpi-v '+(falta>0?'am':'ok');
-  document.getElementById('h-meta-s').textContent= 'Meta: '+fRK(meta);
-  document.getElementById('h-media').textContent = fRK(media);
-  document.getElementById('h-du-s').textContent  = DU.passou+' D.U. passados';
-  document.getElementById('h-need').textContent  = DU.restam>0 ? fRK(need) : '—';
-  document.getElementById('h-restam-s').textContent = DU.restam+' D.U. restantes';
-  document.getElementById('h-ac').textContent    = totalAc.toLocaleString('pt-BR');
-  // Progress bar
+  s('h-meta-s',   'Meta 1: '+fRK(meta));
+  s('h-media',    fRK(media));
+  s('h-du-s',     DU.passou+' D.U. passados');
+  s('h-need',     DU.restam>0 ? fRK(need) : '—');
+  s('h-restam-s', DU.restam+' D.U. restantes');
+  s('h-ac',       totalAc.toLocaleString('pt-BR'));
+
+  // ── Barra Meta 1 ──
   const pct = meta>0 ? Math.min(100, totalRec/meta*100) : 0;
   const barEl = document.getElementById('h-meta-bar');
   const pctEl = document.getElementById('h-meta-pct');
-  if(barEl) setTimeout(()=>{barEl.style.width=pct.toFixed(1)+'%';},100);
-  if(pctEl) pctEl.textContent = pct.toFixed(1)+'% da meta';
-  if(barEl && pct>=100){ barEl.style.background='linear-gradient(90deg,#4ADE80,#00C97F)'; }
-  else if(barEl && pct>=70){ barEl.style.background='linear-gradient(90deg,#FCD34D,#F59E0B)'; }
-  else if(barEl){ barEl.style.background='linear-gradient(90deg,#FCA5A5,#EF4444)'; }
+  if(barEl) setTimeout(()=>{ barEl.style.width=pct.toFixed(1)+'%'; },100);
+  if(pctEl) pctEl.textContent = pct.toFixed(1)+'% da meta 1';
+  if(barEl && pct>=100) barEl.style.background='linear-gradient(90deg,#4ADE80,#00C97F)';
+  else if(barEl && pct>=70) barEl.style.background='linear-gradient(90deg,#FCD34D,#F59E0B)';
+  else if(barEl) barEl.style.background='linear-gradient(90deg,#FCA5A5,#EF4444)';
+
+  // ── Subtotais por COREN ──
+  const anyCorenSet = corenMT>0 || corenPI>0 || corenMA>0 || corenCE>0;
+  const corensWrap = document.getElementById('h-corens-wrap');
+  if(corensWrap) corensWrap.style.display = anyCorenSet ? 'block' : 'none';
+  s('h-coren-mt', corenMT>0 ? fRK(corenMT) : '—');
+  s('h-coren-pi', corenPI>0 ? fRK(corenPI) : '—');
+  s('h-coren-ma', corenMA>0 ? fRK(corenMA) : '—');
+  s('h-coren-ce', corenCE>0 ? fRK(corenCE) : '—');
+
+  // ── Meta 2: Total Arrecadado ──
+  const hoArr    = totalArrecadado * 0.25;
+  const faltaArr = Math.max(0, metaArrecadado - totalArrecadado);
+  const mediaArr = DU.passou>0 ? totalArrecadado/DU.passou : 0;
+  const needArr  = DU.restam>0 && faltaArr>0 ? faltaArr/DU.restam : 0;
+  const pct2     = metaArrecadado>0 ? Math.min(100, totalArrecadado/metaArrecadado*100) : 0;
+
+  s('h-arrecadado',       totalArrecadado>0 ? fRK(totalArrecadado) : '—');
+  s('h-arrecadado-ho',    totalArrecadado>0 ? fRK(hoArr) : '—');
+  s('h-arrecadado-falta', faltaArr>0 ? fRK(faltaArr) : totalArrecadado>0 ? '✅ Meta 2!' : '—');
+  document.getElementById('h-arrecadado-falta').style.color = faltaArr>0 ? '#FCA5A5' : '#4ADE80';
+  s('h-arrecadado-meta-s', 'Meta 2: '+fRK(metaArrecadado));
+  s('h-arrecadado-media',  totalArrecadado>0 ? fRK(mediaArr) : '—');
+  s('h-arrecadado-need',   needArr>0 ? fRK(needArr) : '—');
+
+  const barArr = document.getElementById('h-arrecadado-bar');
+  const pctArr = document.getElementById('h-arrecadado-pct');
+  if(barArr) setTimeout(()=>{ barArr.style.width=pct2.toFixed(1)+'%'; },150);
+  if(pctArr) pctArr.textContent = totalArrecadado>0 ? pct2.toFixed(1)+'% da meta 2' : '—';
+  if(barArr && pct2>=100) barArr.style.background='linear-gradient(90deg,#4ADE80,#00C97F)';
+  else if(barArr && pct2>=70) barArr.style.background='linear-gradient(90deg,#FCD34D,#F59E0B)';
+  else if(barArr) barArr.style.background='linear-gradient(90deg,#FCA5A5,#EF4444)';
 }
 
 // ── CHARTS ──
@@ -1844,7 +2006,18 @@ function mkTop5(){
 function buildOpEditor(){
   document.getElementById('inp-total').value = overrideTotalRec > 0 ? overrideTotalRec : '';
   document.getElementById('inp-meta').value  = meta;
+  // Preencher campos COREN
+  const setV = (id,v)=>{ const el=document.getElementById(id); if(el) el.value=v>0?v:''; };
+  setV('inp-coren-mt', corenMT);
+  setV('inp-coren-pi', corenPI);
+  setV('inp-coren-ma', corenMA);
+  setV('inp-coren-ce', corenCE);
+  // Preencher Total Arrecadado
+  setV('inp-arrecadado',     totalArrecadado);
+  setV('inp-meta-arrecadado', metaArrecadado>0&&metaArrecadado!==1000000 ? metaArrecadado : '');
   liveCalc();
+  liveCalcCorens();
+  liveCalcArrecadado();
 
   // Load saved op overrides
   const saved = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
@@ -1914,15 +2087,83 @@ function liveCalc(){
   const falta = Math.max(0,m-v);
   const media = DU.passou>0 ? v/DU.passou : 0;
   const need  = DU.restam>0 ? falta/DU.restam : 0;
-
-  document.getElementById('res-ho').textContent    = v>0 ? fR(ho) : '—';
+  const s=(id,v2)=>{const e=document.getElementById(id);if(e)e.textContent=v2;};
+  s('res-ho',    v>0 ? fR(ho) : '—');
   document.getElementById('res-falta').textContent = v>0 ? (falta>0?fR(falta):'✅ Meta!') : '—';
   document.getElementById('res-falta').className   = 'res-v '+(falta>0?'rd':'ok');
-  document.getElementById('res-media').textContent = v>0 ? fR(media) : '—';
-  document.getElementById('res-need').textContent  = v>0 && DU.restam>0 ? fR(need) : '—';
-  document.getElementById('res-meta-lbl').textContent = 'Meta: '+fRK(m);
-  document.getElementById('res-du-lbl').textContent   = DU.passou+' D.U. passados';
-  document.getElementById('res-rest-lbl').textContent = DU.restam+' D.U. restam';
+  s('res-media', v>0 ? fR(media) : '—');
+  s('res-need',  v>0 && DU.restam>0 ? fR(need) : '—');
+  s('res-meta-lbl', 'Meta 1: '+fRK(m));
+  s('res-du-lbl',   DU.passou+' D.U. passados');
+  s('res-rest-lbl', DU.restam+' D.U. restam');
+}
+
+// Atualiza soma dos CORENs em tempo real no editor
+function liveCalcCorens(){
+  const mt = parseFloat(document.getElementById('inp-coren-mt')?.value)||0;
+  const pi = parseFloat(document.getElementById('inp-coren-pi')?.value)||0;
+  const ma = parseFloat(document.getElementById('inp-coren-ma')?.value)||0;
+  const ce = parseFloat(document.getElementById('inp-coren-ce')?.value)||0;
+  const soma = mt+pi+ma+ce;
+  const el = document.getElementById('res-corens-soma');
+  if(el) el.textContent = soma>0 ? fR(soma) : '—';
+}
+
+// Atualiza resultados do Total Arrecadado em tempo real no editor
+function liveCalcArrecadado(){
+  const v = parseFloat(document.getElementById('inp-arrecadado')?.value)||0;
+  const m = parseFloat(document.getElementById('inp-meta-arrecadado')?.value)||0;
+  const ho    = v*0.25;
+  const falta = Math.max(0,m-v);
+  const media = DU.passou>0 ? v/DU.passou : 0;
+  const need  = DU.restam>0 && falta>0 ? falta/DU.restam : 0;
+  const s=(id,v2)=>{const e=document.getElementById(id);if(e)e.textContent=v2;};
+  s('res-arrecadado-ho',    v>0 ? fR(ho) : '—');
+  s('res-arrecadado-falta', v>0 ? (falta>0?fR(falta):'✅ Meta 2!') : '—');
+  document.getElementById('res-arrecadado-falta')?.classList.toggle('rd', falta>0);
+  document.getElementById('res-arrecadado-falta')?.classList.toggle('ok', falta<=0&&v>0);
+  s('res-arrecadado-meta-lbl', 'Meta 2: '+fRK(m));
+  s('res-arrecadado-media',    v>0 ? fR(media) : '—');
+  s('res-arrecadado-need',     need>0 ? fR(need) : '—');
+  s('res-arrecadado-du-lbl',   DU.passou+' D.U. passados');
+  s('res-arrecadado-rest-lbl', DU.restam+' D.U. restam');
+}
+
+// Salva Total Arrecadado + Meta 2
+function applyArrecadado(){
+  const v = parseFloat(document.getElementById('inp-arrecadado')?.value)||0;
+  const m = parseFloat(document.getElementById('inp-meta-arrecadado')?.value)||0;
+  totalArrecadado = v;
+  metaArrecadado  = m>0 ? m : 1000000;
+  localStorage.setItem('cofen_arrecadado',     v);
+  localStorage.setItem('cofen_meta_arrecadado',metaArrecadado);
+  // CORENs
+  const mt = parseFloat(document.getElementById('inp-coren-mt')?.value)||0;
+  const pi = parseFloat(document.getElementById('inp-coren-pi')?.value)||0;
+  const ma = parseFloat(document.getElementById('inp-coren-ma')?.value)||0;
+  const ce = parseFloat(document.getElementById('inp-coren-ce')?.value)||0;
+  corenMT=mt; corenPI=pi; corenMA=ma; corenCE=ce;
+  localStorage.setItem('cofen_coren_mt', mt);
+  localStorage.setItem('cofen_coren_pi', pi);
+  localStorage.setItem('cofen_coren_ma', ma);
+  localStorage.setItem('cofen_coren_ce', ce);
+  initHero();
+  fbPush('arrecadado', {v, m:metaArrecadado, mt, pi, ma, ce});
+  toast('✅ Total Arrecadado e CORENs salvos!');
+}
+
+function resetArrecadado(){
+  if(!confirm('Resetar Total Arrecadado, Meta 2 e CORENs?')) return;
+  totalArrecadado=0; metaArrecadado=1000000;
+  corenMT=0; corenPI=0; corenMA=0; corenCE=0;
+  ['cofen_arrecadado','cofen_meta_arrecadado',
+   'cofen_coren_mt','cofen_coren_pi','cofen_coren_ma','cofen_coren_ce']
+    .forEach(k=>localStorage.removeItem(k));
+  ['inp-arrecadado','inp-meta-arrecadado',
+   'inp-coren-mt','inp-coren-pi','inp-coren-ma','inp-coren-ce']
+    .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  liveCalcArrecadado(); liveCalcCorens(); initHero();
+  toast('↩ Arrecadado e CORENs resetados!');
 }
 
 function applyTotal(){
@@ -1932,9 +2173,16 @@ function applyTotal(){
   meta = m;
   localStorage.setItem('cofen_meta',  m);
   localStorage.setItem('cofen_total', v);
+  // Salvar CORENs também (se preenchidos)
+  const mt = parseFloat(document.getElementById('inp-coren-mt')?.value)||corenMT;
+  const pi = parseFloat(document.getElementById('inp-coren-pi')?.value)||corenPI;
+  const ma = parseFloat(document.getElementById('inp-coren-ma')?.value)||corenMA;
+  const ce = parseFloat(document.getElementById('inp-coren-ce')?.value)||corenCE;
+  corenMT=mt; corenPI=pi; corenMA=ma; corenCE=ce;
+  localStorage.setItem('cofen_coren_mt',mt); localStorage.setItem('cofen_coren_pi',pi);
+  localStorage.setItem('cofen_coren_ma',ma); localStorage.setItem('cofen_coren_ce',ce);
   refreshAll();
-  // Sincronizar para todos via Firebase (outros dispositivos) e BroadcastChannel (outras abas)
-  fbPush('meta', {total: v, meta: m});
+  fbPush('meta', {total: v, meta: m, mt, pi, ma, ce});
   syncBroadcast('meta_update', JSON.stringify({total: v, meta: m}));
   const syncMsg = fbDb && fbRoom ? '✅ Aplicado e sincronizado para todos!' : '✅ Total e meta aplicados!';
   toast(syncMsg);
@@ -5154,6 +5402,33 @@ function fbStartListening(){
       pulseSyncDot();
     });
   });
+
+  // ── Arrecadado + CORENs ──
+  fbDb.ref(fbRoom+'/arrecadado').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    if(typeof remote.v === 'number' && remote.v !== totalArrecadado){
+      totalArrecadado = remote.v;
+      localStorage.setItem('cofen_arrecadado', remote.v);
+    }
+    if(typeof remote.m === 'number' && remote.m !== metaArrecadado){
+      metaArrecadado = remote.m;
+      localStorage.setItem('cofen_meta_arrecadado', remote.m);
+    }
+    ['mt','pi','ma','ce'].forEach(st=>{
+      if(typeof remote[st]==='number'){
+        const key='coren'+st.toUpperCase();
+        if(st==='mt') corenMT=remote.mt;
+        if(st==='pi') corenPI=remote.pi;
+        if(st==='ma') corenMA=remote.ma;
+        if(st==='ce') corenCE=remote.ce;
+        localStorage.setItem('cofen_coren_'+st, remote[st]);
+      }
+    });
+    initHero();
+    pulseSyncDot();
+  });
+
 
   // ── Acordos (importação) ──
   fbDb.ref(fbRoom+'/acordos').on('value', snap=>{
