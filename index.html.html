@@ -403,6 +403,7 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('acordos',this)">🤝 Acordos</div>
   <div class="tab"     onclick="go('calend',this)">📆 Calendário</div>
   <div class="tab"     onclick="go('check',this)">✅ Checklist Líder</div>
+  <div class="tab" onclick="go('comp',this)">📊 Comparativo Meses</div>
 </div>
 
 <!-- ══════════ PAGE: GERAL ══════════ -->
@@ -1582,6 +1583,24 @@ select.ev-inp{cursor:pointer}
 // ══════════════════════════════
 // DATA
 // ══════════════════════════════
+const COMP_MARCO = {
+  total: 774800.42,
+  by_day: {"1": 271.87, "2": 10406.64, "3": 39436.57, "4": 12426.82, "5": 22235.39, "6": 25396.13, "7": 1769.49, "8": 1173.82, "9": 28835.97, "10": 43964.04, "11": 23022.48, "12": 28456.53, "13": 28974.96, "14": 75.69, "15": 278.54, "16": 24079.98, "17": 24950.2, "18": 15881.73, "19": 24310.81, "20": 27716.25, "21": 1495.2, "22": 758.53, "23": 26956.56, "24": 14303.2, "25": 34337.03, "26": 66401.58, "27": 66372.24, "28": 6765.9, "29": 1847.34, "30": 79517.02, "31": 92381.91},
+  by_eq:  {"COFEN BIRIGUI BRUNA": 141725.08, "COFEN BIRIGUI LUCIANO": 91544.84, "COFEN MARILIA BRENDA": 300680.47, "COFEN STEPHANIE 2° TURNO": 158581.71, "ELITE": 34298.27, "LIDERANÇA": 3787.32, "TIME DIGITAL": 8358.12},
+  by_op:  {"AMABELLY_SANTOS": 9690.77, "ANA_BENTO": 3351.36, "BIANCA_V_SILVA": 26353.59, "BRENDA_FERREIRA": 3610.24, "BRUNA_JUSTIMIANO": 177.08, "BRUNO_UEMURA": 546.88, "CLEBER_JUNIOR": 19196.47, "DEBORA_ANDRIELLY": 5038.61, "EDUARDO_SILVA": 4427.0, "FABIO_AQUINO": 11241.36, "FRANCISCA_BRITO": 17046.0, "GIOVANA_SOUZA": 30308.41, "HELENA_SANTOS": 7478.35, "HELTON_ROLDON": 17004.27, "ISABELA_MONTEIRO": 29266.09, "JESSICA_O_SILVA": 1259.49, "JHONATA_NASCIMENTO": 15101.8, "JOAO_MIRANDA": 1996.99, "KAROLAINE_SILVA": 35186.89, "KELY_SILVA": 4053.96, "LEONARDO_NUNES": 35201.88, "LYVIA_DIAS": 9914.01, "MARIA_BRAIDOTI": 2926.36, "MARIA_MOREIRASANTOS": 17004.65, "MATHEUS_SOUZA": 27567.63, "MAYSA_OLIVEIRA": 18194.91, "NAYARA_CRUZ": 8358.12, "RAFAELA_MINHOTO": 7654.69, "RENATARODRIGUES": 12184.46, "STEPHANIE_FAGUNDES": 47907.72, "THAYRA_FERREIRASILVA": 11091.86, "aline_pupim": 16596.63, "caio_shimite": 50498.34, "carulini_santos": 15376.91, "felipe_arruda": 4652.8, "geovanna_almeida": 17086.58, "itallo_cardamoni": 28656.38, "jussara_pereira": 16922.65, "katia_regina": 22578.94, "kauane_azevedo": 7044.82, "larissa_santana": 21611.29, "leticia_romeu": 23578.41, "pagueplay": 21296.34, "raissa_paloma": 35604.17, "silva_beatriz": 18541.19, "thais_c_ferreira": 2740.03, "thais_mayara": 10584.0, "thalia_thomaz": 7199.94, "thauany_moura": 13889.1},
+  acc14:  266446.4,
+  meta:   800000
+};
+const COMP_ABRIL = {
+  total: 529486.27,
+  by_day: {"1": 48862.91, "2": 22109.37, "3": 306.81, "5": 687.22, "6": 80396.73, "7": 83329.72, "8": 54934.23, "9": 90618.77, "10": 72601.54, "11": 11173.75, "12": 3670.6, "13": 60794.62},
+  by_eq:  {"COFEN BIRIGUI BRUNA": 108117.9, "COFEN BIRIGUI LUCIANO": 56711.03, "COFEN MARILIA BRENDA": 202499.07, "COFEN STEPHANIE 2° TURNO": 131013.76, "ELITE": 15490.25, "LIDERANÇA": 6162.93, "TIME DIGITAL": 164.76},
+  by_op:  {"AMABELLY_SANTOS": 11464.81, "ANA_BENTO": 8111.94, "BIANCA_V_SILVA": 14132.9, "BRENDA_FERREIRA": 915.42, "BRUNA_JUSTIMIANO": 5247.51, "CLEBER_JUNIOR": 9820.42, "DEBORA_ANDRIELLY": 449.03, "EDUARDO_SILVA": 3815.53, "FRANCISCA_BRITO": 14032.27, "GIOVANA_SOUZA": 11178.19, "HELENA_SANTOS": 251.65, "HELTON_ROLDON": 11822.69, "ISABELA_MONTEIRO": 4336.39, "JHONATA_NASCIMENTO": 5669.83, "JOAO_MIRANDA": 2132.02, "KAROLAINE_SILVA": 21950.93, "LEONARDO_NUNES": 8959.83, "LYVIA_DIAS": 6415.57, "MARIA_BRAIDOTI": 3832.35, "MARIA_MOREIRASANTOS": 14356.74, "MARIA_RODARTE": 4602.02, "MATHEUS_SOUZA": 25690.3, "MAYSA_OLIVEIRA": 12243.26, "NAYARA_CRUZ": 164.76, "RAFAELA_MINHOTO": 6090.26, "RENATARODRIGUES": 14634.18, "STEPHANIE_FAGUNDES": 35735.15, "THAYRA_FERREIRASILVA": 5438.36, "aline_pupim": 21417.38, "caio_shimite": 23217.19, "carulini_santos": 6682.53, "geovanna_almeida": 16225.12, "itallo_cardamoni": 24749.69, "jussara_pereira": 17520.95, "katia_regina": 25076.94, "kauane_azevedo": 16464.37, "larissa_santana": 4312.12, "leticia_romeu": 21094.43, "pagueplay": 5470.75, "raissa_paloma": 20280.94, "silva_beatriz": 21414.19, "thais_c_ferreira": 3855.82, "thais_mayara": 9335.23, "thalia_thomaz": 4860.45, "thauany_moura": 24013.86},
+  acc14:  529486.27,
+  meta:   800000
+};
+const COMP_OPS_LIST = ["STEPHANIE_FAGUNDES", "MATHEUS_SOUZA", "katia_regina", "itallo_cardamoni", "thauany_moura", "caio_shimite", "KAROLAINE_SILVA", "aline_pupim", "silva_beatriz", "leticia_romeu", "raissa_paloma", "jussara_pereira", "kauane_azevedo", "geovanna_almeida", "RENATARODRIGUES", "MARIA_MOREIRASANTOS", "BIANCA_V_SILVA", "FRANCISCA_BRITO", "MAYSA_OLIVEIRA", "HELTON_ROLDON"];
+
 const ORIG = {"global":{"total":529268.02,"pp":106472.0,"coren":240077.08,"cofen":80026.32,"daily":{"1":48405.33,"2":23084.24,"3":613.13,"6":80151.77,"7":83229.25,"8":53433.79,"9":91674.35,"10":72426.34,"11":10465.05,"13":57408.61,"4":1727.96,"12":6040.2,"5":608.0}},"equipes":[{"name":"COFEN MARILIA BRENDA","rec":212485.19,"ho":53121.3,"n_op":14,"acordos":306,"ops":[{"name":"STEPHANIE_FAGUNDES","rec":35735.15,"ho":8933.79,"acordos":73,"ligacoes":73,"med_atraso":1741.0,"med_lig_baixa":2.6,"daily":{"1":3537.92,"2":247.02,"3":306.81,"6":2549.46,"7":8488.56,"8":2615.46,"9":4820.9,"10":3831.64,"11":278.42,"13":9058.96},"tipos":{"BOLETO NEGOCIAÇÃO":3794.16,"CARTÃO DE CRÉDITO":12355.92,"PIX":4770.48},"n_ag":132,"val_ag":5854.82,"gerados":93,"pagos":21,"avista":5,"ate3dias":7,"mais3dias":9,"ticket":996.22,"media_dias":5.9,"pendentes":72,"agendados":72,"eficiencia":22.6,"ag_futuro":{"2026-04-07":3,"2026-04-09":8,"2026-04-10":19,"2026-04-11":8,"2026-04-12":5,"2026-04-13":1,"2026-04-16":8,"2026-04-17":6,"2026-04-18":6,"2026-04-19":5,"2026-04-20":10,"2026-04-22":2,"2026-04-23":9,"2026-04-25":3,"2026-04-29":1,"2026-04-30":8,"2026-05-01":1,"2026-05-03":2,"2026-05-05":1,"2026-05-06":1,"2026-05-07":1,"2026-05-09":1,"2026-05-10":20,"2026-05-13":1,"2026-05-23":2}},{"name":"raissa_paloma","rec":20280.94,"ho":5070.24,"acordos":25,"ligacoes":25,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":8279.38,"2":374.41,"6":1317.05,"7":924.14,"8":212.24,"9":5170.67,"10":3415.14,"11":587.91},"tipos":{"Boleto":1847.01,"Cartão Padrão":7850.88,"Pix":374.41},"n_ag":59,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":402.89,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":3,"2026-04-09":16,"2026-04-10":2,"2026-04-11":6,"2026-04-12":3,"2026-04-15":1,"2026-04-16":1,"2026-04-17":2,"2026-04-18":2,"2026-04-19":5,"2026-04-20":1,"2026-04-22":1,"2026-04-25":2,"2026-04-27":2,"2026-04-30":1,"2026-05-02":1,"2026-05-05":1,"2026-05-08":1,"2026-05-09":2,"2026-05-10":3,"2026-05-20":1}},{"name":"itallo_cardamoni","rec":24749.69,"ho":6187.42,"acordos":22,"ligacoes":22,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":4995.29,"2":1067.76,"6":2682.45,"7":1002.9,"8":4952.01,"9":1257.41,"10":3675.97,"11":774.16,"13":4341.74},"tipos":{"Boleto":88.43,"Cartão Padrão":3801.4,"Pix":4999.7},"n_ag":39,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":404.07,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":3,"2026-04-08":1,"2026-04-09":3,"2026-04-10":8,"2026-04-11":1,"2026-04-12":2,"2026-04-16":3,"2026-04-17":2,"2026-04-18":2,"2026-04-19":2,"2026-04-20":3,"2026-04-22":1,"2026-04-27":1,"2026-05-05":1,"2026-05-09":1,"2026-05-13":1,"2026-05-14":1,"2026-05-18":1,"2026-05-20":1,"2026-05-23":1}},{"name":"silva_beatriz","rec":21414.19,"ho":5353.55,"acordos":43,"ligacoes":43,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":899.45,"2":729.6,"6":5499.68,"7":4889.26,"8":2838.93,"9":3436.4,"10":2785.49,"13":335.38},"tipos":{"Boleto":1790.17,"Cartão Padrão":4725.91,"Pix":612.65},"n_ag":74,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":165.78,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-09":1,"2026-04-10":7,"2026-04-11":17,"2026-04-13":3,"2026-04-14":1,"2026-04-16":2,"2026-04-17":7,"2026-04-18":3,"2026-04-19":2,"2026-04-20":4,"2026-04-21":1,"2026-04-23":3,"2026-04-25":2,"2026-04-26":1,"2026-04-27":1,"2026-04-30":9,"2026-05-10":8}},{"name":"caio_shimite","rec":23217.19,"ho":5804.3,"acordos":15,"ligacoes":15,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":257.15,"2":380.64,"6":3927.79,"7":3808.67,"8":2706.02,"9":9437.98,"10":1882.67,"13":816.27},"tipos":{"Boleto":1016.84,"Cartão Padrão":1492.87,"Pix":4121.85},"n_ag":124,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":442.1,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-09":1,"2026-04-10":11,"2026-04-12":1,"2026-04-14":5,"2026-04-16":4,"2026-04-17":13,"2026-04-18":1,"2026-04-20":13,"2026-04-22":3,"2026-04-23":2,"2026-04-24":1,"2026-04-25":6,"2026-04-26":1,"2026-04-27":3,"2026-04-28":1,"2026-04-30":33,"2026-05-01":1,"2026-05-05":4,"2026-05-08":1,"2026-05-09":1,"2026-05-10":4,"2026-05-11":1,"2026-05-12":1,"2026-05-15":8,"2026-05-22":2,"2026-05-25":1}},{"name":"BIANCA_V_SILVA","rec":14132.9,"ho":3533.22,"acordos":31,"ligacoes":31,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1432.51,"2":578.86,"6":4196.78,"7":4464.52,"8":602.89,"9":1596.02,"10":879.71,"11":381.61},"tipos":{"Boleto":357.85,"Cartão Padrão":5271.44,"Pix":795.14},"n_ag":75,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":207.24,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":1,"2026-04-09":5,"2026-04-10":7,"2026-04-11":4,"2026-04-14":1,"2026-04-15":5,"2026-04-16":3,"2026-04-17":2,"2026-04-18":4,"2026-04-19":3,"2026-04-21":2,"2026-04-22":5,"2026-04-23":1,"2026-04-24":2,"2026-04-28":1,"2026-04-29":2,"2026-04-30":3,"2026-05-06":4,"2026-05-07":2,"2026-05-09":10,"2026-05-12":1,"2026-05-14":1,"2026-05-19":1,"2026-05-20":2,"2026-05-24":1}},{"name":"GIOVANA_SOUZA","rec":11178.19,"ho":2794.55,"acordos":11,"ligacoes":11,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":335.61,"2":468.94,"6":4095.18,"7":748.49,"8":1330.13,"9":1177.29,"10":208.02,"11":284.63,"13":2529.9},"tipos":{"Boleto":4279.93,"Pix":958.28},"n_ag":107,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":476.2,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":3,"2026-04-10":12,"2026-04-11":12,"2026-04-12":3,"2026-04-13":1,"2026-04-16":12,"2026-04-17":1,"2026-04-18":4,"2026-04-19":9,"2026-04-20":7,"2026-04-21":3,"2026-04-23":5,"2026-04-24":1,"2026-04-25":1,"2026-04-27":1,"2026-04-30":3,"2026-05-02":1,"2026-05-04":1,"2026-05-05":2,"2026-05-07":1,"2026-05-08":2,"2026-05-09":3,"2026-05-10":17,"2026-05-21":1,"2026-05-28":1}},{"name":"thauany_moura","rec":24013.86,"ho":6003.46,"acordos":9,"ligacoes":9,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":402.95,"2":982.69,"6":2410.26,"7":2393.72,"8":2005.73,"9":6234.17,"10":555.65,"11":2273.46,"13":6755.23},"tipos":{"Boleto":1233.73,"Cartão Padrão":961.93,"Pix":2562.17},"n_ag":50,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":528.65,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-08":1,"2026-04-09":1,"2026-04-10":18,"2026-04-11":1,"2026-04-15":3,"2026-04-16":3,"2026-04-17":1,"2026-04-18":7,"2026-04-19":1,"2026-04-20":1,"2026-04-21":1,"2026-04-22":1,"2026-04-23":3,"2026-04-24":1,"2026-04-30":2,"2026-05-01":1,"2026-05-05":1,"2026-05-10":1,"2026-05-15":1,"2026-05-23":1}},{"name":"felipe_arruda","rec":4645.36,"ho":1161.34,"acordos":7,"ligacoes":7,"med_atraso":2298.0,"med_lig_baixa":1.9,"daily":{"4":1727.96,"6":488.6,"11":271.44,"12":1668.76,"13":488.6},"tipos":{"BOLETO NEGOCIAÇÃO":1792.32,"CARTÃO DE CRÉDITO":424.24,"PIX":2428.8},"n_ag":1,"val_ag":341.87,"gerados":9,"pagos":2,"avista":0,"ate3dias":2,"mais3dias":0,"ticket":2322.68,"media_dias":1.0,"pendentes":7,"agendados":7,"eficiencia":22.2,"ag_futuro":{"2026-03-20":1,"2026-03-26":1,"2026-03-31":5}},{"name":"carulini_santos","rec":6682.53,"ho":1670.63,"acordos":29,"ligacoes":29,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1327.21,"2":216.9,"6":2536.5,"7":874.07,"9":1727.85},"tipos":{"Boleto":587.13,"Cartão Padrão":3067.98,"Pix":553.83},"n_ag":28,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":145.14,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-08":2,"2026-04-09":1,"2026-04-10":3,"2026-04-11":5,"2026-04-12":1,"2026-04-16":3,"2026-04-17":1,"2026-04-18":1,"2026-04-20":1,"2026-05-04":1,"2026-05-06":2,"2026-05-08":1,"2026-05-09":1,"2026-05-11":2,"2026-05-13":2}},{"name":"KELY_SILVA","rec":4047.6,"ho":1011.9,"acordos":21,"ligacoes":21,"med_atraso":1091.0,"med_lig_baixa":3.5,"daily":{"2":1360.96,"3":306.32,"9":1259.76,"10":419.72,"12":700.84},"tipos":{"BOLETO NEGOCIAÇÃO":1523.8,"CARTÃO DE CRÉDITO":986.24,"PIX":1537.56},"n_ag":3,"val_ag":634.78,"gerados":2,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":1,"ticket":4047.6,"media_dias":30.0,"pendentes":1,"agendados":1,"eficiencia":50.0,"ag_futuro":{"2026-03-19":1}},{"name":"leticia_romeu","rec":21094.43,"ho":5273.61,"acordos":14,"ligacoes":14,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1011.67,"6":2790.24,"7":1161.14,"8":4701.45,"9":4839.56,"10":2622.06,"13":3968.31},"tipos":{"Boleto":1011.67,"Cartão Padrão":1062.87,"Pix":1727.37},"n_ag":82,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":271.56,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-09":1,"2026-04-10":13,"2026-04-11":14,"2026-04-13":1,"2026-04-15":1,"2026-04-16":2,"2026-04-17":3,"2026-04-18":5,"2026-04-19":5,"2026-04-20":7,"2026-04-21":1,"2026-04-23":3,"2026-04-26":1,"2026-04-30":8,"2026-05-09":2,"2026-05-10":5,"2026-05-11":1,"2026-05-15":1,"2026-05-19":2,"2026-05-22":2,"2026-05-23":1,"2026-05-24":1}},{"name":"BRENDA_FERREIRA","rec":915.42,"ho":228.85,"acordos":4,"ligacoes":4,"med_atraso":1894.0,"med_lig_baixa":1.0,"daily":{"1":320.65,"6":90.41,"13":504.36},"tipos":{"BOLETO NEGOCIAÇÃO":504.04,"CARTÃO DE CRÉDITO":1533.64},"n_ag":9,"val_ag":0,"eq":"COFEN MARILIA BRENDA","gerados":4,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":4,"agendados":4,"eficiencia":0.0,"ag_futuro":{"2026-04-10":1,"2026-04-20":1,"2026-04-30":2,"2026-05-10":4,"2026-05-11":1}},{"name":"JESSICA_O_SILVA","rec":377.74,"ho":94.44,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":286.53,"6":91.21},"tipos":{"Boleto":377.74},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":188.87,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}}]},{"name":"COFEN BIRIGUI BRUNA","rec":113365.41,"ho":28341.34,"n_op":10,"acordos":88,"ops":[{"name":"HELTON_ROLDON","rec":11822.69,"ho":2955.67,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":5941.24,"6":384.62,"7":3312.87,"9":2183.96},"tipos":{"Boleto":5974.14,"Pix":408.85},"n_ag":57,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":1276.6,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-08":1,"2026-04-09":3,"2026-04-10":5,"2026-04-11":5,"2026-04-13":3,"2026-04-14":1,"2026-04-16":3,"2026-04-17":4,"2026-04-18":3,"2026-04-20":5,"2026-04-21":3,"2026-04-22":5,"2026-04-23":2,"2026-04-24":2,"2026-04-25":1,"2026-04-27":1,"2026-04-30":2,"2026-05-01":1,"2026-05-05":1,"2026-05-11":2,"2026-05-15":1,"2026-05-22":2}},{"name":"MAYSA_OLIVEIRA","rec":12243.26,"ho":3060.81,"acordos":18,"ligacoes":18,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":3394.69,"2":1382.62,"6":849.72,"7":2070.08,"8":766.14,"9":2575.46,"10":610.05,"13":594.5},"tipos":{"Boleto":3674.2,"Cartão Padrão":1382.62,"Pix":748.21},"n_ag":59,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":322.5,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-09":3,"2026-04-10":7,"2026-04-13":3,"2026-04-14":6,"2026-04-16":3,"2026-04-20":4,"2026-04-21":2,"2026-04-22":6,"2026-04-23":1,"2026-04-25":1,"2026-04-27":4,"2026-04-29":1,"2026-05-04":3,"2026-05-05":2,"2026-05-10":1,"2026-05-11":1,"2026-05-12":4,"2026-05-15":1,"2026-05-18":2,"2026-05-19":1,"2026-05-20":1,"2026-05-22":1}},{"name":"RENATARODRIGUES","rec":14634.18,"ho":3658.54,"acordos":3,"ligacoes":3,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":4889.3,"7":4711.73,"8":334.63,"9":2609.8,"10":1639.66,"13":449.06},"tipos":{"Boleto":934.14,"Cartão Padrão":3955.16},"n_ag":107,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":1629.77,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-08":1,"2026-04-09":1,"2026-04-10":10,"2026-04-13":10,"2026-04-16":6,"2026-04-17":4,"2026-04-20":12,"2026-04-21":5,"2026-04-23":4,"2026-04-24":1,"2026-04-27":1,"2026-04-28":1,"2026-04-30":30,"2026-05-01":17,"2026-05-08":1,"2026-05-11":2}},{"name":"MATHEUS_SOUZA","rec":25690.3,"ho":6422.57,"acordos":27,"ligacoes":27,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1348.02,"2":2213.58,"7":7891.94,"8":478.85,"9":5952.06,"10":5571.41,"13":2234.44},"tipos":{"Boleto":1712.13,"Cartão Padrão":1477.34,"Pix":444.71},"n_ag":42,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":134.6,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":2,"2026-04-09":4,"2026-04-10":6,"2026-04-13":2,"2026-04-17":5,"2026-04-20":7,"2026-04-23":3,"2026-04-30":2,"2026-05-01":7,"2026-05-04":1,"2026-05-12":1}},{"name":"LYVIA_DIAS","rec":6415.57,"ho":1603.89,"acordos":14,"ligacoes":14,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1680.76,"6":280.07,"7":273.4,"8":1983.13,"9":1227.49,"10":719.46,"13":251.26},"tipos":{"Boleto":257.04,"Cartão Padrão":954.51,"Pix":1534.17},"n_ag":60,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":196.12,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":1,"2026-04-09":1,"2026-04-10":9,"2026-04-11":5,"2026-04-13":5,"2026-04-15":1,"2026-04-16":1,"2026-04-17":4,"2026-04-20":2,"2026-04-23":6,"2026-04-27":5,"2026-04-30":5,"2026-05-02":2,"2026-05-08":1,"2026-05-11":7,"2026-05-24":1,"2026-05-25":1,"2026-05-26":1}},{"name":"KAROLAINE_SILVA","rec":21950.93,"ho":5487.73,"acordos":8,"ligacoes":8,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":102.62,"6":1737.55,"7":202.17,"8":3233.68,"9":7896.54,"10":5856.3,"13":2922.07},"tipos":{"Cartão Padrão":1452.96,"Pix":387.21},"n_ag":72,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":230.02,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-08":1,"2026-04-09":3,"2026-04-10":2,"2026-04-11":2,"2026-04-12":4,"2026-04-13":1,"2026-04-16":1,"2026-04-17":1,"2026-04-18":7,"2026-04-19":7,"2026-04-20":9,"2026-04-23":4,"2026-04-25":2,"2026-04-29":2,"2026-04-30":5,"2026-05-01":6,"2026-05-05":1,"2026-05-06":1,"2026-05-07":1,"2026-05-09":4,"2026-05-10":6,"2026-05-22":1}},{"name":"MARIA_BRAIDOTI","rec":3832.35,"ho":958.09,"acordos":9,"ligacoes":9,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":526.62,"5":608.0,"7":2164.33,"10":533.4},"tipos":{"Boleto":80.91,"Cartão Padrão":608.0,"Pix":605.84},"n_ag":24,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":143.86,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-09":1,"2026-04-11":2,"2026-04-13":1,"2026-04-15":1,"2026-04-16":4,"2026-04-18":1,"2026-04-21":3,"2026-04-23":1,"2026-04-29":1,"2026-04-30":1,"2026-05-01":2,"2026-05-20":3,"2026-05-22":1}},{"name":"THAYRA_FERREIRASILVA","rec":5438.36,"ho":1359.59,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":578.86,"8":1524.21,"9":444.45,"10":2136.74,"12":574.1,"13":180.0},"tipos":{"Pix":578.86},"n_ag":44,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":578.86,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-10":3,"2026-04-11":11,"2026-04-12":1,"2026-04-16":1,"2026-04-17":2,"2026-04-19":1,"2026-04-20":4,"2026-04-21":6,"2026-04-22":2,"2026-04-23":1,"2026-04-25":1,"2026-04-26":2,"2026-04-27":4,"2026-04-29":1,"2026-05-10":1,"2026-05-11":1,"2026-05-16":1}},{"name":"RAFAELA_MINHOTO","rec":6090.26,"ho":1522.57,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":155.01,"6":158.16,"7":2602.8,"8":820.8,"10":539.55,"11":1813.94},"tipos":{"Pix":313.17},"n_ag":36,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":156.58,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-09":1,"2026-04-10":6,"2026-04-14":1,"2026-04-15":1,"2026-04-16":3,"2026-04-17":3,"2026-04-20":10,"2026-04-21":1,"2026-04-27":1,"2026-04-30":1,"2026-05-08":1,"2026-05-11":6,"2026-05-18":1}},{"name":"BRUNA_JUSTIMIANO","rec":5247.51,"ho":1311.88,"acordos":1,"ligacoes":1,"med_atraso":2537.0,"med_lig_baixa":0.0,"daily":{"1":5247.51},"tipos":{"PIX":123.76},"n_ag":0,"val_ag":0,"eq":"COFEN BIRIGUI BRUNA","gerados":1,"pagos":1,"avista":1,"ate3dias":0,"mais3dias":0,"ticket":123.76,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":100.0,"ag_futuro":{}}]},{"name":"COFEN STEPHANIE 2° TURNO","rec":134869.58,"ho":33717.39,"n_op":11,"acordos":188,"ops":[{"name":"larissa_santana","rec":4312.12,"ho":1078.03,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":642.78,"7":1943.1,"8":429.72,"9":296.37,"13":1000.15},"tipos":{"Boleto":642.78},"n_ag":38,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":321.39,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-10":2,"2026-04-12":1,"2026-04-16":3,"2026-04-17":1,"2026-04-19":2,"2026-04-20":1,"2026-04-30":3,"2026-05-04":6,"2026-05-06":4,"2026-05-10":7,"2026-05-11":7,"2026-05-12":1}},{"name":"jussara_pereira","rec":17520.95,"ho":4380.24,"acordos":8,"ligacoes":8,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1161.14,"2":660.31,"6":2410.89,"7":5943.8,"8":2765.19,"9":2335.37,"10":980.27,"13":1263.98},"tipos":{"Boleto":2247.86,"Cartão Padrão":1324.17,"Pix":660.31},"n_ag":55,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":529.04,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":3,"2026-04-09":2,"2026-04-10":2,"2026-04-17":1,"2026-04-23":2,"2026-04-24":1,"2026-04-25":1,"2026-04-29":1,"2026-04-30":39,"2026-05-02":1,"2026-05-08":1,"2026-05-17":1}},{"name":"aline_pupim","rec":21417.38,"ho":5354.34,"acordos":50,"ligacoes":50,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":3522.02,"2":3500.46,"6":6419.93,"7":2373.18,"8":2535.37,"10":1135.69,"13":1930.73},"tipos":{"Boleto":2444.38,"Cartão Padrão":9187.57,"Pix":4227.5},"n_ag":73,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":317.19,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":4,"2026-04-08":1,"2026-04-09":4,"2026-04-10":8,"2026-04-11":2,"2026-04-13":2,"2026-04-15":2,"2026-04-16":4,"2026-04-17":2,"2026-04-18":1,"2026-04-20":6,"2026-04-21":1,"2026-04-23":2,"2026-04-24":1,"2026-04-25":1,"2026-04-26":1,"2026-04-27":1,"2026-04-29":2,"2026-04-30":6,"2026-05-02":2,"2026-05-04":2,"2026-05-07":3,"2026-05-10":9,"2026-05-11":4,"2026-05-14":1,"2026-05-15":1}},{"name":"thais_mayara","rec":9335.23,"ho":2333.81,"acordos":3,"ligacoes":3,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":174.24,"6":216.72,"7":1998.67,"8":1091.01,"9":3474.3,"10":2380.29},"tipos":{"Boleto":390.96,"Pix":546.88},"n_ag":39,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":312.61,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":2,"2026-04-09":4,"2026-04-10":6,"2026-04-11":2,"2026-04-12":1,"2026-04-15":4,"2026-04-16":1,"2026-04-17":2,"2026-04-18":1,"2026-04-19":1,"2026-04-20":1,"2026-04-23":4,"2026-04-24":2,"2026-05-04":1,"2026-05-10":5}},{"name":"geovanna_almeida","rec":16225.12,"ho":4056.28,"acordos":19,"ligacoes":19,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":87.15,"6":5815.24,"7":225.51,"9":982.11,"10":4981.59,"13":4133.52},"tipos":{"Boleto":1551.81,"Cartão Padrão":1943.3,"Pix":2672.17},"n_ag":113,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":324.59,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":1,"2026-04-09":5,"2026-04-10":9,"2026-04-11":1,"2026-04-12":1,"2026-04-15":1,"2026-04-16":3,"2026-04-17":6,"2026-04-18":2,"2026-04-19":5,"2026-04-20":3,"2026-04-21":1,"2026-04-22":1,"2026-04-23":8,"2026-04-25":1,"2026-04-29":1,"2026-04-30":3,"2026-05-02":1,"2026-05-03":1,"2026-05-05":5,"2026-05-06":12,"2026-05-07":6,"2026-05-08":2,"2026-05-09":1,"2026-05-10":10,"2026-05-13":4,"2026-05-14":1,"2026-05-15":1,"2026-05-16":1,"2026-05-19":1,"2026-05-20":1,"2026-05-22":8,"2026-05-24":4}},{"name":"ISABELA_MONTEIRO","rec":4336.39,"ho":1084.1,"acordos":16,"ligacoes":16,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1903.35,"6":748.45,"7":251.88,"8":1382.09,"13":50.62},"tipos":{"Boleto":610.69,"Cartão Padrão":1347.03,"Pix":748.45},"n_ag":45,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":169.14,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-09":1,"2026-04-10":4,"2026-04-11":1,"2026-04-13":2,"2026-04-16":4,"2026-04-17":2,"2026-04-19":1,"2026-04-23":1,"2026-04-24":4,"2026-04-25":3,"2026-04-26":1,"2026-04-30":1,"2026-05-04":1,"2026-05-05":2,"2026-05-06":4,"2026-05-10":2,"2026-05-11":7,"2026-05-12":1,"2026-05-18":3}},{"name":"thalia_thomaz","rec":4860.45,"ho":1215.11,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":204.83,"6":4411.86,"8":243.76},"tipos":{"Boleto":312.83,"Pix":4411.86},"n_ag":30,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":944.94,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-10":7,"2026-04-13":1,"2026-04-14":1,"2026-04-15":1,"2026-04-16":8,"2026-04-17":2,"2026-04-30":2,"2026-05-06":4,"2026-05-10":2,"2026-05-20":1}},{"name":"katia_regina","rec":25076.94,"ho":6269.23,"acordos":52,"ligacoes":52,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":279.18,"2":403.96,"6":8904.5,"7":6890.86,"8":2435.68,"9":1030.65,"10":766.97,"13":4365.14},"tipos":{"Boleto":106.0,"Cartão Padrão":7680.2,"Pix":1801.44},"n_ag":54,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":184.38,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-10":5,"2026-04-11":1,"2026-04-16":11,"2026-04-17":4,"2026-04-18":1,"2026-04-20":3,"2026-04-23":2,"2026-04-24":1,"2026-04-30":4,"2026-05-05":1,"2026-05-07":1,"2026-05-08":1,"2026-05-09":10,"2026-05-10":1,"2026-05-17":2,"2026-05-18":1,"2026-05-19":1,"2026-05-22":2,"2026-05-27":1}},{"name":"kauane_azevedo","rec":16464.37,"ho":4116.09,"acordos":23,"ligacoes":23,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":62.65,"2":442.87,"6":4831.06,"7":931.23,"8":1588.21,"9":3365.9,"10":3657.43,"13":1585.02},"tipos":{"Boleto":2175.7,"Cartão Padrão":4647.67,"Pix":307.44},"n_ag":53,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":310.04,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":5,"2026-04-09":2,"2026-04-10":6,"2026-04-11":2,"2026-04-12":1,"2026-04-13":3,"2026-04-15":1,"2026-04-16":1,"2026-04-18":4,"2026-04-19":2,"2026-04-20":2,"2026-04-23":6,"2026-04-24":1,"2026-04-30":4,"2026-05-01":4,"2026-05-10":5,"2026-05-11":3,"2026-05-20":1}},{"name":"thais_c_ferreira","rec":3855.82,"ho":963.96,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1437.3,"6":1106.36,"7":1312.16},"tipos":{"Pix":2543.66},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":508.73,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"AMABELLY_SANTOS","rec":11464.81,"ho":2866.2,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":961.93,"6":742.79,"8":4045.7,"9":4927.01,"10":589.16,"13":198.22},"tipos":{"Boleto":325.67,"Cartão Padrão":961.93,"Pix":417.12},"n_ag":54,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":340.94,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":2,"2026-04-09":4,"2026-04-10":5,"2026-04-11":3,"2026-04-16":8,"2026-04-17":2,"2026-04-19":3,"2026-04-20":9,"2026-04-21":1,"2026-04-23":2,"2026-04-24":1,"2026-04-27":3,"2026-05-02":1,"2026-05-03":1,"2026-05-04":1,"2026-05-10":2,"2026-05-11":1,"2026-05-20":3}}]},{"name":"COFEN BIRIGUI LUCIANO","rec":53517.0,"ho":13379.24,"n_op":10,"acordos":43,"ops":[{"name":"HELENA_SANTOS","rec":251.65,"ho":62.91,"acordos":2,"ligacoes":2,"med_atraso":3420.0,"med_lig_baixa":2.5,"daily":{"7":124.43,"13":127.22},"tipos":{"BOLETO NEGOCIAÇÃO":4900.8},"n_ag":43,"val_ag":0,"gerados":12,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":1,"ticket":4900.8,"media_dias":5.0,"pendentes":11,"agendados":11,"eficiencia":8.3,"ag_futuro":{"2026-04-08":1,"2026-04-09":1,"2026-04-10":16,"2026-04-13":1,"2026-04-16":1,"2026-04-20":3,"2026-04-21":1,"2026-04-22":1,"2026-04-23":1,"2026-04-24":2,"2026-04-27":6,"2026-05-01":1,"2026-05-10":1,"2026-05-11":3,"2026-05-12":3,"2026-05-13":1}},{"name":"ANA_BENTO","rec":4841.74,"ho":1210.43,"acordos":6,"ligacoes":6,"med_atraso":1187.0,"med_lig_baixa":2.5,"daily":{"1":773.63,"6":767.43,"7":366.85,"8":92.25,"9":1344.51,"10":583.52,"11":578.86,"13":334.69},"tipos":{"BOLETO NEGOCIAÇÃO":919.8,"PIX":1867.24},"n_ag":31,"val_ag":0,"gerados":19,"pagos":2,"avista":1,"ate3dias":1,"mais3dias":0,"ticket":1393.52,"media_dias":0.5,"pendentes":17,"agendados":17,"eficiencia":10.5,"ag_futuro":{"2026-04-07":2,"2026-04-10":3,"2026-04-13":2,"2026-04-14":1,"2026-04-15":1,"2026-04-16":1,"2026-04-20":4,"2026-04-21":1,"2026-04-22":1,"2026-04-23":1,"2026-04-24":1,"2026-04-25":5,"2026-04-27":1,"2026-04-28":2,"2026-04-30":1,"2026-05-01":1,"2026-05-05":1,"2026-05-06":1,"2026-05-11":1}},{"name":"MARIA_MOREIRASANTOS","rec":14356.74,"ho":3589.18,"acordos":7,"ligacoes":7,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1572.28,"6":252.03,"7":1535.18,"8":1210.65,"10":7242.37,"13":2544.23},"tipos":{"Boleto":428.75,"Cartão Padrão":1395.56},"n_ag":46,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":260.62,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":4,"2026-04-09":6,"2026-04-10":2,"2026-04-13":2,"2026-04-14":1,"2026-04-15":1,"2026-04-17":1,"2026-04-20":6,"2026-04-22":1,"2026-04-24":1,"2026-05-01":1,"2026-05-06":1,"2026-05-08":2,"2026-05-09":3,"2026-05-10":1,"2026-05-11":10,"2026-05-12":1}},{"name":"FRANCISCA_BRITO","rec":14032.27,"ho":3508.07,"acordos":4,"ligacoes":4,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":1716.4,"7":3501.93,"8":213.36,"9":508.33,"10":7246.37,"11":578.86,"13":267.02},"tipos":{"Boleto":758.18,"Cartão Padrão":958.22},"n_ag":32,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":429.1,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":4,"2026-04-08":1,"2026-04-10":2,"2026-04-11":4,"2026-04-14":1,"2026-04-17":2,"2026-04-18":2,"2026-04-20":1,"2026-04-21":1,"2026-04-22":1,"2026-04-23":1,"2026-04-24":1,"2026-04-27":1,"2026-04-29":1,"2026-05-06":1,"2026-05-11":3,"2026-05-12":5}},{"name":"DEBORA_ANDRIELLY","rec":449.03,"ho":112.26,"acordos":15,"ligacoes":15,"med_atraso":764.0,"med_lig_baixa":5.1,"daily":{"9":280.13,"11":168.9},"tipos":{"BOLETO NEGOCIAÇÃO":92.72,"CARTÃO DE CRÉDITO":1067.04,"PIX":299.68},"n_ag":40,"val_ag":1249.79,"gerados":19,"pagos":2,"avista":0,"ate3dias":2,"mais3dias":0,"ticket":729.72,"media_dias":2.0,"pendentes":17,"agendados":17,"eficiencia":10.5,"ag_futuro":{"2026-04-08":1,"2026-04-09":3,"2026-04-10":6,"2026-04-11":1,"2026-04-13":2,"2026-04-18":2,"2026-04-20":1,"2026-04-22":1,"2026-04-23":1,"2026-04-25":1,"2026-04-26":2,"2026-04-30":1,"2026-05-03":1,"2026-05-10":12,"2026-05-11":1,"2026-05-12":1,"2026-05-18":2,"2026-05-25":1}},{"name":"EDUARDO_SILVA","rec":3815.53,"ho":953.88,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":933.88,"7":222.37,"8":131.4,"9":774.24,"10":1753.64},"tipos":{"Pix":933.88},"n_ag":63,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":466.94,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-09":5,"2026-04-10":7,"2026-04-11":2,"2026-04-12":3,"2026-04-17":4,"2026-04-18":2,"2026-04-19":1,"2026-04-20":1,"2026-04-23":2,"2026-04-25":1,"2026-04-27":1,"2026-04-29":1,"2026-04-30":1,"2026-05-07":1,"2026-05-08":1,"2026-05-09":1,"2026-05-10":8,"2026-05-11":6,"2026-05-12":5,"2026-05-15":4,"2026-05-16":1,"2026-05-18":2,"2026-05-23":3}},{"name":"NAYARA_CRUZ","rec":164.76,"ho":41.19,"acordos":4,"ligacoes":4,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":164.76},"tipos":{"Cartão Padrão":437.4,"Pix":164.76},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":150.54,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"LEONARDO_NUNES","rec":8871.24,"ho":2217.81,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":381.61,"7":2200.61,"8":578.86,"9":1532.17,"13":4177.99},"tipos":{"Pix":381.61},"n_ag":39,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":381.61,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-09":1,"2026-04-10":3,"2026-04-11":2,"2026-04-13":1,"2026-04-16":3,"2026-04-17":3,"2026-04-18":1,"2026-04-20":1,"2026-04-21":4,"2026-04-23":2,"2026-04-26":1,"2026-04-27":1,"2026-04-30":2,"2026-05-10":11,"2026-05-12":3}},{"name":"MARIA_RODARTE","rec":4602.02,"ho":1150.51,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":178.07,"9":4423.95},"tipos":{"Boleto":178.07},"n_ag":5,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":178.07,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-08":1,"2026-04-17":1,"2026-04-20":1,"2026-04-23":1,"2026-04-29":1}},{"name":"JOAO_MIRANDA","rec":2132.02,"ho":533.0,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"8":1858.62,"9":273.4},"tipos":{"Boleto":82.73},"n_ag":11,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":82.73,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":1,"2026-04-09":1,"2026-04-10":1,"2026-04-11":2,"2026-04-20":3,"2026-05-05":1}}]},{"name":"ELITE","rec":15030.84,"ho":3757.71,"n_op":2,"acordos":120,"ops":[{"name":"CLEBER_JUNIOR","rec":9820.42,"ho":2455.1,"acordos":83,"ligacoes":83,"med_atraso":2032.0,"med_lig_baixa":0.2,"daily":{"2":235.97,"8":1725.62,"9":275.28,"10":3226.4,"11":1260.65,"12":3096.5},"tipos":{"BOLETO NEGOCIAÇÃO":1496.72,"CARTÃO DE CRÉDITO":11643.4,"PIX":1702.04},"n_ag":14,"val_ag":1929.26,"gerados":24,"pagos":13,"avista":11,"ate3dias":2,"mais3dias":0,"ticket":1141.7,"media_dias":0.2,"pendentes":11,"agendados":11,"eficiencia":54.2,"ag_futuro":{"2026-04-10":3,"2026-04-16":1,"2026-04-18":6,"2026-04-30":3,"2026-05-04":1}},{"name":"JHONATA_NASCIMENTO","rec":5210.42,"ho":1302.61,"acordos":37,"ligacoes":37,"med_atraso":1314.0,"med_lig_baixa":0.2,"daily":{"1":299.25,"6":273.4,"7":1422.7,"9":2002.86,"11":1212.21},"tipos":{"BOLETO NEGOCIAÇÃO":3013.64,"CARTÃO DE CRÉDITO":1189.12,"PIX":6952.32},"n_ag":10,"val_ag":761.3,"gerados":31,"pagos":18,"avista":11,"ate3dias":4,"mais3dias":3,"ticket":619.73,"media_dias":2.0,"pendentes":13,"agendados":13,"eficiencia":58.1,"ag_futuro":{"2026-04-16":1,"2026-04-21":1,"2026-04-24":1,"2026-04-25":3,"2026-04-26":1,"2026-04-30":2,"2026-05-01":1}},{"name":"fabio_aquino","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":0,"med_lig_baixa":0,"daily":{},"tipos":{},"n_ag":5,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0,"pendentes":0,"agendados":0,"eficiencia":0,"ag_futuro":{"2026-04-10":1,"2026-04-11":1,"2026-04-30":2,"2026-05-15":1}}]}]};
 
 // Working state — deep clone so edits don't corrupt original
@@ -2737,7 +2756,7 @@ function closeM(e){
 function go(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
-  ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos','calend','check'].forEach(p=>document.getElementById('pg-'+p).classList.remove('on'));
+  ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos','calend','check','comp'].forEach(p=>document.getElementById('pg-'+p).classList.remove('on'));
   document.getElementById('pg-'+id).classList.add('on');
   if(id==='geral'){mkGD();mkDist();buildDUManualGrid();}
   if(id==='editor') buildOpEditor();
@@ -2749,6 +2768,7 @@ function go(id,el){
   if(id==='acordos') acordosInit();
   if(id==='calend') calInit();
   if(id==='check') checkInit();
+  if(id==='comp') compInit();
 }
 
 // ── REFRESH ALL ──
@@ -6779,6 +6799,183 @@ setInterval(()=>{
   buildCal('cal-grid2');
 }, 30000);
 
+
+// ══════════════════════════════════════════════
+// COMPARATIVO MESES
+// ══════════════════════════════════════════════
+var compChartDaily = null;
+
+function compInit(){
+  compRenderHero();
+  compRenderMeta();
+  compRenderChart();
+  compRenderEquipes();
+  compRenderOps();
+}
+
+function compRenderHero(){
+  var el = document.getElementById('comp-hero-kpis');
+  if(!el) return;
+  var diffTotal = COMP_ABRIL.total - COMP_MARCO.total;
+  var pctTotal  = (COMP_ABRIL.total/COMP_MARCO.total - 1)*100;
+  var acc14Diff = COMP_ABRIL.acc14 - COMP_MARCO.acc14;
+  var acc14Pct  = (COMP_ABRIL.acc14/COMP_MARCO.acc14 - 1)*100;
+
+  function kpi(icon, label, val, sub, subColor){
+    return '<div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:var(--rm);padding:12px 18px;min-width:130px">'
+      +'<div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">'+icon+' '+label+'</div>'
+      +'<div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#fff;line-height:1.1">'+val+'</div>'
+      +'<div style="font-size:10px;font-weight:700;color:'+subColor+';margin-top:3px">'+sub+'</div>'
+      +'</div>';
+  }
+
+  var dTotColor = diffTotal>=0?'#4ADE80':'#F87171';
+  var d14Color  = acc14Diff>=0?'#4ADE80':'#F87171';
+  el.innerHTML =
+    kpi('📅','Março (mês completo)', fRK(COMP_MARCO.total), (COMP_MARCO.total/COMP_MARCO.meta*100).toFixed(1)+'% da meta', '#67E8F9')
+   +kpi('🗓️','Abril (14 dias)', fRK(COMP_ABRIL.total), (COMP_ABRIL.total/COMP_ABRIL.meta*100).toFixed(1)+'% da meta', '#4ADE80')
+   +kpi('📊','Acum. D1–D14 Março', fRK(COMP_MARCO.acc14), 'base de comparação', '#FCD34D')
+   +kpi('⚡','Acum. D1–D14 Abril', fRK(COMP_ABRIL.acc14), (acc14Pct>=0?'+':'')+acc14Pct.toFixed(1)+'% vs Março', d14Color)
+   +kpi('🔮','Projeção Abril (30d)', fRK(COMP_ABRIL.total/14*20), 'estimativa linear 20 DU', '#C4B5FD');
+}
+
+function compRenderMeta(){
+  var el = document.getElementById('comp-meta-bars');
+  if(!el) return;
+  function bar(label, val, meta, color, sub){
+    var pct = Math.min(100, val/meta*100);
+    var falta = Math.max(0, meta-val);
+    return '<div style="margin-bottom:14px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">'
+      +'<div style="font-size:13px;font-weight:800;color:var(--g900)">'+label+'</div>'
+      +'<div style="display:flex;gap:12px;align-items:center">'
+      +'<span style="font-size:11px;font-weight:700;color:var(--g500)">'+sub+'</span>'
+      +'<span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:'+color+'">'+fRK(val)+'</span>'
+      +'<span style="font-size:11px;font-weight:700;color:var(--g500)">'+pct.toFixed(1)+'%</span>'
+      +(falta>0?'<span style="font-size:11px;color:var(--g500)">falta '+fRK(falta)+'</span>':'<span style="font-size:11px;font-weight:800;color:#22C55E">✅ META</span>')
+      +'</div></div>'
+      +'<div style="background:var(--g100);border-radius:100px;height:14px;overflow:hidden">'
+      +'<div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:100px;transition:width .8s ease"></div>'
+      +'</div>'
+      +'</div>';
+  }
+  var projAbr = COMP_ABRIL.total/14*20;
+  el.innerHTML =
+    bar('Março 2026 — Fechamento', COMP_MARCO.total, COMP_MARCO.meta, '#3B82F6', 'mês completo (31 dias)')
+   +bar('Abril 2026 — Parcial (14 dias)', COMP_ABRIL.total, COMP_ABRIL.meta, '#00A86B', 'parcial')
+   +bar('Abril 2026 — Projeção linear (20 DU)', projAbr, COMP_ABRIL.meta, '#8B5CF6', 'estimativa');
+}
+
+function compRenderChart(){
+  var canvas = document.getElementById('comp-chart-daily');
+  if(!canvas) return;
+  if(compChartDaily){ compChartDaily.destroy(); compChartDaily=null; }
+
+  var dias = Array.from({length:31}, function(_,i){ return i+1; });
+  var marData = dias.map(function(d){ return COMP_MARCO.by_day[String(d)]||0; });
+  var abrData = dias.map(function(d){ return COMP_ABRIL.by_day[String(d)]||0; });
+
+  compChartDaily = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: dias.map(function(d){ return 'D'+d; }),
+      datasets: [
+        { label:'Março', data: marData, backgroundColor:'rgba(59,130,246,.55)', borderColor:'#3B82F6', borderWidth:1.5, borderRadius:3, borderSkipped:false },
+        { label:'Abril', data: abrData, backgroundColor:'rgba(0,168,107,.6)',   borderColor:'#00A86B', borderWidth:1.5, borderRadius:3, borderSkipped:false }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:function(ctx){ return ctx.dataset.label+': '+fRK(ctx.parsed.y); }}}
+      },
+      scales:{
+        x:{ grid:{display:false}, ticks:{font:{size:9}} },
+        y:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:9}, callback:function(v){ return 'R$'+(v/1000).toFixed(0)+'k'; }}}
+      }
+    }
+  });
+}
+
+function compRenderEquipes(){
+  var el = document.getElementById('comp-equipes');
+  if(!el) return;
+  var eqs = Object.keys(Object.assign({}, COMP_MARCO.by_eq, COMP_ABRIL.by_eq)).filter(function(k){
+    return k && k!=='nan';
+  }).sort(function(a,b){ return (COMP_ABRIL.by_eq[b]||0)-(COMP_ABRIL.by_eq[a]||0); });
+
+  var rows = eqs.map(function(eq){
+    var cfg = EQ[eq]||{c:'#888', sh:eq, ico:'📌'};
+    var mar = COMP_MARCO.by_eq[eq]||0;
+    var abr = COMP_ABRIL.by_eq[eq]||0;
+    var diff = abr - mar;
+    var pct = mar>0 ? (abr/mar-1)*100 : 0;
+    var pctColor = diff>=0?'#22C55E':'#EF4444';
+    var pctIcon = diff>=0?'▲':'▼';
+    var maxVal = Math.max(COMP_MARCO.total, COMP_ABRIL.total) * 0.5;
+    var marW = Math.round(mar/maxVal*100);
+    var abrW = Math.round(abr/maxVal*100);
+
+    return '<div style="padding:12px 16px;border-bottom:1px solid var(--g100)">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<div style="width:10px;height:10px;border-radius:2px;background:'+cfg.c+'"></div>'
+      +'<span style="font-size:13px;font-weight:800;color:var(--g900)">'+cfg.sh+'</span>'
+      +'</div>'
+      +'<div style="display:flex;gap:16px;align-items:center">'
+      +'<div style="text-align:right"><div style="font-size:10px;color:var(--g500)">Março</div><div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:#3B82F6">'+fRK(mar)+'</div></div>'
+      +'<div style="text-align:right"><div style="font-size:10px;color:var(--g500)">Abril (14d)</div><div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:#00A86B">'+fRK(abr)+'</div></div>'
+      +'<div style="text-align:right;min-width:70px"><div style="font-size:10px;color:var(--g500)">Variação</div><div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:'+pctColor+'">'+pctIcon+' '+Math.abs(pct).toFixed(1)+'%</div></div>'
+      +'</div></div>'
+      +'<div style="display:flex;flex-direction:column;gap:4px">'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<span style="font-size:9px;font-weight:700;color:#3B82F6;min-width:40px">MAR</span>'
+      +'<div style="flex:1;background:var(--g100);border-radius:100px;height:8px;overflow:hidden">'
+      +'<div style="height:100%;width:'+marW+'%;background:#3B82F6;border-radius:100px"></div></div>'
+      +'<span style="font-size:10px;font-weight:700;color:var(--g700);min-width:70px;text-align:right">'+fRK(mar)+'</span>'
+      +'</div>'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<span style="font-size:9px;font-weight:700;color:#00A86B;min-width:40px">ABR</span>'
+      +'<div style="flex:1;background:var(--g100);border-radius:100px;height:8px;overflow:hidden">'
+      +'<div style="height:100%;width:'+abrW+'%;background:#00A86B;border-radius:100px"></div></div>'
+      +'<span style="font-size:10px;font-weight:700;color:var(--g700);min-width:70px;text-align:right">'+fRK(abr)+'</span>'
+      +'</div></div></div>';
+  }).join('');
+  el.innerHTML = '<div style="border-radius:var(--r);overflow:hidden;border:1px solid var(--g200)">'+rows+'</div>';
+}
+
+function compRenderOps(){
+  var el = document.getElementById('comp-ops');
+  if(!el) return;
+  var medals = {1:'🥇',2:'🥈',3:'🥉'};
+  var rows = COMP_OPS_LIST.map(function(name, i){
+    var mar = COMP_MARCO.by_op[name]||0;
+    var abr = COMP_ABRIL.by_op[name]||0;
+    if(mar===0 && abr===0) return '';
+    var diff = abr - mar;
+    var pct  = mar>0 ? (abr/mar-1)*100 : 100;
+    var pctColor = diff>=0?'#22C55E':'#EF4444';
+    var pctIcon  = diff>=0?'▲':'▼';
+    var proj = abr/14*20; // projeção 20 DU
+    var projColor = proj>=COMP_ABRIL.meta/20?'#22C55E':proj>=COMP_ABRIL.meta/30?'#F59E0B':'#EF4444';
+    var pos = i+1;
+    var posLbl = medals[pos]||(pos+'°');
+    var bg = i%2===0?'var(--g50)':'var(--w)';
+    return '<div style="display:grid;grid-template-columns:32px 1fr 110px 110px 90px 110px;gap:6px;align-items:center;padding:9px 12px;background:'+bg+';border-bottom:1px solid var(--g100)">'
+      +'<div style="font-size:12px;text-align:center">'+posLbl+'</div>'
+      +'<div style="font-size:12px;font-weight:800;color:var(--g900)">'+name.replace(/_/g,' ')+'</div>'
+      +'<div style="text-align:right;font-family:Bebas Neue,sans-serif;font-size:14px;color:#3B82F6">'+fRK(mar)+'</div>'
+      +'<div style="text-align:right;font-family:Bebas Neue,sans-serif;font-size:14px;color:#00A86B">'+fRK(abr)+'</div>'
+      +'<div style="text-align:right;font-family:Bebas Neue,sans-serif;font-size:13px;color:'+pctColor+'">'
+        +pctIcon+' '+Math.abs(pct).toFixed(0)+'%'
+      +'</div>'
+      +'<div style="text-align:right;font-family:Bebas Neue,sans-serif;font-size:13px;color:'+projColor+'">'+fRK(proj)+'</div>'
+      +'</div>';
+  }).join('');
+  el.innerHTML = '<div style="border-radius:var(--r);overflow:hidden;border:1px solid var(--g200)">'+rows+'</div>';
+}
+
 </script>
 
 <!-- TV MODE OVERLAY -->
@@ -7053,6 +7250,61 @@ setInterval(()=>{
 
   <!-- Seções do checklist -->
   <div id="chk-sections" style="display:flex;flex-direction:column;gap:12px"></div>
+
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: COMPARATIVO MESES                    -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="pg-comp">
+
+  <!-- HERO HEADER -->
+  <div style="background:linear-gradient(135deg,#1A2E22,#0D3D2B 55%,#0A2A1E);border-radius:var(--rxl);padding:20px 26px">
+    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Análise Mensal</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:#fff;margin-bottom:12px">📊 COMPARATIVO: MARÇO vs ABRIL 2026</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap" id="comp-hero-kpis"></div>
+  </div>
+
+  <!-- PROGRESS BARS: META MENSAL -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px 22px;box-shadow:var(--sh)">
+    <div class="sec">🎯 Progresso da Meta Mensal (R$ 800.000)</div>
+    <div id="comp-meta-bars"></div>
+  </div>
+
+  <!-- GRÁFICO: RECEBIMENTO DIA A DIA -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px 22px;box-shadow:var(--sh)">
+    <div class="sec">📈 Recebimento por Dia — Março vs Abril</div>
+    <div style="font-size:11px;color:var(--g500);margin-bottom:14px">
+      Comparativo dia a dia dos dois meses. Abril inclui dados até o dia 13.
+    </div>
+    <div style="height:240px;position:relative"><canvas id="comp-chart-daily"></canvas></div>
+    <div style="display:flex;gap:16px;justify-content:center;margin-top:10px">
+      <div style="display:flex;align-items:center;gap:6px"><div style="width:16px;height:3px;background:#3B82F6;border-radius:2px"></div><span style="font-size:11px;color:var(--g700);font-weight:700">Março 2026</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><div style="width:16px;height:3px;background:#00A86B;border-radius:2px"></div><span style="font-size:11px;color:var(--g700);font-weight:700">Abril 2026</span></div>
+    </div>
+  </div>
+
+  <!-- COMPARATIVO POR EQUIPE -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px 22px;box-shadow:var(--sh)">
+    <div class="sec">🏢 Comparativo por Equipe</div>
+    <div id="comp-equipes"></div>
+  </div>
+
+  <!-- RANKING OPERADORES -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px 22px;box-shadow:var(--sh)">
+    <div class="sec">👥 Comparativo por Operador</div>
+    <div style="display:grid;grid-template-columns:32px 1fr 110px 110px 90px 110px;gap:6px;
+        padding:8px 12px;background:var(--g50);border-radius:var(--r);margin-bottom:8px;
+        font-size:10px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.6px">
+      <div></div>
+      <div>Operador</div>
+      <div style="text-align:right">Março</div>
+      <div style="text-align:right">Abril (14d)</div>
+      <div style="text-align:right">Variação</div>
+      <div style="text-align:right">Projeção Mês</div>
+    </div>
+    <div id="comp-ops"></div>
+  </div>
 
 </div>
 
