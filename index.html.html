@@ -347,6 +347,11 @@ select.ev-inp{cursor:pointer}
   font-size:12px;font-weight:700;background:var(--g50);border:1px solid var(--g200)}
 .ss-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 
+
+/* ── Resumo Editor bloco ── */
+#resumo-editor-bloco{animation:fadeInDown .3s ease}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+#resumo-editor-bloco canvas{width:100%!important;height:180px!important}
 </style>
 
 <!-- Firebase SDK -->
@@ -408,10 +413,11 @@ select.ev-inp{cursor:pointer}
 
 <!-- ══════════ PAGE: GERAL ══════════ -->
 <div class="page on" id="pg-geral">
+
+  <!-- ══ HERO ORIGINAL (mantido) ══ -->
   <div class="hero">
     <div class="htitle">Recebimento Global · Abril 2026</div>
     <div class="hmonth">ABRIL 2026 — COB COFEN</div>
-    <!-- ── KPIs LINHA 1: Total Real Recebido ── -->
     <div class="hkpis">
       <div class="hkpi"><div class="hkpi-l">Total Real Recebido</div><div class="hkpi-v ok" id="h-total">—</div><div class="hkpi-s">Cobrança Jurídica</div></div>
       <div class="hkpi"><div class="hkpi-l">HO (25%)</div><div class="hkpi-v tl" id="h-ho">—</div><div class="hkpi-s">Honorários PaguePlay</div></div>
@@ -420,31 +426,15 @@ select.ev-inp{cursor:pointer}
       <div class="hkpi"><div class="hkpi-l">Precisa/DU</div><div class="hkpi-v am" id="h-need">—</div><div class="hkpi-s" id="h-restam-s">7 D.U. restantes</div></div>
       <div class="hkpi"><div class="hkpi-l">Acordos</div><div class="hkpi-v ok" id="h-ac">—</div><div class="hkpi-s">Total baixas</div></div>
     </div>
-
-    <!-- ── SUBTOTAIS POR COREN ── -->
     <div id="h-corens-wrap" style="margin-top:10px;padding:10px 14px;background:rgba(255,255,255,.06);border-radius:var(--rl);border:1px solid rgba(255,255,255,.1);display:none">
       <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">📍 Subtotal por COREN</div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-        <div style="text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-MT</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9;letter-spacing:.5px" id="h-coren-mt">—</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-PI</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9;letter-spacing:.5px" id="h-coren-pi">—</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-MA</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9;letter-spacing:.5px" id="h-coren-ma">—</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-CE</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9;letter-spacing:.5px" id="h-coren-ce">—</div>
-        </div>
+        <div style="text-align:center"><div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-MT</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9" id="h-coren-mt">—</div></div>
+        <div style="text-align:center"><div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-PI</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9" id="h-coren-pi">—</div></div>
+        <div style="text-align:center"><div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-MA</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9" id="h-coren-ma">—</div></div>
+        <div style="text-align:center"><div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-CE</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9" id="h-coren-ce">—</div></div>
       </div>
     </div>
-
-    <!-- ── BARRA META 1: Total Real Recebido ── -->
     <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
         <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase">🎯 Meta 1 — Total Real Recebido</div>
@@ -454,48 +444,80 @@ select.ev-inp{cursor:pointer}
         <div id="h-meta-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#4ADE80,#00C97F);width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
       </div>
     </div>
-
-    <!-- ── KPIs LINHA 2: Total Arrecadado ── -->
     <div id="h-arrecadado-wrap" style="margin-top:12px;padding:12px 14px;background:rgba(251,191,36,.07);border-radius:var(--rl);border:1px solid rgba(251,191,36,.2)">
       <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.7);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💼 Total Arrecadado — Valor que entra para a empresa</div>
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Arrecadado</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#FCD34D;letter-spacing:.5px" id="h-arrecadado">—</div>
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">💼 Total Arrecadado</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#FCD34D" id="h-arrecadado">—</div>
         </div>
         <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">HO Arrecadado (25%)</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#67E8F9;letter-spacing:.5px" id="h-arrecadado-ho">—</div>
-        </div>
-        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Falta p/ Meta 2</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#FCA5A5;letter-spacing:.5px" id="h-arrecadado-falta">—</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.3)" id="h-arrecadado-meta-s">Meta 2: —</div>
-        </div>
-        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Média/DU</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:.5px" id="h-arrecadado-media">—</div>
-        </div>
-        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Precisa/DU</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#FCD34D;letter-spacing:.5px" id="h-arrecadado-need">—</div>
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">HO (25%) — Honorários PaguePay</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#67E8F9" id="h-arrecadado-ho">—</div>
         </div>
       </div>
-      <!-- Barra meta 2 -->
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-        <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.6);letter-spacing:1.5px;text-transform:uppercase">🎯 Meta 2 — Total Arrecadado</div>
-        <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.6)" id="h-arrecadado-pct">—</div>
-      </div>
-      <div style="background:rgba(255,255,255,.1);border-radius:100px;height:6px;overflow:hidden">
-        <div id="h-arrecadado-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#FCD34D,#F59E0B);width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
-      </div>
+      <span id="h-arrecadado-falta" style="display:none"></span><span id="h-arrecadado-meta-s" style="display:none"></span>
+      <span id="h-arrecadado-media" style="display:none"></span><span id="h-arrecadado-need" style="display:none"></span>
+      <span id="h-arrecadado-pct" style="display:none"></span><div id="h-arrecadado-bar" style="display:none"></div>
     </div>
   </div>
 
+  <!-- ══ VISÃO GERAL FINANCEIRA ══ -->
+  <div style="background:var(--w);border:1.5px solid var(--g200);border-radius:var(--rl);overflow:hidden;box-shadow:var(--sh);margin-bottom:12px">
+    <!-- Cabeçalho -->
+    <div style="background:linear-gradient(135deg,#0a2a6e,#1a6ef5);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:2px">📊 VISÃO GERAL FINANCEIRA — Jan a Hoje</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px" id="vg-periodo-label">Nenhum arquivo importado · Clique em Importar para começar</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="vg-badge" style="display:none;font-size:11px;font-weight:700;color:#4ADE80;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);border-radius:20px;padding:4px 12px"></span>
+        <button id="btn-vg-import" onclick="vgAbrirModal()"
+          style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);padding:9px 18px;border-radius:var(--rm);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;color:#fff">
+          📥 Importar Relatório
+        </button>
+      </div>
+    </div>
+
+    <!-- Estado vazio -->
+    <div id="vg-empty" style="padding:48px 24px;text-align:center">
+      <div style="font-size:40px;margin-bottom:10px">📂</div>
+      <div style="font-size:15px;font-weight:800;color:var(--g600);margin-bottom:6px">Nenhum relatório importado</div>
+      <div style="font-size:12px;color:var(--g400);margin-bottom:16px">Importe o arquivo <strong>rec_total_geral</strong> (.xls, .xlsx ou .csv) para ver todos os totais</div>
+      <button onclick="vgAbrirModal()" style="padding:10px 24px;background:linear-gradient(135deg,#1a4db0,#1a6ef5);color:#fff;border:none;border-radius:var(--rm);font-family:Nunito,sans-serif;font-weight:800;font-size:13px;cursor:pointer">
+        📥 Importar agora
+      </button>
+    </div>
+
+    <!-- Conteúdo (hidden until import) -->
+    <div id="vg-content" style="display:none;padding:16px">
+      <!-- KPIs Totais -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">🏆 TOTAIS GERAIS — Jan até Hoje</div>
+        <div id="vg-kpis" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px"></div>
+      </div>
+      <!-- Abas -->
+      <div id="vg-tabs" style="display:flex;gap:0;margin-bottom:12px;border-bottom:2px solid var(--g100);overflow-x:auto">
+        <button class="vgtab" data-tab="mes"      onclick="vgSetTab(this,'mes')"      style="padding:8px 14px;border:none;border-bottom:3px solid #1a6ef5;background:none;color:#1a6ef5;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;margin-bottom:-2px">📆 Por Mês</button>
+        <button class="vgtab" data-tab="semana"   onclick="vgSetTab(this,'semana')"   style="padding:8px 14px;border:none;border-bottom:3px solid transparent;background:none;color:var(--g500);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;margin-bottom:-2px">📅 Por Semana</button>
+        <button class="vgtab" data-tab="dia"      onclick="vgSetTab(this,'dia')"      style="padding:8px 14px;border:none;border-bottom:3px solid transparent;background:none;color:var(--g500);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;margin-bottom:-2px">🗓️ Por Dia</button>
+        <button class="vgtab" data-tab="coren"    onclick="vgSetTab(this,'coren')"    style="padding:8px 14px;border:none;border-bottom:3px solid transparent;background:none;color:var(--g500);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;margin-bottom:-2px">📍 Por COREN</button>
+        <button class="vgtab" data-tab="forma"    onclick="vgSetTab(this,'forma')"    style="padding:8px 14px;border:none;border-bottom:3px solid transparent;background:none;color:var(--g500);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;margin-bottom:-2px">💳 Forma Pgto</button>
+        <button class="vgtab" data-tab="operador" onclick="vgSetTab(this,'operador')" style="padding:8px 14px;border:none;border-bottom:3px solid transparent;background:none;color:var(--g500);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;margin-bottom:-2px">👤 Operador</button>
+      </div>
+      <!-- Gráfico -->
+      <div style="background:var(--g50);border:1px solid var(--g200);border-radius:var(--rm);padding:12px;margin-bottom:12px;height:200px">
+        <canvas id="vg-chart"></canvas>
+      </div>
+      <!-- Tabela -->
+      <div id="vg-table" style="overflow-x:auto;border-radius:var(--rm);border:1px solid var(--g200)"></div>
+    </div>
+  </div>
+
+  <!-- ══ SEÇÕES ORIGINAIS ══ -->
   <div class="g2">
     <div class="card"><div class="sec">📈 Recebimento Diário (PaguePlay Consolidado)</div><div class="ch-w"><canvas id="ch-gd"></canvas></div></div>
     <div>
-      <!-- DU + Calendar -->
       <div class="du-strip" style="margin-bottom:12px">
         <div class="du-title">📅 Dias Úteis — Abril 2026 (Seg–Sex)</div>
         <div class="du-grid">
@@ -514,41 +536,22 @@ select.ev-inp{cursor:pointer}
           <div class="cal-leg"><div class="cal-dot" style="background:var(--g50);border:1px dashed var(--g300)"></div>Útil futuro</div>
           <div class="cal-leg"><div class="cal-dot" style="background:#FEF2F2;border:1px solid #FCA5A5"></div>Não útil</div>
           <div class="cal-leg"><div class="cal-dot" style="background:#FFF7ED;border:1px solid #FCD34D"></div>Útil manual ✏️</div>
-          <div class="cal-leg"><div class="cal-dot" style="background:var(--pp)"></div>📌 Clique p/ eventos</div>
         </div>
-        <!-- EDITOR DIAS ÚTEIS -->
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--g200)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase">
-              ✏️ Editar Dias Úteis Manualmente
-            </div>
-            <button onclick="duResetManual()"
-              style="font-size:10px;font-weight:700;color:var(--g500);background:none;border:none;cursor:pointer;text-decoration:underline">
-              Resetar automático
-            </button>
+            <div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase">✏️ Editar Dias Úteis Manualmente</div>
+            <button onclick="duResetManual()" style="font-size:10px;font-weight:700;color:var(--g500);background:none;border:none;cursor:pointer;text-decoration:underline">Resetar automático</button>
           </div>
-          <div style="font-size:11px;color:var(--g500);font-weight:600;margin-bottom:8px;line-height:1.5">
-            Clique nos dias abaixo para marcar/desmarcar como dia útil.<br>
-            <span style="color:var(--warn);font-weight:700">Amarelo</span> = marcado manualmente como útil &nbsp;|&nbsp;
-            <span style="color:var(--danger);font-weight:700">Vermelho</span> = marcado como não útil
-          </div>
+          <div style="font-size:11px;color:var(--g500);font-weight:600;margin-bottom:8px;line-height:1.5">Clique nos dias abaixo para marcar/desmarcar como dia útil.<br><span style="color:var(--warn);font-weight:700">Amarelo</span> = útil manual &nbsp;|&nbsp; <span style="color:var(--danger);font-weight:700">Vermelho</span> = não útil</div>
           <div id="du-manual-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px"></div>
           <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:11px;color:var(--g500);font-weight:600">
-              D.U. ajustados: <strong id="du-manual-count" style="color:var(--pp)">—</strong>
-            </div>
-            <button onclick="duApplyManual()"
-              style="padding:6px 14px;border-radius:var(--rm);border:none;cursor:pointer;
-              background:linear-gradient(135deg,var(--pp),var(--pp3));color:#fff;
-              font-family:Nunito,sans-serif;font-weight:800;font-size:11px">
-              ✔ Aplicar
-            </button>
+            <div style="font-size:11px;color:var(--g500);font-weight:600">D.U. ajustados: <strong id="du-manual-count" style="color:var(--pp)">—</strong></div>
+            <button onclick="duApplyManual()" style="padding:6px 14px;border-radius:var(--rm);border:none;cursor:pointer;background:linear-gradient(135deg,var(--pp),var(--pp3));color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:11px">✔ Aplicar</button>
           </div>
         </div>
       </div>
     </div>
   </div>
-
   <div class="g2">
     <div class="card"><div class="sec">🏢 Distribuição por Equipe</div>
       <div style="display:flex;align-items:center;gap:14px">
@@ -558,28 +561,17 @@ select.ev-inp{cursor:pointer}
     </div>
     <div class="card"><div class="sec">⭐ Top 5 Operadores</div><div id="top5-list" style="display:flex;flex-direction:column;gap:6px"></div></div>
   </div>
-  <!-- SHARE BANNER -->
   <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:14px 18px;box-shadow:var(--sh);display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-    <div style="width:36px;height:36px;border-radius:9px;background:var(--ppl);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--pp)" stroke-width="2.5" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-    </div>
-    <div style="flex:1;min-width:200px">
-      <div style="font-weight:800;font-size:13px;color:var(--g900);margin-bottom:2px">🔗 Acesso Multi-Equipe em Tempo Real</div>
-      <div style="font-size:11px;color:var(--g500);font-weight:600">
-        Qualquer alteração feita em uma aba/dispositivo sincroniza automaticamente com os outros via BroadcastChannel.
-        Fotos e recebimento do dia são compartilhados entre todas as abas abertas.
-      </div>
-    </div>
-    <button onclick="navigator.clipboard&&navigator.clipboard.writeText(location.href).then(()=>toast('🔗 Link copiado!'))"
-      style="padding:8px 16px;border-radius:var(--rm);border:1.5px solid var(--pp);background:var(--ppl);
-      color:var(--pp);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap">
-      📋 Copiar Link
-    </button>
+    <div style="width:36px;height:36px;border-radius:9px;background:var(--ppl);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--pp)" stroke-width="2.5" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+    <div style="flex:1;min-width:200px"><div style="font-weight:800;font-size:13px;color:var(--g900);margin-bottom:2px">🔗 Acesso Multi-Equipe em Tempo Real</div><div style="font-size:11px;color:var(--g500);font-weight:600">Qualquer alteração feita em uma aba/dispositivo sincroniza automaticamente via BroadcastChannel.</div></div>
+    <button onclick="navigator.clipboard&&navigator.clipboard.writeText(location.href).then(()=>toast('🔗 Link copiado!'))" style="padding:8px 16px;border-radius:var(--rm);border:1.5px solid var(--pp);background:var(--ppl);color:var(--pp);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap">📋 Copiar Link</button>
   </div>
 </div>
 
 <!-- ══════════ PAGE: EDITOR ══════════ -->
 <div class="page" id="pg-editor">
+  <!-- BLOCO RESUMO MENSAL (preenchido por renderResumoEditor) -->
+  <div id="resumo-editor-bloco" style="display:none;margin-bottom:4px"></div>
   <!-- TOTAL + META -->
   <div class="editor-panel">
     <div class="ep-header">
@@ -587,9 +579,17 @@ select.ev-inp{cursor:pointer}
         <div class="ep-title">✏️ EDITAR VALORES TOTAIS</div>
         <div class="ep-sub">Atualize o recebimento total e a meta — tudo recalcula automaticamente</div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;background:rgba(0,200,127,.15);padding:6px 12px;border-radius:var(--rm);border:1px solid rgba(0,200,127,.3)">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span style="font-size:10px;font-weight:700;color:#4ADE80">Salvo automaticamente</span>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <button onclick="importarGeral()"
+          style="display:flex;align-items:center;gap:6px;background:rgba(0,168,107,.85);padding:7px 14px;border-radius:var(--rm);border:none;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;color:#fff;transition:all .2s"
+          onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          📊 Importar Total Geral
+        </button>
+        <div style="display:flex;align-items:center;gap:6px;background:rgba(0,200,127,.15);padding:6px 12px;border-radius:var(--rm);border:1px solid rgba(0,200,127,.3)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span style="font-size:10px;font-weight:700;color:#4ADE80">Salvo automaticamente</span>
+        </div>
       </div>
     </div>
     <div class="ep-body">
@@ -637,37 +637,51 @@ select.ev-inp{cursor:pointer}
 
       <!-- ── TOTAL ARRECADADO + META 2 ── -->
       <div style="background:#FFFBEB;border:1.5px solid #FCD34D;border-radius:var(--rl);padding:14px 16px;margin-bottom:10px">
-        <div style="font-size:10px;font-weight:800;color:#92400E;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">
-          💼 Total Arrecadado — Valor que entra para a empresa (meta separada)
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+          <div style="font-size:10px;font-weight:800;color:#92400E;letter-spacing:.8px;text-transform:uppercase">
+            💼 Total Arrecadado — Valor que entra para a empresa (meta separada)
+          </div>
+          <button onclick="importarEmpresa()"
+            style="display:flex;align-items:center;gap:6px;background:#D97706;padding:6px 13px;border-radius:var(--rm);border:none;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;color:#fff;transition:all .2s"
+            onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            💼 Importar Total Empresa
+          </button>
         </div>
         <div class="ep-row" style="margin-bottom:10px">
           <div class="ep-group">
-            <label class="ep-label" style="color:#92400E">💼 Total Arrecadado (R$)</label>
+            <label class="ep-label" style="color:#92400E">💼 Total Arrecadado — Valor Recebido (R$)</label>
             <input class="ep-input yellow" type="number" id="inp-arrecadado" placeholder="Ex: 520000.00" step="0.01" min="0" oninput="liveCalcArrecadado()">
           </div>
-          <div class="ep-group">
-            <label class="ep-label" style="color:#92400E">🎯 Meta 2 — Total Arrecadado (R$)</label>
-            <input class="ep-input" type="number" id="inp-meta-arrecadado" placeholder="Ex: 1000000" step="1000" min="0" oninput="liveCalcArrecadado()">
-          </div>
+          <input type="hidden" id="inp-meta-arrecadado" value="2000000">
           <button class="btn-calc" style="background:linear-gradient(135deg,#F59E0B,#D97706)" onclick="applyArrecadado()">⚡ Aplicar</button>
           <button class="btn-outline" onclick="resetArrecadado()">↩ Resetar</button>
         </div>
         <!-- Resultados Arrecadado em tempo real -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px" id="res-arrecadado-cards">
-          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">HO (25%)</div><div class="res-v" style="color:#F59E0B" id="res-arrecadado-ho">—</div><div class="res-s">Honorários sobre arrecadado</div></div>
-          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">Falta p/ Meta 2</div><div class="res-v rd" id="res-arrecadado-falta">—</div><div class="res-s" id="res-arrecadado-meta-lbl">Meta 2: —</div></div>
-          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">Média/DU</div><div class="res-v info" id="res-arrecadado-media">—</div><div class="res-s" id="res-arrecadado-du-lbl">— D.U. passados</div></div>
-          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">Precisa/DU Restante</div><div class="res-v am" id="res-arrecadado-need">—</div><div class="res-s" id="res-arrecadado-rest-lbl">— D.U. restam</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="res-arrecadado-cards">
+          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">💼 Total Arrecadado (Valor Recebido)</div><div class="res-v" style="color:#D97706" id="res-arrecadado-bruto">—</div><div class="res-s">Valor bruto recebido pela empresa</div></div>
+          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">HO (25%) — Honorários PaguePay</div><div class="res-v" style="color:#F59E0B" id="res-arrecadado-ho">—</div><div class="res-s">25% sobre o Total Arrecadado</div></div>
         </div>
+        <!-- IDs ocultos preservados para compatibilidade com liveCalcArrecadado -->
+        <span id="res-arrecadado-falta" style="display:none"></span>
+        <span id="res-arrecadado-meta-lbl" style="display:none"></span>
+        <span id="res-arrecadado-media" style="display:none"></span>
+        <span id="res-arrecadado-du-lbl" style="display:none"></span>
+        <span id="res-arrecadado-need" style="display:none"></span>
+        <span id="res-arrecadado-rest-lbl" style="display:none"></span>
       </div>
 
-      <!-- Resultados Meta 1 em tempo real -->
-      <div class="res-grid" id="res-cards">
-        <div class="res-card"><div class="res-l">HO (25%)</div><div class="res-v ok" id="res-ho">—</div><div class="res-s">Honorários PaguePlay</div></div>
-        <div class="res-card"><div class="res-l">Falta p/ Meta 1</div><div class="res-v rd" id="res-falta">—</div><div class="res-s" id="res-meta-lbl">Meta 1: R$ 800K</div></div>
-        <div class="res-card"><div class="res-l">Média Real/DU</div><div class="res-v info" id="res-media">—</div><div class="res-s" id="res-du-lbl">13 D.U. passados</div></div>
-        <div class="res-card"><div class="res-l">Precisa/DU Restante</div><div class="res-v am" id="res-need">—</div><div class="res-s" id="res-rest-lbl">7 D.U. restam</div></div>
+      <!-- Resultados Meta 1 em tempo real — apenas HO -->
+      <div class="res-grid" id="res-cards" style="grid-template-columns:1fr">
+        <div class="res-card"><div class="res-l">HO (25%) — Honorários PaguePay</div><div class="res-v ok" id="res-ho">—</div><div class="res-s">25% sobre o Total Real Recebido</div></div>
       </div>
+      <!-- IDs ocultos preservados -->
+      <span id="res-falta" style="display:none"></span>
+      <span id="res-meta-lbl" style="display:none"></span>
+      <span id="res-media" style="display:none"></span>
+      <span id="res-du-lbl" style="display:none"></span>
+      <span id="res-need" style="display:none"></span>
+      <span id="res-rest-lbl" style="display:none"></span>
     </div>
   </div>
 
@@ -1681,6 +1695,117 @@ select.ev-inp{cursor:pointer}
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════════════════════════════
+     MODAL: IMPORTAR TOTAL GERAL (rec_total_geral)
+     Preenche: Total Real, Tarifa, PaguePay, Coren, Cofen, COREN por estado
+     ══════════════════════════════════════════════════════════════ -->
+<div id="modal-import-geral" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:20px 16px;overflow-y:auto" onclick="if(event.target===this)fecharModalGeral()">
+  <div style="background:var(--w);border-radius:var(--rxl);max-width:640px;width:100%;box-shadow:var(--sh-lg);margin:auto">
+    <div style="background:linear-gradient(135deg,var(--ppd),#1B4332);padding:16px 20px;border-radius:var(--rxl) var(--rxl) 0 0;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:#fff;letter-spacing:2px">📊 IMPORTAR — TOTAL GERAL (rec_total_geral)</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px">Preenche automaticamente: Total Real · Tarifa · PaguePay · Coren · Cofen · COREN por estado</div>
+      </div>
+      <button onclick="fecharModalGeral()" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div style="padding:18px 20px">
+      <!-- Info box -->
+      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:var(--rm);padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1E40AF;line-height:1.6">
+        <strong>Arquivo:</strong> <code>rec_total_geral_*.csv</code><br>
+        Colunas usadas: <strong>Coren</strong> (MT/PI/MA/CE) · <strong>Valor Recebido</strong> · <strong>Valor Tarifa</strong> · <strong>Pague Play (24,96%)</strong> · <strong>Coren (56,28%)</strong> · <strong>Cofen (18,76%)</strong><br>
+        <span style="color:#6B7280">Abra o CSV, selecione tudo (Ctrl+A), copie (Ctrl+C) e cole abaixo</span>
+      </div>
+
+      <!-- Upload area -->
+      <div id="drop-geral-modal" onclick="document.getElementById('file-geral-modal').click()"
+        ondragover="event.preventDefault();this.style.background='var(--ppl)'"
+        ondragleave="this.style.background=''"
+        ondrop="event.preventDefault();this.style.background='';processarArquivoGeral(event.dataTransfer.files[0])"
+        style="border:2px dashed var(--g300);border-radius:var(--rl);padding:16px;text-align:center;cursor:pointer;margin-bottom:10px;transition:all .2s">
+        <div style="font-size:28px;margin-bottom:6px">📂</div>
+        <div style="font-size:13px;font-weight:700;color:var(--g700)">Clique para selecionar arquivo ou arraste aqui</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:3px">.csv · .xls · .xlsx · .txt</div>
+        <input id="file-geral-modal" type="file" accept=".csv,.txt,.tsv,.xls,.xlsx" style="display:none" onchange="processarArquivoGeral(this.files[0])">
+      </div>
+
+      <!-- Ou cole o texto -->
+      <div style="font-size:11px;font-weight:700;color:var(--g500);text-align:center;margin:8px 0">— ou cole o conteúdo diretamente —</div>
+      <textarea id="txt-geral-modal" placeholder="Cole aqui o conteúdo do CSV (Ctrl+A → Ctrl+C no arquivo) ..."
+        style="width:100%;height:140px;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);padding:10px;font-family:monospace;font-size:11px;color:var(--g700);outline:none;resize:vertical;box-sizing:border-box"
+        oninput="previewGeral(this.value)"></textarea>
+
+      <!-- Preview resultado -->
+      <div id="preview-geral" style="display:none;margin:10px 0;padding:12px 14px;background:var(--g50);border:1px solid var(--g200);border-radius:var(--rm);font-size:12px"></div>
+
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button onclick="aplicarGeral()"
+          style="flex:1;padding:11px;border-radius:var(--rm);border:none;cursor:pointer;background:linear-gradient(135deg,var(--pp),var(--pp3));color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:14px">
+          ✅ Aplicar Valores
+        </button>
+        <button onclick="fecharModalGeral()"
+          style="padding:11px 18px;border-radius:var(--rm);border:1.5px solid var(--g200);background:var(--w);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;font-size:13px;cursor:pointer">
+          Cancelar
+        </button>
+      </div>
+      <div id="status-geral" style="font-size:12px;font-weight:700;margin-top:8px;display:none;padding:8px 12px;border-radius:var(--rm)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     MODAL: IMPORTAR TOTAL EMPRESA (rec_total_empresa)
+     Preenche: Total Arrecadado = soma de Pague Play (24,96%) apenas
+     ══════════════════════════════════════════════════════════════ -->
+<div id="modal-import-empresa" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:20px 16px;overflow-y:auto" onclick="if(event.target===this)fecharModalEmpresa()">
+  <div style="background:var(--w);border-radius:var(--rxl);max-width:620px;width:100%;box-shadow:var(--sh-lg);margin:auto">
+    <div style="background:linear-gradient(135deg,#92400E,#D97706);padding:16px 20px;border-radius:var(--rxl) var(--rxl) 0 0;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:#fff;letter-spacing:2px">💼 IMPORTAR — TOTAL EMPRESA (rec_total_empresa)</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">Preenche o Total Arrecadado = soma da coluna <strong>Pague Play (24,96%)</strong></div>
+      </div>
+      <button onclick="fecharModalEmpresa()" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div style="padding:18px 20px">
+      <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:var(--rm);padding:10px 14px;margin-bottom:14px;font-size:12px;color:#92400E;line-height:1.6">
+        <strong>Arquivo:</strong> <code>rec_total_empresa_*.csv</code><br>
+        Coluna usada: <strong>Pague Play (24,96%)</strong> — soma de todas as linhas<br>
+        <span style="color:#6B7280">Não altera operadores, equipes ou nenhum outro valor — apenas o campo "Total Arrecadado"</span>
+      </div>
+
+      <div id="drop-empresa-modal" onclick="document.getElementById('file-empresa-modal').click()"
+        ondragover="event.preventDefault();this.style.background='#FFFBEB'"
+        ondragleave="this.style.background=''"
+        ondrop="event.preventDefault();this.style.background='';processarArquivoEmpresa(event.dataTransfer.files[0])"
+        style="border:2px dashed #FCD34D;border-radius:var(--rl);padding:16px;text-align:center;cursor:pointer;margin-bottom:10px;transition:all .2s">
+        <div style="font-size:28px;margin-bottom:6px">📂</div>
+        <div style="font-size:13px;font-weight:700;color:var(--g700)">Clique para selecionar arquivo ou arraste aqui</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:3px">.csv · .xls · .xlsx · .txt</div>
+        <input id="file-empresa-modal" type="file" accept=".csv,.txt,.tsv,.xls,.xlsx" style="display:none" onchange="processarArquivoEmpresa(this.files[0])">
+      </div>
+
+      <div style="font-size:11px;font-weight:700;color:var(--g500);text-align:center;margin:8px 0">— ou cole o conteúdo diretamente —</div>
+      <textarea id="txt-empresa-modal" placeholder="Cole aqui o conteúdo do CSV (rec_total_empresa) ..."
+        style="width:100%;height:130px;background:var(--g50);border:1.5px solid #FCD34D;border-radius:var(--rm);padding:10px;font-family:monospace;font-size:11px;color:var(--g700);outline:none;resize:vertical;box-sizing:border-box"
+        oninput="previewEmpresa(this.value)"></textarea>
+
+      <div id="preview-empresa" style="display:none;margin:10px 0;padding:12px 14px;background:#FFFBEB;border:1px solid #FCD34D;border-radius:var(--rm);font-size:12px"></div>
+
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button onclick="aplicarEmpresa()"
+          style="flex:1;padding:11px;border-radius:var(--rm);border:none;cursor:pointer;background:linear-gradient(135deg,#D97706,#92400E);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:14px">
+          ✅ Aplicar Total Arrecadado
+        </button>
+        <button onclick="fecharModalEmpresa()"
+          style="padding:11px 18px;border-radius:var(--rm);border:1.5px solid var(--g200);background:var(--w);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;font-size:13px;cursor:pointer">
+          Cancelar
+        </button>
+      </div>
+      <div id="status-empresa" style="font-size:12px;font-weight:700;margin-top:8px;display:none;padding:8px 12px;border-radius:var(--rm)"></div>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -2223,10 +2348,11 @@ function liveCalcArrecadado(){
   const media = DU.passou>0 ? v/DU.passou : 0;
   const need  = DU.restam>0 && falta>0 ? falta/DU.restam : 0;
   const s=(id,v2)=>{const e=document.getElementById(id);if(e)e.textContent=v2;};
+  // Cards visíveis
+  s('res-arrecadado-bruto', v>0 ? fR(v) : '—');
   s('res-arrecadado-ho',    v>0 ? fR(ho) : '—');
+  // IDs ocultos (preservados para compatibilidade)
   s('res-arrecadado-falta', v>0 ? (falta>0?fR(falta):'✅ Meta 2!') : '—');
-  document.getElementById('res-arrecadado-falta')?.classList.toggle('rd', falta>0);
-  document.getElementById('res-arrecadado-falta')?.classList.toggle('ok', falta<=0&&v>0);
   s('res-arrecadado-meta-lbl', 'Meta 2: '+fRK(m));
   s('res-arrecadado-media',    v>0 ? fR(media) : '—');
   s('res-arrecadado-need',     need>0 ? fR(need) : '—');
@@ -2269,6 +2395,660 @@ function resetArrecadado(){
     .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   liveCalcArrecadado(); liveCalcCorens(); initHero();
   toast('↩ Arrecadado e CORENs resetados!');
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// IMPORTAR TOTAL GERAL — rec_total_geral*.csv
+// Preenche: Total Real, Tarifa, PaguePay, Coren, Cofen, COREN por estado
+// ══════════════════════════════════════════════════════════════
+
+// Estado interno do parse do arquivo geral
+let _geralParsed = null;
+let _empresaParsed = null;
+
+// Abrir/fechar modais
+function importarGeral(){
+  document.getElementById('modal-import-geral').style.display = 'flex';
+  document.getElementById('txt-geral-modal').value = '';
+  document.getElementById('preview-geral').style.display = 'none';
+  document.getElementById('status-geral').style.display = 'none';
+  _geralParsed = null;
+}
+function fecharModalGeral(){
+  document.getElementById('modal-import-geral').style.display = 'none';
+}
+function importarEmpresa(){
+  document.getElementById('modal-import-empresa').style.display = 'flex';
+  document.getElementById('txt-empresa-modal').value = '';
+  document.getElementById('preview-empresa').style.display = 'none';
+  document.getElementById('status-empresa').style.display = 'none';
+  _empresaParsed = null;
+}
+function fecharModalEmpresa(){
+  document.getElementById('modal-import-empresa').style.display = 'none';
+}
+
+// Ler arquivo como texto e processar
+function processarArquivoGeral(file){
+  if(!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if(ext==='xls'||ext==='xlsx'){
+    _lerXLS(file, txt => {
+      document.getElementById('txt-geral-modal').value = txt.slice(0,50000);
+      previewGeral(txt);
+    });
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const txt = e.target.result;
+    document.getElementById('txt-geral-modal').value = txt.slice(0, 50000);
+    previewGeral(txt);
+  };
+  reader.readAsText(file, 'latin1');
+}
+function processarArquivoEmpresa(file){
+  if(!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if(ext==='xls'||ext==='xlsx'){
+    _lerXLS(file, txt => {
+      document.getElementById('txt-empresa-modal').value = txt.slice(0,50000);
+      previewEmpresa(txt);
+    });
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const txt = e.target.result;
+    document.getElementById('txt-empresa-modal').value = txt.slice(0, 50000);
+    previewEmpresa(txt);
+  };
+  reader.readAsText(file, 'latin1');
+}
+
+// ── Parser genérico para os arquivos CSV ──────────────────────
+
+// ────────────────────────────────────────────────────────────
+// XLS/XLSX reader (SheetJS CDN carregado sob demanda)
+// ────────────────────────────────────────────────────────────
+function _lerXLS(file, callback){
+  function _doRead(XLSX){
+    const reader = new FileReader();
+    reader.onload = e => {
+      try{
+        const wb = XLSX.read(e.target.result, {type:'array'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const csv = XLSX.utils.sheet_to_csv(ws, {FS:';'});
+        callback(csv);
+      }catch(err){ alert('Erro ao ler XLS/XLSX: '+err.message); }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+  if(window.XLSX){ _doRead(window.XLSX); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  s.onload = () => _doRead(window.XLSX);
+  s.onerror = () => alert('Nao foi possivel carregar o leitor XLS. Verifique sua conexao.');
+  document.head.appendChild(s);
+}
+
+// Vars globais para historico mensal (preenchidas ao importar)
+let _histMensalGeral   = {};  // { '2026-01': {rec, pp, corens:{PI,MA,MT,CE}} }
+let _histMensalEmpresa = {};  // { '2026-01': pp }
+
+// Carregar historico mensal do localStorage ao iniciar
+try{
+  const _sg = localStorage.getItem('cofen_hist_geral');
+  if(_sg) _histMensalGeral = JSON.parse(_sg);
+  const _se = localStorage.getItem('cofen_hist_empresa');
+  if(_se) _histMensalEmpresa = JSON.parse(_se);
+}catch(e){}
+
+// Parser auxiliar — extrai totais por mes/COREN (complementa _parseImportCSV)
+function _parseMensal(raw){
+  const lines = raw.trim().split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length < 2) return {};
+  const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
+
+  const norm = s => s.trim().replace(/^"|"$/g,'').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const headers = lines[0].split(sep).map(norm);
+
+  const col = cands => {
+    for(const c of cands){ const i=headers.findIndex(h=>h.includes(c)); if(i>=0)return i; }
+    return -1;
+  };
+  const iData   = col(['data','dt.baixa','dt baixa','date']);
+  const iPer    = col(['periodo','period']);  // "Pagamento - 2026/04"
+  const iRec    = col(['valor recebido','vlr recebido','recebido','valor rec']);
+  const iPP     = col(['pague play','pagueplay','24,96','24.96','pp (']);
+  const iCoren  = col(['coren','estado','coren_nome']);
+
+  const pN = s => {
+    if(!s||s.trim()===''||s.trim()==='-') return 0;
+    let v = s.trim().replace(/^"/,'').replace(/"$/,'').replace(/R\$\s*/,'').trim();
+    if(/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(v)) return parseFloat(v.replace(/\./g,'').replace(',','.'));
+    return parseFloat(v.replace(',','.')) || 0;
+  };
+
+  const pMes = s => {
+    if(!s) return null;
+    let m = s.match(/(\d{4})[\/-](\d{2})/);
+    if(m) return m[1]+'-'+m[2].padStart(2,'0');
+    m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if(m) return m[3]+'-'+m[2].padStart(2,'0');
+    return null;
+  };
+
+  const meses = {};
+
+  for(let i=1;i<lines.length;i++){
+    const cells = lines[i].split(sep).map(c=>c.trim().replace(/^"|"$/g,''));
+    if(cells.length < 3) continue;
+    const fc = cells[0].toLowerCase().trim();
+    if(fc===''||fc==='total'||fc.startsWith('soma')) continue;
+
+    const vRec = iRec>=0 ? pN(cells[iRec]) : 0;
+    const vPP  = iPP>=0  ? pN(cells[iPP])  : 0;
+    if(vRec===0 && vPP===0) continue;
+
+    // Detectar mes
+    let mesKey = null;
+    if(iData>=0)  mesKey = pMes(cells[iData]);
+    if(!mesKey && iPer>=0) mesKey = pMes(cells[iPer]);
+    if(!mesKey)   mesKey = pMes(cells[0]);
+    if(!mesKey) continue;
+
+    if(!meses[mesKey]) meses[mesKey] = {rec:0, pp:0, corens:{}};
+    meses[mesKey].rec += vRec;
+    meses[mesKey].pp  += vPP;
+
+    if(iCoren>=0){
+      const nm = (cells[iCoren]||'').trim().toUpperCase();
+      if(nm && nm.length<=4 && /^[A-Z]+$/.test(nm)){
+        meses[mesKey].corens[nm] = (meses[mesKey].corens[nm]||0) + vRec;
+      }
+    }
+  }
+
+  // Arredondar
+  Object.values(meses).forEach(m=>{
+    m.rec = Math.round(m.rec*100)/100;
+    m.pp  = Math.round(m.pp*100)/100;
+    Object.keys(m.corens).forEach(k=>{ m.corens[k]=Math.round(m.corens[k]*100)/100; });
+  });
+  return meses;
+}
+
+function _parseImportCSV(raw){
+  const lines = raw.trim().split(/\r?\n/).filter(l => l.trim());
+  if(lines.length < 2) return null;
+
+  const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
+  const headers = lines[0].split(sep).map(h => h.trim().replace(/^"|"$/g,'').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')  // remove acentos
+  );
+
+  const col = (candidates) => {
+    for(const c of candidates){
+      const i = headers.findIndex(h => h.includes(c));
+      if(i >= 0) return i;
+    }
+    return -1;
+  };
+
+  const iValorRec = col(['valor recebido','vlr recebido','recebido','valor rec']);
+  const iTarifa   = col(['valor tarifa','tarifa','vlr tarifa']);
+  const iPP       = col(['pague play','pagueplay','pague_play','24,96','24.96','pp (']);
+  const iCorenPct = col(['coren (56','coren(56','56,28','56.28','coren %']);
+  const iCofenPct = col(['cofen (18','cofen(18','18,76','18.76','cofen %']);
+  const iCorenNm  = col(['coren','coren_nome','estado']); // col com nome do coren (PI/MA/MT/CE)
+
+  if(iValorRec < 0 && iPP < 0){
+    return {error: 'Colunas não encontradas. Cabeçalho detectado: ' + headers.slice(0,8).join(' | ')};
+  }
+
+  const parseN = (s) => {
+    if(!s || s.trim() === '' || s.trim() === '-') return 0;
+    let v = s.trim().replace(/^"/,'').replace(/"$/,'').replace(/R\$\s*/,'').trim();
+    // BR format: 1.234,56
+    if(/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(v)) return parseFloat(v.replace(/\./g,'').replace(',','.'));
+    return parseFloat(v.replace(',','.')) || 0;
+  };
+
+  let totValorRec = 0, totTarifa = 0, totPP = 0, totCorenPct = 0, totCofenPct = 0;
+  const corenMap = {}; // { PI: sum, MA: sum, MT: sum, CE: sum }
+
+  for(let i = 1; i < lines.length; i++){
+    const cells = lines[i].split(sep).map(c => c.trim().replace(/^"|"$/g,''));
+    if(cells.length < 3) continue;
+
+    // Detectar linha de totais (primeira coluna vazia ou "total")
+    const firstCell = cells[0].toLowerCase().trim();
+    if(firstCell === '' || firstCell.includes('total') || firstCell.includes('soma')) continue;
+
+    const vRec    = iValorRec >= 0 ? parseN(cells[iValorRec]) : 0;
+    const vTarifa = iTarifa   >= 0 ? parseN(cells[iTarifa])   : 0;
+    const vPP     = iPP       >= 0 ? parseN(cells[iPP])       : 0;
+    const vCoren  = iCorenPct >= 0 ? parseN(cells[iCorenPct]) : 0;
+    const vCofen  = iCofenPct >= 0 ? parseN(cells[iCofenPct]) : 0;
+
+    if(vRec === 0 && vPP === 0) continue;
+
+    totValorRec  += vRec;
+    totTarifa    += vTarifa;
+    totPP        += vPP;
+    totCorenPct  += vCoren;
+    totCofenPct  += vCofen;
+
+    // Acumular por COREN (MT/PI/MA/CE)
+    if(iCorenNm >= 0){
+      const nm = (cells[iCorenNm] || '').trim().toUpperCase();
+      if(nm && nm.length <= 4 && /^[A-Z]+$/.test(nm)){
+        corenMap[nm] = (corenMap[nm] || 0) + vRec;
+      }
+    }
+  }
+
+  return {
+    totValorRec:  Math.round(totValorRec * 100) / 100,
+    totTarifa:    Math.round(totTarifa   * 100) / 100,
+    totPP:        Math.round(totPP       * 100) / 100,
+    totCorenPct:  Math.round(totCorenPct * 100) / 100,
+    totCofenPct:  Math.round(totCofenPct * 100) / 100,
+    corenMap,
+    hasSplit: iPP >= 0,
+    linhas: lines.length - 1,
+  };
+}
+
+// ── PREVIEW GERAL ─────────────────────────────────────────────
+function previewGeral(raw){
+  if(!raw || raw.trim().length < 20) return;
+  const result = _parseImportCSV(raw);
+  const prevEl = document.getElementById('preview-geral');
+  if(!result || result.error){
+    prevEl.innerHTML = '<span style="color:var(--danger)">❌ ' + (result?.error || 'Formato não reconhecido') + '</span>';
+    prevEl.style.display = 'block';
+    _geralParsed = null;
+    return;
+  }
+  _geralParsed = result;
+
+  const corenRows = Object.entries(result.corenMap)
+    .sort((a,b) => b[1]-a[1])
+    .map(([k,v]) => `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--g100)">
+      <span style="font-weight:700;color:var(--g700)">COREN-${k}</span>
+      <span style="font-family:'Bebas Neue',sans-serif;color:var(--info)">${fR(v)}</span>
+    </div>`).join('');
+
+  prevEl.innerHTML = `
+    <div style="font-weight:800;color:var(--ok);margin-bottom:8px">✅ ${result.linhas} registros encontrados</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
+        <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">💰 Total Real Recebido</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--pp)">${fR(result.totValorRec)}</div>
+      </div>
+      ${result.hasSplit ? `
+      <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
+        <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">📊 Pague Play (24,96%)</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#3B82F6">${fR(result.totPP)}</div>
+      </div>
+      <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
+        <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">🏛 Coren (56,28%)</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#8B5CF6">${fR(result.totCorenPct)}</div>
+      </div>
+      <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
+        <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">📋 Cofen (18,76%)</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#0F9E76">${fR(result.totCofenPct)}</div>
+      </div>` : ''}
+    </div>
+    ${Object.keys(result.corenMap).length > 0 ? `
+    <div style="font-size:10px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Por COREN</div>
+    ${corenRows}` : ''}`;
+  prevEl.style.display = 'block';
+}
+
+// ── APLICAR GERAL ─────────────────────────────────────────────
+function aplicarGeral(){
+  const raw = document.getElementById('txt-geral-modal').value;
+  const statusEl = document.getElementById('status-geral');
+  statusEl.style.display = 'block';
+
+  if(!raw.trim()){ statusEl.textContent='⚠️ Cole o conteúdo do arquivo primeiro!'; statusEl.style.background='#FEF9C3'; statusEl.style.color='#92400E'; return; }
+
+  const result = _geralParsed || _parseImportCSV(raw);
+  if(!result || result.error){ statusEl.textContent='❌ ' + (result?.error||'Erro ao processar'); statusEl.style.background='#FEF2F2'; statusEl.style.color='#991B1B'; return; }
+
+  // 1. Preencher campo Total Real
+  const inpTotal = document.getElementById('inp-total');
+  if(inpTotal){ inpTotal.value = result.totValorRec.toFixed(2); liveCalc(); }
+
+  // 2. Preencher CORENs por estado
+  const corenFields = { MT:'inp-coren-mt', PI:'inp-coren-pi', MA:'inp-coren-ma', CE:'inp-coren-ce' };
+  let algumCoren = false;
+  for(const [nm, id] of Object.entries(corenFields)){
+    const el = document.getElementById(id);
+    if(el){
+      const v = result.corenMap[nm] || 0;
+      el.value = v > 0 ? v.toFixed(2) : '';
+      if(v > 0) algumCoren = true;
+    }
+  }
+  liveCalcCorens();
+
+  // 3. Salvar via applyTotal (preserva meta)
+  if(result.totValorRec > 0){
+    overrideTotalRec = result.totValorRec;
+    localStorage.setItem('cofen_total', result.totValorRec);
+    // Salvar CORENs
+    ['mt','pi','ma','ce'].forEach(k => {
+      const v = parseFloat(document.getElementById('inp-coren-'+k)?.value)||0;
+      if(k==='mt') corenMT=v; if(k==='pi') corenPI=v; if(k==='ma') corenMA=v; if(k==='ce') corenCE=v;
+      localStorage.setItem('cofen_coren_'+k, v);
+    });
+    refreshAll();
+    if(fbDb && fbRoom) fbPush('meta', {
+      total: result.totValorRec, meta,
+      mt: corenMT, pi: corenPI, ma: corenMA, ce: corenCE
+    });
+  }
+
+  const corenCount = Object.keys(result.corenMap).length;
+  statusEl.innerHTML = `✅ Aplicado! Total Real: <strong>${fR(result.totValorRec)}</strong>${result.hasSplit?' · PaguePay: '+fR(result.totPP):''}${algumCoren?' · '+corenCount+' CORENs preenchidos':''}`;
+  statusEl.style.background = '#F0FDF4';
+  statusEl.style.color = '#065F46';
+
+  // Salvar historico mensal
+  _histMensalGeral = _parseMensal(raw);
+  localStorage.setItem('cofen_hist_geral', JSON.stringify(_histMensalGeral));
+  renderResumoEditor();
+
+  setTimeout(() => fecharModalGeral(), 2000);
+}
+
+// ══════════════════════════════════════════════════════════════
+// IMPORTAR TOTAL EMPRESA — rec_total_empresa*.csv
+// Preenche: Total Arrecadado = soma de Pague Play (24,96%) apenas
+// ══════════════════════════════════════════════════════════════
+
+function previewEmpresa(raw){
+  if(!raw || raw.trim().length < 20) return;
+  const result = _parseImportCSV(raw);
+  const prevEl = document.getElementById('preview-empresa');
+  if(!result || result.error){
+    prevEl.innerHTML = '<span style="color:var(--danger)">❌ ' + (result?.error || 'Formato não reconhecido') + '</span>';
+    prevEl.style.display = 'block';
+    _empresaParsed = null;
+    return;
+  }
+  _empresaParsed = result;
+
+  const ppVal = result.totPP > 0 ? result.totPP : result.totValorRec;
+  prevEl.innerHTML = `
+    <div style="font-weight:800;color:#D97706;margin-bottom:6px">✅ ${result.linhas} registros · Arquivo Empresa reconhecido</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="padding:8px 10px;background:var(--w);border:1px solid #FCD34D;border-radius:var(--rm)">
+        <div style="font-size:10px;color:#92400E;font-weight:700;text-transform:uppercase;margin-bottom:3px">💼 Total Arrecadado (PaguePay)</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#D97706">${fR(ppVal)}</div>
+        <div style="font-size:10px;color:var(--g500);margin-top:2px">${result.hasSplit ? 'Coluna: Pague Play (24,96%)' : 'Coluna: Valor Recebido (sem split)'}</div>
+      </div>
+      <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
+        <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">Bruto Total</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--g500)">${fR(result.totValorRec)}</div>
+      </div>
+    </div>`;
+  prevEl.style.display = 'block';
+}
+
+function aplicarEmpresa(){
+  const raw = document.getElementById('txt-empresa-modal').value;
+  const statusEl = document.getElementById('status-empresa');
+  statusEl.style.display = 'block';
+
+  if(!raw.trim()){ statusEl.textContent='⚠️ Cole o conteúdo do arquivo primeiro!'; statusEl.style.background='#FFFBEB'; statusEl.style.color='#92400E'; return; }
+
+  const result = _empresaParsed || _parseImportCSV(raw);
+  if(!result || result.error){ statusEl.textContent='❌ ' + (result?.error||'Erro ao processar'); statusEl.style.background='#FEF2F2'; statusEl.style.color='#991B1B'; return; }
+
+  // Valor a usar: PaguePay se disponível, senão Valor Recebido
+  const ppVal = result.totPP > 0 ? result.totPP : result.totValorRec;
+
+  if(ppVal <= 0){ statusEl.textContent='⚠️ Nenhum valor encontrado no arquivo.'; statusEl.style.background='#FFFBEB'; statusEl.style.color='#92400E'; return; }
+
+  // Preencher campo Total Arrecadado
+  const inpArr = document.getElementById('inp-arrecadado');
+  if(inpArr){ inpArr.value = ppVal.toFixed(2); liveCalcArrecadado(); }
+
+  // Salvar via applyArrecadado (sem alterar operadores/equipes/meta)
+  totalArrecadado = ppVal;
+  localStorage.setItem('cofen_arrecadado', ppVal);
+  initHero();
+  if(fbDb && fbRoom) fbPush('arrecadado', {
+    v: ppVal, m: metaArrecadado,
+    mt: corenMT, pi: corenPI, ma: corenMA, ce: corenCE
+  });
+
+  statusEl.innerHTML = `✅ Total Arrecadado atualizado: <strong>${fR(ppVal)}</strong>${result.hasSplit?' (Pague Play 24,96%)':' (Valor Recebido)'}`;
+  statusEl.style.background = '#FFFBEB';
+  statusEl.style.color = '#065F46';
+
+  // Salvar historico mensal PP
+  const mesalEmp = _parseMensal(raw);
+  _histMensalEmpresa = {};
+  Object.entries(mesalEmp).forEach(([k,v])=>{ _histMensalEmpresa[k] = v.pp>0?v.pp:v.rec; });
+  localStorage.setItem('cofen_hist_empresa', JSON.stringify(_histMensalEmpresa));
+  renderResumoEditor();
+
+  setTimeout(() => fecharModalEmpresa(), 2000);
+}
+// ── FIM IMPORTAR ──────────────────────────────────────────────
+
+
+// ─────────────────────────────────────────────────────────────
+// renderResumoEditor — bloco de totais no topo do editor
+// ─────────────────────────────────────────────────────────────
+function renderResumoEditor(){
+  const el = document.getElementById('resumo-editor-bloco');
+  if(!el) return;
+
+  const fR  = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fRK = v => v>=1e6?'R$ '+(v/1e6).toFixed(2).replace('.',',')+'M':v>=1000?'R$ '+(v/1000).toFixed(1).replace('.',',')+'K':'R$ '+Math.round(v).toLocaleString('pt-BR');
+
+  // Combinar dados de Geral e Empresa
+  const mesesGeral   = _histMensalGeral   || {};
+  const mesesEmpresa = _histMensalEmpresa || {};
+
+  // Carregar do localStorage se vazio
+  if(!Object.keys(mesesGeral).length){
+    try{ const s=localStorage.getItem('cofen_hist_geral'); if(s) Object.assign(mesesGeral, JSON.parse(s)); }catch(e){}
+  }
+  if(!Object.keys(mesesEmpresa).length){
+    try{ const s=localStorage.getItem('cofen_hist_empresa'); if(s) Object.assign(mesesEmpresa, JSON.parse(s)); }catch(e){}
+  }
+
+  // Se nenhum dado, esconde bloco
+  const temGeral   = Object.keys(mesesGeral).length > 0;
+  const temEmpresa = Object.keys(mesesEmpresa).length > 0;
+  if(!temGeral && !temEmpresa){ el.style.display='none'; return; }
+  el.style.display='block';
+
+  const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const nomeMes = key => {
+    const p = key.match(/(\d{4})-(\d{2})/);
+    if(!p) return key;
+    return MESES_PT[parseInt(p[2])-1]+'/'+p[1].slice(2);
+  };
+
+  // Mes atual = Abril 2026 (mes 4)
+  const now = new Date();
+  const mesAtualKey = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+
+  // Totais gerais
+  const allMesKeys = Array.from(new Set([
+    ...Object.keys(mesesGeral), ...Object.keys(mesesEmpresa)
+  ])).sort();
+
+  const totalGeralRec = Object.values(mesesGeral).reduce((s,m)=>s+(m.rec||0),0);
+  const totalGeralPP  = Object.values(mesesGeral).reduce((s,m)=>s+(m.pp||0),0);
+  const totalEmpPP    = Object.values(mesesEmpresa).reduce((s,v)=>s+v,0);
+
+  const abrilRec = (mesesGeral[mesAtualKey]?.rec) || 0;
+  const abrilPP  = (mesesGeral[mesAtualKey]?.pp)  || 0;
+  const abrilEmp = mesesEmpresa[mesAtualKey] || 0;
+
+  // ── Bloco HERO com Total Abril + Total Geral ──────────────
+  const heroHtml = `
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+    <!-- TOTAL ABRIL -->
+    <div style="background:linear-gradient(135deg,#065F46,#059669);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:rgba(255,255,255,.06);border-radius:50%"></div>
+      <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">📅 Total Abril/26</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#fff;letter-spacing:1px;line-height:1">${fR(abrilRec)}</div>
+      ${abrilPP>0?`<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:4px">PaguePay: <strong style="color:#6EE7B7">${fR(abrilPP)}</strong></div>`:''}
+    </div>
+    <!-- TOTAL GERAL -->
+    <div style="background:linear-gradient(135deg,#1e3a5f,#1a6ef5);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:rgba(255,255,255,.06);border-radius:50%"></div>
+      <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">🏆 Total Geral (todos os meses)</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#fff;letter-spacing:1px;line-height:1">${fR(totalGeralRec)}</div>
+      ${totalGeralPP>0?`<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:4px">PaguePay total: <strong style="color:#93C5FD">${fR(totalGeralPP)}</strong></div>`:''}
+    </div>
+  </div>`;
+
+  // ── Tabela COREN × Mês ────────────────────────────────────
+  // Coletar todos os CORENs presentes
+  const allCorens = new Set();
+  Object.values(mesesGeral).forEach(m=>Object.keys(m.corens||{}).forEach(c=>allCorens.add(c)));
+  const corensArr = Array.from(allCorens).sort();
+
+  let tabelaMeses = '';
+  if(allMesKeys.length > 0 && corensArr.length > 0){
+    const headerCols = corensArr.map(c=>`<th style="text-align:right">COREN-${c}</th>`).join('');
+    const bodyRows = allMesKeys.map(k=>{
+      const m = mesesGeral[k] || {rec:0,pp:0,corens:{}};
+      const corenCells = corensArr.map(c=>{
+        const v = m.corens[c]||0;
+        return `<td style="text-align:right;font-family:'Courier New',monospace">${v>0?fR(v):'—'}</td>`;
+      }).join('');
+      const ppEmp = mesesEmpresa[k] || 0;
+      return `<tr>
+        <td style="font-weight:700;white-space:nowrap">${nomeMes(k)}</td>
+        <td style="text-align:right;font-weight:600;color:var(--pp)">${m.rec>0?fR(m.rec):'—'}</td>
+        ${corenCells}
+        <td style="text-align:right;color:#F59E0B;font-weight:600">${ppEmp>0?fR(ppEmp):'—'}</td>
+      </tr>`;
+    }).join('');
+
+    // Linha de totais
+    const totalCorenCells = corensArr.map(c=>{
+      const t = Object.values(mesesGeral).reduce((s,m)=>s+(m.corens[c]||0),0);
+      return `<td style="text-align:right;font-weight:800;font-family:'Courier New',monospace">${t>0?fR(t):'—'}</td>`;
+    }).join('');
+
+    tabelaMeses = `
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;font-weight:800;color:var(--g600);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📍 Total por COREN e por Mês</div>
+      <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--g200)">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:var(--g50)">
+              <th style="padding:8px 10px;text-align:left;font-weight:800;color:var(--g700);border-bottom:2px solid var(--g200)">Mês</th>
+              <th style="padding:8px 10px;text-align:right;font-weight:800;color:var(--g700);border-bottom:2px solid var(--g200)">Total Recebido</th>
+              ${headerCols.replace(/<th/g,'<th style="padding:8px 10px;font-weight:800;color:var(--g700);border-bottom:2px solid var(--g200)"')}
+              <th style="padding:8px 10px;text-align:right;font-weight:800;color:#92400E;border-bottom:2px solid var(--g200)">PaguePay (Emp.)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${bodyRows.replace(/<tr>/g,'<tr style="border-bottom:1px solid var(--g100)">').replace(/<td/g,'<td style="padding:7px 10px"')}
+            <tr style="background:var(--g50);border-top:2px solid var(--g300)">
+              <td style="padding:8px 10px;font-weight:800">TOTAL</td>
+              <td style="padding:8px 10px;text-align:right;font-weight:800;color:var(--pp)">${fR(totalGeralRec)}</td>
+              ${totalCorenCells.replace(/<td/g,'<td style="padding:8px 10px"')}
+              <td style="padding:8px 10px;text-align:right;font-weight:800;color:#F59E0B">${totalEmpPP>0?fR(totalEmpPP):'—'}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  } else if(allMesKeys.length > 0) {
+    // Sem corens — tabela simples por mes
+    const bodyRows = allMesKeys.map(k=>{
+      const m = mesesGeral[k] || {rec:0,pp:0};
+      const ppEmp = mesesEmpresa[k] || 0;
+      return `<tr style="border-bottom:1px solid var(--g100)">
+        <td style="padding:7px 10px;font-weight:700">${nomeMes(k)}</td>
+        <td style="padding:7px 10px;text-align:right;font-weight:600;color:var(--pp)">${m.rec>0?fR(m.rec):'—'}</td>
+        <td style="padding:7px 10px;text-align:right;color:#3B82F6">${m.pp>0?fR(m.pp):'—'}</td>
+        <td style="padding:7px 10px;text-align:right;color:#F59E0B">${ppEmp>0?fR(ppEmp):'—'}</td>
+      </tr>`;
+    }).join('');
+    tabelaMeses = `
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;font-weight:800;color:var(--g600);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📅 Total por Mês</div>
+      <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--g200)">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead><tr style="background:var(--g50)">
+            <th style="padding:8px 10px;text-align:left;border-bottom:2px solid var(--g200)">Mês</th>
+            <th style="padding:8px 10px;text-align:right;border-bottom:2px solid var(--g200)">Total Recebido</th>
+            <th style="padding:8px 10px;text-align:right;border-bottom:2px solid var(--g200)">PaguePay</th>
+            <th style="padding:8px 10px;text-align:right;border-bottom:2px solid var(--g200);color:#92400E">PaguePay (Emp.)</th>
+          </tr></thead>
+          <tbody>${bodyRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }
+
+  // ── Gráfico de barras mensal (canvas inline) ───────────────
+  const chartId = 'chart-resumo-editor-'+Date.now();
+  const chartHtml = allMesKeys.length > 0 ? `
+  <div style="margin-bottom:14px">
+    <div style="font-size:10px;font-weight:800;color:var(--g600);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📊 Recebimento por Mês — Geral</div>
+    <div style="background:var(--w);border:1px solid var(--g200);border-radius:8px;padding:12px">
+      <canvas id="${chartId}" height="180"></canvas>
+    </div>
+  </div>` : '';
+
+  el.innerHTML = heroHtml + tabelaMeses + chartHtml;
+
+  // Renderizar gráfico após inserção no DOM
+  if(allMesKeys.length > 0 && typeof Chart !== 'undefined'){
+    const labels = allMesKeys.map(nomeMes);
+    const dataRec = allMesKeys.map(k=>(mesesGeral[k]?.rec||0));
+    const dataPP  = allMesKeys.map(k=>(mesesGeral[k]?.pp||0));
+    const dataEmp = allMesKeys.map(k=>(mesesEmpresa[k]||0));
+
+    // Destruir instancia anterior se existir
+    const existingChart = Chart.getChart(chartId);
+    if(existingChart) existingChart.destroy();
+
+    new Chart(document.getElementById(chartId), {
+      type:'bar',
+      data:{
+        labels,
+        datasets:[
+          {label:'Total Recebido',data:dataRec,backgroundColor:'rgba(0,168,107,.75)',borderRadius:4},
+          {label:'PaguePay',data:dataPP,backgroundColor:'rgba(26,110,245,.7)',borderRadius:4},
+          {label:'Arrecadado (Emp.)',data:dataEmp,backgroundColor:'rgba(245,158,11,.7)',borderRadius:4}
+        ]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{
+          legend:{position:'top',labels:{font:{family:'Nunito',size:11},color:'#6B7280',boxWidth:12}},
+          tooltip:{callbacks:{label:ctx=>'R$ '+Math.round(ctx.parsed.y).toLocaleString('pt-BR')}}
+        },
+        scales:{
+          x:{grid:{display:false},ticks:{color:'#9CA3AF',font:{size:10}}},
+          y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#9CA3AF',font:{size:10},
+            callback:v=>'R$'+Math.round(v/1000)+'K'}}
+        }
+      }
+    });
+  }
 }
 
 function applyTotal(){
@@ -2878,6 +3658,8 @@ function refreshAll(){
   // FIX: Mantém lista de mover e remover sempre sincronizadas com estado atual
   if(typeof gestaoMoverInit==='function' && document.getElementById('gsub-mover')?.style.display!=='none') gestaoMoverInit();
   if(typeof gestaoRemoverInit==='function' && document.getElementById('gsub-remover')?.style.display!=='none') gestaoRemoverInit();
+  // Atualiza resumo mensal do editor (carrega do localStorage se disponível)
+  if(typeof renderResumoEditor==='function') renderResumoEditor();
 }
 
 // ── TOAST ──
@@ -7395,6 +8177,344 @@ setInterval(()=>{
   <div id="chk-sections" style="display:flex;flex-direction:column;gap:12px"></div>
 
 </div>
+
+
+<!-- ══ MODAL VISÃO GERAL IMPORT ══ -->
+<div id="modal-vg" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)document.getElementById('modal-vg').style.display='none'">
+  <div style="background:var(--w);border-radius:16px;max-width:620px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#0a2a6e,#1a6ef5);padding:16px 20px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#fff;letter-spacing:2px">📊 IMPORTAR RELATÓRIO GERAL</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">Suporte: .xls · .xlsx · .csv · Arraste ou clique</div>
+      </div>
+      <button onclick="document.getElementById('modal-vg').style.display='none'" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:18px;line-height:1">✕</button>
+    </div>
+    <!-- Body -->
+    <div style="padding:20px">
+      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1E40AF;line-height:1.6">
+        <strong>Arquivo:</strong> rec_total_geral_*.xls / .csv<br>
+        Campos: Data · Coren · Forma Pgto · Valor Recebido · Valor Tarifa · Pague Play (24,96%) · Coren (56,28%) · Cofen (18,76%) · Operador · Tabulação<br>
+        <span style="color:#6B7280">Importe diariamente para manter os dados atualizados</span>
+      </div>
+      <!-- Drop zone -->
+      <div id="vg-drop"
+        ondragover="event.preventDefault();this.style.borderColor='#1a6ef5';this.style.background='#EFF6FF'"
+        ondragleave="this.style.borderColor='#93C5FD';this.style.background=''"
+        ondrop="event.preventDefault();this.style.borderColor='#93C5FD';this.style.background='';vgLerArquivo(event.dataTransfer.files[0])"
+        onclick="document.getElementById('vg-file-input').click()"
+        style="border:2px dashed #93C5FD;border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:10px">
+        <div style="font-size:36px;margin-bottom:8px">📂</div>
+        <div style="font-size:13px;font-weight:700;color:var(--g700)">Clique para selecionar ou arraste o arquivo aqui</div>
+        <div style="font-size:11px;color:var(--g400);margin-top:4px">.xls · .xlsx · .csv · .txt</div>
+        <input id="vg-file-input" type="file" accept=".xls,.xlsx,.csv,.txt,.tsv" style="display:none" onchange="vgLerArquivo(this.files[0])">
+      </div>
+      <div style="font-size:11px;color:var(--g400);text-align:center;margin:8px 0;font-weight:700">— ou cole o CSV diretamente —</div>
+      <textarea id="vg-textarea" rows="5"
+        style="width:100%;border:1.5px solid #93C5FD;border-radius:8px;padding:10px;font-family:monospace;font-size:11px;color:var(--g700);background:var(--g50);outline:none;resize:vertical;box-sizing:border-box"
+        placeholder="Cole aqui o conteúdo do CSV..."
+        oninput="vgPreviewCSV(this.value)"></textarea>
+      <!-- Preview -->
+      <div id="vg-preview" style="display:none;margin:10px 0;padding:12px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12px"></div>
+      <!-- Botões -->
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button onclick="vgAplicarDados()" style="flex:1;padding:12px;border-radius:8px;border:none;cursor:pointer;background:linear-gradient(135deg,#1a4db0,#1a6ef5);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:14px">✅ Aplicar e Atualizar</button>
+        <button onclick="document.getElementById('modal-vg').style.display='none'" style="padding:12px 20px;border-radius:8px;border:1.5px solid var(--g200);background:var(--w);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;cursor:pointer">Cancelar</button>
+      </div>
+      <div id="vg-status" style="display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:700"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// VISÃO GERAL FINANCEIRA — vg* functions
+// ════════════════════════════════════════════════════════════
+
+(function(){
+
+const VG_KEY = 'cofen_vg2_data';
+let vgDB = null;   // dados processados
+let vgTab = 'mes'; // aba ativa
+let vgChartObj = null;
+
+// Formatos
+const fR  = v => 'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fRK = v => (v||0)>=1e6?'R$ '+((v||0)/1e6).toFixed(2).replace('.',',')+'M'
+                :(v||0)>=1000?'R$ '+((v||0)/1000).toFixed(1).replace('.',',')+'K'
+                :'R$ '+Math.round(v||0).toLocaleString('pt-BR');
+
+const CAMPOS = [
+  {k:'vr', label:'Valor Recebido',       cor:'#1a6ef5'},
+  {k:'vt', label:'Valor Tarifa',          cor:'#6c5ce7'},
+  {k:'pp', label:'Pague Play (24,96%)',   cor:'#0f9e76'},
+  {k:'cr', label:'Coren (56,28%)',        cor:'#d97706'},
+  {k:'cf', label:'Cofen (18,76%)',        cor:'#e74c3c'},
+];
+
+// Abrir modal
+window.vgAbrirModal = function(){
+  const m = document.getElementById('modal-vg');
+  m.style.display = 'flex';
+  document.getElementById('vg-status').style.display = 'none';
+  document.getElementById('vg-preview').style.display = 'none';
+  document.getElementById('vg-textarea').value = '';
+  _vgParsed = null;
+};
+
+let _vgParsed = null;
+
+// Ler arquivo (XLS ou CSV)
+window.vgLerArquivo = function(file){
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  const processar = txt => {
+    document.getElementById('vg-textarea').value = txt.slice(0,60000);
+    vgPreviewCSV(txt);
+  };
+  if (ext==='xls'||ext==='xlsx') {
+    _lerXLS(file, processar);
+  } else {
+    const r = new FileReader();
+    r.onload = e => processar(e.target.result);
+    r.readAsText(file, 'latin1');
+  }
+};
+
+// Preview
+window.vgPreviewCSV = function(raw){
+  const result = vgParseRaw(raw);
+  const el = document.getElementById('vg-preview');
+  if (!result || result.err) {
+    el.innerHTML = '<span style="color:red">❌ '+(result?.err||'Formato não reconhecido')+'</span>';
+    el.style.display = 'block';
+    _vgParsed = null;
+    return;
+  }
+  _vgParsed = result;
+  const t = result.tot;
+  el.innerHTML = '<div style="font-weight:800;color:green;margin-bottom:8px">✅ '+result.n+' registros encontrados</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'
+    +CAMPOS.slice(0,3).map(c=>'<div style="padding:8px;background:white;border:1px solid #e5e7eb;border-radius:6px"><div style="font-size:10px;color:#6b7280;font-weight:700;text-transform:uppercase">'+c.label+'</div><div style="font-size:17px;font-weight:800;color:'+c.cor+'">'+fRK(t[c.k])+'</div></div>').join('')
+    +'</div>';
+  el.style.display = 'block';
+};
+
+// Parser CSV
+function vgParseRaw(raw){
+  const lines = raw.trim().split(/
+?
+/).filter(l=>l.trim());
+  if (lines.length < 2) return null;
+
+  const sep = lines[0].includes('	')?'	':lines[0].includes(';')?';':',';
+  const nh = s => s.trim().replace(/^"|"$/g,'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  const hdr = lines[0].split(sep).map(nh);
+  const ci = cands => { for(const c of cands){const i=hdr.findIndex(h=>h.includes(c));if(i>=0)return i;} return -1; };
+
+  const iDt = ci(['data','dt.baixa','dt baixa']);
+  const iPer= ci(['periodo','period']);
+  const iCo = ci(['coren','estado']);
+  const iFo = ci(['forma pgto','forma pag','forma']);
+  const iVR = ci(['valor recebido','vlr recebido','valor rec','recebido']);
+  const iVT = ci(['valor tarifa','vlr tarifa','tarifa']);
+  const iPP = ci(['pague play','pagueplay','24,96','24.96']);
+  const iCR = ci(['coren (56','coren(56','56,28']);
+  const iCF = ci(['cofen (18','cofen(18','18,76']);
+  const iOp = ci(['operador','operator']);
+  const iTab= ci(['tabulacao','tabulação','tab']);
+
+  if (iVR<0&&iPP<0) return {err:'Colunas não encontradas. Headers detectados: '+hdr.slice(0,6).join(' | ')};
+
+  const pN = s => {
+    if (!s||s.trim()===''||s.trim()==='-') return 0;
+    let v = s.trim().replace(/^"/,'').replace(/"$/,'').replace(/R\$\s*/,'').trim();
+    if (/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(v)) return parseFloat(v.replace(/\./g,'').replace(',','.'));
+    return parseFloat(v.replace(',','.')) || 0;
+  };
+
+  const pDt = s => {
+    if (!s) return null;
+    const n = parseFloat(s);
+    if (!isNaN(n) && n>40000 && n<60000) {
+      const d = new Date((n-25569)*86400*1000);
+      return d.toISOString().slice(0,10);
+    }
+    let m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (m) return m[3]+'-'+m[2]+'-'+m[1];
+    m = s.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})$/);
+    if (m) return m[0].slice(0,10);
+    m = s.match(/(\d{4})[\/\-](\d{2})/);
+    if (m) return m[1]+'-'+m[2]+'-01';
+    return null;
+  };
+
+  const isoW = ds => {
+    const d = new Date(ds); d.setHours(12);
+    d.setDate(d.getDate()+3-(d.getDay()+6)%7);
+    const j4 = new Date(d.getFullYear(),0,4);
+    const w = 1+Math.round(((d-j4)/86400000-3+(j4.getDay()+6)%7)/7);
+    return d.getFullYear()+'-S'+String(w).padStart(2,'0');
+  };
+
+  const mk = () => CAMPOS.reduce((a,c)=>(a[c.k]=0,a),{n:0});
+  const add = (map,key,vals) => {
+    if (!map[key]) map[key]=mk();
+    CAMPOS.forEach(c=>map[key][c.k]+=vals[c.k]||0);
+    map[key].n++;
+  };
+
+  const mes={},sem={},dia={},cor={},for_={}; const tot=mk();
+  let dMin=null,dMax=null;
+
+  for (let i=1;i<lines.length;i++){
+    const cells = lines[i].split(sep).map(c=>c.trim().replace(/^"|"$/g,''));
+    if (cells.length<3) continue;
+    const fc = cells[0].toLowerCase().trim();
+    if (fc===''||fc==='total'||fc.startsWith('soma')) continue;
+    const vr=iVR>=0?pN(cells[iVR]):0, vt=iVT>=0?pN(cells[iVT]):0;
+    const pp=iPP>=0?pN(cells[iPP]):0, cr=iCR>=0?pN(cells[iCR]):0, cf=iCF>=0?pN(cells[iCF]):0;
+    if (vr===0&&pp===0) continue;
+    const vals = {vr,vt,pp,cr,cf};
+    let ds = iDt>=0?pDt(cells[iDt]):null;
+    if (!ds&&iPer>=0) ds=pDt(cells[iPer]);
+    if (!ds) continue;
+    if (!dMin||ds<dMin) dMin=ds;
+    if (!dMax||ds>dMax) dMax=ds;
+    add(mes, ds.slice(0,7), vals);
+    add(sem, isoW(ds),      vals);
+    add(dia, ds.slice(0,10),vals);
+    const c_=(iCo>=0?(cells[iCo]||'').trim().toUpperCase()||'N/A':'N/A');
+    const f_=(iFo>=0?(cells[iFo]||'').trim()||'Outros':'Outros');
+    const o_=(iOp>=0?(cells[iOp]||'').trim()||'—':'—');
+    add(cor,  c_, vals);
+    add(for_, f_, vals);
+    CAMPOS.forEach(c=>{tot[c.k]+=vals[c.k]||0;}); tot.n++;
+  }
+
+  return {tot,mes,sem,dia,cor,for_,dMin,dMax,n:tot.n};
+}
+
+// Aplicar dados
+window.vgAplicarDados = function(){
+  const raw = document.getElementById('vg-textarea').value;
+  const stEl = document.getElementById('vg-status');
+  stEl.style.display='block';
+  if (!raw.trim()){stEl.textContent='⚠️ Nenhum conteúdo';stEl.style.background='#FEF9C3';stEl.style.color='#92400E';return;}
+  const result = _vgParsed || vgParseRaw(raw);
+  if (!result||result.err){stEl.textContent='❌ '+(result?.err||'Erro');stEl.style.background='#FEF2F2';stEl.style.color='#991B1B';return;}
+  vgDB = result;
+  try{localStorage.setItem(VG_KEY, JSON.stringify(vgDB));}catch(e){}
+  vgRender();
+  stEl.innerHTML='✅ Aplicado! <strong>'+result.n+'</strong> registros · '+fRK(result.tot.vr)+' recebido';
+  stEl.style.background='#F0FDF4'; stEl.style.color='#065F46';
+  setTimeout(()=>document.getElementById('modal-vg').style.display='none', 1600);
+};
+
+// Aba
+window.vgSetTab = function(btn, tab){
+  vgTab = tab;
+  document.querySelectorAll('.vgtab').forEach(b=>{
+    b.style.borderBottomColor='transparent';
+    b.style.color='var(--g500)';
+  });
+  btn.style.borderBottomColor='#1a6ef5';
+  btn.style.color='#1a6ef5';
+  vgRenderTabela();
+};
+
+// Render principal
+function vgRender(){
+  if (!vgDB) return;
+  document.getElementById('vg-empty').style.display='none';
+  document.getElementById('vg-content').style.display='block';
+  // Label
+  const lb = document.getElementById('vg-periodo-label');
+  if (lb) lb.textContent = vgDB.n+' registros · '+( vgDB.dMin||'')+ ' → '+(vgDB.dMax||'');
+  // Badge
+  const bg = document.getElementById('vg-badge');
+  if (bg){bg.textContent='✅ '+vgDB.n+' registros';bg.style.display='block';}
+  // KPIs
+  const kpiEl = document.getElementById('vg-kpis');
+  if (kpiEl) kpiEl.innerHTML = CAMPOS.map(c=>`
+    <div style="background:var(--w);border:1.5px solid var(--g200);border-radius:8px;padding:12px 8px;text-align:center;border-top:3px solid ${c.cor}">
+      <div style="font-size:9px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">${c.label}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${c.cor}">${fRK(vgDB.tot[c.k])}</div>
+      <div style="font-size:10px;color:var(--g400);margin-top:2px">${fR(vgDB.tot[c.k])}</div>
+    </div>`).join('');
+  vgRenderTabela();
+}
+
+// Render tabela + gráfico
+function vgRenderTabela(){
+  if (!vgDB) return;
+  const map = {mes:vgDB.mes,semana:vgDB.sem,dia:vgDB.dia,coren:vgDB.cor,forma:vgDB.for_}[vgTab]||vgDB.mes;
+  const MP = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const lbl = k => {
+    if (vgTab==='mes'){const p=k.match(/(\d{4})-(\d{2})/);return p?MP[parseInt(p[2])-1]+'/'+p[1].slice(2):k;}
+    return k;
+  };
+  const keys = Object.keys(map).sort();
+
+  // Gráfico
+  const canvas = document.getElementById('vg-chart');
+  if (canvas){
+    if (vgChartObj){vgChartObj.destroy();vgChartObj=null;}
+    if (typeof Chart!=='undefined'){
+      vgChartObj = new Chart(canvas,{
+        type:'bar',
+        data:{
+          labels:keys.map(lbl),
+          datasets:CAMPOS.map(c=>({
+            label:c.label,
+            data:keys.map(k=>map[k][c.k]||0),
+            backgroundColor:c.cor+'bb',
+            borderRadius:3
+          }))
+        },
+        options:{
+          responsive:true,maintainAspectRatio:false,
+          plugins:{
+            legend:{position:'top',labels:{font:{family:'Nunito',size:10},color:'#6b7280',boxWidth:10}},
+            tooltip:{callbacks:{label:ctx=>'R$ '+Math.round(ctx.parsed.y).toLocaleString('pt-BR')}}
+          },
+          scales:{
+            x:{stacked:false,grid:{display:false},ticks:{color:'#9ca3af',font:{size:9},maxRotation:45}},
+            y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#9ca3af',font:{size:9},callback:v=>'R$'+Math.round(v/1000)+'K'}}
+          }
+        }
+      });
+    }
+  }
+
+  // Tabela
+  const tbl = document.getElementById('vg-table');
+  if (!tbl) return;
+  const tot = CAMPOS.reduce((a,c)=>(a[c.k]=0,a),{n:0});
+  keys.forEach(k=>{CAMPOS.forEach(c=>{tot[c.k]+=(map[k][c.k]||0);}); tot.n+=(map[k].n||0);});
+
+  const ths = ['Período','Reg',...CAMPOS.map(c=>c.label)].map((h,i)=>
+    `<th style="padding:8px 10px;background:var(--g50);border-bottom:2px solid var(--g200);font-size:11px;font-weight:800;color:var(--g700);text-align:${i<2?'left':'right'};white-space:nowrap">${h}</th>`).join('');
+
+  const rows = keys.map((k,ri)=>{
+    const d=map[k]; const bg=ri%2?'var(--g50)':'var(--w)';
+    const cells=CAMPOS.map(c=>`<td style="padding:7px 10px;text-align:right;font-family:'Courier New',monospace;font-size:11px;color:${c.cor};background:${bg}">${fR(d[c.k]||0)}</td>`).join('');
+    return `<tr><td style="padding:7px 10px;font-weight:700;font-size:12px;background:${bg}">${lbl(k)}</td><td style="padding:7px 10px;text-align:right;color:var(--g400);font-size:11px;background:${bg}">${d.n}</td>${cells}</tr>`;
+  }).join('');
+
+  const totCells=CAMPOS.map(c=>`<td style="padding:8px 10px;text-align:right;font-weight:800;font-size:12px;color:${c.cor};font-family:'Bebas Neue',sans-serif">${fR(tot[c.k])}</td>`).join('');
+
+  tbl.innerHTML=`<table style="width:100%;border-collapse:collapse"><thead><tr>${ths}</tr></thead><tbody>${rows}<tr style="background:var(--g100);border-top:2px solid var(--g300)"><td style="padding:8px 10px;font-weight:800;font-size:12px">TOTAL</td><td style="padding:8px 10px;text-align:right;font-weight:800;font-size:12px;color:var(--g500)">${tot.n}</td>${totCells}</tr></tbody></table>`;
+}
+
+// Carregar localStorage ao iniciar
+try {
+  const s = localStorage.getItem(VG_KEY);
+  if (s) { vgDB = JSON.parse(s); setTimeout(vgRender, 300); }
+} catch(e) {}
+
+})(); // end IIFE
+</script>
 
 </body>
 </html>
