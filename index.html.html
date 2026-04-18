@@ -444,21 +444,46 @@ select.ev-inp{cursor:pointer}
         <div id="h-meta-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#4ADE80,#00C97F);width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
       </div>
     </div>
-    <div id="h-arrecadado-wrap" style="margin-top:12px;padding:12px 14px;background:rgba(251,191,36,.07);border-radius:var(--rl);border:1px solid rgba(251,191,36,.2)">
-      <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.7);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💼 Total Arrecadado — Valor que entra para a empresa</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">💼 Total Arrecadado</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#FCD34D" id="h-arrecadado">—</div>
-        </div>
-        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">HO (25%) — Honorários PaguePay</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#67E8F9" id="h-arrecadado-ho">—</div>
-        </div>
+    <div id="h-arrecadado-wrap" style="margin-top:12px;padding:14px 16px;background:rgba(251,191,36,.07);border-radius:var(--rl);border:1px solid rgba(251,191,36,.2)">
+      <!-- Cabeçalho com botão importar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.7);letter-spacing:1.5px;text-transform:uppercase">💼 Pague Play (24,96%) — Total Arrecadado Empresa</div>
+        <button onclick="empAbrir()" style="display:flex;align-items:center;gap:5px;background:rgba(251,191,36,.25);border:1px solid rgba(251,191,36,.5);padding:5px 12px;border-radius:var(--rm);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;color:#FCD34D">
+          📥 Importar Empresa
+        </button>
       </div>
-      <span id="h-arrecadado-falta" style="display:none"></span><span id="h-arrecadado-meta-s" style="display:none"></span>
-      <span id="h-arrecadado-media" style="display:none"></span><span id="h-arrecadado-need" style="display:none"></span>
-      <span id="h-arrecadado-pct" style="display:none"></span><div id="h-arrecadado-bar" style="display:none"></div>
+
+      <!-- KPI TOTAL GERAL em destaque -->
+      <div style="background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,191,36,.08));border:1px solid rgba(251,191,36,.3);border-radius:var(--rm);padding:12px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px">💰 Total Geral PaguePay</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#FCD34D;letter-spacing:1px;line-height:1" id="emp-total-geral">—</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:3px" id="emp-periodo-label">Sem dados importados</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="emp-kpis-ano"></div>
+      </div>
+
+      <!-- Abas período -->
+      <div style="display:flex;gap:0;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.12);overflow-x:auto">
+        <button class="emp-tab" onclick="empSetTab(this,'mes')"    style="padding:6px 12px;border:none;border-bottom:2px solid #FCD34D;background:none;color:#FCD34D;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap;margin-bottom:-1px">📆 Mês</button>
+        <button class="emp-tab" onclick="empSetTab(this,'semana')" style="padding:6px 12px;border:none;border-bottom:2px solid transparent;background:none;color:rgba(255,255,255,.4);font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap;margin-bottom:-1px">📅 Semana</button>
+        <button class="emp-tab" onclick="empSetTab(this,'dia')"    style="padding:6px 12px;border:none;border-bottom:2px solid transparent;background:none;color:rgba(255,255,255,.4);font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap;margin-bottom:-1px">🗓️ Dia</button>
+      </div>
+
+      <!-- Tabela de períodos -->
+      <div id="emp-tabela" style="max-height:220px;overflow-y:auto">
+        <div style="font-size:11px;color:rgba(255,255,255,.3);text-align:center;padding:16px">Importe o relatório <strong style="color:#FCD34D">rec_empresa</strong> para ver os totais</div>
+      </div>
+
+      <!-- Spans ocultos para compatibilidade -->
+      <span id="h-arrecadado" style="display:none"></span>
+      <span id="h-arrecadado-ho" style="display:none"></span>
+      <span id="h-arrecadado-falta" style="display:none"></span>
+      <span id="h-arrecadado-meta-s" style="display:none"></span>
+      <span id="h-arrecadado-media" style="display:none"></span>
+      <span id="h-arrecadado-need" style="display:none"></span>
+      <span id="h-arrecadado-pct" style="display:none"></span>
+      <div id="h-arrecadado-bar" style="display:none"></div>
     </div>
   </div>
 
@@ -8628,6 +8653,444 @@ setInterval(()=>{
 
 })();
 </script>
+
+
+<!-- ═══ MODAL + ENGINE: PAGUE PLAY EMPRESA ═══ -->
+<div id="modal-emp" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:var(--w);border-radius:16px;max-width:580px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.35);max-height:92vh;overflow-y:auto">
+    <div style="background:linear-gradient(135deg,#92400E,#D97706);padding:16px 20px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#fff;letter-spacing:2px">💼 IMPORTAR TOTAL EMPRESA (rec_empresa)</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">Lê apenas a coluna Pague Play (24,96%) · .xls · .xlsx · .csv</div>
+      </div>
+      <button onclick="document.getElementById('modal-emp').style.display='none'" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:18px">✕</button>
+    </div>
+    <div style="padding:20px">
+      <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#92400E;line-height:1.7">
+        <strong>Arquivo:</strong> rec_total_empresa_*.xls / .csv<br>
+        <strong>Coluna lida:</strong> Pague Play (24,96%) — soma por ano, mês, semana e dia<br>
+        <span style="color:#9CA3AF">Não altera operadores, equipes nem outros dados</span>
+      </div>
+      <!-- Drop zone -->
+      <div id="emp-drop"
+        ondragover="event.preventDefault();this.style.borderColor='#D97706';this.style.background='#FFFBEB'"
+        ondragleave="this.style.borderColor='#FCD34D';this.style.background=''"
+        ondrop="event.preventDefault();this.style.borderColor='#FCD34D';this.style.background='';empLerArq(event.dataTransfer.files[0])"
+        onclick="document.getElementById('emp-finput').click()"
+        style="border:2px dashed #FCD34D;border-radius:10px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:10px">
+        <div style="font-size:34px;margin-bottom:8px">📂</div>
+        <div style="font-size:13px;font-weight:700;color:var(--g700)">Clique ou arraste o arquivo aqui</div>
+        <div style="font-size:11px;color:var(--g400);margin-top:4px">.xls &nbsp;·&nbsp; .xlsx &nbsp;·&nbsp; .csv &nbsp;·&nbsp; .txt</div>
+        <input id="emp-finput" type="file" accept=".xls,.xlsx,.csv,.txt,.tsv" style="display:none" onchange="empLerArq(this.files[0])">
+      </div>
+      <div style="font-size:11px;color:var(--g400);text-align:center;margin:8px 0;font-weight:700">— ou cole o CSV —</div>
+      <textarea id="emp-txt" rows="4"
+        style="width:100%;border:1.5px solid #FCD34D;border-radius:8px;padding:10px;font-family:monospace;font-size:11px;color:var(--g700);background:#FFFBEB;outline:none;resize:vertical;box-sizing:border-box"
+        placeholder="Cole aqui o conteúdo do CSV..."
+        oninput="empPreview(this.value)"></textarea>
+      <div id="emp-prev" style="display:none;margin:10px 0;padding:12px;background:#FFFBEB;border:1px solid #FCD34D;border-radius:8px;font-size:12px"></div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button onclick="empAplicar()" style="flex:1;padding:12px;border-radius:8px;border:none;cursor:pointer;background:linear-gradient(135deg,#D97706,#92400E);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:14px">✅ Aplicar e Atualizar</button>
+        <button onclick="document.getElementById('modal-emp').style.display='none'" style="padding:12px 20px;border-radius:8px;border:1.5px solid var(--g200);background:var(--w);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;cursor:pointer">Cancelar</button>
+      </div>
+      <div id="emp-st" style="display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:700"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   ENGINE: PAGUE PLAY EMPRESA — v2 corrigido
+   ═══════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  var EMP_KEY = 'cofen_emp_pp4';
+  var empDB   = null;
+  var empAba  = 'mes';
+  var _eparsed = null;
+
+  /* Formatos */
+  function fR(v)  { return 'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function fRK(v) {
+    v=v||0;
+    if(v>=1e6) return 'R$ '+(v/1e6).toFixed(2).replace('.',',')+' M';
+    if(v>=1000) return 'R$ '+(v/1000).toFixed(1).replace('.',',')+' K';
+    return 'R$ '+Math.round(v).toLocaleString('pt-BR');
+  }
+
+  /* Abrir modal */
+  window.empAbrir = function() {
+    var m=document.getElementById('modal-emp');
+    if(!m) return;
+    m.style.display='flex';
+    document.getElementById('emp-st').style.display='none';
+    document.getElementById('emp-prev').style.display='none';
+    document.getElementById('emp-txt').value='';
+    _eparsed=null;
+  };
+
+  /* Ler arquivo */
+  window.empLerArq = function(file) {
+    if(!file) return;
+    var ext=file.name.split('.').pop().toLowerCase();
+    var processar=function(txt){
+      document.getElementById('emp-txt').value=txt.slice(0,80000);
+      empPreview(txt);
+    };
+    if(ext==='xls'||ext==='xlsx') { _empLerXLS(file,processar); }
+    else { var r=new FileReader(); r.onload=function(e){processar(e.target.result);}; r.readAsText(file,'latin1'); }
+  };
+
+  /* Ler XLS — usar cellDates:true para conversão automática de datas */
+  function _empLerXLS(file,cb) {
+    function doRead(XLSX) {
+      var reader=new FileReader();
+      reader.onload=function(e){
+        try {
+          var wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+          var ws=wb.Sheets[wb.SheetNames[0]];
+          /* Converter manualmente cada célula de data para DD/MM/YYYY */
+          var range=XLSX.utils.decode_range(ws['!ref']);
+          for(var R=range.s.r;R<=range.e.r;R++) {
+            for(var C=range.s.c;C<=range.e.c;C++) {
+              var addr=XLSX.utils.encode_cell({r:R,c:C});
+              var cell=ws[addr];
+              if(cell && cell.t==='d' && cell.v instanceof Date) {
+                var d=cell.v;
+                var dd=String(d.getUTCDate()).padStart(2,'0');
+                var mm=String(d.getUTCMonth()+1).padStart(2,'0');
+                var yy=d.getUTCFullYear();
+                cell.t='s'; cell.v=dd+'/'+mm+'/'+yy; cell.w=dd+'/'+mm+'/'+yy;
+              }
+            }
+          }
+          var csv=XLSX.utils.sheet_to_csv(ws,{FS:';'});
+          cb(csv);
+        } catch(err){alert('Erro ao ler XLS: '+err.message);}
+      };
+      reader.readAsArrayBuffer(file);
+    }
+    if(window.XLSX){doRead(window.XLSX);return;}
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload=function(){doRead(window.XLSX);};
+    s.onerror=function(){alert('Erro ao carregar leitor XLS.');};
+    document.head.appendChild(s);
+  }
+
+  /* Serial Excel → YYYY-MM-DD */
+  function serialToISO(n) {
+    n=parseFloat(n);
+    if(isNaN(n)||n<40000||n>60000) return null;
+    var d=new Date(Math.round((n-25569)*86400*1000));
+    return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');
+  }
+
+  /* Qualquer formato de data → YYYY-MM-DD */
+  function parseDtISO(s) {
+    if(!s) return null;
+    s=s.trim().replace(/^"|"$/g,'');
+
+    /* Serial numérico: 46083 ou 46083.0 */
+    if(/^\d{5}(\.\d+)?$/.test(s)) {
+      var iso=serialToISO(s);
+      if(iso) return iso;
+    }
+
+    /* DD/MM/YYYY ou D/M/YYYY */
+    var m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if(m) return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');
+
+    /* MM/DD/YYYY (SheetJS às vezes gera assim) — detectar se mês > 12 */
+    m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    /* já coberto acima */
+
+    /* YYYY-MM-DD */
+    m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(m) return s.slice(0,10);
+
+    /* Período: "Pagamento - 2026/04" ou "2026/04" ou "2026-04" */
+    m=s.match(/(\d{4})[\/\-](\d{2})(?![\/\-]\d)/);
+    if(m) return m[1]+'-'+m[2].padStart(2,'0')+'-01'; /* só para mes — não cria dia/semana falso */
+
+    return null;
+  }
+
+  /* Semana ISO → string "YYYY-SWW" */
+  function isoWeek(ds) {
+    /* ds = YYYY-MM-DD */
+    var parts=ds.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(!parts) return ds.slice(0,7)+'-S01';
+    /* Usar Date UTC para evitar timezone */
+    var d=new Date(Date.UTC(parseInt(parts[1]),parseInt(parts[2])-1,parseInt(parts[3])));
+    d.setUTCDate(d.getUTCDate()+3-(d.getUTCDay()+6)%7);
+    var j4=new Date(Date.UTC(d.getUTCFullYear(),0,4));
+    var w=1+Math.round(((d-j4)/86400000-3+(j4.getUTCDay()+6)%7)/7);
+    return d.getUTCFullYear()+'-S'+String(w).padStart(2,'0');
+  }
+
+  /* Parse número BR/US */
+  function pN(s) {
+    if(!s||s.trim()===''||s.trim()==='-') return 0;
+    s=s.trim().replace(/^"/,'').replace(/"$/,'').replace(/R\$\s*/,'').trim();
+    if(/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(s)) return parseFloat(s.replace(/\./g,'').replace(',','.'));
+    return parseFloat(s.replace(',','.')) || 0;
+  }
+
+  /* Normalizar header */
+  function normH(s) {
+    s=s.toLowerCase();
+    var map={'á':'a','à':'a','ã':'a','â':'a','é':'e','ê':'e','í':'i','ó':'o','õ':'o','ô':'o','ú':'u','ç':'c'};
+    return s.replace(/[áàãâéêíóõôúç]/g,function(c){return map[c]||c;});
+  }
+
+  /* Parser principal — apenas coluna PaguePay */
+  function empParse(raw) {
+    var lines=raw.trim().split(/\r?\n/).filter(function(l){return l.trim();});
+    if(lines.length<2) return null;
+
+    var sep=lines[0].indexOf('\t')>=0?'\t':lines[0].indexOf(';')>=0?';':',';
+    var hdrs=lines[0].split(sep).map(function(h){return normH(h.replace(/^"|"$/g,''));});
+
+    function ci(cands) {
+      for(var k=0;k<cands.length;k++)
+        for(var i=0;i<hdrs.length;i++)
+          if(hdrs[i].indexOf(cands[k])>=0) return i;
+      return -1;
+    }
+
+    var iDt  = ci(['data']);          /* Coluna Data (index 1) */
+    var iPer = ci(['periodo','period']); /* Período (fallback) */
+    var iPP  = ci(['pague play','pagueplay','24,96','24.96','pague_play']);
+
+    if(iPP<0) return {err:'Coluna "Pague Play (24,96%)" não encontrada. Headers: '+hdrs.slice(0,8).join(' | ')};
+
+    var ano={}, mes={}, semana={}, dia={};
+    var total=0, n=0, dMin=null, dMax=null;
+
+    for(var i=1;i<lines.length;i++) {
+      var cells=lines[i].split(sep).map(function(c){return c.trim().replace(/^"|"$/g,'');});
+      if(cells.length<3) continue;
+      var fc=cells[0].toLowerCase().trim();
+      if(fc===''||fc==='total'||fc.indexOf('soma')===0) continue;
+
+      var pp=pN(cells[iPP]);
+      if(pp<=0) continue;
+
+      /* Tentar coluna Data primeiro (data real), depois Período */
+      var ds=null;
+      var isRealDate=false;
+      if(iDt>=0) {
+        var dtRaw=cells[iDt].trim();
+        /* Só aceitar como data real se parece DD/MM/YYYY ou serial ou YYYY-MM-DD */
+        if(/^\d{5}(\.\d+)?$/.test(dtRaw) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dtRaw) || /^\d{4}-\d{2}-\d{2}$/.test(dtRaw)) {
+          ds=parseDtISO(dtRaw);
+          if(ds) isRealDate=true;
+        }
+      }
+      if(!ds && iPer>=0) {
+        /* Período dá apenas ano-mes, não dia real */
+        var perRaw=cells[iPer].trim();
+        var mp=perRaw.match(/(\d{4})[\/\-](\d{2})/);
+        if(mp) {
+          var mesPer=mp[1]+'-'+mp[2].padStart(2,'0');
+          mes[mesPer]=(mes[mesPer]||0)+pp;
+          ano[mp[1]]=(ano[mp[1]]||0)+pp;
+          /* Não agregar em semana/dia pois não temos a data real */
+          total+=pp; n++;
+          continue;
+        }
+      }
+      if(!ds) continue;
+
+      /* Validar que é data real (tem dia) para semana e dia */
+      var hasDay=ds.match(/^\d{4}-\d{2}-\d{2}$/) && ds.slice(8,10)!=='01' || isRealDate;
+
+      if(!dMin||ds<dMin) dMin=ds;
+      if(!dMax||ds>dMax) dMax=ds;
+
+      var a_=ds.slice(0,4);
+      var m_=ds.slice(0,7);
+      ano[a_]=(ano[a_]||0)+pp;
+      mes[m_]=(mes[m_]||0)+pp;
+
+      if(isRealDate) {
+        /* Só agrupa por semana e dia se temos data real */
+        var sw=isoWeek(ds);
+        var d_=ds.slice(0,10);
+        semana[sw]=(semana[sw]||0)+pp;
+        dia[d_]=(dia[d_]||0)+pp;
+      }
+
+      total+=pp; n++;
+    }
+
+    return {total:total, ano:ano, mes:mes, semana:semana, dia:dia, dMin:dMin, dMax:dMax, n:n};
+  }
+
+  /* Preview */
+  window.empPreview = function(raw) {
+    var result=empParse(raw);
+    var el=document.getElementById('emp-prev');
+    if(!result||result.err) {
+      el.innerHTML='<span style="color:red">❌ '+(result?result.err:'Formato não reconhecido')+'</span>';
+      el.style.display='block'; _eparsed=null; return;
+    }
+    _eparsed=result;
+    /* Resumo por mês */
+    var mesesKeys=Object.keys(result.mes).sort();
+    var mesesHtml=mesesKeys.map(function(k){
+      var MP=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      var p=k.match(/(\d{4})-(\d{2})/);
+      var lbl=p?MP[parseInt(p[2])-1]+'/'+p[1].slice(2):k;
+      return '<div style="padding:5px 8px;background:#FFF;border:1px solid #FCD34D;border-radius:5px;text-align:center">'
+        +'<div style="font-size:9px;color:#92400E;font-weight:700">'+lbl+'</div>'
+        +'<div style="font-size:13px;font-weight:800;color:#D97706">'+fRK(result.mes[k])+'</div></div>';
+    }).join('');
+    el.innerHTML='<div style="font-weight:800;color:#D97706;margin-bottom:8px">✅ '+result.n+' registros · '+(result.dMin||'')+' → '+(result.dMax||'')+'</div>'
+      +'<div style="margin-bottom:8px;padding:8px;background:#FFF;border:1px solid #FCD34D;border-radius:6px;text-align:center">'
+      +'<div style="font-size:10px;color:#92400E;font-weight:700;text-transform:uppercase">Total PaguePay</div>'
+      +'<div style="font-size:20px;font-weight:800;color:#D97706">'+fR(result.total)+'</div></div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px">'+mesesHtml+'</div>';
+    el.style.display='block';
+  };
+
+  /* Aplicar */
+  window.empAplicar = function() {
+    var raw=document.getElementById('emp-txt').value;
+    var stEl=document.getElementById('emp-st');
+    stEl.style.display='block';
+    if(!raw.trim()){stEl.textContent='⚠️ Nenhum conteúdo';stEl.style.background='#FEF9C3';stEl.style.color='#92400E';return;}
+    var result=_eparsed||empParse(raw);
+    if(!result||result.err){stEl.textContent='❌ '+(result?result.err:'Erro');stEl.style.background='#FEF2F2';stEl.style.color='#991B1B';return;}
+    empDB=result;
+    try{localStorage.setItem(EMP_KEY,JSON.stringify(empDB));}catch(e){}
+    empRender();
+    stEl.innerHTML='✅ Aplicado! <strong>'+result.n+'</strong> registros · PaguePay Total: '+fRK(result.total);
+    stEl.style.background='#F0FDF4'; stEl.style.color='#065F46';
+    setTimeout(function(){document.getElementById('modal-emp').style.display='none';},1600);
+  };
+
+  /* Aba */
+  window.empSetTab = function(btn,tab) {
+    empAba=tab;
+    document.querySelectorAll('.emp-tab').forEach(function(b){
+      b.style.borderBottomColor='transparent'; b.style.color='rgba(255,255,255,.4)';
+    });
+    btn.style.borderBottomColor='#FCD34D'; btn.style.color='#FCD34D';
+    empRenderTabela();
+  };
+
+  /* Render principal */
+  function empRender() {
+    if(!empDB) return;
+
+    /* Total geral */
+    var elTot=document.getElementById('emp-total-geral');
+    if(elTot) elTot.textContent=fRK(empDB.total);
+
+    var elLbl=document.getElementById('emp-periodo-label');
+    if(elLbl) elLbl.textContent=(empDB.dMin||'')+' → '+(empDB.dMax||'')+' · '+empDB.n+' registros';
+
+    /* KPIs: por ano + mes atual (abril) lado a lado */
+    var elAno=document.getElementById('emp-kpis-ano');
+    if(elAno) {
+      var now=new Date();
+      var mesAtual=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+      var MP=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      var mesAtualNome=MP[now.getMonth()]+'/'+String(now.getFullYear()).slice(2);
+      var valMesAtual=empDB.mes[mesAtual]||0;
+
+      var anos=Object.keys(empDB.ano).sort();
+      var anosHtml=anos.map(function(a){
+        return '<div style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);border-radius:var(--rm);padding:8px 12px;text-align:center;min-width:80px">'
+          +'<div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:2px">📅 '+a+'</div>'
+          +'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:#FCD34D">'+fRK(empDB.ano[a])+'</div>'
+          +'</div>';
+      }).join('');
+
+      /* Card mês atual destacado */
+      var mesHtml='<div style="background:linear-gradient(135deg,rgba(251,191,36,.3),rgba(251,191,36,.15));border:2px solid rgba(251,191,36,.6);border-radius:var(--rm);padding:8px 12px;text-align:center;min-width:90px">'
+        +'<div style="font-size:9px;font-weight:700;color:#FCD34D;text-transform:uppercase;margin-bottom:2px">🔥 '+mesAtualNome+'</div>'
+        +'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:#FCD34D">'+fRK(valMesAtual)+'</div>'
+        +'</div>';
+
+      elAno.innerHTML=mesHtml+anosHtml;
+    }
+
+    empRenderTabela();
+  }
+
+  /* Render tabela */
+  function empRenderTabela() {
+    if(!empDB) return;
+    var mapSrc={mes:empDB.mes, semana:empDB.semana, dia:empDB.dia};
+    var map=mapSrc[empAba]||empDB.mes;
+    var keys=Object.keys(map).sort();
+
+    /* Verificar se aba semana/dia tem dados */
+    if(keys.length===0 && (empAba==='semana'||empAba==='dia')) {
+      var tbl=document.getElementById('emp-tabela');
+      if(tbl) tbl.innerHTML='<div style="padding:16px;text-align:center;font-size:12px;color:rgba(255,255,255,.4)">⚠️ Dados de '+empAba+' só ficam disponíveis quando o arquivo contém a coluna <strong style="color:#FCD34D">Data</strong> com datas reais (não apenas o Período). Importe o arquivo <strong style="color:#FCD34D">rec_empresa</strong> que contém a coluna Data.</div>';
+      return;
+    }
+
+    var MP=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    function lbl(k) {
+      if(empAba==='mes'){var p=k.match(/(\d{4})-(\d{2})/);return p?MP[parseInt(p[2])-1]+'/'+p[1].slice(2):k;}
+      if(empAba==='dia'){var p2=k.match(/(\d{4})-(\d{2})-(\d{2})/);return p2?p2[3]+'/'+p2[2]:k;}
+      /* semana: "2026-S14" → "Sem 14" */
+      if(empAba==='semana'){var p3=k.match(/(\d{4})-S(\d{2})/);return p3?'Sem '+p3[2]+'/'+p3[1].slice(2):k;}
+      return k;
+    }
+
+    var totalPP=0;
+    keys.forEach(function(k){totalPP+=(map[k]||0);});
+    var maxVal=keys.reduce(function(mx,k){return Math.max(mx,map[k]||0);},0);
+
+    var rows=keys.map(function(k,ri){
+      var v=map[k]||0;
+      var pct=maxVal>0?(v/maxVal*100).toFixed(0):0;
+      var bg=ri%2?'rgba(255,255,255,.04)':'rgba(255,255,255,.02)';
+      var pctTotal=totalPP>0?((v/totalPP)*100).toFixed(1)+'%':'—';
+      return '<tr style="border-bottom:1px solid rgba(255,255,255,.06)">'
+        +'<td style="padding:6px 10px;font-weight:700;font-size:12px;color:rgba(255,255,255,.85);background:'+bg+'">'+lbl(k)+'</td>'
+        +'<td style="padding:6px 10px;text-align:right;font-family:\'Bebas Neue\',sans-serif;font-size:15px;color:#FCD34D;background:'+bg+'">'+fRK(v)+'</td>'
+        +'<td style="padding:6px 10px;text-align:right;font-size:10px;color:rgba(255,255,255,.4);background:'+bg+'">'+pctTotal+'</td>'
+        +'<td style="padding:6px 10px;background:'+bg+';width:120px">'
+          +'<div style="height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden">'
+            +'<div style="height:6px;width:'+pct+'%;background:linear-gradient(90deg,#FCD34D,#F59E0B);border-radius:3px"></div>'
+          +'</div>'
+        +'</td>'
+        +'</tr>';
+    }).join('');
+
+    var tbl=document.getElementById('emp-tabela');
+    if(!tbl) return;
+    tbl.innerHTML='<table style="width:100%;border-collapse:collapse">'
+      +'<thead><tr style="border-bottom:2px solid rgba(251,191,36,.3)">'
+      +'<th style="padding:6px 10px;text-align:left;font-size:10px;font-weight:800;color:rgba(251,191,36,.7);text-transform:uppercase">Período</th>'
+      +'<th style="padding:6px 10px;text-align:right;font-size:10px;font-weight:800;color:rgba(251,191,36,.7);text-transform:uppercase">Pague Play</th>'
+      +'<th style="padding:6px 10px;text-align:right;font-size:10px;font-weight:800;color:rgba(251,191,36,.7);text-transform:uppercase">%</th>'
+      +'<th style="padding:6px 10px;font-size:10px;font-weight:800;color:rgba(251,191,36,.7);text-transform:uppercase">Participação</th>'
+      +'</tr></thead>'
+      +'<tbody>'+rows+'</tbody>'
+      +'<tfoot><tr style="border-top:2px solid rgba(251,191,36,.3)">'
+      +'<td style="padding:7px 10px;font-weight:800;font-size:12px;color:rgba(255,255,255,.9)">TOTAL</td>'
+      +'<td style="padding:7px 10px;text-align:right;font-family:\'Bebas Neue\',sans-serif;font-size:17px;color:#FCD34D">'+fRK(totalPP)+'</td>'
+      +'<td style="padding:7px 10px;text-align:right;font-size:11px;color:rgba(255,255,255,.5)">100%</td><td></td>'
+      +'</tr></tfoot>'
+      +'</table>';
+  }
+
+  /* Carregar localStorage ao iniciar */
+  try {
+    var saved=localStorage.getItem(EMP_KEY);
+    if(saved){empDB=JSON.parse(saved); setTimeout(empRender,400);}
+  } catch(e){}
+
+})();
 
 </body>
 </html>
