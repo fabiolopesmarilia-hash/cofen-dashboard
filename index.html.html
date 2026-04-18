@@ -347,11 +347,6 @@ select.ev-inp{cursor:pointer}
   font-size:12px;font-weight:700;background:var(--g50);border:1px solid var(--g200)}
 .ss-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 
-
-/* ── Resumo Editor bloco ── */
-#resumo-editor-bloco{animation:fadeInDown .3s ease}
-@keyframes fadeInDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-#resumo-editor-bloco canvas{width:100%!important;height:180px!important}
 </style>
 
 <!-- Firebase SDK -->
@@ -413,11 +408,10 @@ select.ev-inp{cursor:pointer}
 
 <!-- ══════════ PAGE: GERAL ══════════ -->
 <div class="page on" id="pg-geral">
-
-  <!-- ══ HERO ORIGINAL (mantido) ══ -->
   <div class="hero">
     <div class="htitle">Recebimento Global · Abril 2026</div>
     <div class="hmonth">ABRIL 2026 — COB COFEN</div>
+    <!-- ── KPIs LINHA 1: Total Real Recebido ── -->
     <div class="hkpis">
       <div class="hkpi"><div class="hkpi-l">Total Real Recebido</div><div class="hkpi-v ok" id="h-total">—</div><div class="hkpi-s">Cobrança Jurídica</div></div>
       <div class="hkpi"><div class="hkpi-l">HO (25%)</div><div class="hkpi-v tl" id="h-ho">—</div><div class="hkpi-s">Honorários PaguePlay</div></div>
@@ -426,15 +420,31 @@ select.ev-inp{cursor:pointer}
       <div class="hkpi"><div class="hkpi-l">Precisa/DU</div><div class="hkpi-v am" id="h-need">—</div><div class="hkpi-s" id="h-restam-s">7 D.U. restantes</div></div>
       <div class="hkpi"><div class="hkpi-l">Acordos</div><div class="hkpi-v ok" id="h-ac">—</div><div class="hkpi-s">Total baixas</div></div>
     </div>
+
+    <!-- ── SUBTOTAIS POR COREN ── -->
     <div id="h-corens-wrap" style="margin-top:10px;padding:10px 14px;background:rgba(255,255,255,.06);border-radius:var(--rl);border:1px solid rgba(255,255,255,.1);display:none">
       <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">📍 Subtotal por COREN</div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-        <div style="text-align:center"><div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-MT</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9" id="h-coren-mt">—</div></div>
-        <div style="text-align:center"><div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-PI</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9" id="h-coren-pi">—</div></div>
-        <div style="text-align:center"><div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-MA</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9" id="h-coren-ma">—</div></div>
-        <div style="text-align:center"><div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-CE</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9" id="h-coren-ce">—</div></div>
+        <div style="text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-MT</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9;letter-spacing:.5px" id="h-coren-mt">—</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-PI</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9;letter-spacing:.5px" id="h-coren-pi">—</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-MA</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9;letter-spacing:.5px" id="h-coren-ma">—</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">COREN-CE</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#67E8F9;letter-spacing:.5px" id="h-coren-ce">—</div>
+        </div>
       </div>
     </div>
+
+    <!-- ── BARRA META 1: Total Real Recebido ── -->
     <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
         <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase">🎯 Meta 1 — Total Real Recebido</div>
@@ -444,80 +454,48 @@ select.ev-inp{cursor:pointer}
         <div id="h-meta-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#4ADE80,#00C97F);width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
       </div>
     </div>
+
+    <!-- ── KPIs LINHA 2: Total Arrecadado ── -->
     <div id="h-arrecadado-wrap" style="margin-top:12px;padding:12px 14px;background:rgba(251,191,36,.07);border-radius:var(--rl);border:1px solid rgba(251,191,36,.2)">
       <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.7);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💼 Total Arrecadado — Valor que entra para a empresa</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:10px">
         <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">💼 Total Arrecadado</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#FCD34D" id="h-arrecadado">—</div>
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Arrecadado</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#FCD34D;letter-spacing:.5px" id="h-arrecadado">—</div>
         </div>
         <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">HO (25%) — Honorários PaguePay</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#67E8F9" id="h-arrecadado-ho">—</div>
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">HO Arrecadado (25%)</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#67E8F9;letter-spacing:.5px" id="h-arrecadado-ho">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Falta p/ Meta 2</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#FCA5A5;letter-spacing:.5px" id="h-arrecadado-falta">—</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.3)" id="h-arrecadado-meta-s">Meta 2: —</div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Média/DU</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:.5px" id="h-arrecadado-media">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Precisa/DU</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#FCD34D;letter-spacing:.5px" id="h-arrecadado-need">—</div>
         </div>
       </div>
-      <span id="h-arrecadado-falta" style="display:none"></span><span id="h-arrecadado-meta-s" style="display:none"></span>
-      <span id="h-arrecadado-media" style="display:none"></span><span id="h-arrecadado-need" style="display:none"></span>
-      <span id="h-arrecadado-pct" style="display:none"></span><div id="h-arrecadado-bar" style="display:none"></div>
+      <!-- Barra meta 2 -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.6);letter-spacing:1.5px;text-transform:uppercase">🎯 Meta 2 — Total Arrecadado</div>
+        <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.6)" id="h-arrecadado-pct">—</div>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:100px;height:6px;overflow:hidden">
+        <div id="h-arrecadado-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#FCD34D,#F59E0B);width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
+      </div>
     </div>
   </div>
 
-  <!-- ══ VISÃO GERAL FINANCEIRA ══ -->
-  <div style="background:var(--w);border:1.5px solid var(--g200);border-radius:var(--rl);overflow:hidden;box-shadow:var(--sh);margin-bottom:12px">
-    <!-- Cabeçalho -->
-    <div style="background:linear-gradient(135deg,#0a2a6e,#1a6ef5);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-      <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:2px">📊 VISÃO GERAL FINANCEIRA — Jan a Hoje</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px" id="vg-periodo-label">Nenhum arquivo importado · Clique em Importar para começar</div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <span id="vg-badge" style="display:none;font-size:11px;font-weight:700;color:#4ADE80;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);border-radius:20px;padding:4px 12px"></span>
-        <button id="btn-vg-import" onclick="vgAbrirModal()"
-          style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);padding:9px 18px;border-radius:var(--rm);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;color:#fff">
-          📥 Importar Relatório
-        </button>
-      </div>
-    </div>
-
-    <!-- Estado vazio -->
-    <div id="vg-empty" style="padding:48px 24px;text-align:center">
-      <div style="font-size:40px;margin-bottom:10px">📂</div>
-      <div style="font-size:15px;font-weight:800;color:var(--g600);margin-bottom:6px">Nenhum relatório importado</div>
-      <div style="font-size:12px;color:var(--g400);margin-bottom:16px">Importe o arquivo <strong>rec_total_geral</strong> (.xls, .xlsx ou .csv) para ver todos os totais</div>
-      <button onclick="vgAbrirModal()" style="padding:10px 24px;background:linear-gradient(135deg,#1a4db0,#1a6ef5);color:#fff;border:none;border-radius:var(--rm);font-family:Nunito,sans-serif;font-weight:800;font-size:13px;cursor:pointer">
-        📥 Importar agora
-      </button>
-    </div>
-
-    <!-- Conteúdo (hidden until import) -->
-    <div id="vg-content" style="display:none;padding:16px">
-      <!-- KPIs Totais -->
-      <div style="margin-bottom:16px">
-        <div style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">🏆 TOTAIS GERAIS — Jan até Hoje</div>
-        <div id="vg-kpis" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px"></div>
-      </div>
-      <!-- Abas -->
-      <div id="vg-tabs" style="display:flex;gap:0;margin-bottom:12px;border-bottom:2px solid var(--g100);overflow-x:auto">
-        <button class="vgtab" data-tab="mes"      onclick="vgSetTab(this,'mes')"      style="padding:8px 14px;border:none;border-bottom:3px solid #1a6ef5;background:none;color:#1a6ef5;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;margin-bottom:-2px">📆 Por Mês</button>
-        <button class="vgtab" data-tab="semana"   onclick="vgSetTab(this,'semana')"   style="padding:8px 14px;border:none;border-bottom:3px solid transparent;background:none;color:var(--g500);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;margin-bottom:-2px">📅 Por Semana</button>
-        <button class="vgtab" data-tab="dia"      onclick="vgSetTab(this,'dia')"      style="padding:8px 14px;border:none;border-bottom:3px solid transparent;background:none;color:var(--g500);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;margin-bottom:-2px">🗓️ Por Dia</button>
-        <button class="vgtab" data-tab="coren"    onclick="vgSetTab(this,'coren')"    style="padding:8px 14px;border:none;border-bottom:3px solid transparent;background:none;color:var(--g500);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;margin-bottom:-2px">📍 Por COREN</button>
-        <button class="vgtab" data-tab="forma"    onclick="vgSetTab(this,'forma')"    style="padding:8px 14px;border:none;border-bottom:3px solid transparent;background:none;color:var(--g500);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;margin-bottom:-2px">💳 Forma Pgto</button>
-        <button class="vgtab" data-tab="operador" onclick="vgSetTab(this,'operador')" style="padding:8px 14px;border:none;border-bottom:3px solid transparent;background:none;color:var(--g500);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;margin-bottom:-2px">👤 Operador</button>
-      </div>
-      <!-- Gráfico -->
-      <div style="background:var(--g50);border:1px solid var(--g200);border-radius:var(--rm);padding:12px;margin-bottom:12px;height:200px">
-        <canvas id="vg-chart"></canvas>
-      </div>
-      <!-- Tabela -->
-      <div id="vg-table" style="overflow-x:auto;border-radius:var(--rm);border:1px solid var(--g200)"></div>
-    </div>
-  </div>
-
-  <!-- ══ SEÇÕES ORIGINAIS ══ -->
   <div class="g2">
     <div class="card"><div class="sec">📈 Recebimento Diário (PaguePlay Consolidado)</div><div class="ch-w"><canvas id="ch-gd"></canvas></div></div>
     <div>
+      <!-- DU + Calendar -->
       <div class="du-strip" style="margin-bottom:12px">
         <div class="du-title">📅 Dias Úteis — Abril 2026 (Seg–Sex)</div>
         <div class="du-grid">
@@ -536,22 +514,41 @@ select.ev-inp{cursor:pointer}
           <div class="cal-leg"><div class="cal-dot" style="background:var(--g50);border:1px dashed var(--g300)"></div>Útil futuro</div>
           <div class="cal-leg"><div class="cal-dot" style="background:#FEF2F2;border:1px solid #FCA5A5"></div>Não útil</div>
           <div class="cal-leg"><div class="cal-dot" style="background:#FFF7ED;border:1px solid #FCD34D"></div>Útil manual ✏️</div>
+          <div class="cal-leg"><div class="cal-dot" style="background:var(--pp)"></div>📌 Clique p/ eventos</div>
         </div>
+        <!-- EDITOR DIAS ÚTEIS -->
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--g200)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase">✏️ Editar Dias Úteis Manualmente</div>
-            <button onclick="duResetManual()" style="font-size:10px;font-weight:700;color:var(--g500);background:none;border:none;cursor:pointer;text-decoration:underline">Resetar automático</button>
+            <div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase">
+              ✏️ Editar Dias Úteis Manualmente
+            </div>
+            <button onclick="duResetManual()"
+              style="font-size:10px;font-weight:700;color:var(--g500);background:none;border:none;cursor:pointer;text-decoration:underline">
+              Resetar automático
+            </button>
           </div>
-          <div style="font-size:11px;color:var(--g500);font-weight:600;margin-bottom:8px;line-height:1.5">Clique nos dias abaixo para marcar/desmarcar como dia útil.<br><span style="color:var(--warn);font-weight:700">Amarelo</span> = útil manual &nbsp;|&nbsp; <span style="color:var(--danger);font-weight:700">Vermelho</span> = não útil</div>
+          <div style="font-size:11px;color:var(--g500);font-weight:600;margin-bottom:8px;line-height:1.5">
+            Clique nos dias abaixo para marcar/desmarcar como dia útil.<br>
+            <span style="color:var(--warn);font-weight:700">Amarelo</span> = marcado manualmente como útil &nbsp;|&nbsp;
+            <span style="color:var(--danger);font-weight:700">Vermelho</span> = marcado como não útil
+          </div>
           <div id="du-manual-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px"></div>
           <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:11px;color:var(--g500);font-weight:600">D.U. ajustados: <strong id="du-manual-count" style="color:var(--pp)">—</strong></div>
-            <button onclick="duApplyManual()" style="padding:6px 14px;border-radius:var(--rm);border:none;cursor:pointer;background:linear-gradient(135deg,var(--pp),var(--pp3));color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:11px">✔ Aplicar</button>
+            <div style="font-size:11px;color:var(--g500);font-weight:600">
+              D.U. ajustados: <strong id="du-manual-count" style="color:var(--pp)">—</strong>
+            </div>
+            <button onclick="duApplyManual()"
+              style="padding:6px 14px;border-radius:var(--rm);border:none;cursor:pointer;
+              background:linear-gradient(135deg,var(--pp),var(--pp3));color:#fff;
+              font-family:Nunito,sans-serif;font-weight:800;font-size:11px">
+              ✔ Aplicar
+            </button>
           </div>
         </div>
       </div>
     </div>
   </div>
+
   <div class="g2">
     <div class="card"><div class="sec">🏢 Distribuição por Equipe</div>
       <div style="display:flex;align-items:center;gap:14px">
@@ -561,17 +558,28 @@ select.ev-inp{cursor:pointer}
     </div>
     <div class="card"><div class="sec">⭐ Top 5 Operadores</div><div id="top5-list" style="display:flex;flex-direction:column;gap:6px"></div></div>
   </div>
+  <!-- SHARE BANNER -->
   <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:14px 18px;box-shadow:var(--sh);display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-    <div style="width:36px;height:36px;border-radius:9px;background:var(--ppl);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--pp)" stroke-width="2.5" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
-    <div style="flex:1;min-width:200px"><div style="font-weight:800;font-size:13px;color:var(--g900);margin-bottom:2px">🔗 Acesso Multi-Equipe em Tempo Real</div><div style="font-size:11px;color:var(--g500);font-weight:600">Qualquer alteração feita em uma aba/dispositivo sincroniza automaticamente via BroadcastChannel.</div></div>
-    <button onclick="navigator.clipboard&&navigator.clipboard.writeText(location.href).then(()=>toast('🔗 Link copiado!'))" style="padding:8px 16px;border-radius:var(--rm);border:1.5px solid var(--pp);background:var(--ppl);color:var(--pp);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap">📋 Copiar Link</button>
+    <div style="width:36px;height:36px;border-radius:9px;background:var(--ppl);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--pp)" stroke-width="2.5" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    </div>
+    <div style="flex:1;min-width:200px">
+      <div style="font-weight:800;font-size:13px;color:var(--g900);margin-bottom:2px">🔗 Acesso Multi-Equipe em Tempo Real</div>
+      <div style="font-size:11px;color:var(--g500);font-weight:600">
+        Qualquer alteração feita em uma aba/dispositivo sincroniza automaticamente com os outros via BroadcastChannel.
+        Fotos e recebimento do dia são compartilhados entre todas as abas abertas.
+      </div>
+    </div>
+    <button onclick="navigator.clipboard&&navigator.clipboard.writeText(location.href).then(()=>toast('🔗 Link copiado!'))"
+      style="padding:8px 16px;border-radius:var(--rm);border:1.5px solid var(--pp);background:var(--ppl);
+      color:var(--pp);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap">
+      📋 Copiar Link
+    </button>
   </div>
 </div>
 
 <!-- ══════════ PAGE: EDITOR ══════════ -->
 <div class="page" id="pg-editor">
-  <!-- BLOCO RESUMO MENSAL (preenchido por renderResumoEditor) -->
-  <div id="resumo-editor-bloco" style="display:none;margin-bottom:4px"></div>
   <!-- TOTAL + META -->
   <div class="editor-panel">
     <div class="ep-header">
@@ -579,17 +587,9 @@ select.ev-inp{cursor:pointer}
         <div class="ep-title">✏️ EDITAR VALORES TOTAIS</div>
         <div class="ep-sub">Atualize o recebimento total e a meta — tudo recalcula automaticamente</div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <button onclick="importarGeral()"
-          style="display:flex;align-items:center;gap:6px;background:rgba(0,168,107,.85);padding:7px 14px;border-radius:var(--rm);border:none;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;color:#fff;transition:all .2s"
-          onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          📊 Importar Total Geral
-        </button>
-        <div style="display:flex;align-items:center;gap:6px;background:rgba(0,200,127,.15);padding:6px 12px;border-radius:var(--rm);border:1px solid rgba(0,200,127,.3)">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span style="font-size:10px;font-weight:700;color:#4ADE80">Salvo automaticamente</span>
-        </div>
+      <div style="display:flex;align-items:center;gap:6px;background:rgba(0,200,127,.15);padding:6px 12px;border-radius:var(--rm);border:1px solid rgba(0,200,127,.3)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span style="font-size:10px;font-weight:700;color:#4ADE80">Salvo automaticamente</span>
       </div>
     </div>
     <div class="ep-body">
@@ -637,51 +637,81 @@ select.ev-inp{cursor:pointer}
 
       <!-- ── TOTAL ARRECADADO + META 2 ── -->
       <div style="background:#FFFBEB;border:1.5px solid #FCD34D;border-radius:var(--rl);padding:14px 16px;margin-bottom:10px">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-          <div style="font-size:10px;font-weight:800;color:#92400E;letter-spacing:.8px;text-transform:uppercase">
-            💼 Total Arrecadado — Valor que entra para a empresa (meta separada)
-          </div>
-          <button onclick="importarEmpresa()"
-            style="display:flex;align-items:center;gap:6px;background:#D97706;padding:6px 13px;border-radius:var(--rm);border:none;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;color:#fff;transition:all .2s"
-            onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            💼 Importar Total Empresa
-          </button>
+        <div style="font-size:10px;font-weight:800;color:#92400E;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">
+          💼 Total Arrecadado — Valor que entra para a empresa (meta separada)
         </div>
         <div class="ep-row" style="margin-bottom:10px">
           <div class="ep-group">
-            <label class="ep-label" style="color:#92400E">💼 Total Arrecadado — Valor Recebido (R$)</label>
+            <label class="ep-label" style="color:#92400E">💼 Total Arrecadado (R$)</label>
             <input class="ep-input yellow" type="number" id="inp-arrecadado" placeholder="Ex: 520000.00" step="0.01" min="0" oninput="liveCalcArrecadado()">
           </div>
-          <input type="hidden" id="inp-meta-arrecadado" value="2000000">
+          <div class="ep-group">
+            <label class="ep-label" style="color:#92400E">🎯 Meta 2 — Total Arrecadado (R$)</label>
+            <input class="ep-input" type="number" id="inp-meta-arrecadado" placeholder="Ex: 1000000" step="1000" min="0" oninput="liveCalcArrecadado()">
+          </div>
           <button class="btn-calc" style="background:linear-gradient(135deg,#F59E0B,#D97706)" onclick="applyArrecadado()">⚡ Aplicar</button>
           <button class="btn-outline" onclick="resetArrecadado()">↩ Resetar</button>
         </div>
         <!-- Resultados Arrecadado em tempo real -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="res-arrecadado-cards">
-          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">💼 Total Arrecadado (Valor Recebido)</div><div class="res-v" style="color:#D97706" id="res-arrecadado-bruto">—</div><div class="res-s">Valor bruto recebido pela empresa</div></div>
-          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">HO (25%) — Honorários PaguePay</div><div class="res-v" style="color:#F59E0B" id="res-arrecadado-ho">—</div><div class="res-s">25% sobre o Total Arrecadado</div></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px" id="res-arrecadado-cards">
+          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">HO (25%)</div><div class="res-v" style="color:#F59E0B" id="res-arrecadado-ho">—</div><div class="res-s">Honorários sobre arrecadado</div></div>
+          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">Falta p/ Meta 2</div><div class="res-v rd" id="res-arrecadado-falta">—</div><div class="res-s" id="res-arrecadado-meta-lbl">Meta 2: —</div></div>
+          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">Média/DU</div><div class="res-v info" id="res-arrecadado-media">—</div><div class="res-s" id="res-arrecadado-du-lbl">— D.U. passados</div></div>
+          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">Precisa/DU Restante</div><div class="res-v am" id="res-arrecadado-need">—</div><div class="res-s" id="res-arrecadado-rest-lbl">— D.U. restam</div></div>
         </div>
-        <!-- IDs ocultos preservados para compatibilidade com liveCalcArrecadado -->
-        <span id="res-arrecadado-falta" style="display:none"></span>
-        <span id="res-arrecadado-meta-lbl" style="display:none"></span>
-        <span id="res-arrecadado-media" style="display:none"></span>
-        <span id="res-arrecadado-du-lbl" style="display:none"></span>
-        <span id="res-arrecadado-need" style="display:none"></span>
-        <span id="res-arrecadado-rest-lbl" style="display:none"></span>
       </div>
 
-      <!-- Resultados Meta 1 em tempo real — apenas HO -->
-      <div class="res-grid" id="res-cards" style="grid-template-columns:1fr">
-        <div class="res-card"><div class="res-l">HO (25%) — Honorários PaguePay</div><div class="res-v ok" id="res-ho">—</div><div class="res-s">25% sobre o Total Real Recebido</div></div>
+      <!-- Resultados Meta 1 em tempo real -->
+      <div class="res-grid" id="res-cards">
+        <div class="res-card"><div class="res-l">HO (25%)</div><div class="res-v ok" id="res-ho">—</div><div class="res-s">Honorários PaguePlay</div></div>
+        <div class="res-card"><div class="res-l">Falta p/ Meta 1</div><div class="res-v rd" id="res-falta">—</div><div class="res-s" id="res-meta-lbl">Meta 1: R$ 800K</div></div>
+        <div class="res-card"><div class="res-l">Média Real/DU</div><div class="res-v info" id="res-media">—</div><div class="res-s" id="res-du-lbl">13 D.U. passados</div></div>
+        <div class="res-card"><div class="res-l">Precisa/DU Restante</div><div class="res-v am" id="res-need">—</div><div class="res-s" id="res-rest-lbl">7 D.U. restam</div></div>
       </div>
-      <!-- IDs ocultos preservados -->
-      <span id="res-falta" style="display:none"></span>
-      <span id="res-meta-lbl" style="display:none"></span>
-      <span id="res-media" style="display:none"></span>
-      <span id="res-du-lbl" style="display:none"></span>
-      <span id="res-need" style="display:none"></span>
-      <span id="res-rest-lbl" style="display:none"></span>
+    </div>
+  </div>
+
+  <!-- TOTAIS HISTÓRICOS POR MÊS -->
+  <div class="editor-panel" style="margin-top:4px">
+    <div class="ep-header">
+      <div>
+        <div class="ep-title">📅 TOTAIS MENSAIS — Jan / Fev / Mar</div>
+        <div class="ep-sub">Valores fixos dos meses encerrados · Abril é calculado automaticamente pelo Total Real Recebido</div>
+      </div>
+    </div>
+    <div class="ep-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="ep-group">
+          <label class="ep-label">📘 Janeiro 2026 — Total Recebido (R$)</label>
+          <input class="ep-input" type="number" id="inp-cmp-jan" placeholder="Ex: 350000.00" step="0.01" min="0"
+            style="border-color:#67E8F9" oninput="cmpLiveCalc()">
+        </div>
+        <div class="ep-group">
+          <label class="ep-label">📗 Fevereiro 2026 — Total Recebido (R$)</label>
+          <input class="ep-input" type="number" id="inp-cmp-fev" placeholder="Ex: 420000.00" step="0.01" min="0"
+            style="border-color:#A78BFA" oninput="cmpLiveCalc()">
+        </div>
+        <div class="ep-group">
+          <label class="ep-label">📙 Março 2026 — Total Recebido (R$)</label>
+          <input class="ep-input yellow" type="number" id="inp-cmp-mar" placeholder="774808" step="0.01" min="0"
+            style="border-color:#FCD34D" oninput="cmpLiveCalc()">
+        </div>
+      </div>
+      <!-- Preview em tempo real -->
+      <div id="cmp-editor-preview" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+        <div class="res-card"><div class="res-l">Janeiro</div><div id="prev-jan" class="res-v info">—</div><div class="res-s">HO: <span id="prev-ho-jan">—</span></div></div>
+        <div class="res-card"><div class="res-l">Fevereiro</div><div id="prev-fev" class="res-v" style="color:#A78BFA">—</div><div class="res-s">HO: <span id="prev-ho-fev">—</span></div></div>
+        <div class="res-card"><div class="res-l">Março</div><div id="prev-mar" class="res-v am">—</div><div class="res-s">HO: <span id="prev-ho-mar">—</span></div></div>
+        <div class="res-card" style="background:rgba(74,222,128,.05);border-color:rgba(74,222,128,.2)"><div class="res-l">Abril (automático)</div><div id="prev-abr" class="res-v ok">—</div><div class="res-s">HO: <span id="prev-ho-abr">—</span></div></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-calc" onclick="cmpApplyMeses()">⚡ Salvar Totais Mensais</button>
+        <button class="btn-outline" onclick="cmpResetMeses()">↩ Resetar</button>
+      </div>
+      <div style="margin-top:8px;padding:8px 12px;background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.15);border-radius:var(--rm);font-size:11px;color:var(--g600)">
+        💡 <strong>Abril</strong> é atualizado automaticamente toda vez que você importa o relatório do dia — não precisa editar aqui.
+        Os valores de <strong>Janeiro, Fevereiro e Março</strong> são fixos (meses encerrados).
+      </div>
     </div>
   </div>
 
@@ -1441,7 +1471,7 @@ select.ev-inp{cursor:pointer}
         <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">mesmo dia</div>
       </div>
       <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Venc. não Pagos</div>
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Pendentes</div>
         <div style="font-family:Bebas Neue,sans-serif;font-size:24px;color:#FCD34D;letter-spacing:.5px;line-height:1;margin-bottom:2px" id="ac-pend">0</div>
         <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">a receber ainda</div>
       </div>
@@ -1569,28 +1599,43 @@ select.ev-inp{cursor:pointer}
   <div style="background:linear-gradient(135deg,var(--ppd),#1B4332 55%,#0D3D2B);border-radius:var(--rxl);padding:20px 24px;position:relative;overflow:hidden">
     <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(0,200,127,.07);pointer-events:none"></div>
     <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">Comparativo de Recebimento</div>
-    <div style="font-family:Bebas Neue,sans-serif;font-size:26px;letter-spacing:3px;color:#fff;margin-bottom:14px">📊 MARÇO vs ABRIL 2026</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Março (até dia 14)</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#67E8F9;letter-spacing:.5px;line-height:1">R$ 266.446</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">dias 1–14</div>
+    <div style="font-family:Bebas Neue,sans-serif;font-size:26px;letter-spacing:3px;color:#fff;margin-bottom:14px">📊 JAN → ABR 2026 · Evolução Mensal</div>
+    <!-- ── TOTAIS POR MÊS: Jan / Fev / Mar / Abr ── -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="cmp-meses-hero">
+      <!-- Janeiro -->
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--rl);padding:12px 14px;position:relative">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Janeiro 2026</div>
+        <div id="cmp-hero-jan" style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#67E8F9;letter-spacing:.5px;line-height:1">—</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.3);font-weight:600;margin-top:3px">mês completo</div>
+        <div id="cmp-ho-jan" style="font-size:9px;color:rgba(103,232,249,.6);font-weight:700;margin-top:2px">HO: —</div>
       </div>
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Abril (até dia 13)</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#4ADE80;letter-spacing:.5px;line-height:1">R$ 529.486</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">dias 1–13</div>
+      <!-- Fevereiro -->
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--rl);padding:12px 14px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Fevereiro 2026</div>
+        <div id="cmp-hero-fev" style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#A78BFA;letter-spacing:.5px;line-height:1">—</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.3);font-weight:600;margin-top:3px">mês completo</div>
+        <div id="cmp-ho-fev" style="font-size:9px;color:rgba(167,139,250,.6);font-weight:700;margin-top:2px">HO: —</div>
       </div>
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Diferença acumulada</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#4ADE80;letter-spacing:.5px;line-height:1">+R$ 263.048</div>
-        <div style="font-size:9px;color:#4ADE80;font-weight:700">+98,7% vs março</div>
+      <!-- Março -->
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--rl);padding:12px 14px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Março 2026</div>
+        <div id="cmp-hero-mar" style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#FCD34D;letter-spacing:.5px;line-height:1">—</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.3);font-weight:600;margin-top:3px">mês completo</div>
+        <div id="cmp-ho-mar" style="font-size:9px;color:rgba(252,211,77,.6);font-weight:700;margin-top:2px">HO: —</div>
       </div>
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Total Março (mês cheio)</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#FCD34D;letter-spacing:.5px;line-height:1">R$ 774.808</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">31 dias completos</div>
+      <!-- Abril (dinâmico) -->
+      <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:var(--rl);padding:12px 14px">
+        <div style="font-size:9px;font-weight:700;color:rgba(74,222,128,.7);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Abril 2026 🔴 ao vivo</div>
+        <div id="cmp-hero-abr" style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#4ADE80;letter-spacing:.5px;line-height:1">—</div>
+        <div id="cmp-hero-abr-dias" style="font-size:9px;color:rgba(74,222,128,.6);font-weight:600;margin-top:3px">atualizado diariamente</div>
+        <div id="cmp-ho-abr" style="font-size:9px;color:rgba(74,222,128,.6);font-weight:700;margin-top:2px">HO: —</div>
       </div>
+    </div>
+
+    <!-- ── BARRA COMPARATIVA VISUAL ── -->
+    <div id="cmp-bar-visual" style="margin-top:12px;padding:10px 14px;background:rgba(255,255,255,.05);border-radius:var(--rl);border:1px solid rgba(255,255,255,.1)">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">📊 Crescimento mês a mês</div>
+      <div id="cmp-growth-bars"></div>
     </div>
   </div>
 
@@ -1695,124 +1740,13 @@ select.ev-inp{cursor:pointer}
   </div>
 </div>
 
-
-<!-- ══════════════════════════════════════════════════════════════
-     MODAL: IMPORTAR TOTAL GERAL (rec_total_geral)
-     Preenche: Total Real, Tarifa, PaguePay, Coren, Cofen, COREN por estado
-     ══════════════════════════════════════════════════════════════ -->
-<div id="modal-import-geral" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:20px 16px;overflow-y:auto" onclick="if(event.target===this)fecharModalGeral()">
-  <div style="background:var(--w);border-radius:var(--rxl);max-width:640px;width:100%;box-shadow:var(--sh-lg);margin:auto">
-    <div style="background:linear-gradient(135deg,var(--ppd),#1B4332);padding:16px 20px;border-radius:var(--rxl) var(--rxl) 0 0;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:#fff;letter-spacing:2px">📊 IMPORTAR — TOTAL GERAL (rec_total_geral)</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px">Preenche automaticamente: Total Real · Tarifa · PaguePay · Coren · Cofen · COREN por estado</div>
-      </div>
-      <button onclick="fecharModalGeral()" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:16px">✕</button>
-    </div>
-    <div style="padding:18px 20px">
-      <!-- Info box -->
-      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:var(--rm);padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1E40AF;line-height:1.6">
-        <strong>Arquivo:</strong> <code>rec_total_geral_*.csv</code><br>
-        Colunas usadas: <strong>Coren</strong> (MT/PI/MA/CE) · <strong>Valor Recebido</strong> · <strong>Valor Tarifa</strong> · <strong>Pague Play (24,96%)</strong> · <strong>Coren (56,28%)</strong> · <strong>Cofen (18,76%)</strong><br>
-        <span style="color:#6B7280">Abra o CSV, selecione tudo (Ctrl+A), copie (Ctrl+C) e cole abaixo</span>
-      </div>
-
-      <!-- Upload area -->
-      <div id="drop-geral-modal" onclick="document.getElementById('file-geral-modal').click()"
-        ondragover="event.preventDefault();this.style.background='var(--ppl)'"
-        ondragleave="this.style.background=''"
-        ondrop="event.preventDefault();this.style.background='';processarArquivoGeral(event.dataTransfer.files[0])"
-        style="border:2px dashed var(--g300);border-radius:var(--rl);padding:16px;text-align:center;cursor:pointer;margin-bottom:10px;transition:all .2s">
-        <div style="font-size:28px;margin-bottom:6px">📂</div>
-        <div style="font-size:13px;font-weight:700;color:var(--g700)">Clique para selecionar arquivo ou arraste aqui</div>
-        <div style="font-size:11px;color:var(--g500);margin-top:3px">.csv · .xls · .xlsx · .txt</div>
-        <input id="file-geral-modal" type="file" accept=".csv,.txt,.tsv,.xls,.xlsx" style="display:none" onchange="processarArquivoGeral(this.files[0])">
-      </div>
-
-      <!-- Ou cole o texto -->
-      <div style="font-size:11px;font-weight:700;color:var(--g500);text-align:center;margin:8px 0">— ou cole o conteúdo diretamente —</div>
-      <textarea id="txt-geral-modal" placeholder="Cole aqui o conteúdo do CSV (Ctrl+A → Ctrl+C no arquivo) ..."
-        style="width:100%;height:140px;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);padding:10px;font-family:monospace;font-size:11px;color:var(--g700);outline:none;resize:vertical;box-sizing:border-box"
-        oninput="previewGeral(this.value)"></textarea>
-
-      <!-- Preview resultado -->
-      <div id="preview-geral" style="display:none;margin:10px 0;padding:12px 14px;background:var(--g50);border:1px solid var(--g200);border-radius:var(--rm);font-size:12px"></div>
-
-      <div style="display:flex;gap:10px;margin-top:12px">
-        <button onclick="aplicarGeral()"
-          style="flex:1;padding:11px;border-radius:var(--rm);border:none;cursor:pointer;background:linear-gradient(135deg,var(--pp),var(--pp3));color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:14px">
-          ✅ Aplicar Valores
-        </button>
-        <button onclick="fecharModalGeral()"
-          style="padding:11px 18px;border-radius:var(--rm);border:1.5px solid var(--g200);background:var(--w);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;font-size:13px;cursor:pointer">
-          Cancelar
-        </button>
-      </div>
-      <div id="status-geral" style="font-size:12px;font-weight:700;margin-top:8px;display:none;padding:8px 12px;border-radius:var(--rm)"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════════
-     MODAL: IMPORTAR TOTAL EMPRESA (rec_total_empresa)
-     Preenche: Total Arrecadado = soma de Pague Play (24,96%) apenas
-     ══════════════════════════════════════════════════════════════ -->
-<div id="modal-import-empresa" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:20px 16px;overflow-y:auto" onclick="if(event.target===this)fecharModalEmpresa()">
-  <div style="background:var(--w);border-radius:var(--rxl);max-width:620px;width:100%;box-shadow:var(--sh-lg);margin:auto">
-    <div style="background:linear-gradient(135deg,#92400E,#D97706);padding:16px 20px;border-radius:var(--rxl) var(--rxl) 0 0;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:#fff;letter-spacing:2px">💼 IMPORTAR — TOTAL EMPRESA (rec_total_empresa)</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">Preenche o Total Arrecadado = soma da coluna <strong>Pague Play (24,96%)</strong></div>
-      </div>
-      <button onclick="fecharModalEmpresa()" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:16px">✕</button>
-    </div>
-    <div style="padding:18px 20px">
-      <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:var(--rm);padding:10px 14px;margin-bottom:14px;font-size:12px;color:#92400E;line-height:1.6">
-        <strong>Arquivo:</strong> <code>rec_total_empresa_*.csv</code><br>
-        Coluna usada: <strong>Pague Play (24,96%)</strong> — soma de todas as linhas<br>
-        <span style="color:#6B7280">Não altera operadores, equipes ou nenhum outro valor — apenas o campo "Total Arrecadado"</span>
-      </div>
-
-      <div id="drop-empresa-modal" onclick="document.getElementById('file-empresa-modal').click()"
-        ondragover="event.preventDefault();this.style.background='#FFFBEB'"
-        ondragleave="this.style.background=''"
-        ondrop="event.preventDefault();this.style.background='';processarArquivoEmpresa(event.dataTransfer.files[0])"
-        style="border:2px dashed #FCD34D;border-radius:var(--rl);padding:16px;text-align:center;cursor:pointer;margin-bottom:10px;transition:all .2s">
-        <div style="font-size:28px;margin-bottom:6px">📂</div>
-        <div style="font-size:13px;font-weight:700;color:var(--g700)">Clique para selecionar arquivo ou arraste aqui</div>
-        <div style="font-size:11px;color:var(--g500);margin-top:3px">.csv · .xls · .xlsx · .txt</div>
-        <input id="file-empresa-modal" type="file" accept=".csv,.txt,.tsv,.xls,.xlsx" style="display:none" onchange="processarArquivoEmpresa(this.files[0])">
-      </div>
-
-      <div style="font-size:11px;font-weight:700;color:var(--g500);text-align:center;margin:8px 0">— ou cole o conteúdo diretamente —</div>
-      <textarea id="txt-empresa-modal" placeholder="Cole aqui o conteúdo do CSV (rec_total_empresa) ..."
-        style="width:100%;height:130px;background:var(--g50);border:1.5px solid #FCD34D;border-radius:var(--rm);padding:10px;font-family:monospace;font-size:11px;color:var(--g700);outline:none;resize:vertical;box-sizing:border-box"
-        oninput="previewEmpresa(this.value)"></textarea>
-
-      <div id="preview-empresa" style="display:none;margin:10px 0;padding:12px 14px;background:#FFFBEB;border:1px solid #FCD34D;border-radius:var(--rm);font-size:12px"></div>
-
-      <div style="display:flex;gap:10px;margin-top:12px">
-        <button onclick="aplicarEmpresa()"
-          style="flex:1;padding:11px;border-radius:var(--rm);border:none;cursor:pointer;background:linear-gradient(135deg,#D97706,#92400E);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:14px">
-          ✅ Aplicar Total Arrecadado
-        </button>
-        <button onclick="fecharModalEmpresa()"
-          style="padding:11px 18px;border-radius:var(--rm);border:1.5px solid var(--g200);background:var(--w);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;font-size:13px;cursor:pointer">
-          Cancelar
-        </button>
-      </div>
-      <div id="status-empresa" style="font-size:12px;font-weight:700;margin-top:8px;display:none;padding:8px 12px;border-radius:var(--rm)"></div>
-    </div>
-  </div>
-</div>
-
 <div id="toast"></div>
 
 <script>
 // ══════════════════════════════
 // DATA
 // ══════════════════════════════
-const ORIG = {"global":{"total":615130.05,"pp":106472.0,"coren":240077.08,"cofen":80026.32,"daily":{"1":48405.33,"2":23084.24,"3":613.13,"6":80151.77,"7":83229.25,"8":53433.79,"9":91674.35,"10":72426.34,"11":10465.05,"13":61534.03,"14":79847.06,"15":1889.55,"4":1727.96,"12":6040.2,"5":608.0}},"equipes":[{"name":"COFEN MARILIA BRENDA","rec":246029.9,"ho":61507.48,"n_op":14,"acordos":306,"ops":[{"name":"STEPHANIE_FAGUNDES","rec":43916.26,"ho":10979.07,"acordos":73,"ligacoes":73,"med_atraso":1741.0,"med_lig_baixa":2.6,"daily":{"1":3537.92,"2":247.02,"3":306.81,"6":2549.46,"7":8488.56,"8":2615.46,"9":4820.9,"10":3831.64,"11":278.42,"13":9058.96,"14":8181.11},"tipos":{"BOLETO NEGOCIAÇÃO":3794.16,"CARTÃO DE CRÉDITO":12355.92,"PIX":4770.48},"n_ag":132,"val_ag":5854.82,"gerados":15,"pagos":3,"avista":5,"ate3dias":7,"mais3dias":9,"ticket":996.22,"media_dias":5.9,"pendentes":12,"agendados":72,"eficiencia":20.0,"ag_futuro":{"2026-04-30":12,"2026-05-23":3,"2026-04-17":9,"2026-04-23":13,"2026-04-18":7,"2026-04-16":10,"2026-04-24":16,"2026-05-05":2,"2026-05-10":22,"2026-05-01":1,"2026-04-20":12,"2026-04-19":8,"2026-05-30":2,"2026-05-07":1,"2026-04-29":1,"2026-04-26":1,"2026-04-25":3,"2026-05-06":1,"2026-04-22":3,"2026-05-13":1,"2026-05-03":2,"2026-05-09":1,"2026-05-11":1},"pagos_total":"29"},{"name":"raissa_paloma","rec":26451.31,"ho":6612.83,"acordos":25,"ligacoes":25,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":8279.38,"2":374.41,"6":1317.05,"7":924.14,"8":212.24,"9":5170.67,"10":3415.14,"11":587.91,"14":6170.37},"tipos":{"Boleto":1847.01,"Cartão Padrão":7850.88,"Pix":374.41},"n_ag":58,"val_ag":0,"gerados":17,"pagos":7,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":402.89,"media_dias":0.0,"pendentes":10,"agendados":0,"eficiencia":41.2,"ag_futuro":{"2026-04-20":5,"2026-04-19":10,"2026-04-25":3,"2026-04-16":2,"2026-05-07":1,"2026-05-20":1,"2026-05-30":1,"2026-04-22":3,"2026-05-10":3,"2026-04-27":2,"2026-04-17":4,"2026-05-09":2,"2026-05-29":2,"2026-04-24":10,"2026-04-18":3,"2026-05-08":2,"2026-05-02":1,"2026-04-30":1,"2026-05-05":1,"2026-04-26":1},"pagos_total":"29"},{"name":"itallo_cardamoni","rec":27396.5,"ho":6849.12,"acordos":22,"ligacoes":22,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":4995.29,"2":1067.76,"6":2682.45,"7":1002.9,"8":4952.01,"9":1257.41,"10":3675.97,"11":774.16,"13":4341.74,"14":2646.81},"tipos":{"Boleto":88.43,"Cartão Padrão":3801.4,"Pix":4999.7},"n_ag":46,"val_ag":0,"gerados":8,"pagos":5,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":404.07,"media_dias":0.0,"pendentes":3,"agendados":0,"eficiencia":62.5,"ag_futuro":{"2026-05-18":1,"2026-05-04":2,"2026-04-27":1,"2026-04-20":8,"2026-04-23":2,"2026-04-30":2,"2026-05-13":1,"2026-04-18":4,"2026-04-19":3,"2026-04-21":2,"2026-05-09":1,"2026-04-16":3,"2026-04-22":1,"2026-04-17":4,"2026-05-10":1,"2026-05-05":1,"2026-04-24":5,"2026-05-20":1,"2026-05-14":1,"2026-05-16":1,"2026-05-23":1},"pagos_total":"28"},{"name":"silva_beatriz","rec":25287.68,"ho":6321.92,"acordos":43,"ligacoes":43,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":899.45,"2":729.6,"6":5499.68,"7":4889.26,"8":2838.93,"9":3436.4,"10":2785.49,"13":335.38,"14":3873.49},"tipos":{"Boleto":1790.17,"Cartão Padrão":4725.91,"Pix":612.65},"n_ag":80,"val_ag":0,"gerados":29,"pagos":12,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":165.78,"media_dias":0.0,"pendentes":17,"agendados":0,"eficiencia":41.4,"ag_futuro":{"2026-04-17":12,"2026-04-27":5,"2026-04-16":6,"2026-04-25":5,"2026-04-30":11,"2026-04-20":6,"2026-04-18":5,"2026-05-10":10,"2026-04-24":8,"2026-04-23":3,"2026-04-19":4,"2026-05-16":1,"2026-04-21":1,"2026-05-30":2,"2026-04-26":1},"pagos_total":"37"},{"name":"caio_shimite","rec":23520.84,"ho":5880.21,"acordos":15,"ligacoes":15,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":257.15,"2":380.64,"6":3927.79,"7":3808.67,"8":2706.02,"9":9437.98,"10":1882.67,"13":816.27,"14":303.65},"tipos":{"Boleto":1016.84,"Cartão Padrão":1492.87,"Pix":4121.85},"n_ag":144,"val_ag":0,"gerados":11,"pagos":4,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":442.1,"media_dias":0.0,"pendentes":7,"agendados":0,"eficiencia":36.4,"ag_futuro":{"2026-04-30":43,"2026-04-20":14,"2026-04-27":3,"2026-05-22":3,"2026-04-24":2,"2026-05-30":6,"2026-04-25":6,"2026-04-17":16,"2026-05-07":4,"2026-04-16":7,"2026-04-18":3,"2026-05-15":9,"2026-05-05":5,"2026-04-26":1,"2026-04-19":1,"2026-05-02":1,"2026-04-22":4,"2026-05-09":1,"2026-04-28":1,"2026-05-29":1,"2026-05-12":1,"2026-05-13":1,"2026-05-11":1,"2026-05-06":1,"2026-05-08":1,"2026-04-23":2,"2026-05-25":1,"2026-05-10":4,"2026-05-01":1},"pagos_total":"29"},{"name":"BIANCA_V_SILVA","rec":16207.73,"ho":4051.93,"acordos":31,"ligacoes":31,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1432.51,"2":578.86,"6":4196.78,"7":4464.52,"8":602.89,"9":1596.02,"10":879.71,"11":381.61,"14":2074.83},"tipos":{"Boleto":357.85,"Cartão Padrão":5271.44,"Pix":795.14},"n_ag":71,"val_ag":0,"gerados":17,"pagos":3,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":207.24,"media_dias":0.0,"pendentes":14,"agendados":0,"eficiencia":17.6,"ag_futuro":{"2026-05-06":4,"2026-05-09":11,"2026-05-12":1,"2026-05-19":1,"2026-05-07":2,"2026-04-24":6,"2026-04-21":2,"2026-04-18":8,"2026-04-16":6,"2026-05-20":2,"2026-04-26":1,"2026-05-14":1,"2026-04-29":2,"2026-04-22":6,"2026-05-27":1,"2026-04-30":3,"2026-04-19":4,"2026-04-28":1,"2026-04-17":2,"2026-05-24":1,"2026-05-05":1,"2026-04-23":4,"2026-05-22":1},"pagos_total":"17"},{"name":"GIOVANA_SOUZA","rec":15255.71,"ho":3813.93,"acordos":11,"ligacoes":11,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":335.61,"2":468.94,"6":4095.18,"7":748.49,"8":1330.13,"9":1177.29,"10":208.02,"11":284.63,"13":2529.9,"14":4077.52},"tipos":{"Boleto":4279.93,"Pix":958.28},"n_ag":110,"val_ag":0,"gerados":14,"pagos":2,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":476.2,"media_dias":0.0,"pendentes":12,"agendados":0,"eficiencia":14.3,"ag_futuro":{"2026-05-10":33,"2026-05-29":1,"2026-05-09":3,"2026-04-30":4,"2026-04-25":3,"2026-04-24":11,"2026-05-21":1,"2026-05-28":1,"2026-05-04":1,"2026-04-19":9,"2026-04-23":5,"2026-04-27":1,"2026-04-20":6,"2026-04-16":13,"2026-04-18":6,"2026-05-22":1,"2026-04-17":2,"2026-05-05":2,"2026-05-08":2,"2026-04-21":3,"2026-05-02":1,"2026-05-07":1},"pagos_total":"24"},{"name":"thauany_moura","rec":25605.49,"ho":6401.37,"acordos":9,"ligacoes":9,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":402.95,"2":982.69,"6":2410.26,"7":2393.72,"8":2005.73,"9":6234.17,"10":555.65,"11":2273.46,"13":6755.23,"14":1404.76,"15":186.87},"tipos":{"Boleto":1233.73,"Cartão Padrão":961.93,"Pix":2562.17},"n_ag":58,"val_ag":0,"gerados":9,"pagos":5,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":528.65,"media_dias":0.0,"pendentes":4,"agendados":0,"eficiencia":55.6,"ag_futuro":{"2026-04-18":9,"2026-04-24":8,"2026-04-23":6,"2026-04-30":4,"2026-04-22":2,"2026-04-17":2,"2026-05-15":1,"2026-05-30":9,"2026-04-16":5,"2026-05-06":1,"2026-05-23":1,"2026-04-21":2,"2026-04-20":2,"2026-05-10":1,"2026-04-19":3,"2026-05-05":1,"2026-05-01":1},"pagos_total":"26"},{"name":"felipe_arruda","rec":4645.36,"ho":1161.34,"acordos":7,"ligacoes":7,"med_atraso":2298.0,"med_lig_baixa":1.9,"daily":{"4":1727.96,"6":488.6,"11":271.44,"12":1668.76,"13":488.6},"tipos":{"BOLETO NEGOCIAÇÃO":1792.32,"CARTÃO DE CRÉDITO":424.24,"PIX":2428.8},"n_ag":1,"val_ag":341.87,"gerados":9,"pagos":2,"avista":0,"ate3dias":2,"mais3dias":0,"ticket":2322.68,"media_dias":1.0,"pendentes":7,"agendados":7,"eficiencia":22.2,"ag_futuro":{"2026-03-20":1,"2026-03-26":1,"2026-03-31":5}},{"name":"carulini_santos","rec":7607.43,"ho":1901.86,"acordos":29,"ligacoes":29,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1327.21,"2":216.9,"6":2536.5,"7":874.07,"9":1727.85,"14":924.9},"tipos":{"Boleto":587.13,"Cartão Padrão":3067.98,"Pix":553.83},"n_ag":26,"val_ag":0,"gerados":8,"pagos":2,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":145.14,"media_dias":0.0,"pendentes":6,"agendados":0,"eficiencia":25.0,"ag_futuro":{"2026-05-08":1,"2026-05-09":2,"2026-05-13":4,"2026-05-11":2,"2026-04-16":4,"2026-04-20":1,"2026-05-06":3,"2026-04-17":1,"2026-05-04":1,"2026-05-10":2,"2026-05-20":1,"2026-04-24":1,"2026-05-14":2,"2026-04-18":1},"pagos_total":"11"},{"name":"KELY_SILVA","rec":4047.6,"ho":1011.9,"acordos":21,"ligacoes":21,"med_atraso":1091.0,"med_lig_baixa":3.5,"daily":{"2":1360.96,"3":306.32,"9":1259.76,"10":419.72,"12":700.84},"tipos":{"BOLETO NEGOCIAÇÃO":1523.8,"CARTÃO DE CRÉDITO":986.24,"PIX":1537.56},"n_ag":3,"val_ag":634.78,"gerados":2,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":1,"ticket":4047.6,"media_dias":30.0,"pendentes":1,"agendados":1,"eficiencia":50.0,"ag_futuro":{"2026-03-19":1}},{"name":"leticia_romeu","rec":24794.83,"ho":6198.71,"acordos":14,"ligacoes":14,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1011.67,"6":2790.24,"7":1161.14,"8":4701.45,"9":4839.56,"10":2622.06,"13":3968.31,"14":3700.4},"tipos":{"Boleto":1011.67,"Cartão Padrão":1062.87,"Pix":1727.37},"n_ag":69,"val_ag":0,"gerados":15,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":271.56,"media_dias":0.0,"pendentes":14,"agendados":0,"eficiencia":6.7,"ag_futuro":{"2026-05-11":1,"2026-04-16":4,"2026-05-09":2,"2026-04-20":9,"2026-04-17":5,"2026-05-19":2,"2026-04-30":11,"2026-04-19":7,"2026-04-18":8,"2026-04-25":1,"2026-04-23":3,"2026-05-24":1,"2026-05-22":3,"2026-05-10":5,"2026-04-26":1,"2026-05-23":1,"2026-04-21":1,"2026-04-24":2,"2026-05-14":1,"2026-05-15":1},"pagos_total":"16"},{"name":"BRENDA_FERREIRA","rec":915.42,"ho":228.85,"acordos":4,"ligacoes":4,"med_atraso":1894.0,"med_lig_baixa":1.0,"daily":{"1":320.65,"6":90.41,"13":504.36},"tipos":{"BOLETO NEGOCIAÇÃO":504.04,"CARTÃO DE CRÉDITO":1533.64},"n_ag":14,"val_ag":0,"eq":"COFEN MARILIA BRENDA","gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":4,"eficiencia":0.0,"ag_futuro":{"2026-05-10":5,"2026-05-12":3,"2026-05-08":1,"2026-05-30":1,"2026-05-11":1,"2026-04-30":2,"2026-04-20":1},"pagos_total":"5"},{"name":"JESSICA_O_SILVA","rec":377.74,"ho":94.44,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":286.53,"6":91.21},"tipos":{"Boleto":377.74},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":188.87,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}}],"gerados":154,"pagos":47,"pendentes":107},{"name":"COFEN BIRIGUI BRUNA","rec":129153.45,"ho":32288.37,"n_op":10,"acordos":88,"ops":[{"name":"HELTON_ROLDON","rec":14940.13,"ho":3735.03,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":5941.24,"6":384.62,"7":3312.87,"9":2183.96,"14":3117.44},"tipos":{"Boleto":5974.14,"Pix":408.85},"n_ag":57,"val_ag":0,"gerados":9,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":1276.6,"media_dias":0.0,"pendentes":9,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-05-20":1,"2026-05-01":1,"2026-04-18":3,"2026-04-30":2,"2026-05-22":2,"2026-04-21":3,"2026-05-04":1,"2026-04-16":5,"2026-04-22":5,"2026-04-25":5,"2026-05-23":1,"2026-04-20":5,"2026-05-09":1,"2026-04-17":5,"2026-05-29":2,"2026-05-11":3,"2026-04-24":4,"2026-04-23":2,"2026-05-30":1,"2026-05-05":2,"2026-05-15":1,"2026-05-06":1,"2026-04-27":1},"pagos_total":"10"},{"name":"MAYSA_OLIVEIRA","rec":12471.22,"ho":3117.8,"acordos":18,"ligacoes":18,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":3394.69,"2":1382.62,"6":849.72,"7":2070.08,"8":766.14,"9":2575.46,"10":610.05,"13":594.5,"14":227.96},"tipos":{"Boleto":3674.2,"Cartão Padrão":1382.62,"Pix":748.21},"n_ag":59,"val_ag":0,"gerados":13,"pagos":3,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":322.5,"media_dias":0.0,"pendentes":10,"agendados":0,"eficiencia":23.1,"ag_futuro":{"2026-05-15":1,"2026-05-04":6,"2026-05-19":1,"2026-05-12":5,"2026-05-14":2,"2026-04-29":1,"2026-04-22":6,"2026-04-27":7,"2026-04-24":2,"2026-05-10":3,"2026-04-20":4,"2026-04-21":2,"2026-05-22":1,"2026-05-13":1,"2026-04-30":2,"2026-04-16":4,"2026-05-05":2,"2026-05-09":2,"2026-04-25":1,"2026-05-18":2,"2026-05-11":1,"2026-05-20":1,"2026-04-23":2},"pagos_total":"13"},{"name":"RENATARODRIGUES","rec":16371.4,"ho":4092.85,"acordos":3,"ligacoes":3,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":4889.3,"7":4711.73,"8":334.63,"9":2609.8,"10":1639.66,"13":756.28,"14":1430.0},"tipos":{"Boleto":934.14,"Cartão Padrão":3955.16},"n_ag":123,"val_ag":0,"gerados":12,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":1629.77,"media_dias":0.0,"pendentes":11,"agendados":0,"eficiencia":8.3,"ag_futuro":{"2026-04-20":14,"2026-04-30":32,"2026-05-01":20,"2026-05-11":2,"2026-04-21":6,"2026-04-24":16,"2026-04-17":7,"2026-05-29":5,"2026-05-30":6,"2026-04-16":7,"2026-04-23":4,"2026-05-22":1,"2026-05-08":1,"2026-04-27":1,"2026-04-28":1},"pagos_total":"17"},{"name":"MATHEUS_SOUZA","rec":28872.38,"ho":7218.1,"acordos":27,"ligacoes":27,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1348.02,"2":2213.58,"7":7891.94,"8":478.85,"9":5952.06,"10":5571.41,"13":2234.44,"14":3182.08},"tipos":{"Boleto":1712.13,"Cartão Padrão":1477.34,"Pix":444.71},"n_ag":52,"val_ag":0,"gerados":5,"pagos":2,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":134.6,"media_dias":0.0,"pendentes":3,"agendados":0,"eficiencia":40.0,"ag_futuro":{"2026-05-01":13,"2026-04-17":7,"2026-04-20":13,"2026-04-23":6,"2026-05-30":3,"2026-04-24":6,"2026-04-30":2,"2026-05-04":1,"2026-05-12":1},"pagos_total":"20"},{"name":"LYVIA_DIAS","rec":6867.48,"ho":1716.87,"acordos":14,"ligacoes":14,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1680.76,"6":280.07,"7":273.4,"8":1983.13,"9":1227.49,"10":719.46,"13":251.26,"14":451.91},"tipos":{"Boleto":257.04,"Cartão Padrão":954.51,"Pix":1534.17},"n_ag":47,"val_ag":0,"gerados":10,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":196.12,"media_dias":0.0,"pendentes":9,"agendados":0,"eficiencia":10.0,"ag_futuro":{"2026-04-23":6,"2026-05-02":2,"2026-04-17":4,"2026-05-08":2,"2026-04-26":2,"2026-04-30":8,"2026-04-20":2,"2026-04-24":3,"2026-05-24":1,"2026-05-15":1,"2026-05-11":7,"2026-05-29":1,"2026-04-27":4,"2026-05-26":1,"2026-05-10":1,"2026-05-25":1,"2026-04-16":1},"pagos_total":"6"},{"name":"KAROLAINE_SILVA","rec":27036.91,"ho":6759.23,"acordos":8,"ligacoes":8,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":102.62,"6":1737.55,"7":202.17,"8":3233.68,"9":7896.54,"10":5856.3,"13":2922.07,"14":5085.98},"tipos":{"Cartão Padrão":1452.96,"Pix":387.21},"n_ag":96,"val_ag":0,"gerados":8,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":230.02,"media_dias":0.0,"pendentes":7,"agendados":0,"eficiencia":12.5,"ag_futuro":{"2026-04-20":16,"2026-05-01":9,"2026-04-18":12,"2026-04-23":6,"2026-04-19":16,"2026-05-10":7,"2026-04-16":2,"2026-04-30":5,"2026-04-24":7,"2026-04-17":1,"2026-05-07":1,"2026-05-09":5,"2026-04-25":2,"2026-04-29":2,"2026-05-04":1,"2026-05-16":1,"2026-05-06":1,"2026-05-22":1,"2026-05-05":1},"pagos_total":"36"},{"name":"MARIA_BRAIDOTI","rec":4052.23,"ho":1013.06,"acordos":9,"ligacoes":9,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":526.62,"5":608.0,"7":2164.33,"10":533.4,"14":219.88},"tipos":{"Boleto":80.91,"Cartão Padrão":608.0,"Pix":605.84},"n_ag":22,"val_ag":0,"gerados":5,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":143.86,"media_dias":0.0,"pendentes":4,"agendados":0,"eficiencia":20.0,"ag_futuro":{"2026-04-16":4,"2026-04-29":1,"2026-04-19":1,"2026-04-23":1,"2026-05-20":3,"2026-05-22":1,"2026-04-21":5,"2026-05-01":3,"2026-04-30":1,"2026-04-18":1,"2026-04-27":1},"pagos_total":"4"},{"name":"THAYRA_FERREIRASILVA","rec":7203.93,"ho":1800.98,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":578.86,"8":1524.21,"9":444.45,"10":2136.74,"12":574.1,"13":180.0,"14":1765.57},"tipos":{"Pix":578.86},"n_ag":35,"val_ag":0,"gerados":15,"pagos":4,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":578.86,"media_dias":0.0,"pendentes":11,"agendados":0,"eficiencia":26.7,"ag_futuro":{"2026-05-11":1,"2026-04-21":9,"2026-04-22":3,"2026-04-27":4,"2026-04-16":1,"2026-04-17":2,"2026-04-20":6,"2026-04-23":1,"2026-04-25":1,"2026-05-10":1,"2026-04-30":1,"2026-04-26":2,"2026-05-16":1,"2026-04-19":1,"2026-04-24":1},"pagos_total":"11"},{"name":"RAFAELA_MINHOTO","rec":6090.26,"ho":1522.57,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":155.01,"6":158.16,"7":2602.8,"8":820.8,"10":539.55,"11":1813.94},"tipos":{"Pix":313.17},"n_ag":38,"val_ag":0,"gerados":4,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":156.58,"media_dias":0.0,"pendentes":4,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-20":11,"2026-05-08":1,"2026-04-24":2,"2026-05-11":8,"2026-04-16":6,"2026-05-30":1,"2026-04-17":3,"2026-04-30":2,"2026-04-27":2,"2026-04-21":1,"2026-05-18":1},"pagos_total":"5"},{"name":"BRUNA_JUSTIMIANO","rec":5247.51,"ho":1311.88,"acordos":1,"ligacoes":1,"med_atraso":2537.0,"med_lig_baixa":0.0,"daily":{"1":5247.51},"tipos":{"PIX":123.76},"n_ag":0,"val_ag":0,"eq":"COFEN BIRIGUI BRUNA","gerados":1,"pagos":1,"avista":1,"ate3dias":0,"mais3dias":0,"ticket":123.76,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":100.0,"ag_futuro":{},"pagos_total":"1"}],"gerados":82,"pagos":14,"pendentes":68},{"name":"COFEN STEPHANIE 2° TURNO","rec":159705.21,"ho":39926.3,"n_op":11,"acordos":188,"ops":[{"name":"larissa_santana","rec":5158.88,"ho":1289.72,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":642.78,"7":1943.1,"8":429.72,"9":296.37,"13":1000.15,"14":846.76},"tipos":{"Boleto":642.78},"n_ag":47,"val_ag":0,"gerados":4,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":321.39,"media_dias":0.0,"pendentes":4,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-05-10":8,"2026-04-30":3,"2026-05-11":8,"2026-04-16":3,"2026-05-04":8,"2026-04-19":3,"2026-04-23":2,"2026-05-08":1,"2026-05-12":2,"2026-05-06":4,"2026-05-29":1,"2026-04-17":1,"2026-04-20":1,"2026-04-27":1,"2026-04-24":1},"pagos_total":"9"},{"name":"jussara_pereira","rec":19924.95,"ho":4981.24,"acordos":8,"ligacoes":8,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1161.14,"2":660.31,"6":2410.89,"7":5943.8,"8":2765.19,"9":2335.37,"10":980.27,"13":1263.98,"14":2404.0},"tipos":{"Boleto":2247.86,"Cartão Padrão":1324.17,"Pix":660.31},"n_ag":115,"val_ag":0,"gerados":1,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":529.04,"media_dias":0.0,"pendentes":1,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-05-29":50,"2026-04-30":44,"2026-05-30":1,"2026-05-02":1,"2026-05-08":1,"2026-04-24":4,"2026-05-17":1,"2026-04-29":1,"2026-04-20":1,"2026-04-25":1,"2026-04-23":8,"2026-05-06":1,"2026-04-17":1},"pagos_total":"21"},{"name":"aline_pupim","rec":22268.82,"ho":5567.2,"acordos":50,"ligacoes":50,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":3522.02,"2":3500.46,"6":6419.93,"7":2373.18,"8":2535.37,"10":1135.69,"13":1930.73,"14":851.44},"tipos":{"Boleto":2444.38,"Cartão Padrão":9187.57,"Pix":4227.5},"n_ag":76,"val_ag":0,"gerados":15,"pagos":5,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":317.19,"media_dias":0.0,"pendentes":10,"agendados":0,"eficiencia":33.3,"ag_futuro":{"2026-05-11":5,"2026-04-29":2,"2026-04-18":4,"2026-04-20":9,"2026-04-26":1,"2026-04-16":9,"2026-04-17":4,"2026-04-25":4,"2026-05-10":12,"2026-05-07":3,"2026-04-30":6,"2026-04-23":3,"2026-04-24":4,"2026-05-14":1,"2026-05-15":1,"2026-05-29":1,"2026-05-04":2,"2026-04-27":1,"2026-05-02":2,"2026-05-03":1,"2026-04-21":1},"pagos_total":"26"},{"name":"thais_mayara","rec":11486.95,"ho":2871.74,"acordos":3,"ligacoes":3,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":174.24,"6":216.72,"7":1998.67,"8":1091.01,"9":3474.3,"10":2380.29,"14":2151.72},"tipos":{"Boleto":390.96,"Pix":546.88},"n_ag":34,"val_ag":0,"gerados":7,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":312.61,"media_dias":0.0,"pendentes":6,"agendados":0,"eficiencia":14.3,"ag_futuro":{"2026-04-23":7,"2026-05-04":1,"2026-04-18":3,"2026-05-10":7,"2026-04-25":1,"2026-04-16":1,"2026-04-19":2,"2026-04-17":4,"2026-04-24":4,"2026-04-26":1,"2026-04-30":1,"2026-04-20":1,"2026-04-22":1},"pagos_total":"14"},{"name":"geovanna_almeida","rec":17293.57,"ho":4323.39,"acordos":19,"ligacoes":19,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":87.15,"6":5815.24,"7":225.51,"9":982.11,"10":4981.59,"13":4133.52,"14":1068.45},"tipos":{"Boleto":1551.81,"Cartão Padrão":1943.3,"Pix":2672.17},"n_ag":122,"val_ag":0,"gerados":5,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":324.59,"media_dias":0.0,"pendentes":4,"agendados":0,"eficiencia":20.0,"ag_futuro":{"2026-05-05":8,"2026-04-23":8,"2026-04-20":5,"2026-05-14":7,"2026-04-30":4,"2026-05-10":10,"2026-04-17":7,"2026-04-19":5,"2026-05-06":13,"2026-05-07":6,"2026-05-08":2,"2026-04-27":2,"2026-04-16":6,"2026-05-22":9,"2026-05-19":2,"2026-05-13":4,"2026-04-24":3,"2026-05-24":5,"2026-05-02":1,"2026-05-20":2,"2026-05-15":1,"2026-05-03":1,"2026-04-18":2,"2026-05-09":1,"2026-04-25":2,"2026-05-16":1,"2026-04-29":1,"2026-05-25":1,"2026-04-21":1,"2026-04-22":1,"2026-05-26":1},"pagos_total":"20"},{"name":"ISABELA_MONTEIRO","rec":8563.52,"ho":2140.88,"acordos":16,"ligacoes":16,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1903.35,"6":748.45,"7":251.88,"8":1382.09,"13":50.62,"14":4227.13},"tipos":{"Boleto":610.69,"Cartão Padrão":1347.03,"Pix":748.45},"n_ag":53,"val_ag":0,"gerados":9,"pagos":5,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":169.14,"media_dias":0.0,"pendentes":4,"agendados":0,"eficiencia":55.6,"ag_futuro":{"2026-04-24":8,"2026-05-06":3,"2026-04-16":5,"2026-05-16":1,"2026-04-26":2,"2026-05-10":3,"2026-05-07":2,"2026-05-05":3,"2026-04-25":3,"2026-05-12":2,"2026-05-11":7,"2026-04-17":2,"2026-05-18":3,"2026-05-25":2,"2026-04-21":1,"2026-04-30":1,"2026-05-04":1,"2026-04-23":1,"2026-04-19":1,"2026-04-27":1,"2026-05-24":1},"pagos_total":"19"},{"name":"thalia_thomaz","rec":4860.45,"ho":1215.11,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":204.83,"6":4411.86,"8":243.76},"tipos":{"Boleto":312.83,"Pix":4411.86},"n_ag":25,"val_ag":0,"gerados":3,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":944.94,"media_dias":0.0,"pendentes":3,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-16":11,"2026-05-16":1,"2026-05-06":4,"2026-04-17":3,"2026-05-10":2,"2026-04-30":2,"2026-05-30":1,"2026-05-20":1},"pagos_total":"5"},{"name":"katia_regina","rec":31864.47,"ho":7966.12,"acordos":52,"ligacoes":52,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":279.18,"2":403.96,"6":8904.5,"7":6890.86,"8":2435.68,"9":1030.65,"10":766.97,"13":4365.14,"14":5366.54,"15":1420.99},"tipos":{"Boleto":106.0,"Cartão Padrão":7680.2,"Pix":1801.44},"n_ag":80,"val_ag":0,"gerados":3,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":184.38,"media_dias":0.0,"pendentes":2,"agendados":0,"eficiencia":33.3,"ag_futuro":{"2026-05-09":10,"2026-04-23":5,"2026-05-22":2,"2026-04-20":3,"2026-05-10":4,"2026-04-16":17,"2026-04-30":3,"2026-04-17":7,"2026-04-26":1,"2026-04-24":11,"2026-04-18":3,"2026-05-07":1,"2026-05-08":2,"2026-05-18":1,"2026-05-17":3,"2026-05-27":1,"2026-05-19":1,"2026-05-23":1,"2026-05-30":1,"2026-04-25":1,"2026-05-05":1,"2026-05-16":1},"pagos_total":"24"},{"name":"kauane_azevedo","rec":22678.12,"ho":5669.53,"acordos":23,"ligacoes":23,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":62.65,"2":442.87,"6":4831.06,"7":931.23,"8":1588.21,"9":3365.9,"10":3657.43,"13":1585.02,"14":6213.75},"tipos":{"Boleto":2175.7,"Cartão Padrão":4647.67,"Pix":307.44},"n_ag":50,"val_ag":0,"gerados":8,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":310.04,"media_dias":0.0,"pendentes":7,"agendados":0,"eficiencia":12.5,"ag_futuro":{"2026-05-01":4,"2026-04-18":4,"2026-04-30":5,"2026-04-23":7,"2026-05-10":7,"2026-04-20":3,"2026-04-16":5,"2026-04-24":5,"2026-05-11":3,"2026-04-19":3,"2026-05-20":1,"2026-04-25":2,"2026-04-27":1},"pagos_total":"17"},{"name":"thais_c_ferreira","rec":3855.82,"ho":963.96,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1437.3,"6":1106.36,"7":1312.16},"tipos":{"Pix":2543.66},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":508.73,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"AMABELLY_SANTOS","rec":11749.66,"ho":2937.41,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":961.93,"6":742.79,"8":4045.7,"9":4927.01,"10":589.16,"13":198.22,"14":284.85},"tipos":{"Boleto":325.67,"Cartão Padrão":961.93,"Pix":417.12},"n_ag":55,"val_ag":0,"gerados":4,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":340.94,"media_dias":0.0,"pendentes":3,"agendados":0,"eficiencia":25.0,"ag_futuro":{"2026-05-02":1,"2026-04-16":9,"2026-04-20":11,"2026-05-20":3,"2026-04-24":7,"2026-04-19":4,"2026-05-04":1,"2026-04-27":4,"2026-05-10":3,"2026-05-25":1,"2026-05-03":1,"2026-05-11":1,"2026-04-23":2,"2026-04-30":2,"2026-05-22":1,"2026-04-17":3,"2026-04-21":1},"pagos_total":"10"}],"gerados":59,"pagos":15,"pendentes":44},{"name":"COFEN BIRIGUI LUCIANO","rec":63172.77,"ho":15793.19,"n_op":10,"acordos":43,"ops":[{"name":"HELENA_SANTOS","rec":560.35,"ho":140.09,"acordos":2,"ligacoes":2,"med_atraso":3420.0,"med_lig_baixa":2.5,"daily":{"7":124.43,"13":127.22,"14":308.7},"tipos":{"BOLETO NEGOCIAÇÃO":4900.8},"n_ag":33,"val_ag":0,"gerados":2,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":1,"ticket":4900.8,"media_dias":5.0,"pendentes":1,"agendados":11,"eficiencia":50.0,"ag_futuro":{"2026-05-30":1,"2026-04-16":1,"2026-05-11":4,"2026-04-20":3,"2026-04-24":2,"2026-05-10":2,"2026-05-12":3,"2026-04-27":7,"2026-05-14":3,"2026-04-23":1,"2026-05-13":1,"2026-04-21":1,"2026-04-22":1,"2026-05-01":1,"2026-05-15":1,"2026-04-25":1},"pagos_total":"3"},{"name":"ANA_BENTO","rec":10327.5,"ho":2581.88,"acordos":6,"ligacoes":6,"med_atraso":1187.0,"med_lig_baixa":2.5,"daily":{"1":773.63,"6":767.43,"7":366.85,"8":92.25,"9":1344.51,"10":583.52,"11":578.86,"13":3604.89,"14":1933.87,"15":281.69},"tipos":{"BOLETO NEGOCIAÇÃO":919.8,"PIX":1867.24},"n_ag":33,"val_ag":0,"gerados":5,"pagos":1,"avista":1,"ate3dias":1,"mais3dias":0,"ticket":1393.52,"media_dias":0.5,"pendentes":4,"agendados":17,"eficiencia":20.0,"ag_futuro":{"2026-04-25":8,"2026-04-20":4,"2026-04-30":1,"2026-05-11":1,"2026-04-28":3,"2026-05-05":1,"2026-05-01":1,"2026-05-14":1,"2026-04-29":1,"2026-04-23":3,"2026-04-24":2,"2026-04-17":1,"2026-04-27":2,"2026-05-06":1,"2026-04-22":2,"2026-04-16":1},"pagos_total":"11"},{"name":"MARIA_MOREIRASANTOS","rec":14749.06,"ho":3687.26,"acordos":7,"ligacoes":7,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1572.28,"6":252.03,"7":1535.18,"8":1210.65,"10":7242.37,"13":2544.23,"14":392.32},"tipos":{"Boleto":428.75,"Cartão Padrão":1395.56},"n_ag":44,"val_ag":0,"gerados":6,"pagos":2,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":260.62,"media_dias":0.0,"pendentes":4,"agendados":0,"eficiencia":33.3,"ag_futuro":{"2026-05-11":15,"2026-05-12":2,"2026-05-08":3,"2026-04-22":4,"2026-05-06":1,"2026-05-09":3,"2026-04-20":8,"2026-05-01":1,"2026-04-29":1,"2026-05-10":2,"2026-04-24":1,"2026-04-17":1,"2026-04-23":2},"pagos_total":"14"},{"name":"FRANCISCA_BRITO","rec":15396.14,"ho":3849.03,"acordos":4,"ligacoes":4,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":1716.4,"7":3501.93,"8":213.36,"9":508.33,"10":7246.37,"11":578.86,"13":267.02,"14":1363.87},"tipos":{"Boleto":758.18,"Cartão Padrão":958.22},"n_ag":36,"val_ag":0,"gerados":5,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":429.1,"media_dias":0.0,"pendentes":5,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-22":3,"2026-04-23":2,"2026-04-25":4,"2026-04-29":2,"2026-05-12":10,"2026-04-24":1,"2026-05-11":3,"2026-04-20":1,"2026-05-06":1,"2026-04-18":3,"2026-04-21":2,"2026-05-18":1,"2026-04-17":2,"2026-04-27":1},"pagos_total":"11"},{"name":"DEBORA_ANDRIELLY","rec":449.03,"ho":112.26,"acordos":15,"ligacoes":15,"med_atraso":764.0,"med_lig_baixa":5.1,"daily":{"9":280.13,"11":168.9},"tipos":{"BOLETO NEGOCIAÇÃO":92.72,"CARTÃO DE CRÉDITO":1067.04,"PIX":299.68},"n_ag":35,"val_ag":1249.79,"gerados":5,"pagos":0,"avista":0,"ate3dias":2,"mais3dias":0,"ticket":729.72,"media_dias":2.0,"pendentes":5,"agendados":17,"eficiencia":0.0,"ag_futuro":{"2026-05-10":15,"2026-04-22":1,"2026-04-26":2,"2026-05-18":2,"2026-04-18":3,"2026-05-11":1,"2026-05-12":1,"2026-05-30":1,"2026-05-25":1,"2026-05-03":1,"2026-04-25":2,"2026-04-30":2,"2026-05-22":1,"2026-04-20":1,"2026-04-23":1},"pagos_total":"4"},{"name":"EDUARDO_SILVA","rec":3815.53,"ho":953.88,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":933.88,"7":222.37,"8":131.4,"9":774.24,"10":1753.64},"tipos":{"Pix":933.88},"n_ag":55,"val_ag":0,"gerados":4,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":466.94,"media_dias":0.0,"pendentes":3,"agendados":0,"eficiencia":25.0,"ag_futuro":{"2026-05-10":11,"2026-05-15":4,"2026-05-12":5,"2026-04-18":2,"2026-05-09":1,"2026-05-18":2,"2026-05-11":6,"2026-04-27":1,"2026-05-23":3,"2026-04-19":2,"2026-05-07":1,"2026-05-16":1,"2026-04-17":4,"2026-05-08":1,"2026-04-24":3,"2026-04-23":2,"2026-04-25":1,"2026-04-30":1,"2026-04-29":1,"2026-04-28":1,"2026-04-20":2},"pagos_total":"6"},{"name":"NAYARA_CRUZ","rec":164.76,"ho":41.19,"acordos":4,"ligacoes":4,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":164.76},"tipos":{"Cartão Padrão":437.4,"Pix":164.76},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":150.54,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"LEONARDO_NUNES","rec":10976.36,"ho":2744.09,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":381.61,"7":2200.61,"8":578.86,"9":1532.17,"13":4266.58,"14":2016.53},"tipos":{"Pix":381.61},"n_ag":44,"val_ag":0,"gerados":2,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":381.61,"media_dias":0.0,"pendentes":2,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-23":4,"2026-04-17":5,"2026-04-20":3,"2026-05-10":11,"2026-04-24":4,"2026-04-21":4,"2026-04-16":3,"2026-05-12":3,"2026-04-19":1,"2026-04-18":2,"2026-04-30":2,"2026-04-26":1,"2026-04-27":1},"pagos_total":"11"},{"name":"MARIA_RODARTE","rec":4602.02,"ho":1150.51,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":178.07,"9":4423.95},"tipos":{"Boleto":178.07},"n_ag":6,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":178.07,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-29":1,"2026-04-23":1,"2026-04-17":2,"2026-04-20":1,"2026-04-24":1},"pagos_total":"2"},{"name":"JOAO_MIRANDA","rec":2132.02,"ho":533.0,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"8":1858.62,"9":273.4},"tipos":{"Boleto":82.73},"n_ag":6,"val_ag":0,"gerados":4,"pagos":2,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":82.73,"media_dias":0.0,"pendentes":2,"agendados":0,"eficiencia":50.0,"ag_futuro":{"2026-04-20":5,"2026-05-05":1},"pagos_total":"4"}],"gerados":33,"pagos":7,"pendentes":26},{"name":"ELITE","rec":17068.72,"ho":4267.17,"n_op":2,"acordos":120,"ops":[{"name":"CLEBER_JUNIOR","rec":10592.22,"ho":2648.05,"acordos":83,"ligacoes":83,"med_atraso":2032.0,"med_lig_baixa":0.2,"daily":{"2":235.97,"8":1725.62,"9":275.28,"10":3226.4,"11":1260.65,"12":3096.5,"14":771.8},"tipos":{"BOLETO NEGOCIAÇÃO":1496.72,"CARTÃO DE CRÉDITO":11643.4,"PIX":1702.04},"n_ag":22,"val_ag":1929.26,"gerados":1,"pagos":1,"avista":11,"ate3dias":2,"mais3dias":0,"ticket":1141.7,"media_dias":0.2,"pendentes":0,"agendados":11,"eficiencia":100.0,"ag_futuro":{"2026-04-18":12,"2026-04-30":3,"2026-04-16":1,"2026-04-22":1,"2026-04-20":3,"2026-05-04":1,"2026-04-24":1},"pagos_total":"12"},{"name":"JHONATA_NASCIMENTO","rec":6476.5,"ho":1619.12,"acordos":37,"ligacoes":37,"med_atraso":1314.0,"med_lig_baixa":0.2,"daily":{"1":299.25,"6":273.4,"7":1422.7,"9":2002.86,"11":1212.21,"13":459.41,"14":806.67},"tipos":{"BOLETO NEGOCIAÇÃO":3013.64,"CARTÃO DE CRÉDITO":1189.12,"PIX":6952.32},"n_ag":17,"val_ag":761.3,"gerados":4,"pagos":4,"avista":11,"ate3dias":4,"mais3dias":3,"ticket":619.73,"media_dias":2.0,"pendentes":0,"agendados":13,"eficiencia":100.0,"ag_futuro":{"2026-04-21":2,"2026-04-19":4,"2026-04-30":2,"2026-04-24":1,"2026-04-25":3,"2026-05-07":1,"2026-04-16":1,"2026-05-05":1,"2026-05-01":1,"2026-04-26":1},"pagos_total":"14"},{"name":"fabio_aquino","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":0,"med_lig_baixa":0,"daily":{},"tipos":{},"n_ag":6,"val_ag":0,"gerados":1,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0,"pendentes":1,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-05-15":1,"2026-04-23":1,"2026-04-30":3,"2026-04-17":1},"pagos_total":"3"}],"gerados":6,"pagos":5,"pendentes":1}]};
+const ORIG = {"global":{"total":529268.02,"pp":106472.0,"coren":240077.08,"cofen":80026.32,"daily":{"1":48405.33,"2":23084.24,"3":613.13,"6":80151.77,"7":83229.25,"8":53433.79,"9":91674.35,"10":72426.34,"11":10465.05,"13":57408.61,"4":1727.96,"12":6040.2,"5":608.0}},"equipes":[{"name":"COFEN MARILIA BRENDA","rec":212485.19,"ho":53121.3,"n_op":14,"acordos":306,"ops":[{"name":"STEPHANIE_FAGUNDES","rec":35735.15,"ho":8933.79,"acordos":73,"ligacoes":73,"med_atraso":1741.0,"med_lig_baixa":2.6,"daily":{"1":3537.92,"2":247.02,"3":306.81,"6":2549.46,"7":8488.56,"8":2615.46,"9":4820.9,"10":3831.64,"11":278.42,"13":9058.96},"tipos":{"BOLETO NEGOCIAÇÃO":3794.16,"CARTÃO DE CRÉDITO":12355.92,"PIX":4770.48},"n_ag":132,"val_ag":5854.82,"gerados":93,"pagos":21,"avista":5,"ate3dias":7,"mais3dias":9,"ticket":996.22,"media_dias":5.9,"pendentes":72,"agendados":72,"eficiencia":22.6,"ag_futuro":{"2026-04-07":3,"2026-04-09":8,"2026-04-10":19,"2026-04-11":8,"2026-04-12":5,"2026-04-13":1,"2026-04-16":8,"2026-04-17":6,"2026-04-18":6,"2026-04-19":5,"2026-04-20":10,"2026-04-22":2,"2026-04-23":9,"2026-04-25":3,"2026-04-29":1,"2026-04-30":8,"2026-05-01":1,"2026-05-03":2,"2026-05-05":1,"2026-05-06":1,"2026-05-07":1,"2026-05-09":1,"2026-05-10":20,"2026-05-13":1,"2026-05-23":2}},{"name":"raissa_paloma","rec":20280.94,"ho":5070.24,"acordos":25,"ligacoes":25,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":8279.38,"2":374.41,"6":1317.05,"7":924.14,"8":212.24,"9":5170.67,"10":3415.14,"11":587.91},"tipos":{"Boleto":1847.01,"Cartão Padrão":7850.88,"Pix":374.41},"n_ag":59,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":402.89,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":3,"2026-04-09":16,"2026-04-10":2,"2026-04-11":6,"2026-04-12":3,"2026-04-15":1,"2026-04-16":1,"2026-04-17":2,"2026-04-18":2,"2026-04-19":5,"2026-04-20":1,"2026-04-22":1,"2026-04-25":2,"2026-04-27":2,"2026-04-30":1,"2026-05-02":1,"2026-05-05":1,"2026-05-08":1,"2026-05-09":2,"2026-05-10":3,"2026-05-20":1}},{"name":"itallo_cardamoni","rec":24749.69,"ho":6187.42,"acordos":22,"ligacoes":22,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":4995.29,"2":1067.76,"6":2682.45,"7":1002.9,"8":4952.01,"9":1257.41,"10":3675.97,"11":774.16,"13":4341.74},"tipos":{"Boleto":88.43,"Cartão Padrão":3801.4,"Pix":4999.7},"n_ag":39,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":404.07,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":3,"2026-04-08":1,"2026-04-09":3,"2026-04-10":8,"2026-04-11":1,"2026-04-12":2,"2026-04-16":3,"2026-04-17":2,"2026-04-18":2,"2026-04-19":2,"2026-04-20":3,"2026-04-22":1,"2026-04-27":1,"2026-05-05":1,"2026-05-09":1,"2026-05-13":1,"2026-05-14":1,"2026-05-18":1,"2026-05-20":1,"2026-05-23":1}},{"name":"silva_beatriz","rec":21414.19,"ho":5353.55,"acordos":43,"ligacoes":43,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":899.45,"2":729.6,"6":5499.68,"7":4889.26,"8":2838.93,"9":3436.4,"10":2785.49,"13":335.38},"tipos":{"Boleto":1790.17,"Cartão Padrão":4725.91,"Pix":612.65},"n_ag":74,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":165.78,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-09":1,"2026-04-10":7,"2026-04-11":17,"2026-04-13":3,"2026-04-14":1,"2026-04-16":2,"2026-04-17":7,"2026-04-18":3,"2026-04-19":2,"2026-04-20":4,"2026-04-21":1,"2026-04-23":3,"2026-04-25":2,"2026-04-26":1,"2026-04-27":1,"2026-04-30":9,"2026-05-10":8}},{"name":"caio_shimite","rec":23217.19,"ho":5804.3,"acordos":15,"ligacoes":15,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":257.15,"2":380.64,"6":3927.79,"7":3808.67,"8":2706.02,"9":9437.98,"10":1882.67,"13":816.27},"tipos":{"Boleto":1016.84,"Cartão Padrão":1492.87,"Pix":4121.85},"n_ag":124,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":442.1,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-09":1,"2026-04-10":11,"2026-04-12":1,"2026-04-14":5,"2026-04-16":4,"2026-04-17":13,"2026-04-18":1,"2026-04-20":13,"2026-04-22":3,"2026-04-23":2,"2026-04-24":1,"2026-04-25":6,"2026-04-26":1,"2026-04-27":3,"2026-04-28":1,"2026-04-30":33,"2026-05-01":1,"2026-05-05":4,"2026-05-08":1,"2026-05-09":1,"2026-05-10":4,"2026-05-11":1,"2026-05-12":1,"2026-05-15":8,"2026-05-22":2,"2026-05-25":1}},{"name":"BIANCA_V_SILVA","rec":14132.9,"ho":3533.22,"acordos":31,"ligacoes":31,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1432.51,"2":578.86,"6":4196.78,"7":4464.52,"8":602.89,"9":1596.02,"10":879.71,"11":381.61},"tipos":{"Boleto":357.85,"Cartão Padrão":5271.44,"Pix":795.14},"n_ag":75,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":207.24,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":1,"2026-04-09":5,"2026-04-10":7,"2026-04-11":4,"2026-04-14":1,"2026-04-15":5,"2026-04-16":3,"2026-04-17":2,"2026-04-18":4,"2026-04-19":3,"2026-04-21":2,"2026-04-22":5,"2026-04-23":1,"2026-04-24":2,"2026-04-28":1,"2026-04-29":2,"2026-04-30":3,"2026-05-06":4,"2026-05-07":2,"2026-05-09":10,"2026-05-12":1,"2026-05-14":1,"2026-05-19":1,"2026-05-20":2,"2026-05-24":1}},{"name":"GIOVANA_SOUZA","rec":11178.19,"ho":2794.55,"acordos":11,"ligacoes":11,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":335.61,"2":468.94,"6":4095.18,"7":748.49,"8":1330.13,"9":1177.29,"10":208.02,"11":284.63,"13":2529.9},"tipos":{"Boleto":4279.93,"Pix":958.28},"n_ag":107,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":476.2,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":3,"2026-04-10":12,"2026-04-11":12,"2026-04-12":3,"2026-04-13":1,"2026-04-16":12,"2026-04-17":1,"2026-04-18":4,"2026-04-19":9,"2026-04-20":7,"2026-04-21":3,"2026-04-23":5,"2026-04-24":1,"2026-04-25":1,"2026-04-27":1,"2026-04-30":3,"2026-05-02":1,"2026-05-04":1,"2026-05-05":2,"2026-05-07":1,"2026-05-08":2,"2026-05-09":3,"2026-05-10":17,"2026-05-21":1,"2026-05-28":1}},{"name":"thauany_moura","rec":24013.86,"ho":6003.46,"acordos":9,"ligacoes":9,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":402.95,"2":982.69,"6":2410.26,"7":2393.72,"8":2005.73,"9":6234.17,"10":555.65,"11":2273.46,"13":6755.23},"tipos":{"Boleto":1233.73,"Cartão Padrão":961.93,"Pix":2562.17},"n_ag":50,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":528.65,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-08":1,"2026-04-09":1,"2026-04-10":18,"2026-04-11":1,"2026-04-15":3,"2026-04-16":3,"2026-04-17":1,"2026-04-18":7,"2026-04-19":1,"2026-04-20":1,"2026-04-21":1,"2026-04-22":1,"2026-04-23":3,"2026-04-24":1,"2026-04-30":2,"2026-05-01":1,"2026-05-05":1,"2026-05-10":1,"2026-05-15":1,"2026-05-23":1}},{"name":"felipe_arruda","rec":4645.36,"ho":1161.34,"acordos":7,"ligacoes":7,"med_atraso":2298.0,"med_lig_baixa":1.9,"daily":{"4":1727.96,"6":488.6,"11":271.44,"12":1668.76,"13":488.6},"tipos":{"BOLETO NEGOCIAÇÃO":1792.32,"CARTÃO DE CRÉDITO":424.24,"PIX":2428.8},"n_ag":1,"val_ag":341.87,"gerados":9,"pagos":2,"avista":0,"ate3dias":2,"mais3dias":0,"ticket":2322.68,"media_dias":1.0,"pendentes":7,"agendados":7,"eficiencia":22.2,"ag_futuro":{"2026-03-20":1,"2026-03-26":1,"2026-03-31":5}},{"name":"carulini_santos","rec":6682.53,"ho":1670.63,"acordos":29,"ligacoes":29,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1327.21,"2":216.9,"6":2536.5,"7":874.07,"9":1727.85},"tipos":{"Boleto":587.13,"Cartão Padrão":3067.98,"Pix":553.83},"n_ag":28,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":145.14,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-08":2,"2026-04-09":1,"2026-04-10":3,"2026-04-11":5,"2026-04-12":1,"2026-04-16":3,"2026-04-17":1,"2026-04-18":1,"2026-04-20":1,"2026-05-04":1,"2026-05-06":2,"2026-05-08":1,"2026-05-09":1,"2026-05-11":2,"2026-05-13":2}},{"name":"KELY_SILVA","rec":4047.6,"ho":1011.9,"acordos":21,"ligacoes":21,"med_atraso":1091.0,"med_lig_baixa":3.5,"daily":{"2":1360.96,"3":306.32,"9":1259.76,"10":419.72,"12":700.84},"tipos":{"BOLETO NEGOCIAÇÃO":1523.8,"CARTÃO DE CRÉDITO":986.24,"PIX":1537.56},"n_ag":3,"val_ag":634.78,"gerados":2,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":1,"ticket":4047.6,"media_dias":30.0,"pendentes":1,"agendados":1,"eficiencia":50.0,"ag_futuro":{"2026-03-19":1}},{"name":"leticia_romeu","rec":21094.43,"ho":5273.61,"acordos":14,"ligacoes":14,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1011.67,"6":2790.24,"7":1161.14,"8":4701.45,"9":4839.56,"10":2622.06,"13":3968.31},"tipos":{"Boleto":1011.67,"Cartão Padrão":1062.87,"Pix":1727.37},"n_ag":82,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":271.56,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-09":1,"2026-04-10":13,"2026-04-11":14,"2026-04-13":1,"2026-04-15":1,"2026-04-16":2,"2026-04-17":3,"2026-04-18":5,"2026-04-19":5,"2026-04-20":7,"2026-04-21":1,"2026-04-23":3,"2026-04-26":1,"2026-04-30":8,"2026-05-09":2,"2026-05-10":5,"2026-05-11":1,"2026-05-15":1,"2026-05-19":2,"2026-05-22":2,"2026-05-23":1,"2026-05-24":1}},{"name":"BRENDA_FERREIRA","rec":915.42,"ho":228.85,"acordos":4,"ligacoes":4,"med_atraso":1894.0,"med_lig_baixa":1.0,"daily":{"1":320.65,"6":90.41,"13":504.36},"tipos":{"BOLETO NEGOCIAÇÃO":504.04,"CARTÃO DE CRÉDITO":1533.64},"n_ag":9,"val_ag":0,"eq":"COFEN MARILIA BRENDA","gerados":4,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":4,"agendados":4,"eficiencia":0.0,"ag_futuro":{"2026-04-10":1,"2026-04-20":1,"2026-04-30":2,"2026-05-10":4,"2026-05-11":1}},{"name":"JESSICA_O_SILVA","rec":377.74,"ho":94.44,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":286.53,"6":91.21},"tipos":{"Boleto":377.74},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":188.87,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}}]},{"name":"COFEN BIRIGUI BRUNA","rec":113365.41,"ho":28341.34,"n_op":10,"acordos":88,"ops":[{"name":"HELTON_ROLDON","rec":11822.69,"ho":2955.67,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":5941.24,"6":384.62,"7":3312.87,"9":2183.96},"tipos":{"Boleto":5974.14,"Pix":408.85},"n_ag":57,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":1276.6,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-08":1,"2026-04-09":3,"2026-04-10":5,"2026-04-11":5,"2026-04-13":3,"2026-04-14":1,"2026-04-16":3,"2026-04-17":4,"2026-04-18":3,"2026-04-20":5,"2026-04-21":3,"2026-04-22":5,"2026-04-23":2,"2026-04-24":2,"2026-04-25":1,"2026-04-27":1,"2026-04-30":2,"2026-05-01":1,"2026-05-05":1,"2026-05-11":2,"2026-05-15":1,"2026-05-22":2}},{"name":"MAYSA_OLIVEIRA","rec":12243.26,"ho":3060.81,"acordos":18,"ligacoes":18,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":3394.69,"2":1382.62,"6":849.72,"7":2070.08,"8":766.14,"9":2575.46,"10":610.05,"13":594.5},"tipos":{"Boleto":3674.2,"Cartão Padrão":1382.62,"Pix":748.21},"n_ag":59,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":322.5,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-09":3,"2026-04-10":7,"2026-04-13":3,"2026-04-14":6,"2026-04-16":3,"2026-04-20":4,"2026-04-21":2,"2026-04-22":6,"2026-04-23":1,"2026-04-25":1,"2026-04-27":4,"2026-04-29":1,"2026-05-04":3,"2026-05-05":2,"2026-05-10":1,"2026-05-11":1,"2026-05-12":4,"2026-05-15":1,"2026-05-18":2,"2026-05-19":1,"2026-05-20":1,"2026-05-22":1}},{"name":"RENATARODRIGUES","rec":14634.18,"ho":3658.54,"acordos":3,"ligacoes":3,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":4889.3,"7":4711.73,"8":334.63,"9":2609.8,"10":1639.66,"13":449.06},"tipos":{"Boleto":934.14,"Cartão Padrão":3955.16},"n_ag":107,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":1629.77,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-08":1,"2026-04-09":1,"2026-04-10":10,"2026-04-13":10,"2026-04-16":6,"2026-04-17":4,"2026-04-20":12,"2026-04-21":5,"2026-04-23":4,"2026-04-24":1,"2026-04-27":1,"2026-04-28":1,"2026-04-30":30,"2026-05-01":17,"2026-05-08":1,"2026-05-11":2}},{"name":"MATHEUS_SOUZA","rec":25690.3,"ho":6422.57,"acordos":27,"ligacoes":27,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1348.02,"2":2213.58,"7":7891.94,"8":478.85,"9":5952.06,"10":5571.41,"13":2234.44},"tipos":{"Boleto":1712.13,"Cartão Padrão":1477.34,"Pix":444.71},"n_ag":42,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":134.6,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":2,"2026-04-09":4,"2026-04-10":6,"2026-04-13":2,"2026-04-17":5,"2026-04-20":7,"2026-04-23":3,"2026-04-30":2,"2026-05-01":7,"2026-05-04":1,"2026-05-12":1}},{"name":"LYVIA_DIAS","rec":6415.57,"ho":1603.89,"acordos":14,"ligacoes":14,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1680.76,"6":280.07,"7":273.4,"8":1983.13,"9":1227.49,"10":719.46,"13":251.26},"tipos":{"Boleto":257.04,"Cartão Padrão":954.51,"Pix":1534.17},"n_ag":60,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":196.12,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":1,"2026-04-09":1,"2026-04-10":9,"2026-04-11":5,"2026-04-13":5,"2026-04-15":1,"2026-04-16":1,"2026-04-17":4,"2026-04-20":2,"2026-04-23":6,"2026-04-27":5,"2026-04-30":5,"2026-05-02":2,"2026-05-08":1,"2026-05-11":7,"2026-05-24":1,"2026-05-25":1,"2026-05-26":1}},{"name":"KAROLAINE_SILVA","rec":21950.93,"ho":5487.73,"acordos":8,"ligacoes":8,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":102.62,"6":1737.55,"7":202.17,"8":3233.68,"9":7896.54,"10":5856.3,"13":2922.07},"tipos":{"Cartão Padrão":1452.96,"Pix":387.21},"n_ag":72,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":230.02,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-08":1,"2026-04-09":3,"2026-04-10":2,"2026-04-11":2,"2026-04-12":4,"2026-04-13":1,"2026-04-16":1,"2026-04-17":1,"2026-04-18":7,"2026-04-19":7,"2026-04-20":9,"2026-04-23":4,"2026-04-25":2,"2026-04-29":2,"2026-04-30":5,"2026-05-01":6,"2026-05-05":1,"2026-05-06":1,"2026-05-07":1,"2026-05-09":4,"2026-05-10":6,"2026-05-22":1}},{"name":"MARIA_BRAIDOTI","rec":3832.35,"ho":958.09,"acordos":9,"ligacoes":9,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":526.62,"5":608.0,"7":2164.33,"10":533.4},"tipos":{"Boleto":80.91,"Cartão Padrão":608.0,"Pix":605.84},"n_ag":24,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":143.86,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-09":1,"2026-04-11":2,"2026-04-13":1,"2026-04-15":1,"2026-04-16":4,"2026-04-18":1,"2026-04-21":3,"2026-04-23":1,"2026-04-29":1,"2026-04-30":1,"2026-05-01":2,"2026-05-20":3,"2026-05-22":1}},{"name":"THAYRA_FERREIRASILVA","rec":5438.36,"ho":1359.59,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":578.86,"8":1524.21,"9":444.45,"10":2136.74,"12":574.1,"13":180.0},"tipos":{"Pix":578.86},"n_ag":44,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":578.86,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-10":3,"2026-04-11":11,"2026-04-12":1,"2026-04-16":1,"2026-04-17":2,"2026-04-19":1,"2026-04-20":4,"2026-04-21":6,"2026-04-22":2,"2026-04-23":1,"2026-04-25":1,"2026-04-26":2,"2026-04-27":4,"2026-04-29":1,"2026-05-10":1,"2026-05-11":1,"2026-05-16":1}},{"name":"RAFAELA_MINHOTO","rec":6090.26,"ho":1522.57,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":155.01,"6":158.16,"7":2602.8,"8":820.8,"10":539.55,"11":1813.94},"tipos":{"Pix":313.17},"n_ag":36,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":156.58,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-09":1,"2026-04-10":6,"2026-04-14":1,"2026-04-15":1,"2026-04-16":3,"2026-04-17":3,"2026-04-20":10,"2026-04-21":1,"2026-04-27":1,"2026-04-30":1,"2026-05-08":1,"2026-05-11":6,"2026-05-18":1}},{"name":"BRUNA_JUSTIMIANO","rec":5247.51,"ho":1311.88,"acordos":1,"ligacoes":1,"med_atraso":2537.0,"med_lig_baixa":0.0,"daily":{"1":5247.51},"tipos":{"PIX":123.76},"n_ag":0,"val_ag":0,"eq":"COFEN BIRIGUI BRUNA","gerados":1,"pagos":1,"avista":1,"ate3dias":0,"mais3dias":0,"ticket":123.76,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":100.0,"ag_futuro":{}}]},{"name":"COFEN STEPHANIE 2° TURNO","rec":134869.58,"ho":33717.39,"n_op":11,"acordos":188,"ops":[{"name":"larissa_santana","rec":4312.12,"ho":1078.03,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":642.78,"7":1943.1,"8":429.72,"9":296.37,"13":1000.15},"tipos":{"Boleto":642.78},"n_ag":38,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":321.39,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-10":2,"2026-04-12":1,"2026-04-16":3,"2026-04-17":1,"2026-04-19":2,"2026-04-20":1,"2026-04-30":3,"2026-05-04":6,"2026-05-06":4,"2026-05-10":7,"2026-05-11":7,"2026-05-12":1}},{"name":"jussara_pereira","rec":17520.95,"ho":4380.24,"acordos":8,"ligacoes":8,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1161.14,"2":660.31,"6":2410.89,"7":5943.8,"8":2765.19,"9":2335.37,"10":980.27,"13":1263.98},"tipos":{"Boleto":2247.86,"Cartão Padrão":1324.17,"Pix":660.31},"n_ag":55,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":529.04,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":3,"2026-04-09":2,"2026-04-10":2,"2026-04-17":1,"2026-04-23":2,"2026-04-24":1,"2026-04-25":1,"2026-04-29":1,"2026-04-30":39,"2026-05-02":1,"2026-05-08":1,"2026-05-17":1}},{"name":"aline_pupim","rec":21417.38,"ho":5354.34,"acordos":50,"ligacoes":50,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":3522.02,"2":3500.46,"6":6419.93,"7":2373.18,"8":2535.37,"10":1135.69,"13":1930.73},"tipos":{"Boleto":2444.38,"Cartão Padrão":9187.57,"Pix":4227.5},"n_ag":73,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":317.19,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":4,"2026-04-08":1,"2026-04-09":4,"2026-04-10":8,"2026-04-11":2,"2026-04-13":2,"2026-04-15":2,"2026-04-16":4,"2026-04-17":2,"2026-04-18":1,"2026-04-20":6,"2026-04-21":1,"2026-04-23":2,"2026-04-24":1,"2026-04-25":1,"2026-04-26":1,"2026-04-27":1,"2026-04-29":2,"2026-04-30":6,"2026-05-02":2,"2026-05-04":2,"2026-05-07":3,"2026-05-10":9,"2026-05-11":4,"2026-05-14":1,"2026-05-15":1}},{"name":"thais_mayara","rec":9335.23,"ho":2333.81,"acordos":3,"ligacoes":3,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":174.24,"6":216.72,"7":1998.67,"8":1091.01,"9":3474.3,"10":2380.29},"tipos":{"Boleto":390.96,"Pix":546.88},"n_ag":39,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":312.61,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":2,"2026-04-09":4,"2026-04-10":6,"2026-04-11":2,"2026-04-12":1,"2026-04-15":4,"2026-04-16":1,"2026-04-17":2,"2026-04-18":1,"2026-04-19":1,"2026-04-20":1,"2026-04-23":4,"2026-04-24":2,"2026-05-04":1,"2026-05-10":5}},{"name":"geovanna_almeida","rec":16225.12,"ho":4056.28,"acordos":19,"ligacoes":19,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":87.15,"6":5815.24,"7":225.51,"9":982.11,"10":4981.59,"13":4133.52},"tipos":{"Boleto":1551.81,"Cartão Padrão":1943.3,"Pix":2672.17},"n_ag":113,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":324.59,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":1,"2026-04-09":5,"2026-04-10":9,"2026-04-11":1,"2026-04-12":1,"2026-04-15":1,"2026-04-16":3,"2026-04-17":6,"2026-04-18":2,"2026-04-19":5,"2026-04-20":3,"2026-04-21":1,"2026-04-22":1,"2026-04-23":8,"2026-04-25":1,"2026-04-29":1,"2026-04-30":3,"2026-05-02":1,"2026-05-03":1,"2026-05-05":5,"2026-05-06":12,"2026-05-07":6,"2026-05-08":2,"2026-05-09":1,"2026-05-10":10,"2026-05-13":4,"2026-05-14":1,"2026-05-15":1,"2026-05-16":1,"2026-05-19":1,"2026-05-20":1,"2026-05-22":8,"2026-05-24":4}},{"name":"ISABELA_MONTEIRO","rec":4336.39,"ho":1084.1,"acordos":16,"ligacoes":16,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1903.35,"6":748.45,"7":251.88,"8":1382.09,"13":50.62},"tipos":{"Boleto":610.69,"Cartão Padrão":1347.03,"Pix":748.45},"n_ag":45,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":169.14,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-09":1,"2026-04-10":4,"2026-04-11":1,"2026-04-13":2,"2026-04-16":4,"2026-04-17":2,"2026-04-19":1,"2026-04-23":1,"2026-04-24":4,"2026-04-25":3,"2026-04-26":1,"2026-04-30":1,"2026-05-04":1,"2026-05-05":2,"2026-05-06":4,"2026-05-10":2,"2026-05-11":7,"2026-05-12":1,"2026-05-18":3}},{"name":"thalia_thomaz","rec":4860.45,"ho":1215.11,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":204.83,"6":4411.86,"8":243.76},"tipos":{"Boleto":312.83,"Pix":4411.86},"n_ag":30,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":944.94,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-10":7,"2026-04-13":1,"2026-04-14":1,"2026-04-15":1,"2026-04-16":8,"2026-04-17":2,"2026-04-30":2,"2026-05-06":4,"2026-05-10":2,"2026-05-20":1}},{"name":"katia_regina","rec":25076.94,"ho":6269.23,"acordos":52,"ligacoes":52,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":279.18,"2":403.96,"6":8904.5,"7":6890.86,"8":2435.68,"9":1030.65,"10":766.97,"13":4365.14},"tipos":{"Boleto":106.0,"Cartão Padrão":7680.2,"Pix":1801.44},"n_ag":54,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":184.38,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":1,"2026-04-10":5,"2026-04-11":1,"2026-04-16":11,"2026-04-17":4,"2026-04-18":1,"2026-04-20":3,"2026-04-23":2,"2026-04-24":1,"2026-04-30":4,"2026-05-05":1,"2026-05-07":1,"2026-05-08":1,"2026-05-09":10,"2026-05-10":1,"2026-05-17":2,"2026-05-18":1,"2026-05-19":1,"2026-05-22":2,"2026-05-27":1}},{"name":"kauane_azevedo","rec":16464.37,"ho":4116.09,"acordos":23,"ligacoes":23,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":62.65,"2":442.87,"6":4831.06,"7":931.23,"8":1588.21,"9":3365.9,"10":3657.43,"13":1585.02},"tipos":{"Boleto":2175.7,"Cartão Padrão":4647.67,"Pix":307.44},"n_ag":53,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":310.04,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":5,"2026-04-09":2,"2026-04-10":6,"2026-04-11":2,"2026-04-12":1,"2026-04-13":3,"2026-04-15":1,"2026-04-16":1,"2026-04-18":4,"2026-04-19":2,"2026-04-20":2,"2026-04-23":6,"2026-04-24":1,"2026-04-30":4,"2026-05-01":4,"2026-05-10":5,"2026-05-11":3,"2026-05-20":1}},{"name":"thais_c_ferreira","rec":3855.82,"ho":963.96,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":1437.3,"6":1106.36,"7":1312.16},"tipos":{"Pix":2543.66},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":508.73,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"AMABELLY_SANTOS","rec":11464.81,"ho":2866.2,"acordos":5,"ligacoes":5,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":961.93,"6":742.79,"8":4045.7,"9":4927.01,"10":589.16,"13":198.22},"tipos":{"Boleto":325.67,"Cartão Padrão":961.93,"Pix":417.12},"n_ag":54,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":340.94,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":2,"2026-04-09":4,"2026-04-10":5,"2026-04-11":3,"2026-04-16":8,"2026-04-17":2,"2026-04-19":3,"2026-04-20":9,"2026-04-21":1,"2026-04-23":2,"2026-04-24":1,"2026-04-27":3,"2026-05-02":1,"2026-05-03":1,"2026-05-04":1,"2026-05-10":2,"2026-05-11":1,"2026-05-20":3}}]},{"name":"COFEN BIRIGUI LUCIANO","rec":53517.0,"ho":13379.24,"n_op":10,"acordos":43,"ops":[{"name":"HELENA_SANTOS","rec":251.65,"ho":62.91,"acordos":2,"ligacoes":2,"med_atraso":3420.0,"med_lig_baixa":2.5,"daily":{"7":124.43,"13":127.22},"tipos":{"BOLETO NEGOCIAÇÃO":4900.8},"n_ag":43,"val_ag":0,"gerados":12,"pagos":1,"avista":0,"ate3dias":0,"mais3dias":1,"ticket":4900.8,"media_dias":5.0,"pendentes":11,"agendados":11,"eficiencia":8.3,"ag_futuro":{"2026-04-08":1,"2026-04-09":1,"2026-04-10":16,"2026-04-13":1,"2026-04-16":1,"2026-04-20":3,"2026-04-21":1,"2026-04-22":1,"2026-04-23":1,"2026-04-24":2,"2026-04-27":6,"2026-05-01":1,"2026-05-10":1,"2026-05-11":3,"2026-05-12":3,"2026-05-13":1}},{"name":"ANA_BENTO","rec":4841.74,"ho":1210.43,"acordos":6,"ligacoes":6,"med_atraso":1187.0,"med_lig_baixa":2.5,"daily":{"1":773.63,"6":767.43,"7":366.85,"8":92.25,"9":1344.51,"10":583.52,"11":578.86,"13":334.69},"tipos":{"BOLETO NEGOCIAÇÃO":919.8,"PIX":1867.24},"n_ag":31,"val_ag":0,"gerados":19,"pagos":2,"avista":1,"ate3dias":1,"mais3dias":0,"ticket":1393.52,"media_dias":0.5,"pendentes":17,"agendados":17,"eficiencia":10.5,"ag_futuro":{"2026-04-07":2,"2026-04-10":3,"2026-04-13":2,"2026-04-14":1,"2026-04-15":1,"2026-04-16":1,"2026-04-20":4,"2026-04-21":1,"2026-04-22":1,"2026-04-23":1,"2026-04-24":1,"2026-04-25":5,"2026-04-27":1,"2026-04-28":2,"2026-04-30":1,"2026-05-01":1,"2026-05-05":1,"2026-05-06":1,"2026-05-11":1}},{"name":"MARIA_MOREIRASANTOS","rec":14356.74,"ho":3589.18,"acordos":7,"ligacoes":7,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"2":1572.28,"6":252.03,"7":1535.18,"8":1210.65,"10":7242.37,"13":2544.23},"tipos":{"Boleto":428.75,"Cartão Padrão":1395.56},"n_ag":46,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":260.62,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":4,"2026-04-09":6,"2026-04-10":2,"2026-04-13":2,"2026-04-14":1,"2026-04-15":1,"2026-04-17":1,"2026-04-20":6,"2026-04-22":1,"2026-04-24":1,"2026-05-01":1,"2026-05-06":1,"2026-05-08":2,"2026-05-09":3,"2026-05-10":1,"2026-05-11":10,"2026-05-12":1}},{"name":"FRANCISCA_BRITO","rec":14032.27,"ho":3508.07,"acordos":4,"ligacoes":4,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":1716.4,"7":3501.93,"8":213.36,"9":508.33,"10":7246.37,"11":578.86,"13":267.02},"tipos":{"Boleto":758.18,"Cartão Padrão":958.22},"n_ag":32,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":429.1,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":4,"2026-04-08":1,"2026-04-10":2,"2026-04-11":4,"2026-04-14":1,"2026-04-17":2,"2026-04-18":2,"2026-04-20":1,"2026-04-21":1,"2026-04-22":1,"2026-04-23":1,"2026-04-24":1,"2026-04-27":1,"2026-04-29":1,"2026-05-06":1,"2026-05-11":3,"2026-05-12":5}},{"name":"DEBORA_ANDRIELLY","rec":449.03,"ho":112.26,"acordos":15,"ligacoes":15,"med_atraso":764.0,"med_lig_baixa":5.1,"daily":{"9":280.13,"11":168.9},"tipos":{"BOLETO NEGOCIAÇÃO":92.72,"CARTÃO DE CRÉDITO":1067.04,"PIX":299.68},"n_ag":40,"val_ag":1249.79,"gerados":19,"pagos":2,"avista":0,"ate3dias":2,"mais3dias":0,"ticket":729.72,"media_dias":2.0,"pendentes":17,"agendados":17,"eficiencia":10.5,"ag_futuro":{"2026-04-08":1,"2026-04-09":3,"2026-04-10":6,"2026-04-11":1,"2026-04-13":2,"2026-04-18":2,"2026-04-20":1,"2026-04-22":1,"2026-04-23":1,"2026-04-25":1,"2026-04-26":2,"2026-04-30":1,"2026-05-03":1,"2026-05-10":12,"2026-05-11":1,"2026-05-12":1,"2026-05-18":2,"2026-05-25":1}},{"name":"EDUARDO_SILVA","rec":3815.53,"ho":953.88,"acordos":2,"ligacoes":2,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":933.88,"7":222.37,"8":131.4,"9":774.24,"10":1753.64},"tipos":{"Pix":933.88},"n_ag":63,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":466.94,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-09":5,"2026-04-10":7,"2026-04-11":2,"2026-04-12":3,"2026-04-17":4,"2026-04-18":2,"2026-04-19":1,"2026-04-20":1,"2026-04-23":2,"2026-04-25":1,"2026-04-27":1,"2026-04-29":1,"2026-04-30":1,"2026-05-07":1,"2026-05-08":1,"2026-05-09":1,"2026-05-10":8,"2026-05-11":6,"2026-05-12":5,"2026-05-15":4,"2026-05-16":1,"2026-05-18":2,"2026-05-23":3}},{"name":"NAYARA_CRUZ","rec":164.76,"ho":41.19,"acordos":4,"ligacoes":4,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"1":164.76},"tipos":{"Cartão Padrão":437.4,"Pix":164.76},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":150.54,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"LEONARDO_NUNES","rec":8871.24,"ho":2217.81,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":381.61,"7":2200.61,"8":578.86,"9":1532.17,"13":4177.99},"tipos":{"Pix":381.61},"n_ag":39,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":381.61,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-09":1,"2026-04-10":3,"2026-04-11":2,"2026-04-13":1,"2026-04-16":3,"2026-04-17":3,"2026-04-18":1,"2026-04-20":1,"2026-04-21":4,"2026-04-23":2,"2026-04-26":1,"2026-04-27":1,"2026-04-30":2,"2026-05-10":11,"2026-05-12":3}},{"name":"MARIA_RODARTE","rec":4602.02,"ho":1150.51,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"6":178.07,"9":4423.95},"tipos":{"Boleto":178.07},"n_ag":5,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":178.07,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-08":1,"2026-04-17":1,"2026-04-20":1,"2026-04-23":1,"2026-04-29":1}},{"name":"JOAO_MIRANDA","rec":2132.02,"ho":533.0,"acordos":1,"ligacoes":1,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{"8":1858.62,"9":273.4},"tipos":{"Boleto":82.73},"n_ag":11,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":82.73,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{"2026-04-07":2,"2026-04-08":1,"2026-04-09":1,"2026-04-10":1,"2026-04-11":2,"2026-04-20":3,"2026-05-05":1}}]},{"name":"ELITE","rec":15030.84,"ho":3757.71,"n_op":2,"acordos":120,"ops":[{"name":"CLEBER_JUNIOR","rec":9820.42,"ho":2455.1,"acordos":83,"ligacoes":83,"med_atraso":2032.0,"med_lig_baixa":0.2,"daily":{"2":235.97,"8":1725.62,"9":275.28,"10":3226.4,"11":1260.65,"12":3096.5},"tipos":{"BOLETO NEGOCIAÇÃO":1496.72,"CARTÃO DE CRÉDITO":11643.4,"PIX":1702.04},"n_ag":14,"val_ag":1929.26,"gerados":24,"pagos":13,"avista":11,"ate3dias":2,"mais3dias":0,"ticket":1141.7,"media_dias":0.2,"pendentes":11,"agendados":11,"eficiencia":54.2,"ag_futuro":{"2026-04-10":3,"2026-04-16":1,"2026-04-18":6,"2026-04-30":3,"2026-05-04":1}},{"name":"JHONATA_NASCIMENTO","rec":5210.42,"ho":1302.61,"acordos":37,"ligacoes":37,"med_atraso":1314.0,"med_lig_baixa":0.2,"daily":{"1":299.25,"6":273.4,"7":1422.7,"9":2002.86,"11":1212.21},"tipos":{"BOLETO NEGOCIAÇÃO":3013.64,"CARTÃO DE CRÉDITO":1189.12,"PIX":6952.32},"n_ag":10,"val_ag":761.3,"gerados":31,"pagos":18,"avista":11,"ate3dias":4,"mais3dias":3,"ticket":619.73,"media_dias":2.0,"pendentes":13,"agendados":13,"eficiencia":58.1,"ag_futuro":{"2026-04-16":1,"2026-04-21":1,"2026-04-24":1,"2026-04-25":3,"2026-04-26":1,"2026-04-30":2,"2026-05-01":1}},{"name":"fabio_aquino","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":0,"med_lig_baixa":0,"daily":{},"tipos":{},"n_ag":5,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0,"pendentes":0,"agendados":0,"eficiencia":0,"ag_futuro":{"2026-04-10":1,"2026-04-11":1,"2026-04-30":2,"2026-05-15":1}}]}]};
 
 // Working state — deep clone so edits don't corrupt original
 let D = JSON.parse(JSON.stringify(ORIG));
@@ -2092,6 +2026,18 @@ function duResetManual(){
   toast('↩ Dias úteis resetados para automático!');
 }
 
+// ── TOTAIS MENSAIS HISTÓRICOS (preenchidos manualmente no editor) ──
+let cmpJanTotal = parseFloat(localStorage.getItem('cofen_cmp_jan') || '0');
+let cmpFevTotal = parseFloat(localStorage.getItem('cofen_cmp_fev') || '0');
+let cmpMarTotal = parseFloat(localStorage.getItem('cofen_cmp_mar') || '774808');
+// Abril = dinâmico via getTotalRec()
+
+function cmpSaveMeses(){
+  localStorage.setItem('cofen_cmp_jan', cmpJanTotal);
+  localStorage.setItem('cofen_cmp_fev', cmpFevTotal);
+  localStorage.setItem('cofen_cmp_mar', cmpMarTotal);
+}
+
 // ── TOTAL REC (with override) ──
 function getTotalRec(){
   return overrideTotalRec > 0
@@ -2249,6 +2195,13 @@ function buildOpEditor(){
   liveCalcCorens();
   liveCalcArrecadado();
 
+  // Preencher campos de totais mensais
+  setV('inp-cmp-jan', cmpJanTotal);
+  setV('inp-cmp-fev', cmpFevTotal);
+  const mEl = document.getElementById('inp-cmp-mar');
+  if(mEl) mEl.value = cmpMarTotal > 0 ? cmpMarTotal : '774808';
+  cmpLiveCalc();
+
   // Load saved op overrides
   const saved = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
 
@@ -2348,11 +2301,10 @@ function liveCalcArrecadado(){
   const media = DU.passou>0 ? v/DU.passou : 0;
   const need  = DU.restam>0 && falta>0 ? falta/DU.restam : 0;
   const s=(id,v2)=>{const e=document.getElementById(id);if(e)e.textContent=v2;};
-  // Cards visíveis
-  s('res-arrecadado-bruto', v>0 ? fR(v) : '—');
   s('res-arrecadado-ho',    v>0 ? fR(ho) : '—');
-  // IDs ocultos (preservados para compatibilidade)
   s('res-arrecadado-falta', v>0 ? (falta>0?fR(falta):'✅ Meta 2!') : '—');
+  document.getElementById('res-arrecadado-falta')?.classList.toggle('rd', falta>0);
+  document.getElementById('res-arrecadado-falta')?.classList.toggle('ok', falta<=0&&v>0);
   s('res-arrecadado-meta-lbl', 'Meta 2: '+fRK(m));
   s('res-arrecadado-media',    v>0 ? fR(media) : '—');
   s('res-arrecadado-need',     need>0 ? fR(need) : '—');
@@ -2395,660 +2347,6 @@ function resetArrecadado(){
     .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   liveCalcArrecadado(); liveCalcCorens(); initHero();
   toast('↩ Arrecadado e CORENs resetados!');
-}
-
-
-// ══════════════════════════════════════════════════════════════
-// IMPORTAR TOTAL GERAL — rec_total_geral*.csv
-// Preenche: Total Real, Tarifa, PaguePay, Coren, Cofen, COREN por estado
-// ══════════════════════════════════════════════════════════════
-
-// Estado interno do parse do arquivo geral
-let _geralParsed = null;
-let _empresaParsed = null;
-
-// Abrir/fechar modais
-function importarGeral(){
-  document.getElementById('modal-import-geral').style.display = 'flex';
-  document.getElementById('txt-geral-modal').value = '';
-  document.getElementById('preview-geral').style.display = 'none';
-  document.getElementById('status-geral').style.display = 'none';
-  _geralParsed = null;
-}
-function fecharModalGeral(){
-  document.getElementById('modal-import-geral').style.display = 'none';
-}
-function importarEmpresa(){
-  document.getElementById('modal-import-empresa').style.display = 'flex';
-  document.getElementById('txt-empresa-modal').value = '';
-  document.getElementById('preview-empresa').style.display = 'none';
-  document.getElementById('status-empresa').style.display = 'none';
-  _empresaParsed = null;
-}
-function fecharModalEmpresa(){
-  document.getElementById('modal-import-empresa').style.display = 'none';
-}
-
-// Ler arquivo como texto e processar
-function processarArquivoGeral(file){
-  if(!file) return;
-  const ext = file.name.split('.').pop().toLowerCase();
-  if(ext==='xls'||ext==='xlsx'){
-    _lerXLS(file, txt => {
-      document.getElementById('txt-geral-modal').value = txt.slice(0,50000);
-      previewGeral(txt);
-    });
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = e => {
-    const txt = e.target.result;
-    document.getElementById('txt-geral-modal').value = txt.slice(0, 50000);
-    previewGeral(txt);
-  };
-  reader.readAsText(file, 'latin1');
-}
-function processarArquivoEmpresa(file){
-  if(!file) return;
-  const ext = file.name.split('.').pop().toLowerCase();
-  if(ext==='xls'||ext==='xlsx'){
-    _lerXLS(file, txt => {
-      document.getElementById('txt-empresa-modal').value = txt.slice(0,50000);
-      previewEmpresa(txt);
-    });
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = e => {
-    const txt = e.target.result;
-    document.getElementById('txt-empresa-modal').value = txt.slice(0, 50000);
-    previewEmpresa(txt);
-  };
-  reader.readAsText(file, 'latin1');
-}
-
-// ── Parser genérico para os arquivos CSV ──────────────────────
-
-// ────────────────────────────────────────────────────────────
-// XLS/XLSX reader (SheetJS CDN carregado sob demanda)
-// ────────────────────────────────────────────────────────────
-function _lerXLS(file, callback){
-  function _doRead(XLSX){
-    const reader = new FileReader();
-    reader.onload = e => {
-      try{
-        const wb = XLSX.read(e.target.result, {type:'array'});
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const csv = XLSX.utils.sheet_to_csv(ws, {FS:';'});
-        callback(csv);
-      }catch(err){ alert('Erro ao ler XLS/XLSX: '+err.message); }
-    };
-    reader.readAsArrayBuffer(file);
-  }
-  if(window.XLSX){ _doRead(window.XLSX); return; }
-  const s = document.createElement('script');
-  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-  s.onload = () => _doRead(window.XLSX);
-  s.onerror = () => alert('Nao foi possivel carregar o leitor XLS. Verifique sua conexao.');
-  document.head.appendChild(s);
-}
-
-// Vars globais para historico mensal (preenchidas ao importar)
-let _histMensalGeral   = {};  // { '2026-01': {rec, pp, corens:{PI,MA,MT,CE}} }
-let _histMensalEmpresa = {};  // { '2026-01': pp }
-
-// Carregar historico mensal do localStorage ao iniciar
-try{
-  const _sg = localStorage.getItem('cofen_hist_geral');
-  if(_sg) _histMensalGeral = JSON.parse(_sg);
-  const _se = localStorage.getItem('cofen_hist_empresa');
-  if(_se) _histMensalEmpresa = JSON.parse(_se);
-}catch(e){}
-
-// Parser auxiliar — extrai totais por mes/COREN (complementa _parseImportCSV)
-function _parseMensal(raw){
-  const lines = raw.trim().split(/\r?\n/).filter(l=>l.trim());
-  if(lines.length < 2) return {};
-  const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
-
-  const norm = s => s.trim().replace(/^"|"$/g,'').toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  const headers = lines[0].split(sep).map(norm);
-
-  const col = cands => {
-    for(const c of cands){ const i=headers.findIndex(h=>h.includes(c)); if(i>=0)return i; }
-    return -1;
-  };
-  const iData   = col(['data','dt.baixa','dt baixa','date']);
-  const iPer    = col(['periodo','period']);  // "Pagamento - 2026/04"
-  const iRec    = col(['valor recebido','vlr recebido','recebido','valor rec']);
-  const iPP     = col(['pague play','pagueplay','24,96','24.96','pp (']);
-  const iCoren  = col(['coren','estado','coren_nome']);
-
-  const pN = s => {
-    if(!s||s.trim()===''||s.trim()==='-') return 0;
-    let v = s.trim().replace(/^"/,'').replace(/"$/,'').replace(/R\$\s*/,'').trim();
-    if(/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(v)) return parseFloat(v.replace(/\./g,'').replace(',','.'));
-    return parseFloat(v.replace(',','.')) || 0;
-  };
-
-  const pMes = s => {
-    if(!s) return null;
-    let m = s.match(/(\d{4})[\/-](\d{2})/);
-    if(m) return m[1]+'-'+m[2].padStart(2,'0');
-    m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-    if(m) return m[3]+'-'+m[2].padStart(2,'0');
-    return null;
-  };
-
-  const meses = {};
-
-  for(let i=1;i<lines.length;i++){
-    const cells = lines[i].split(sep).map(c=>c.trim().replace(/^"|"$/g,''));
-    if(cells.length < 3) continue;
-    const fc = cells[0].toLowerCase().trim();
-    if(fc===''||fc==='total'||fc.startsWith('soma')) continue;
-
-    const vRec = iRec>=0 ? pN(cells[iRec]) : 0;
-    const vPP  = iPP>=0  ? pN(cells[iPP])  : 0;
-    if(vRec===0 && vPP===0) continue;
-
-    // Detectar mes
-    let mesKey = null;
-    if(iData>=0)  mesKey = pMes(cells[iData]);
-    if(!mesKey && iPer>=0) mesKey = pMes(cells[iPer]);
-    if(!mesKey)   mesKey = pMes(cells[0]);
-    if(!mesKey) continue;
-
-    if(!meses[mesKey]) meses[mesKey] = {rec:0, pp:0, corens:{}};
-    meses[mesKey].rec += vRec;
-    meses[mesKey].pp  += vPP;
-
-    if(iCoren>=0){
-      const nm = (cells[iCoren]||'').trim().toUpperCase();
-      if(nm && nm.length<=4 && /^[A-Z]+$/.test(nm)){
-        meses[mesKey].corens[nm] = (meses[mesKey].corens[nm]||0) + vRec;
-      }
-    }
-  }
-
-  // Arredondar
-  Object.values(meses).forEach(m=>{
-    m.rec = Math.round(m.rec*100)/100;
-    m.pp  = Math.round(m.pp*100)/100;
-    Object.keys(m.corens).forEach(k=>{ m.corens[k]=Math.round(m.corens[k]*100)/100; });
-  });
-  return meses;
-}
-
-function _parseImportCSV(raw){
-  const lines = raw.trim().split(/\r?\n/).filter(l => l.trim());
-  if(lines.length < 2) return null;
-
-  const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
-  const headers = lines[0].split(sep).map(h => h.trim().replace(/^"|"$/g,'').toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')  // remove acentos
-  );
-
-  const col = (candidates) => {
-    for(const c of candidates){
-      const i = headers.findIndex(h => h.includes(c));
-      if(i >= 0) return i;
-    }
-    return -1;
-  };
-
-  const iValorRec = col(['valor recebido','vlr recebido','recebido','valor rec']);
-  const iTarifa   = col(['valor tarifa','tarifa','vlr tarifa']);
-  const iPP       = col(['pague play','pagueplay','pague_play','24,96','24.96','pp (']);
-  const iCorenPct = col(['coren (56','coren(56','56,28','56.28','coren %']);
-  const iCofenPct = col(['cofen (18','cofen(18','18,76','18.76','cofen %']);
-  const iCorenNm  = col(['coren','coren_nome','estado']); // col com nome do coren (PI/MA/MT/CE)
-
-  if(iValorRec < 0 && iPP < 0){
-    return {error: 'Colunas não encontradas. Cabeçalho detectado: ' + headers.slice(0,8).join(' | ')};
-  }
-
-  const parseN = (s) => {
-    if(!s || s.trim() === '' || s.trim() === '-') return 0;
-    let v = s.trim().replace(/^"/,'').replace(/"$/,'').replace(/R\$\s*/,'').trim();
-    // BR format: 1.234,56
-    if(/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(v)) return parseFloat(v.replace(/\./g,'').replace(',','.'));
-    return parseFloat(v.replace(',','.')) || 0;
-  };
-
-  let totValorRec = 0, totTarifa = 0, totPP = 0, totCorenPct = 0, totCofenPct = 0;
-  const corenMap = {}; // { PI: sum, MA: sum, MT: sum, CE: sum }
-
-  for(let i = 1; i < lines.length; i++){
-    const cells = lines[i].split(sep).map(c => c.trim().replace(/^"|"$/g,''));
-    if(cells.length < 3) continue;
-
-    // Detectar linha de totais (primeira coluna vazia ou "total")
-    const firstCell = cells[0].toLowerCase().trim();
-    if(firstCell === '' || firstCell.includes('total') || firstCell.includes('soma')) continue;
-
-    const vRec    = iValorRec >= 0 ? parseN(cells[iValorRec]) : 0;
-    const vTarifa = iTarifa   >= 0 ? parseN(cells[iTarifa])   : 0;
-    const vPP     = iPP       >= 0 ? parseN(cells[iPP])       : 0;
-    const vCoren  = iCorenPct >= 0 ? parseN(cells[iCorenPct]) : 0;
-    const vCofen  = iCofenPct >= 0 ? parseN(cells[iCofenPct]) : 0;
-
-    if(vRec === 0 && vPP === 0) continue;
-
-    totValorRec  += vRec;
-    totTarifa    += vTarifa;
-    totPP        += vPP;
-    totCorenPct  += vCoren;
-    totCofenPct  += vCofen;
-
-    // Acumular por COREN (MT/PI/MA/CE)
-    if(iCorenNm >= 0){
-      const nm = (cells[iCorenNm] || '').trim().toUpperCase();
-      if(nm && nm.length <= 4 && /^[A-Z]+$/.test(nm)){
-        corenMap[nm] = (corenMap[nm] || 0) + vRec;
-      }
-    }
-  }
-
-  return {
-    totValorRec:  Math.round(totValorRec * 100) / 100,
-    totTarifa:    Math.round(totTarifa   * 100) / 100,
-    totPP:        Math.round(totPP       * 100) / 100,
-    totCorenPct:  Math.round(totCorenPct * 100) / 100,
-    totCofenPct:  Math.round(totCofenPct * 100) / 100,
-    corenMap,
-    hasSplit: iPP >= 0,
-    linhas: lines.length - 1,
-  };
-}
-
-// ── PREVIEW GERAL ─────────────────────────────────────────────
-function previewGeral(raw){
-  if(!raw || raw.trim().length < 20) return;
-  const result = _parseImportCSV(raw);
-  const prevEl = document.getElementById('preview-geral');
-  if(!result || result.error){
-    prevEl.innerHTML = '<span style="color:var(--danger)">❌ ' + (result?.error || 'Formato não reconhecido') + '</span>';
-    prevEl.style.display = 'block';
-    _geralParsed = null;
-    return;
-  }
-  _geralParsed = result;
-
-  const corenRows = Object.entries(result.corenMap)
-    .sort((a,b) => b[1]-a[1])
-    .map(([k,v]) => `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--g100)">
-      <span style="font-weight:700;color:var(--g700)">COREN-${k}</span>
-      <span style="font-family:'Bebas Neue',sans-serif;color:var(--info)">${fR(v)}</span>
-    </div>`).join('');
-
-  prevEl.innerHTML = `
-    <div style="font-weight:800;color:var(--ok);margin-bottom:8px">✅ ${result.linhas} registros encontrados</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-      <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
-        <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">💰 Total Real Recebido</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--pp)">${fR(result.totValorRec)}</div>
-      </div>
-      ${result.hasSplit ? `
-      <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
-        <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">📊 Pague Play (24,96%)</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#3B82F6">${fR(result.totPP)}</div>
-      </div>
-      <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
-        <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">🏛 Coren (56,28%)</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#8B5CF6">${fR(result.totCorenPct)}</div>
-      </div>
-      <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
-        <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">📋 Cofen (18,76%)</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#0F9E76">${fR(result.totCofenPct)}</div>
-      </div>` : ''}
-    </div>
-    ${Object.keys(result.corenMap).length > 0 ? `
-    <div style="font-size:10px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Por COREN</div>
-    ${corenRows}` : ''}`;
-  prevEl.style.display = 'block';
-}
-
-// ── APLICAR GERAL ─────────────────────────────────────────────
-function aplicarGeral(){
-  const raw = document.getElementById('txt-geral-modal').value;
-  const statusEl = document.getElementById('status-geral');
-  statusEl.style.display = 'block';
-
-  if(!raw.trim()){ statusEl.textContent='⚠️ Cole o conteúdo do arquivo primeiro!'; statusEl.style.background='#FEF9C3'; statusEl.style.color='#92400E'; return; }
-
-  const result = _geralParsed || _parseImportCSV(raw);
-  if(!result || result.error){ statusEl.textContent='❌ ' + (result?.error||'Erro ao processar'); statusEl.style.background='#FEF2F2'; statusEl.style.color='#991B1B'; return; }
-
-  // 1. Preencher campo Total Real
-  const inpTotal = document.getElementById('inp-total');
-  if(inpTotal){ inpTotal.value = result.totValorRec.toFixed(2); liveCalc(); }
-
-  // 2. Preencher CORENs por estado
-  const corenFields = { MT:'inp-coren-mt', PI:'inp-coren-pi', MA:'inp-coren-ma', CE:'inp-coren-ce' };
-  let algumCoren = false;
-  for(const [nm, id] of Object.entries(corenFields)){
-    const el = document.getElementById(id);
-    if(el){
-      const v = result.corenMap[nm] || 0;
-      el.value = v > 0 ? v.toFixed(2) : '';
-      if(v > 0) algumCoren = true;
-    }
-  }
-  liveCalcCorens();
-
-  // 3. Salvar via applyTotal (preserva meta)
-  if(result.totValorRec > 0){
-    overrideTotalRec = result.totValorRec;
-    localStorage.setItem('cofen_total', result.totValorRec);
-    // Salvar CORENs
-    ['mt','pi','ma','ce'].forEach(k => {
-      const v = parseFloat(document.getElementById('inp-coren-'+k)?.value)||0;
-      if(k==='mt') corenMT=v; if(k==='pi') corenPI=v; if(k==='ma') corenMA=v; if(k==='ce') corenCE=v;
-      localStorage.setItem('cofen_coren_'+k, v);
-    });
-    refreshAll();
-    if(fbDb && fbRoom) fbPush('meta', {
-      total: result.totValorRec, meta,
-      mt: corenMT, pi: corenPI, ma: corenMA, ce: corenCE
-    });
-  }
-
-  const corenCount = Object.keys(result.corenMap).length;
-  statusEl.innerHTML = `✅ Aplicado! Total Real: <strong>${fR(result.totValorRec)}</strong>${result.hasSplit?' · PaguePay: '+fR(result.totPP):''}${algumCoren?' · '+corenCount+' CORENs preenchidos':''}`;
-  statusEl.style.background = '#F0FDF4';
-  statusEl.style.color = '#065F46';
-
-  // Salvar historico mensal
-  _histMensalGeral = _parseMensal(raw);
-  localStorage.setItem('cofen_hist_geral', JSON.stringify(_histMensalGeral));
-  renderResumoEditor();
-
-  setTimeout(() => fecharModalGeral(), 2000);
-}
-
-// ══════════════════════════════════════════════════════════════
-// IMPORTAR TOTAL EMPRESA — rec_total_empresa*.csv
-// Preenche: Total Arrecadado = soma de Pague Play (24,96%) apenas
-// ══════════════════════════════════════════════════════════════
-
-function previewEmpresa(raw){
-  if(!raw || raw.trim().length < 20) return;
-  const result = _parseImportCSV(raw);
-  const prevEl = document.getElementById('preview-empresa');
-  if(!result || result.error){
-    prevEl.innerHTML = '<span style="color:var(--danger)">❌ ' + (result?.error || 'Formato não reconhecido') + '</span>';
-    prevEl.style.display = 'block';
-    _empresaParsed = null;
-    return;
-  }
-  _empresaParsed = result;
-
-  const ppVal = result.totPP > 0 ? result.totPP : result.totValorRec;
-  prevEl.innerHTML = `
-    <div style="font-weight:800;color:#D97706;margin-bottom:6px">✅ ${result.linhas} registros · Arquivo Empresa reconhecido</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div style="padding:8px 10px;background:var(--w);border:1px solid #FCD34D;border-radius:var(--rm)">
-        <div style="font-size:10px;color:#92400E;font-weight:700;text-transform:uppercase;margin-bottom:3px">💼 Total Arrecadado (PaguePay)</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#D97706">${fR(ppVal)}</div>
-        <div style="font-size:10px;color:var(--g500);margin-top:2px">${result.hasSplit ? 'Coluna: Pague Play (24,96%)' : 'Coluna: Valor Recebido (sem split)'}</div>
-      </div>
-      <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
-        <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">Bruto Total</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--g500)">${fR(result.totValorRec)}</div>
-      </div>
-    </div>`;
-  prevEl.style.display = 'block';
-}
-
-function aplicarEmpresa(){
-  const raw = document.getElementById('txt-empresa-modal').value;
-  const statusEl = document.getElementById('status-empresa');
-  statusEl.style.display = 'block';
-
-  if(!raw.trim()){ statusEl.textContent='⚠️ Cole o conteúdo do arquivo primeiro!'; statusEl.style.background='#FFFBEB'; statusEl.style.color='#92400E'; return; }
-
-  const result = _empresaParsed || _parseImportCSV(raw);
-  if(!result || result.error){ statusEl.textContent='❌ ' + (result?.error||'Erro ao processar'); statusEl.style.background='#FEF2F2'; statusEl.style.color='#991B1B'; return; }
-
-  // Valor a usar: PaguePay se disponível, senão Valor Recebido
-  const ppVal = result.totPP > 0 ? result.totPP : result.totValorRec;
-
-  if(ppVal <= 0){ statusEl.textContent='⚠️ Nenhum valor encontrado no arquivo.'; statusEl.style.background='#FFFBEB'; statusEl.style.color='#92400E'; return; }
-
-  // Preencher campo Total Arrecadado
-  const inpArr = document.getElementById('inp-arrecadado');
-  if(inpArr){ inpArr.value = ppVal.toFixed(2); liveCalcArrecadado(); }
-
-  // Salvar via applyArrecadado (sem alterar operadores/equipes/meta)
-  totalArrecadado = ppVal;
-  localStorage.setItem('cofen_arrecadado', ppVal);
-  initHero();
-  if(fbDb && fbRoom) fbPush('arrecadado', {
-    v: ppVal, m: metaArrecadado,
-    mt: corenMT, pi: corenPI, ma: corenMA, ce: corenCE
-  });
-
-  statusEl.innerHTML = `✅ Total Arrecadado atualizado: <strong>${fR(ppVal)}</strong>${result.hasSplit?' (Pague Play 24,96%)':' (Valor Recebido)'}`;
-  statusEl.style.background = '#FFFBEB';
-  statusEl.style.color = '#065F46';
-
-  // Salvar historico mensal PP
-  const mesalEmp = _parseMensal(raw);
-  _histMensalEmpresa = {};
-  Object.entries(mesalEmp).forEach(([k,v])=>{ _histMensalEmpresa[k] = v.pp>0?v.pp:v.rec; });
-  localStorage.setItem('cofen_hist_empresa', JSON.stringify(_histMensalEmpresa));
-  renderResumoEditor();
-
-  setTimeout(() => fecharModalEmpresa(), 2000);
-}
-// ── FIM IMPORTAR ──────────────────────────────────────────────
-
-
-// ─────────────────────────────────────────────────────────────
-// renderResumoEditor — bloco de totais no topo do editor
-// ─────────────────────────────────────────────────────────────
-function renderResumoEditor(){
-  const el = document.getElementById('resumo-editor-bloco');
-  if(!el) return;
-
-  const fR  = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const fRK = v => v>=1e6?'R$ '+(v/1e6).toFixed(2).replace('.',',')+'M':v>=1000?'R$ '+(v/1000).toFixed(1).replace('.',',')+'K':'R$ '+Math.round(v).toLocaleString('pt-BR');
-
-  // Combinar dados de Geral e Empresa
-  const mesesGeral   = _histMensalGeral   || {};
-  const mesesEmpresa = _histMensalEmpresa || {};
-
-  // Carregar do localStorage se vazio
-  if(!Object.keys(mesesGeral).length){
-    try{ const s=localStorage.getItem('cofen_hist_geral'); if(s) Object.assign(mesesGeral, JSON.parse(s)); }catch(e){}
-  }
-  if(!Object.keys(mesesEmpresa).length){
-    try{ const s=localStorage.getItem('cofen_hist_empresa'); if(s) Object.assign(mesesEmpresa, JSON.parse(s)); }catch(e){}
-  }
-
-  // Se nenhum dado, esconde bloco
-  const temGeral   = Object.keys(mesesGeral).length > 0;
-  const temEmpresa = Object.keys(mesesEmpresa).length > 0;
-  if(!temGeral && !temEmpresa){ el.style.display='none'; return; }
-  el.style.display='block';
-
-  const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
-                    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const nomeMes = key => {
-    const p = key.match(/(\d{4})-(\d{2})/);
-    if(!p) return key;
-    return MESES_PT[parseInt(p[2])-1]+'/'+p[1].slice(2);
-  };
-
-  // Mes atual = Abril 2026 (mes 4)
-  const now = new Date();
-  const mesAtualKey = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
-
-  // Totais gerais
-  const allMesKeys = Array.from(new Set([
-    ...Object.keys(mesesGeral), ...Object.keys(mesesEmpresa)
-  ])).sort();
-
-  const totalGeralRec = Object.values(mesesGeral).reduce((s,m)=>s+(m.rec||0),0);
-  const totalGeralPP  = Object.values(mesesGeral).reduce((s,m)=>s+(m.pp||0),0);
-  const totalEmpPP    = Object.values(mesesEmpresa).reduce((s,v)=>s+v,0);
-
-  const abrilRec = (mesesGeral[mesAtualKey]?.rec) || 0;
-  const abrilPP  = (mesesGeral[mesAtualKey]?.pp)  || 0;
-  const abrilEmp = mesesEmpresa[mesAtualKey] || 0;
-
-  // ── Bloco HERO com Total Abril + Total Geral ──────────────
-  const heroHtml = `
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-    <!-- TOTAL ABRIL -->
-    <div style="background:linear-gradient(135deg,#065F46,#059669);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden">
-      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:rgba(255,255,255,.06);border-radius:50%"></div>
-      <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">📅 Total Abril/26</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#fff;letter-spacing:1px;line-height:1">${fR(abrilRec)}</div>
-      ${abrilPP>0?`<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:4px">PaguePay: <strong style="color:#6EE7B7">${fR(abrilPP)}</strong></div>`:''}
-    </div>
-    <!-- TOTAL GERAL -->
-    <div style="background:linear-gradient(135deg,#1e3a5f,#1a6ef5);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden">
-      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:rgba(255,255,255,.06);border-radius:50%"></div>
-      <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">🏆 Total Geral (todos os meses)</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#fff;letter-spacing:1px;line-height:1">${fR(totalGeralRec)}</div>
-      ${totalGeralPP>0?`<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:4px">PaguePay total: <strong style="color:#93C5FD">${fR(totalGeralPP)}</strong></div>`:''}
-    </div>
-  </div>`;
-
-  // ── Tabela COREN × Mês ────────────────────────────────────
-  // Coletar todos os CORENs presentes
-  const allCorens = new Set();
-  Object.values(mesesGeral).forEach(m=>Object.keys(m.corens||{}).forEach(c=>allCorens.add(c)));
-  const corensArr = Array.from(allCorens).sort();
-
-  let tabelaMeses = '';
-  if(allMesKeys.length > 0 && corensArr.length > 0){
-    const headerCols = corensArr.map(c=>`<th style="text-align:right">COREN-${c}</th>`).join('');
-    const bodyRows = allMesKeys.map(k=>{
-      const m = mesesGeral[k] || {rec:0,pp:0,corens:{}};
-      const corenCells = corensArr.map(c=>{
-        const v = m.corens[c]||0;
-        return `<td style="text-align:right;font-family:'Courier New',monospace">${v>0?fR(v):'—'}</td>`;
-      }).join('');
-      const ppEmp = mesesEmpresa[k] || 0;
-      return `<tr>
-        <td style="font-weight:700;white-space:nowrap">${nomeMes(k)}</td>
-        <td style="text-align:right;font-weight:600;color:var(--pp)">${m.rec>0?fR(m.rec):'—'}</td>
-        ${corenCells}
-        <td style="text-align:right;color:#F59E0B;font-weight:600">${ppEmp>0?fR(ppEmp):'—'}</td>
-      </tr>`;
-    }).join('');
-
-    // Linha de totais
-    const totalCorenCells = corensArr.map(c=>{
-      const t = Object.values(mesesGeral).reduce((s,m)=>s+(m.corens[c]||0),0);
-      return `<td style="text-align:right;font-weight:800;font-family:'Courier New',monospace">${t>0?fR(t):'—'}</td>`;
-    }).join('');
-
-    tabelaMeses = `
-    <div style="margin-bottom:14px">
-      <div style="font-size:10px;font-weight:800;color:var(--g600);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📍 Total por COREN e por Mês</div>
-      <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--g200)">
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <thead>
-            <tr style="background:var(--g50)">
-              <th style="padding:8px 10px;text-align:left;font-weight:800;color:var(--g700);border-bottom:2px solid var(--g200)">Mês</th>
-              <th style="padding:8px 10px;text-align:right;font-weight:800;color:var(--g700);border-bottom:2px solid var(--g200)">Total Recebido</th>
-              ${headerCols.replace(/<th/g,'<th style="padding:8px 10px;font-weight:800;color:var(--g700);border-bottom:2px solid var(--g200)"')}
-              <th style="padding:8px 10px;text-align:right;font-weight:800;color:#92400E;border-bottom:2px solid var(--g200)">PaguePay (Emp.)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${bodyRows.replace(/<tr>/g,'<tr style="border-bottom:1px solid var(--g100)">').replace(/<td/g,'<td style="padding:7px 10px"')}
-            <tr style="background:var(--g50);border-top:2px solid var(--g300)">
-              <td style="padding:8px 10px;font-weight:800">TOTAL</td>
-              <td style="padding:8px 10px;text-align:right;font-weight:800;color:var(--pp)">${fR(totalGeralRec)}</td>
-              ${totalCorenCells.replace(/<td/g,'<td style="padding:8px 10px"')}
-              <td style="padding:8px 10px;text-align:right;font-weight:800;color:#F59E0B">${totalEmpPP>0?fR(totalEmpPP):'—'}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>`;
-  } else if(allMesKeys.length > 0) {
-    // Sem corens — tabela simples por mes
-    const bodyRows = allMesKeys.map(k=>{
-      const m = mesesGeral[k] || {rec:0,pp:0};
-      const ppEmp = mesesEmpresa[k] || 0;
-      return `<tr style="border-bottom:1px solid var(--g100)">
-        <td style="padding:7px 10px;font-weight:700">${nomeMes(k)}</td>
-        <td style="padding:7px 10px;text-align:right;font-weight:600;color:var(--pp)">${m.rec>0?fR(m.rec):'—'}</td>
-        <td style="padding:7px 10px;text-align:right;color:#3B82F6">${m.pp>0?fR(m.pp):'—'}</td>
-        <td style="padding:7px 10px;text-align:right;color:#F59E0B">${ppEmp>0?fR(ppEmp):'—'}</td>
-      </tr>`;
-    }).join('');
-    tabelaMeses = `
-    <div style="margin-bottom:14px">
-      <div style="font-size:10px;font-weight:800;color:var(--g600);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📅 Total por Mês</div>
-      <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--g200)">
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <thead><tr style="background:var(--g50)">
-            <th style="padding:8px 10px;text-align:left;border-bottom:2px solid var(--g200)">Mês</th>
-            <th style="padding:8px 10px;text-align:right;border-bottom:2px solid var(--g200)">Total Recebido</th>
-            <th style="padding:8px 10px;text-align:right;border-bottom:2px solid var(--g200)">PaguePay</th>
-            <th style="padding:8px 10px;text-align:right;border-bottom:2px solid var(--g200);color:#92400E">PaguePay (Emp.)</th>
-          </tr></thead>
-          <tbody>${bodyRows}</tbody>
-        </table>
-      </div>
-    </div>`;
-  }
-
-  // ── Gráfico de barras mensal (canvas inline) ───────────────
-  const chartId = 'chart-resumo-editor-'+Date.now();
-  const chartHtml = allMesKeys.length > 0 ? `
-  <div style="margin-bottom:14px">
-    <div style="font-size:10px;font-weight:800;color:var(--g600);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📊 Recebimento por Mês — Geral</div>
-    <div style="background:var(--w);border:1px solid var(--g200);border-radius:8px;padding:12px">
-      <canvas id="${chartId}" height="180"></canvas>
-    </div>
-  </div>` : '';
-
-  el.innerHTML = heroHtml + tabelaMeses + chartHtml;
-
-  // Renderizar gráfico após inserção no DOM
-  if(allMesKeys.length > 0 && typeof Chart !== 'undefined'){
-    const labels = allMesKeys.map(nomeMes);
-    const dataRec = allMesKeys.map(k=>(mesesGeral[k]?.rec||0));
-    const dataPP  = allMesKeys.map(k=>(mesesGeral[k]?.pp||0));
-    const dataEmp = allMesKeys.map(k=>(mesesEmpresa[k]||0));
-
-    // Destruir instancia anterior se existir
-    const existingChart = Chart.getChart(chartId);
-    if(existingChart) existingChart.destroy();
-
-    new Chart(document.getElementById(chartId), {
-      type:'bar',
-      data:{
-        labels,
-        datasets:[
-          {label:'Total Recebido',data:dataRec,backgroundColor:'rgba(0,168,107,.75)',borderRadius:4},
-          {label:'PaguePay',data:dataPP,backgroundColor:'rgba(26,110,245,.7)',borderRadius:4},
-          {label:'Arrecadado (Emp.)',data:dataEmp,backgroundColor:'rgba(245,158,11,.7)',borderRadius:4}
-        ]
-      },
-      options:{
-        responsive:true,maintainAspectRatio:false,
-        plugins:{
-          legend:{position:'top',labels:{font:{family:'Nunito',size:11},color:'#6B7280',boxWidth:12}},
-          tooltip:{callbacks:{label:ctx=>'R$ '+Math.round(ctx.parsed.y).toLocaleString('pt-BR')}}
-        },
-        scales:{
-          x:{grid:{display:false},ticks:{color:'#9CA3AF',font:{size:10}}},
-          y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#9CA3AF',font:{size:10},
-            callback:v=>'R$'+Math.round(v/1000)+'K'}}
-        }
-      }
-    });
-  }
 }
 
 function applyTotal(){
@@ -3512,19 +2810,19 @@ function openM(opName){
   document.getElementById('m-efic').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px">
       <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--r);padding:9px 11px">
-        <div style="font-size:9px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Vencidos até hoje</div>
+        <div style="font-size:9px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Gerados no Mês</div>
         <div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:var(--info)">${gerados}</div>
-        <div style="font-size:10px;color:var(--g500)">acordos c/ vencimento</div>
+        <div style="font-size:10px;color:var(--g500)">${gerados===op.acordos&&pagos===op.acordos?'acordos (diretos)':'acordos gerados'}</div>
       </div>
       <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--r);padding:9px 11px">
-        <div style="font-size:9px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Pagos dos Vencidos</div>
+        <div style="font-size:9px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Pagos</div>
         <div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:var(--ok)">${pagos}</div>
-        <div style="font-size:10px;color:var(--g500)">pagaram dos vencidos (${efPct}%)</div>
+        <div style="font-size:10px;color:var(--g500)">acordos pagos (${efPct}%)</div>
       </div>
     </div>
     <div style="background:var(--g50);border-radius:var(--r);padding:7px 10px;margin-bottom:6px">
       <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;margin-bottom:4px">
-        <span style="color:var(--g500)">Eficiência (vencidos pagos)</span>
+        <span style="color:var(--g500)">Taxa de conversão</span>
         <span style="color:${parseFloat(efPct)>=40?'var(--ok)':parseFloat(efPct)>=20?'var(--warn)':'var(--danger)'}">${efPct}%</span>
       </div>
       <div style="background:var(--g200);border-radius:100px;height:6px;overflow:hidden">
@@ -3533,7 +2831,7 @@ function openM(opName){
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
       <div class="ef-row" style="flex-direction:column;align-items:flex-start;gap:2px">
-        <span class="ef-l">📋 Venc. Pendentes</span>
+        <span class="ef-l">📋 Pendentes</span>
         <span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--warn)">${pendentes}</span>
       </div>
       <div class="ef-row" style="flex-direction:column;align-items:flex-start;gap:2px">
@@ -3658,8 +2956,8 @@ function refreshAll(){
   // FIX: Mantém lista de mover e remover sempre sincronizadas com estado atual
   if(typeof gestaoMoverInit==='function' && document.getElementById('gsub-mover')?.style.display!=='none') gestaoMoverInit();
   if(typeof gestaoRemoverInit==='function' && document.getElementById('gsub-remover')?.style.display!=='none') gestaoRemoverInit();
-  // Atualiza resumo mensal do editor (carrega do localStorage se disponível)
-  if(typeof renderResumoEditor==='function') renderResumoEditor();
+  // Atualiza hero do comparativo com Abril dinâmico
+  if(typeof cmpUpdateHero==='function') cmpUpdateHero();
 }
 
 // ── TOAST ──
@@ -5740,8 +5038,7 @@ function tvShow(idx){
   const gerados  = op.gerados  ||0;
   const pagos    = op.pagos    ||0;
   const pendentes= op.pendentes||0;
-  // Eficiência correta: pagos_vencidos / vencidos_ate_hoje
-  const temEfic  = gerados>0;  // gerados = vencidos até hoje
+  const temEfic  = gerados>0;
   const efPct    = temEfic?(pagos/gerados*100).toFixed(1):null;
   const efC      = efColor(efPct||'0');
 
@@ -5855,9 +5152,9 @@ function tvShow(idx){
           </div>
           ${temEfic
             ? `<div style="background:${efC}18;border:1px solid ${efC}33;border-radius:12px;padding:12px;text-align:center">
-                <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚡ Efic. Pgto</div>
+                <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚡ Eficiência</div>
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${efC};line-height:1">${efPct}%</div>
-                <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px">${pagos}/${gerados} venc.</div>
+                <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px">${pagos}p/${pendentes}pend</div>
                </div>`
             : `<div style="background:rgba(252,211,77,.08);border:1px solid rgba(252,211,77,.2);border-radius:12px;padding:12px;text-align:center">
                 <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎫 Ticket Médio</div>
@@ -6311,6 +5608,17 @@ function fbStartListening(){
       mkEq();
       pulseSyncDot();
     });
+  });
+
+  // ── Totais mensais históricos (Jan/Fev/Mar) ──
+  fbDb.ref(fbRoom+'/cmp_meses').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    if(typeof remote.jan === 'number'){ cmpJanTotal = remote.jan; localStorage.setItem('cofen_cmp_jan', remote.jan); }
+    if(typeof remote.fev === 'number'){ cmpFevTotal = remote.fev; localStorage.setItem('cofen_cmp_fev', remote.fev); }
+    if(typeof remote.mar === 'number'){ cmpMarTotal = remote.mar; localStorage.setItem('cofen_cmp_mar', remote.mar); }
+    cmpUpdateHero();
+    pulseSyncDot();
   });
 
   // ── Arrecadado + CORENs ──
@@ -7563,6 +6871,110 @@ function cmpInit(){
   cmpRenderGeral();
   cmpBuildTableGeral();
   cmpBuildTableEquipes();
+  cmpUpdateHero();
+}
+
+// ── Atualiza o hero dos 4 meses no comparativo ──
+function cmpUpdateHero(){
+  const abrTotal = getTotalRec();
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  const fRK2=v=>v>0?fRK(v):'—';
+
+  // Janeiro
+  s('cmp-hero-jan', fRK2(cmpJanTotal));
+  s('cmp-ho-jan',   cmpJanTotal>0 ? 'HO: '+fRK(cmpJanTotal*0.25) : 'HO: —');
+
+  // Fevereiro
+  s('cmp-hero-fev', fRK2(cmpFevTotal));
+  s('cmp-ho-fev',   cmpFevTotal>0 ? 'HO: '+fRK(cmpFevTotal*0.25) : 'HO: —');
+
+  // Março
+  s('cmp-hero-mar', fRK2(cmpMarTotal));
+  s('cmp-ho-mar',   cmpMarTotal>0 ? 'HO: '+fRK(cmpMarTotal*0.25) : 'HO: —');
+
+  // Abril (dinâmico)
+  s('cmp-hero-abr', fRK2(abrTotal));
+  s('cmp-ho-abr',   abrTotal>0 ? 'HO: '+fRK(abrTotal*0.25) : 'HO: —');
+
+  // Dias de Abril
+  const hoje = new Date().getDate();
+  s('cmp-hero-abr-dias', `até dia ${hoje} (ao vivo)`);
+
+  // Barras de crescimento visual
+  const meses = [
+    {label:'Jan', val:cmpJanTotal, color:'#67E8F9'},
+    {label:'Fev', val:cmpFevTotal, color:'#A78BFA'},
+    {label:'Mar', val:cmpMarTotal, color:'#FCD34D'},
+    {label:'Abr', val:abrTotal,   color:'#4ADE80'},
+  ];
+  const maxVal = Math.max(...meses.map(m=>m.val), 1);
+  const barsEl = document.getElementById('cmp-growth-bars');
+  if(barsEl){
+    barsEl.innerHTML = meses.map((m,i)=>{
+      const pct = maxVal>0 ? (m.val/maxVal*100).toFixed(1) : 0;
+      const prev = i>0 ? meses[i-1].val : null;
+      const diff = prev && prev>0 ? ((m.val-prev)/prev*100) : null;
+      const diffHtml = diff!==null && m.val>0
+        ? `<span style="font-size:10px;font-weight:800;color:${diff>=0?'#4ADE80':'#FCA5A5'};margin-left:6px">${diff>=0?'▲':'▼'}${Math.abs(diff).toFixed(0)}%</span>`
+        : '';
+      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:7px">
+        <div style="width:36px;font-size:11px;font-weight:800;color:rgba(255,255,255,.5);text-align:right;flex-shrink:0">${m.label}</div>
+        <div style="flex:1;background:rgba(255,255,255,.08);border-radius:100px;height:8px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${m.color};border-radius:100px;transition:width 1s"></div>
+        </div>
+        <div style="min-width:80px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:${m.color}">${m.val>0?fRK(m.val):'—'}${diffHtml}</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ── Preview em tempo real no editor ──
+function cmpLiveCalc(){
+  const jan = parseFloat(document.getElementById('inp-cmp-jan')?.value)||0;
+  const fev = parseFloat(document.getElementById('inp-cmp-fev')?.value)||0;
+  const mar = parseFloat(document.getElementById('inp-cmp-mar')?.value)||cmpMarTotal;
+  const abr = getTotalRec();
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  s('prev-jan',    jan>0?fRK(jan):'—');
+  s('prev-ho-jan', jan>0?fRK(jan*0.25):'—');
+  s('prev-fev',    fev>0?fRK(fev):'—');
+  s('prev-ho-fev', fev>0?fRK(fev*0.25):'—');
+  s('prev-mar',    mar>0?fRK(mar):'—');
+  s('prev-ho-mar', mar>0?fRK(mar*0.25):'—');
+  s('prev-abr',    abr>0?fRK(abr):'—');
+  s('prev-ho-abr', abr>0?fRK(abr*0.25):'—');
+}
+
+// ── Salvar totais mensais ──
+function cmpApplyMeses(){
+  const jan = parseFloat(document.getElementById('inp-cmp-jan')?.value)||0;
+  const fev = parseFloat(document.getElementById('inp-cmp-fev')?.value)||0;
+  const mar = parseFloat(document.getElementById('inp-cmp-mar')?.value)||0;
+  if(jan>0) cmpJanTotal = jan;
+  if(fev>0) cmpFevTotal = fev;
+  if(mar>0) cmpMarTotal = mar;
+  cmpSaveMeses();
+  // Sincronizar via Firebase
+  if(fbDb && fbRoom) fbPush('cmp_meses', {jan:cmpJanTotal, fev:cmpFevTotal, mar:cmpMarTotal});
+  cmpUpdateHero();
+  // Se comparativo estiver aberto, atualiza
+  if(document.getElementById('pg-comparativo')?.classList.contains('on')) cmpInit();
+  toast('✅ Totais mensais salvos! Janeiro, Fevereiro e Março atualizados.');
+}
+
+// ── Resetar totais mensais ──
+function cmpResetMeses(){
+  if(!confirm('Resetar totais de Janeiro e Fevereiro? Março volta para R$ 774.808.')) return;
+  cmpJanTotal = 0;
+  cmpFevTotal = 0;
+  cmpMarTotal = 774808;
+  cmpSaveMeses();
+  ['inp-cmp-jan','inp-cmp-fev'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const m=document.getElementById('inp-cmp-mar');
+  if(m) m.value='774808';
+  cmpLiveCalc();
+  cmpUpdateHero();
+  toast('↩ Totais mensais resetados!');
 }
 
 function cmpRenderGeral(){
@@ -8177,344 +7589,6 @@ setInterval(()=>{
   <div id="chk-sections" style="display:flex;flex-direction:column;gap:12px"></div>
 
 </div>
-
-
-<!-- ══ MODAL VISÃO GERAL IMPORT ══ -->
-<div id="modal-vg" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)document.getElementById('modal-vg').style.display='none'">
-  <div style="background:var(--w);border-radius:16px;max-width:620px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto">
-    <!-- Header -->
-    <div style="background:linear-gradient(135deg,#0a2a6e,#1a6ef5);padding:16px 20px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#fff;letter-spacing:2px">📊 IMPORTAR RELATÓRIO GERAL</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">Suporte: .xls · .xlsx · .csv · Arraste ou clique</div>
-      </div>
-      <button onclick="document.getElementById('modal-vg').style.display='none'" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:18px;line-height:1">✕</button>
-    </div>
-    <!-- Body -->
-    <div style="padding:20px">
-      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1E40AF;line-height:1.6">
-        <strong>Arquivo:</strong> rec_total_geral_*.xls / .csv<br>
-        Campos: Data · Coren · Forma Pgto · Valor Recebido · Valor Tarifa · Pague Play (24,96%) · Coren (56,28%) · Cofen (18,76%) · Operador · Tabulação<br>
-        <span style="color:#6B7280">Importe diariamente para manter os dados atualizados</span>
-      </div>
-      <!-- Drop zone -->
-      <div id="vg-drop"
-        ondragover="event.preventDefault();this.style.borderColor='#1a6ef5';this.style.background='#EFF6FF'"
-        ondragleave="this.style.borderColor='#93C5FD';this.style.background=''"
-        ondrop="event.preventDefault();this.style.borderColor='#93C5FD';this.style.background='';vgLerArquivo(event.dataTransfer.files[0])"
-        onclick="document.getElementById('vg-file-input').click()"
-        style="border:2px dashed #93C5FD;border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:10px">
-        <div style="font-size:36px;margin-bottom:8px">📂</div>
-        <div style="font-size:13px;font-weight:700;color:var(--g700)">Clique para selecionar ou arraste o arquivo aqui</div>
-        <div style="font-size:11px;color:var(--g400);margin-top:4px">.xls · .xlsx · .csv · .txt</div>
-        <input id="vg-file-input" type="file" accept=".xls,.xlsx,.csv,.txt,.tsv" style="display:none" onchange="vgLerArquivo(this.files[0])">
-      </div>
-      <div style="font-size:11px;color:var(--g400);text-align:center;margin:8px 0;font-weight:700">— ou cole o CSV diretamente —</div>
-      <textarea id="vg-textarea" rows="5"
-        style="width:100%;border:1.5px solid #93C5FD;border-radius:8px;padding:10px;font-family:monospace;font-size:11px;color:var(--g700);background:var(--g50);outline:none;resize:vertical;box-sizing:border-box"
-        placeholder="Cole aqui o conteúdo do CSV..."
-        oninput="vgPreviewCSV(this.value)"></textarea>
-      <!-- Preview -->
-      <div id="vg-preview" style="display:none;margin:10px 0;padding:12px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12px"></div>
-      <!-- Botões -->
-      <div style="display:flex;gap:10px;margin-top:14px">
-        <button onclick="vgAplicarDados()" style="flex:1;padding:12px;border-radius:8px;border:none;cursor:pointer;background:linear-gradient(135deg,#1a4db0,#1a6ef5);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:14px">✅ Aplicar e Atualizar</button>
-        <button onclick="document.getElementById('modal-vg').style.display='none'" style="padding:12px 20px;border-radius:8px;border:1.5px solid var(--g200);background:var(--w);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;cursor:pointer">Cancelar</button>
-      </div>
-      <div id="vg-status" style="display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:700"></div>
-    </div>
-  </div>
-</div>
-
-<script>
-// ════════════════════════════════════════════════════════════
-// VISÃO GERAL FINANCEIRA — vg* functions
-// ════════════════════════════════════════════════════════════
-
-(function(){
-
-const VG_KEY = 'cofen_vg2_data';
-let vgDB = null;   // dados processados
-let vgTab = 'mes'; // aba ativa
-let vgChartObj = null;
-
-// Formatos
-const fR  = v => 'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-const fRK = v => (v||0)>=1e6?'R$ '+((v||0)/1e6).toFixed(2).replace('.',',')+'M'
-                :(v||0)>=1000?'R$ '+((v||0)/1000).toFixed(1).replace('.',',')+'K'
-                :'R$ '+Math.round(v||0).toLocaleString('pt-BR');
-
-const CAMPOS = [
-  {k:'vr', label:'Valor Recebido',       cor:'#1a6ef5'},
-  {k:'vt', label:'Valor Tarifa',          cor:'#6c5ce7'},
-  {k:'pp', label:'Pague Play (24,96%)',   cor:'#0f9e76'},
-  {k:'cr', label:'Coren (56,28%)',        cor:'#d97706'},
-  {k:'cf', label:'Cofen (18,76%)',        cor:'#e74c3c'},
-];
-
-// Abrir modal
-window.vgAbrirModal = function(){
-  const m = document.getElementById('modal-vg');
-  m.style.display = 'flex';
-  document.getElementById('vg-status').style.display = 'none';
-  document.getElementById('vg-preview').style.display = 'none';
-  document.getElementById('vg-textarea').value = '';
-  _vgParsed = null;
-};
-
-let _vgParsed = null;
-
-// Ler arquivo (XLS ou CSV)
-window.vgLerArquivo = function(file){
-  if (!file) return;
-  const ext = file.name.split('.').pop().toLowerCase();
-  const processar = txt => {
-    document.getElementById('vg-textarea').value = txt.slice(0,60000);
-    vgPreviewCSV(txt);
-  };
-  if (ext==='xls'||ext==='xlsx') {
-    _lerXLS(file, processar);
-  } else {
-    const r = new FileReader();
-    r.onload = e => processar(e.target.result);
-    r.readAsText(file, 'latin1');
-  }
-};
-
-// Preview
-window.vgPreviewCSV = function(raw){
-  const result = vgParseRaw(raw);
-  const el = document.getElementById('vg-preview');
-  if (!result || result.err) {
-    el.innerHTML = '<span style="color:red">❌ '+(result?.err||'Formato não reconhecido')+'</span>';
-    el.style.display = 'block';
-    _vgParsed = null;
-    return;
-  }
-  _vgParsed = result;
-  const t = result.tot;
-  el.innerHTML = '<div style="font-weight:800;color:green;margin-bottom:8px">✅ '+result.n+' registros encontrados</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'
-    +CAMPOS.slice(0,3).map(c=>'<div style="padding:8px;background:white;border:1px solid #e5e7eb;border-radius:6px"><div style="font-size:10px;color:#6b7280;font-weight:700;text-transform:uppercase">'+c.label+'</div><div style="font-size:17px;font-weight:800;color:'+c.cor+'">'+fRK(t[c.k])+'</div></div>').join('')
-    +'</div>';
-  el.style.display = 'block';
-};
-
-// Parser CSV
-function vgParseRaw(raw){
-  const lines = raw.trim().split(/
-?
-/).filter(l=>l.trim());
-  if (lines.length < 2) return null;
-
-  const sep = lines[0].includes('	')?'	':lines[0].includes(';')?';':',';
-  const nh = s => s.trim().replace(/^"|"$/g,'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-  const hdr = lines[0].split(sep).map(nh);
-  const ci = cands => { for(const c of cands){const i=hdr.findIndex(h=>h.includes(c));if(i>=0)return i;} return -1; };
-
-  const iDt = ci(['data','dt.baixa','dt baixa']);
-  const iPer= ci(['periodo','period']);
-  const iCo = ci(['coren','estado']);
-  const iFo = ci(['forma pgto','forma pag','forma']);
-  const iVR = ci(['valor recebido','vlr recebido','valor rec','recebido']);
-  const iVT = ci(['valor tarifa','vlr tarifa','tarifa']);
-  const iPP = ci(['pague play','pagueplay','24,96','24.96']);
-  const iCR = ci(['coren (56','coren(56','56,28']);
-  const iCF = ci(['cofen (18','cofen(18','18,76']);
-  const iOp = ci(['operador','operator']);
-  const iTab= ci(['tabulacao','tabulação','tab']);
-
-  if (iVR<0&&iPP<0) return {err:'Colunas não encontradas. Headers detectados: '+hdr.slice(0,6).join(' | ')};
-
-  const pN = s => {
-    if (!s||s.trim()===''||s.trim()==='-') return 0;
-    let v = s.trim().replace(/^"/,'').replace(/"$/,'').replace(/R\$\s*/,'').trim();
-    if (/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(v)) return parseFloat(v.replace(/\./g,'').replace(',','.'));
-    return parseFloat(v.replace(',','.')) || 0;
-  };
-
-  const pDt = s => {
-    if (!s) return null;
-    const n = parseFloat(s);
-    if (!isNaN(n) && n>40000 && n<60000) {
-      const d = new Date((n-25569)*86400*1000);
-      return d.toISOString().slice(0,10);
-    }
-    let m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-    if (m) return m[3]+'-'+m[2]+'-'+m[1];
-    m = s.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})$/);
-    if (m) return m[0].slice(0,10);
-    m = s.match(/(\d{4})[\/\-](\d{2})/);
-    if (m) return m[1]+'-'+m[2]+'-01';
-    return null;
-  };
-
-  const isoW = ds => {
-    const d = new Date(ds); d.setHours(12);
-    d.setDate(d.getDate()+3-(d.getDay()+6)%7);
-    const j4 = new Date(d.getFullYear(),0,4);
-    const w = 1+Math.round(((d-j4)/86400000-3+(j4.getDay()+6)%7)/7);
-    return d.getFullYear()+'-S'+String(w).padStart(2,'0');
-  };
-
-  const mk = () => CAMPOS.reduce((a,c)=>(a[c.k]=0,a),{n:0});
-  const add = (map,key,vals) => {
-    if (!map[key]) map[key]=mk();
-    CAMPOS.forEach(c=>map[key][c.k]+=vals[c.k]||0);
-    map[key].n++;
-  };
-
-  const mes={},sem={},dia={},cor={},for_={}; const tot=mk();
-  let dMin=null,dMax=null;
-
-  for (let i=1;i<lines.length;i++){
-    const cells = lines[i].split(sep).map(c=>c.trim().replace(/^"|"$/g,''));
-    if (cells.length<3) continue;
-    const fc = cells[0].toLowerCase().trim();
-    if (fc===''||fc==='total'||fc.startsWith('soma')) continue;
-    const vr=iVR>=0?pN(cells[iVR]):0, vt=iVT>=0?pN(cells[iVT]):0;
-    const pp=iPP>=0?pN(cells[iPP]):0, cr=iCR>=0?pN(cells[iCR]):0, cf=iCF>=0?pN(cells[iCF]):0;
-    if (vr===0&&pp===0) continue;
-    const vals = {vr,vt,pp,cr,cf};
-    let ds = iDt>=0?pDt(cells[iDt]):null;
-    if (!ds&&iPer>=0) ds=pDt(cells[iPer]);
-    if (!ds) continue;
-    if (!dMin||ds<dMin) dMin=ds;
-    if (!dMax||ds>dMax) dMax=ds;
-    add(mes, ds.slice(0,7), vals);
-    add(sem, isoW(ds),      vals);
-    add(dia, ds.slice(0,10),vals);
-    const c_=(iCo>=0?(cells[iCo]||'').trim().toUpperCase()||'N/A':'N/A');
-    const f_=(iFo>=0?(cells[iFo]||'').trim()||'Outros':'Outros');
-    const o_=(iOp>=0?(cells[iOp]||'').trim()||'—':'—');
-    add(cor,  c_, vals);
-    add(for_, f_, vals);
-    CAMPOS.forEach(c=>{tot[c.k]+=vals[c.k]||0;}); tot.n++;
-  }
-
-  return {tot,mes,sem,dia,cor,for_,dMin,dMax,n:tot.n};
-}
-
-// Aplicar dados
-window.vgAplicarDados = function(){
-  const raw = document.getElementById('vg-textarea').value;
-  const stEl = document.getElementById('vg-status');
-  stEl.style.display='block';
-  if (!raw.trim()){stEl.textContent='⚠️ Nenhum conteúdo';stEl.style.background='#FEF9C3';stEl.style.color='#92400E';return;}
-  const result = _vgParsed || vgParseRaw(raw);
-  if (!result||result.err){stEl.textContent='❌ '+(result?.err||'Erro');stEl.style.background='#FEF2F2';stEl.style.color='#991B1B';return;}
-  vgDB = result;
-  try{localStorage.setItem(VG_KEY, JSON.stringify(vgDB));}catch(e){}
-  vgRender();
-  stEl.innerHTML='✅ Aplicado! <strong>'+result.n+'</strong> registros · '+fRK(result.tot.vr)+' recebido';
-  stEl.style.background='#F0FDF4'; stEl.style.color='#065F46';
-  setTimeout(()=>document.getElementById('modal-vg').style.display='none', 1600);
-};
-
-// Aba
-window.vgSetTab = function(btn, tab){
-  vgTab = tab;
-  document.querySelectorAll('.vgtab').forEach(b=>{
-    b.style.borderBottomColor='transparent';
-    b.style.color='var(--g500)';
-  });
-  btn.style.borderBottomColor='#1a6ef5';
-  btn.style.color='#1a6ef5';
-  vgRenderTabela();
-};
-
-// Render principal
-function vgRender(){
-  if (!vgDB) return;
-  document.getElementById('vg-empty').style.display='none';
-  document.getElementById('vg-content').style.display='block';
-  // Label
-  const lb = document.getElementById('vg-periodo-label');
-  if (lb) lb.textContent = vgDB.n+' registros · '+( vgDB.dMin||'')+ ' → '+(vgDB.dMax||'');
-  // Badge
-  const bg = document.getElementById('vg-badge');
-  if (bg){bg.textContent='✅ '+vgDB.n+' registros';bg.style.display='block';}
-  // KPIs
-  const kpiEl = document.getElementById('vg-kpis');
-  if (kpiEl) kpiEl.innerHTML = CAMPOS.map(c=>`
-    <div style="background:var(--w);border:1.5px solid var(--g200);border-radius:8px;padding:12px 8px;text-align:center;border-top:3px solid ${c.cor}">
-      <div style="font-size:9px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">${c.label}</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${c.cor}">${fRK(vgDB.tot[c.k])}</div>
-      <div style="font-size:10px;color:var(--g400);margin-top:2px">${fR(vgDB.tot[c.k])}</div>
-    </div>`).join('');
-  vgRenderTabela();
-}
-
-// Render tabela + gráfico
-function vgRenderTabela(){
-  if (!vgDB) return;
-  const map = {mes:vgDB.mes,semana:vgDB.sem,dia:vgDB.dia,coren:vgDB.cor,forma:vgDB.for_}[vgTab]||vgDB.mes;
-  const MP = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const lbl = k => {
-    if (vgTab==='mes'){const p=k.match(/(\d{4})-(\d{2})/);return p?MP[parseInt(p[2])-1]+'/'+p[1].slice(2):k;}
-    return k;
-  };
-  const keys = Object.keys(map).sort();
-
-  // Gráfico
-  const canvas = document.getElementById('vg-chart');
-  if (canvas){
-    if (vgChartObj){vgChartObj.destroy();vgChartObj=null;}
-    if (typeof Chart!=='undefined'){
-      vgChartObj = new Chart(canvas,{
-        type:'bar',
-        data:{
-          labels:keys.map(lbl),
-          datasets:CAMPOS.map(c=>({
-            label:c.label,
-            data:keys.map(k=>map[k][c.k]||0),
-            backgroundColor:c.cor+'bb',
-            borderRadius:3
-          }))
-        },
-        options:{
-          responsive:true,maintainAspectRatio:false,
-          plugins:{
-            legend:{position:'top',labels:{font:{family:'Nunito',size:10},color:'#6b7280',boxWidth:10}},
-            tooltip:{callbacks:{label:ctx=>'R$ '+Math.round(ctx.parsed.y).toLocaleString('pt-BR')}}
-          },
-          scales:{
-            x:{stacked:false,grid:{display:false},ticks:{color:'#9ca3af',font:{size:9},maxRotation:45}},
-            y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#9ca3af',font:{size:9},callback:v=>'R$'+Math.round(v/1000)+'K'}}
-          }
-        }
-      });
-    }
-  }
-
-  // Tabela
-  const tbl = document.getElementById('vg-table');
-  if (!tbl) return;
-  const tot = CAMPOS.reduce((a,c)=>(a[c.k]=0,a),{n:0});
-  keys.forEach(k=>{CAMPOS.forEach(c=>{tot[c.k]+=(map[k][c.k]||0);}); tot.n+=(map[k].n||0);});
-
-  const ths = ['Período','Reg',...CAMPOS.map(c=>c.label)].map((h,i)=>
-    `<th style="padding:8px 10px;background:var(--g50);border-bottom:2px solid var(--g200);font-size:11px;font-weight:800;color:var(--g700);text-align:${i<2?'left':'right'};white-space:nowrap">${h}</th>`).join('');
-
-  const rows = keys.map((k,ri)=>{
-    const d=map[k]; const bg=ri%2?'var(--g50)':'var(--w)';
-    const cells=CAMPOS.map(c=>`<td style="padding:7px 10px;text-align:right;font-family:'Courier New',monospace;font-size:11px;color:${c.cor};background:${bg}">${fR(d[c.k]||0)}</td>`).join('');
-    return `<tr><td style="padding:7px 10px;font-weight:700;font-size:12px;background:${bg}">${lbl(k)}</td><td style="padding:7px 10px;text-align:right;color:var(--g400);font-size:11px;background:${bg}">${d.n}</td>${cells}</tr>`;
-  }).join('');
-
-  const totCells=CAMPOS.map(c=>`<td style="padding:8px 10px;text-align:right;font-weight:800;font-size:12px;color:${c.cor};font-family:'Bebas Neue',sans-serif">${fR(tot[c.k])}</td>`).join('');
-
-  tbl.innerHTML=`<table style="width:100%;border-collapse:collapse"><thead><tr>${ths}</tr></thead><tbody>${rows}<tr style="background:var(--g100);border-top:2px solid var(--g300)"><td style="padding:8px 10px;font-weight:800;font-size:12px">TOTAL</td><td style="padding:8px 10px;text-align:right;font-weight:800;font-size:12px;color:var(--g500)">${tot.n}</td>${totCells}</tr></tbody></table>`;
-}
-
-// Carregar localStorage ao iniciar
-try {
-  const s = localStorage.getItem(VG_KEY);
-  if (s) { vgDB = JSON.parse(s); setTimeout(vgRender, 300); }
-} catch(e) {}
-
-})(); // end IIFE
-</script>
 
 </body>
 </html>
