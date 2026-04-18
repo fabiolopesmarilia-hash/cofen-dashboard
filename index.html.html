@@ -445,26 +445,36 @@ select.ev-inp{cursor:pointer}
       </div>
     </div>
     <div id="h-arrecadado-wrap" style="margin-top:12px;padding:14px 16px;background:rgba(251,191,36,.07);border-radius:var(--rl);border:1px solid rgba(251,191,36,.2)">
-      <!-- Cabeçalho com botão importar -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
-        <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.7);letter-spacing:1.5px;text-transform:uppercase">💼 Pague Play (24,96%) — Total Arrecadado Empresa</div>
-        <button onclick="empAbrir()" style="display:flex;align-items:center;gap:5px;background:rgba(251,191,36,.25);border:1px solid rgba(251,191,36,.5);padding:5px 12px;border-radius:var(--rm);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;color:#FCD34D">
-          📥 Importar Empresa
+
+      <!-- Título + botão importar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.7);letter-spacing:1.5px;text-transform:uppercase">💼 Pague Play (24,96%) — Empresa</div>
+        <button onclick="empAbrir()" style="display:flex;align-items:center;gap:5px;background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.45);padding:5px 12px;border-radius:var(--rm);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;color:#FCD34D">
+          📥 Importar
         </button>
       </div>
 
-      <!-- KPI TOTAL GERAL em destaque -->
-      <div style="background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,191,36,.08));border:1px solid rgba(251,191,36,.3);border-radius:var(--rm);padding:12px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <div>
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px">💰 Total Geral PaguePay</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#FCD34D;letter-spacing:1px;line-height:1" id="emp-total-geral">—</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:3px" id="emp-periodo-label">Sem dados importados</div>
+      <!-- KPIs: Total Ano (grande) + Total Mês Atual (ao lado) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+
+        <!-- Total Ano -->
+        <div style="background:rgba(251,191,36,.12);border:1.5px solid rgba(251,191,36,.35);border-radius:var(--rm);padding:12px 14px">
+          <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.6);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">📅 Total Ano</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#FCD34D;letter-spacing:1px;line-height:1" id="emp-val-ano">—</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px" id="emp-ano-label">Sem dados</div>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap" id="emp-kpis-ano"></div>
+
+        <!-- Total Mês Atual -->
+        <div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:var(--rm);padding:12px 14px">
+          <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px" id="emp-mes-titulo">🔥 Mês Atual</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#FCD34D;letter-spacing:1px;line-height:1" id="emp-val-mes">—</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px" id="emp-mes-label">Sem dados</div>
+        </div>
+
       </div>
 
       <!-- Abas período -->
-      <div style="display:flex;gap:0;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.12);overflow-x:auto">
+      <div style="display:flex;gap:0;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.1);overflow-x:auto">
         <button class="emp-tab" onclick="empSetTab(this,'mes')"    style="padding:6px 12px;border:none;border-bottom:2px solid #FCD34D;background:none;color:#FCD34D;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap;margin-bottom:-1px">📆 Mês</button>
         <button class="emp-tab" onclick="empSetTab(this,'semana')" style="padding:6px 12px;border:none;border-bottom:2px solid transparent;background:none;color:rgba(255,255,255,.4);font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap;margin-bottom:-1px">📅 Semana</button>
         <button class="emp-tab" onclick="empSetTab(this,'dia')"    style="padding:6px 12px;border:none;border-bottom:2px solid transparent;background:none;color:rgba(255,255,255,.4);font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap;margin-bottom:-1px">🗓️ Dia</button>
@@ -472,17 +482,20 @@ select.ev-inp{cursor:pointer}
 
       <!-- Tabela de períodos -->
       <div id="emp-tabela" style="max-height:220px;overflow-y:auto">
-        <div style="font-size:11px;color:rgba(255,255,255,.3);text-align:center;padding:16px">Importe o relatório <strong style="color:#FCD34D">rec_empresa</strong> para ver os totais</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.3);text-align:center;padding:16px">Importe o relatório <strong style="color:#FCD34D">rec_empresa</strong> (.xls ou .csv) para ver os totais</div>
       </div>
 
-      <!-- Spans ocultos para compatibilidade -->
-      <span id="h-arrecadado" style="display:none"></span>
-      <span id="h-arrecadado-ho" style="display:none"></span>
+      <!-- IDs ocultos para compatibilidade com o sistema existente -->
+      <span id="emp-total-geral"    style="display:none"></span>
+      <span id="emp-periodo-label"  style="display:none"></span>
+      <span id="emp-kpis-ano"       style="display:none"></span>
+      <span id="h-arrecadado"       style="display:none"></span>
+      <span id="h-arrecadado-ho"    style="display:none"></span>
       <span id="h-arrecadado-falta" style="display:none"></span>
       <span id="h-arrecadado-meta-s" style="display:none"></span>
       <span id="h-arrecadado-media" style="display:none"></span>
-      <span id="h-arrecadado-need" style="display:none"></span>
-      <span id="h-arrecadado-pct" style="display:none"></span>
+      <span id="h-arrecadado-need"  style="display:none"></span>
+      <span id="h-arrecadado-pct"   style="display:none"></span>
       <div id="h-arrecadado-bar" style="display:none"></div>
     </div>
   </div>
@@ -8986,38 +8999,39 @@ setInterval(()=>{
   function empRender() {
     if(!empDB) return;
 
-    /* Total geral */
-    var elTot=document.getElementById('emp-total-geral');
-    if(elTot) elTot.textContent=fRK(empDB.total);
+    var now=new Date();
+    var mesAtual=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    var MP=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    var mesAtualNome=MP[now.getMonth()]+'/'+String(now.getFullYear()).slice(2);
+    var anoAtual=String(now.getFullYear());
+    var valAno=empDB.ano[anoAtual]||empDB.total;
+    var valMes=empDB.mes[mesAtual]||0;
+    var nMes=Object.keys(empDB.mes).length;
 
-    var elLbl=document.getElementById('emp-periodo-label');
-    if(elLbl) elLbl.textContent=(empDB.dMin||'')+' → '+(empDB.dMax||'')+' · '+empDB.n+' registros';
+    /* KPI Total Ano */
+    var elAno=document.getElementById('emp-val-ano');
+    if(elAno) elAno.textContent=fRK(valAno);
+    var elAnoLbl=document.getElementById('emp-ano-label');
+    if(elAnoLbl) elAnoLbl.textContent=anoAtual+' · '+nMes+' mes'+(nMes!==1?'es':'');
 
-    /* KPIs: por ano + mes atual (abril) lado a lado */
-    var elAno=document.getElementById('emp-kpis-ano');
-    if(elAno) {
-      var now=new Date();
-      var mesAtual=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
-      var MP=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-      var mesAtualNome=MP[now.getMonth()]+'/'+String(now.getFullYear()).slice(2);
-      var valMesAtual=empDB.mes[mesAtual]||0;
-
-      var anos=Object.keys(empDB.ano).sort();
-      var anosHtml=anos.map(function(a){
-        return '<div style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);border-radius:var(--rm);padding:8px 12px;text-align:center;min-width:80px">'
-          +'<div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:2px">📅 '+a+'</div>'
-          +'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:#FCD34D">'+fRK(empDB.ano[a])+'</div>'
-          +'</div>';
-      }).join('');
-
-      /* Card mês atual destacado */
-      var mesHtml='<div style="background:linear-gradient(135deg,rgba(251,191,36,.3),rgba(251,191,36,.15));border:2px solid rgba(251,191,36,.6);border-radius:var(--rm);padding:8px 12px;text-align:center;min-width:90px">'
-        +'<div style="font-size:9px;font-weight:700;color:#FCD34D;text-transform:uppercase;margin-bottom:2px">🔥 '+mesAtualNome+'</div>'
-        +'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:#FCD34D">'+fRK(valMesAtual)+'</div>'
-        +'</div>';
-
-      elAno.innerHTML=mesHtml+anosHtml;
+    /* KPI Total Mês Atual */
+    var elMes=document.getElementById('emp-val-mes');
+    if(elMes) elMes.textContent=valMes>0?fRK(valMes):'—';
+    var elMesTit=document.getElementById('emp-mes-titulo');
+    if(elMesTit) elMesTit.textContent='🔥 '+mesAtualNome;
+    var elMesLbl=document.getElementById('emp-mes-label');
+    if(elMesLbl) {
+      if(valMes>0&&valAno>0) {
+        var pct=(valMes/valAno*100).toFixed(1);
+        elMesLbl.textContent=pct+'% do ano · '+fR(valMes);
+      } else {
+        elMesLbl.textContent='Sem registros neste mês';
+      }
     }
+
+    /* Legacy IDs */
+    var elH=document.getElementById('h-arrecadado'); if(elH) elH.textContent=fRK(valAno);
+    var elHo=document.getElementById('h-arrecadado-ho'); if(elHo) elHo.textContent=fRK(valAno*0.25);
 
     empRenderTabela();
   }
@@ -9091,6 +9105,7 @@ setInterval(()=>{
   } catch(e){}
 
 })();
+</script>
 
 </body>
 </html>
