@@ -409,6 +409,7 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('calend',this)">📆 Calendário</div>
   <div class="tab"     onclick="go('check',this)">✅ Checklist Líder</div>
   <div class="tab"     onclick="go('comparativo',this)">📊 Comparativo Mês</div>
+  <div class="tab"     onclick="go('inadimpl',this)">🚨 Inadimplência</div>
 </div>
 
 <!-- ══════════ PAGE: GERAL ══════════ -->
@@ -444,59 +445,21 @@ select.ev-inp{cursor:pointer}
         <div id="h-meta-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#4ADE80,#00C97F);width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
       </div>
     </div>
-    <div id="h-arrecadado-wrap" style="margin-top:12px;padding:14px 16px;background:rgba(251,191,36,.07);border-radius:var(--rl);border:1px solid rgba(251,191,36,.2)">
-
-      <!-- Título + botão importar -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-        <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.7);letter-spacing:1.5px;text-transform:uppercase">💼 Pague Play (24,96%) — Empresa</div>
-        <button onclick="empAbrir()" style="display:flex;align-items:center;gap:5px;background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.45);padding:5px 12px;border-radius:var(--rm);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;color:#FCD34D">
-          📥 Importar
-        </button>
-      </div>
-
-      <!-- KPIs: Total Ano (grande) + Total Mês Atual (ao lado) -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-
-        <!-- Total Ano -->
-        <div style="background:rgba(251,191,36,.12);border:1.5px solid rgba(251,191,36,.35);border-radius:var(--rm);padding:12px 14px">
-          <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.6);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">📅 Total Ano</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#FCD34D;letter-spacing:1px;line-height:1" id="emp-val-ano">—</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px" id="emp-ano-label">Sem dados</div>
+    <div id="h-arrecadado-wrap" style="margin-top:12px;padding:12px 14px;background:rgba(251,191,36,.07);border-radius:var(--rl);border:1px solid rgba(251,191,36,.2)">
+      <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.7);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💼 Total Arrecadado — Valor que entra para a empresa</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">💼 Total Arrecadado</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#FCD34D" id="h-arrecadado">—</div>
         </div>
-
-        <!-- Total Mês Atual -->
-        <div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:var(--rm);padding:12px 14px">
-          <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px" id="emp-mes-titulo">🔥 Mês Atual</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#FCD34D;letter-spacing:1px;line-height:1" id="emp-val-mes">—</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px" id="emp-mes-label">Sem dados</div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">HO (25%) — Honorários PaguePay</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#67E8F9" id="h-arrecadado-ho">—</div>
         </div>
-
       </div>
-
-      <!-- Abas período -->
-      <div style="display:flex;gap:0;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.1);overflow-x:auto">
-        <button class="emp-tab" onclick="empSetTab(this,'mes')"    style="padding:6px 12px;border:none;border-bottom:2px solid #FCD34D;background:none;color:#FCD34D;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap;margin-bottom:-1px">📆 Mês</button>
-        <button class="emp-tab" onclick="empSetTab(this,'semana')" style="padding:6px 12px;border:none;border-bottom:2px solid transparent;background:none;color:rgba(255,255,255,.4);font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap;margin-bottom:-1px">📅 Semana</button>
-        <button class="emp-tab" onclick="empSetTab(this,'dia')"    style="padding:6px 12px;border:none;border-bottom:2px solid transparent;background:none;color:rgba(255,255,255,.4);font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap;margin-bottom:-1px">🗓️ Dia</button>
-      </div>
-
-      <!-- Tabela de períodos -->
-      <div id="emp-tabela" style="max-height:220px;overflow-y:auto">
-        <div style="font-size:11px;color:rgba(255,255,255,.3);text-align:center;padding:16px">Importe o relatório <strong style="color:#FCD34D">rec_empresa</strong> (.xls ou .csv) para ver os totais</div>
-      </div>
-
-      <!-- IDs ocultos para compatibilidade com o sistema existente -->
-      <span id="emp-total-geral"    style="display:none"></span>
-      <span id="emp-periodo-label"  style="display:none"></span>
-      <span id="emp-kpis-ano"       style="display:none"></span>
-      <span id="h-arrecadado"       style="display:none"></span>
-      <span id="h-arrecadado-ho"    style="display:none"></span>
-      <span id="h-arrecadado-falta" style="display:none"></span>
-      <span id="h-arrecadado-meta-s" style="display:none"></span>
-      <span id="h-arrecadado-media" style="display:none"></span>
-      <span id="h-arrecadado-need"  style="display:none"></span>
-      <span id="h-arrecadado-pct"   style="display:none"></span>
-      <div id="h-arrecadado-bar" style="display:none"></div>
+      <span id="h-arrecadado-falta" style="display:none"></span><span id="h-arrecadado-meta-s" style="display:none"></span>
+      <span id="h-arrecadado-media" style="display:none"></span><span id="h-arrecadado-need" style="display:none"></span>
+      <span id="h-arrecadado-pct" style="display:none"></span><div id="h-arrecadado-bar" style="display:none"></div>
     </div>
   </div>
 
@@ -1684,6 +1647,120 @@ select.ev-inp{cursor:pointer}
         <button class="fbtn" onclick="cmpSortOp('nome',this)">🔤 Por Nome</button>
       </div>
       <div id="cmp-op-list" style="display:flex;flex-direction:column;gap:5px;max-height:600px;overflow-y:auto"></div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════ PAGE: INADIMPLÊNCIA DE ACORDOS ══════════ -->
+<div class="page" id="pg-inadimpl">
+
+  <!-- HERO -->
+  <div style="background:linear-gradient(135deg,#7F1D1D,#B91C1C 55%,#991B1B);border-radius:var(--rxl);padding:20px 24px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-50px;right:-50px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none"></div>
+    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">Monitoramento de Acordos</div>
+    <div style="font-family:Bebas Neue,sans-serif;font-size:26px;letter-spacing:3px;color:#fff;margin-bottom:14px">🚨 INADIMPLÊNCIA — ACORDOS QUEBRADOS</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Total Acordos</div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:26px;color:#67E8F9;letter-spacing:.5px;line-height:1;margin-bottom:2px" id="ind-total">—</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">no relatório</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">✅ Pagos</div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:26px;color:#4ADE80;letter-spacing:.5px;line-height:1;margin-bottom:2px" id="ind-pagos">—</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600" id="ind-pagos-pct">—</div>
+      </div>
+      <div style="background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.35);border-radius:var(--rl);padding:12px 14px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,165,165,.7);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">🚨 QUEBRADOS</div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:26px;color:#FCA5A5;letter-spacing:.5px;line-height:1;margin-bottom:2px" id="ind-quebrados">—</div>
+        <div style="font-size:9px;color:rgba(255,165,165,.6);font-weight:600" id="ind-quebrados-pct">vencidos sem pagar</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">💰 Valor em Risco</div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#FCD34D;letter-spacing:.5px;line-height:1;margin-bottom:2px" id="ind-valor">—</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">soma dos quebrados</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">📅 Agendados</div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:26px;color:#fff;letter-spacing:.5px;line-height:1;margin-bottom:2px" id="ind-agendados">—</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">previsão futura</div>
+      </div>
+    </div>
+
+    <!-- Barra visual quebrados -->
+    <div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase">% QUEBRADOS do total</div>
+        <div style="font-size:11px;font-weight:800;color:#FCA5A5" id="ind-bar-pct">—</div>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:100px;height:7px;overflow:hidden">
+        <div id="ind-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#EF4444,#B91C1C);width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMPORTAR + ALERTA -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <!-- Importar -->
+    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:16px;box-shadow:var(--sh)">
+      <div style="font-size:11px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">📥 Importar Relatório de Acordos</div>
+      <div style="font-size:11px;color:var(--g500);font-weight:600;margin-bottom:10px;line-height:1.6">
+        Arquivo: <strong>Preventivos_*.xls</strong><br>
+        Lógica: <span style="color:var(--danger);font-weight:700">Dt.Prev.Pgto. &lt; hoje + Dt.Pagamento vazia = QUEBRADO</span>
+      </div>
+      <div id="ind-drop"
+        ondragover="event.preventDefault();this.style.borderColor='var(--danger)';this.style.background='#FEF2F2'"
+        ondragleave="this.style.borderColor='var(--g300)';this.style.background=''"
+        ondrop="event.preventDefault();this.style.borderColor='var(--g300)';this.style.background='';indLerArq(event.dataTransfer.files[0])"
+        onclick="document.getElementById('ind-finput').click()"
+        style="border:2px dashed var(--g300);border-radius:var(--rl);padding:16px;text-align:center;cursor:pointer;transition:all .2s">
+        <div style="font-size:28px;margin-bottom:6px">📂</div>
+        <div style="font-size:12px;font-weight:700;color:var(--g700)">Clique ou arraste o arquivo</div>
+        <div style="font-size:10px;color:var(--g500);margin-top:3px">.xls · .xlsx · .csv</div>
+        <input id="ind-finput" type="file" accept=".xls,.xlsx,.csv,.txt" style="display:none" onchange="indLerArq(this.files[0])">
+      </div>
+      <div id="ind-status" style="font-size:11px;font-weight:700;color:var(--g500);margin-top:8px;min-height:16px"></div>
+    </div>
+
+    <!-- Resumo risco por equipe -->
+    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:16px;box-shadow:var(--sh)">
+      <div style="font-size:11px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">🏢 Risco por Equipe</div>
+      <div id="ind-equipes" style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12px;color:var(--g400);text-align:center;padding:20px 0">Importe o relatório para ver</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RANKING DE QUEBRADOS -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden">
+    <!-- Cabeçalho -->
+    <div style="background:linear-gradient(135deg,#7F1D1D,#991B1B);padding:12px 18px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:#fff;letter-spacing:2px">🚨 RANKING — OPERADORES COM MAIS QUEBRADOS</div>
+      <div style="display:flex;gap:6px">
+        <button class="ind-sort-btn on" onclick="indSort('quebrados',this)" style="padding:5px 12px;border-radius:var(--rm);border:none;cursor:pointer;background:rgba(255,255,255,.25);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:10px">Por Quebrados ↓</button>
+        <button class="ind-sort-btn" onclick="indSort('valor',this)" style="padding:5px 12px;border-radius:var(--rm);border:none;cursor:pointer;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);font-family:Nunito,sans-serif;font-weight:800;font-size:10px">Por Valor ↓</button>
+        <button class="ind-sort-btn" onclick="indSort('taxa',this)" style="padding:5px 12px;border-radius:var(--rm);border:none;cursor:pointer;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);font-family:Nunito,sans-serif;font-weight:800;font-size:10px">Por Taxa % ↓</button>
+      </div>
+    </div>
+
+    <!-- Header colunas -->
+    <div style="display:grid;grid-template-columns:40px 1fr 80px 80px 80px 120px 110px 100px;gap:8px;padding:9px 18px;background:var(--g50);border-bottom:1px solid var(--g200);font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase">
+      <span>Pos.</span><span>Operador</span>
+      <span style="text-align:center">Acordos</span>
+      <span style="text-align:center;color:#4ADE80">Pagos</span>
+      <span style="text-align:center;color:#EF4444">Quebrados</span>
+      <span style="text-align:right;color:#EF4444">Valor em Risco</span>
+      <span style="text-align:center">Taxa Quebra %</span>
+      <span style="text-align:center">Agendados</span>
+    </div>
+
+    <!-- Lista -->
+    <div id="ind-ranking-list" style="max-height:500px;overflow-y:auto">
+      <div style="padding:32px;text-align:center;font-size:13px;font-weight:700;color:var(--g400)">
+        📂 Importe o relatório <strong>Preventivos_*.xls</strong> para ver o ranking
+      </div>
     </div>
   </div>
 
@@ -3646,7 +3723,7 @@ function closeM(e){
 function go(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
-  ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos','calend','check'].forEach(p=>document.getElementById('pg-'+p).classList.remove('on'));
+  ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl'].forEach(p=>document.getElementById('pg-'+p).classList.remove('on'));
   document.getElementById('pg-'+id).classList.add('on');
   if(id==='geral'){mkGD();mkDist();buildDUManualGrid();}
   if(id==='editor') buildOpEditor();
@@ -3659,6 +3736,7 @@ function go(id,el){
   if(id==='calend') calInit();
   if(id==='check') checkInit();
   if(id==='comparativo') cmpInit();
+  if(id==='inadimpl') inadimplInit();
 }
 
 // ── REFRESH ALL ──
@@ -8667,444 +8745,374 @@ setInterval(()=>{
 })();
 </script>
 
-
-<!-- ═══ MODAL + ENGINE: PAGUE PLAY EMPRESA ═══ -->
-<div id="modal-emp" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)this.style.display='none'">
-  <div style="background:var(--w);border-radius:16px;max-width:580px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.35);max-height:92vh;overflow-y:auto">
-    <div style="background:linear-gradient(135deg,#92400E,#D97706);padding:16px 20px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#fff;letter-spacing:2px">💼 IMPORTAR TOTAL EMPRESA (rec_empresa)</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">Lê apenas a coluna Pague Play (24,96%) · .xls · .xlsx · .csv</div>
-      </div>
-      <button onclick="document.getElementById('modal-emp').style.display='none'" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:18px">✕</button>
-    </div>
-    <div style="padding:20px">
-      <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#92400E;line-height:1.7">
-        <strong>Arquivo:</strong> rec_total_empresa_*.xls / .csv<br>
-        <strong>Coluna lida:</strong> Pague Play (24,96%) — soma por ano, mês, semana e dia<br>
-        <span style="color:#9CA3AF">Não altera operadores, equipes nem outros dados</span>
-      </div>
-      <!-- Drop zone -->
-      <div id="emp-drop"
-        ondragover="event.preventDefault();this.style.borderColor='#D97706';this.style.background='#FFFBEB'"
-        ondragleave="this.style.borderColor='#FCD34D';this.style.background=''"
-        ondrop="event.preventDefault();this.style.borderColor='#FCD34D';this.style.background='';empLerArq(event.dataTransfer.files[0])"
-        onclick="document.getElementById('emp-finput').click()"
-        style="border:2px dashed #FCD34D;border-radius:10px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:10px">
-        <div style="font-size:34px;margin-bottom:8px">📂</div>
-        <div style="font-size:13px;font-weight:700;color:var(--g700)">Clique ou arraste o arquivo aqui</div>
-        <div style="font-size:11px;color:var(--g400);margin-top:4px">.xls &nbsp;·&nbsp; .xlsx &nbsp;·&nbsp; .csv &nbsp;·&nbsp; .txt</div>
-        <input id="emp-finput" type="file" accept=".xls,.xlsx,.csv,.txt,.tsv" style="display:none" onchange="empLerArq(this.files[0])">
-      </div>
-      <div style="font-size:11px;color:var(--g400);text-align:center;margin:8px 0;font-weight:700">— ou cole o CSV —</div>
-      <textarea id="emp-txt" rows="4"
-        style="width:100%;border:1.5px solid #FCD34D;border-radius:8px;padding:10px;font-family:monospace;font-size:11px;color:var(--g700);background:#FFFBEB;outline:none;resize:vertical;box-sizing:border-box"
-        placeholder="Cole aqui o conteúdo do CSV..."
-        oninput="empPreview(this.value)"></textarea>
-      <div id="emp-prev" style="display:none;margin:10px 0;padding:12px;background:#FFFBEB;border:1px solid #FCD34D;border-radius:8px;font-size:12px"></div>
-      <div style="display:flex;gap:10px;margin-top:14px">
-        <button onclick="empAplicar()" style="flex:1;padding:12px;border-radius:8px;border:none;cursor:pointer;background:linear-gradient(135deg,#D97706,#92400E);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:14px">✅ Aplicar e Atualizar</button>
-        <button onclick="document.getElementById('modal-emp').style.display='none'" style="padding:12px 20px;border-radius:8px;border:1.5px solid var(--g200);background:var(--w);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;cursor:pointer">Cancelar</button>
-      </div>
-      <div id="emp-st" style="display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:700"></div>
-    </div>
-  </div>
-</div>
-
 <script>
-/* ═══════════════════════════════════════════════════════════
-   ENGINE: PAGUE PLAY EMPRESA — v2 corrigido
-   ═══════════════════════════════════════════════════════════ */
-(function () {
-  'use strict';
+// ══════════════════════════════════════════
+// ENGINE: INADIMPLÊNCIA DE ACORDOS
+// Lógica: Dt.Prev.Pgto. < hoje + Dt.Pagamento vazia = QUEBRADO
+// ══════════════════════════════════════════
+var IND_KEY = 'cofen_inadimpl_v1';
+var indDB   = null;
+var indSortField = 'quebrados';
 
-  var EMP_KEY = 'cofen_emp_pp4';
-  var empDB   = null;
-  var empAba  = 'mes';
-  var _eparsed = null;
+// Carregar salvo ao iniciar
+try { var _is = localStorage.getItem(IND_KEY); if(_is) indDB = JSON.parse(_is); } catch(e) {}
 
-  /* Formatos */
-  function fR(v)  { return 'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-  function fRK(v) {
-    v=v||0;
-    if(v>=1e6) return 'R$ '+(v/1e6).toFixed(2).replace('.',',')+' M';
-    if(v>=1000) return 'R$ '+(v/1000).toFixed(1).replace('.',',')+' K';
-    return 'R$ '+Math.round(v).toLocaleString('pt-BR');
+function inadimplInit(){
+  if(indDB) indRender();
+}
+
+// ── Ler arquivo ──
+function indLerArq(file){
+  if(!file) return;
+  var ext = file.name.split('.').pop().toLowerCase();
+  if(ext==='xls'||ext==='xlsx'){
+    _indLerXLS(file);
+  } else {
+    var r = new FileReader();
+    r.onload = function(e){ indParse(e.target.result); };
+    r.readAsText(file, 'latin1');
   }
+}
 
-  /* Abrir modal */
-  window.empAbrir = function() {
-    var m=document.getElementById('modal-emp');
-    if(!m) return;
-    m.style.display='flex';
-    document.getElementById('emp-st').style.display='none';
-    document.getElementById('emp-prev').style.display='none';
-    document.getElementById('emp-txt').value='';
-    _eparsed=null;
-  };
-
-  /* Ler arquivo */
-  window.empLerArq = function(file) {
-    if(!file) return;
-    var ext=file.name.split('.').pop().toLowerCase();
-    var processar=function(txt){
-      document.getElementById('emp-txt').value=txt.slice(0,80000);
-      empPreview(txt);
-    };
-    if(ext==='xls'||ext==='xlsx') { _empLerXLS(file,processar); }
-    else { var r=new FileReader(); r.onload=function(e){processar(e.target.result);}; r.readAsText(file,'latin1'); }
-  };
-
-  /* Ler XLS — usar cellDates:true para conversão automática de datas */
-  function _empLerXLS(file,cb) {
-    function doRead(XLSX) {
-      var reader=new FileReader();
-      reader.onload=function(e){
-        try {
-          var wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
-          var ws=wb.Sheets[wb.SheetNames[0]];
-          /* Converter manualmente cada célula de data para DD/MM/YYYY */
-          var range=XLSX.utils.decode_range(ws['!ref']);
-          for(var R=range.s.r;R<=range.e.r;R++) {
-            for(var C=range.s.c;C<=range.e.c;C++) {
-              var addr=XLSX.utils.encode_cell({r:R,c:C});
-              var cell=ws[addr];
-              if(cell && cell.t==='d' && cell.v instanceof Date) {
-                var d=cell.v;
-                var dd=String(d.getUTCDate()).padStart(2,'0');
-                var mm=String(d.getUTCMonth()+1).padStart(2,'0');
-                var yy=d.getUTCFullYear();
-                cell.t='s'; cell.v=dd+'/'+mm+'/'+yy; cell.w=dd+'/'+mm+'/'+yy;
-              }
+function _indLerXLS(file){
+  function doRead(XLSX){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      try {
+        var wb = XLSX.read(e.target.result, {type:'array', cellDates:true});
+        var ws = wb.Sheets[wb.SheetNames[0]];
+        // Converter células Date para DD/MM/YYYY
+        var range = XLSX.utils.decode_range(ws['!ref']);
+        for(var R=range.s.r; R<=range.e.r; R++){
+          for(var C=range.s.c; C<=range.e.c; C++){
+            var addr = XLSX.utils.encode_cell({r:R,c:C});
+            var cell = ws[addr];
+            if(cell && cell.t==='d' && cell.v instanceof Date){
+              var d = cell.v;
+              var dd = String(d.getUTCDate()).padStart(2,'0');
+              var mm = String(d.getUTCMonth()+1).padStart(2,'0');
+              var yy = d.getUTCFullYear();
+              cell.t='s'; cell.v=dd+'/'+mm+'/'+yy; cell.w=dd+'/'+mm+'/'+yy;
             }
           }
-          var csv=XLSX.utils.sheet_to_csv(ws,{FS:';'});
-          cb(csv);
-        } catch(err){alert('Erro ao ler XLS: '+err.message);}
-      };
-      reader.readAsArrayBuffer(file);
-    }
-    if(window.XLSX){doRead(window.XLSX);return;}
-    var s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-    s.onload=function(){doRead(window.XLSX);};
-    s.onerror=function(){alert('Erro ao carregar leitor XLS.');};
-    document.head.appendChild(s);
+        }
+        var csv = XLSX.utils.sheet_to_csv(ws, {FS:';'});
+        indParse(csv);
+      } catch(err){ toast('Erro ao ler XLS: '+err.message); }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+  if(window.XLSX){ doRead(window.XLSX); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  s.onload = function(){ doRead(window.XLSX); };
+  s.onerror = function(){ toast('Erro ao carregar leitor XLS'); };
+  document.head.appendChild(s);
+}
+
+// ── Parser ──
+function indParse(raw){
+  var stEl = document.getElementById('ind-status');
+  if(stEl) stEl.textContent = '⏳ Processando...';
+
+  var lines = raw.trim().split(/\r?\n/).filter(function(l){ return l.trim(); });
+  if(lines.length < 2){ if(stEl) stEl.textContent = '❌ Arquivo vazio'; return; }
+
+  var sep = lines[0].indexOf('\t')>=0?'\t':lines[0].indexOf(';')>=0?';':',';
+  var hdrs = lines[0].split(sep).map(function(h){ return h.trim().replace(/^"|"$/g,''); });
+
+  function ci(cands){
+    for(var k=0; k<cands.length; k++)
+      for(var i=0; i<hdrs.length; i++)
+        if(hdrs[i].toLowerCase().indexOf(cands[k].toLowerCase())>=0) return i;
+    return -1;
   }
 
-  /* Serial Excel → YYYY-MM-DD */
-  function serialToISO(n) {
-    n=parseFloat(n);
-    if(isNaN(n)||n<40000||n>60000) return null;
-    var d=new Date(Math.round((n-25569)*86400*1000));
-    return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');
+  var iUsuario  = ci(['Usuário','Usuario','operador','cobrador']);
+  var iSubGrupo = ci(['SubGrupo','Subgrupo','equipe']);
+  var iDtPrev   = ci(['Dt.Prev.Pgto','dt.prev','prevpgto','prev.pgto']);
+  var iDtPag    = ci(['Dt.Pagamento','dtpagamento','pagamento']);
+  var iValAb    = ci(['Valor Aberto','valoraberto']);
+  var iValRec   = ci(['Valor Recebido','valorrecebido']);
+
+  if(iUsuario<0||iDtPrev<0){
+    if(stEl) stEl.textContent = '❌ Colunas "Usuário" e "Dt.Prev.Pgto." não encontradas. Headers: '+hdrs.slice(0,6).join(' | ');
+    return;
   }
 
-  /* Qualquer formato de data → YYYY-MM-DD */
-  function parseDtISO(s) {
-    if(!s) return null;
-    s=s.trim().replace(/^"|"$/g,'');
+  // Data de hoje = 2026-04-20 (ou real)
+  var hoje = new Date(); hoje.setHours(0,0,0,0);
+  var hojeISO = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0')+'-'+String(hoje.getDate()).padStart(2,'0');
 
-    /* Serial numérico: 46083 ou 46083.0 */
-    if(/^\d{5}(\.\d+)?$/.test(s)) {
-      var iso=serialToISO(s);
-      if(iso) return iso;
+  function parseDt(s){
+    if(!s || s.trim()==='' || s.toLowerCase()==='nat' || s.toLowerCase()==='nan' || s==='-') return null;
+    s = s.trim().replace(/^"|"$/g,'');
+    // Serial numérico
+    if(/^\d{5}(\.\d+)?$/.test(s)){
+      var n = parseFloat(s);
+      if(n>40000&&n<60000){
+        var d = new Date(Math.round((n-25569)*86400*1000));
+        return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');
+      }
+      return null;
     }
-
-    /* DD/MM/YYYY ou D/M/YYYY */
-    var m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    // DD/MM/YYYY
+    var m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if(m) return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');
-
-    /* MM/DD/YYYY (SheetJS às vezes gera assim) — detectar se mês > 12 */
-    m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    /* já coberto acima */
-
-    /* YYYY-MM-DD */
-    m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    // YYYY-MM-DD
+    m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
     if(m) return s.slice(0,10);
-
-    /* Período: "Pagamento - 2026/04" ou "2026/04" ou "2026-04" */
-    m=s.match(/(\d{4})[\/\-](\d{2})(?![\/\-]\d)/);
-    if(m) return m[1]+'-'+m[2].padStart(2,'0')+'-01'; /* só para mes — não cria dia/semana falso */
-
     return null;
   }
 
-  /* Semana ISO → string "YYYY-SWW" */
-  function isoWeek(ds) {
-    /* ds = YYYY-MM-DD */
-    var parts=ds.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if(!parts) return ds.slice(0,7)+'-S01';
-    /* Usar Date UTC para evitar timezone */
-    var d=new Date(Date.UTC(parseInt(parts[1]),parseInt(parts[2])-1,parseInt(parts[3])));
-    d.setUTCDate(d.getUTCDate()+3-(d.getUTCDay()+6)%7);
-    var j4=new Date(Date.UTC(d.getUTCFullYear(),0,4));
-    var w=1+Math.round(((d-j4)/86400000-3+(j4.getUTCDay()+6)%7)/7);
-    return d.getUTCFullYear()+'-S'+String(w).padStart(2,'0');
-  }
-
-  /* Parse número BR/US */
-  function pN(s) {
-    if(!s||s.trim()===''||s.trim()==='-') return 0;
-    s=s.trim().replace(/^"/,'').replace(/"$/,'').replace(/R\$\s*/,'').trim();
+  function pN(s){
+    if(!s||s.trim()===''||s==='-') return 0;
+    s = s.trim().replace(/^"/,'').replace(/"$/,'').replace(/R\$\s*/,'').trim();
     if(/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(s)) return parseFloat(s.replace(/\./g,'').replace(',','.'));
     return parseFloat(s.replace(',','.')) || 0;
   }
 
-  /* Normalizar header */
-  function normH(s) {
-    s=s.toLowerCase();
-    var map={'á':'a','à':'a','ã':'a','â':'a','é':'e','ê':'e','í':'i','ó':'o','õ':'o','ô':'o','ú':'u','ç':'c'};
-    return s.replace(/[áàãâéêíóõôúç]/g,function(c){return map[c]||c;});
-  }
+  var ops = {};
+  var totalGerados=0, totalPagos=0, totalQuebrados=0, totalAgendados=0;
+  var valQuebradoTotal=0, valPagoTotal=0;
 
-  /* Parser principal — apenas coluna PaguePay */
-  function empParse(raw) {
-    var lines=raw.trim().split(/\r?\n/).filter(function(l){return l.trim();});
-    if(lines.length<2) return null;
+  for(var i=1; i<lines.length; i++){
+    var cells = lines[i].split(sep).map(function(c){ return c.trim().replace(/^"|"$/g,''); });
+    if(cells.length<3) continue;
+    var usuario = (cells[iUsuario]||'').trim();
+    if(!usuario||usuario==='nan'||usuario==='-') continue;
 
-    var sep=lines[0].indexOf('\t')>=0?'\t':lines[0].indexOf(';')>=0?';':',';
-    var hdrs=lines[0].split(sep).map(function(h){return normH(h.replace(/^"|"$/g,''));});
+    var subgrupo = iSubGrupo>=0 ? (cells[iSubGrupo]||'') : '';
+    var dtPrevStr = iDtPrev>=0 ? cells[iDtPrev] : '';
+    var dtPagStr  = iDtPag>=0  ? cells[iDtPag]  : '';
+    var valAb     = iValAb>=0  ? pN(cells[iValAb]) : 0;
+    var valRec    = iValRec>=0 ? pN(cells[iValRec]) : 0;
 
-    function ci(cands) {
-      for(var k=0;k<cands.length;k++)
-        for(var i=0;i<hdrs.length;i++)
-          if(hdrs[i].indexOf(cands[k])>=0) return i;
-      return -1;
-    }
+    var dtPrev = parseDt(dtPrevStr);
+    var dtPag  = parseDt(dtPagStr);
+    var hasPag = !!dtPag;
 
-    var iDt  = ci(['data']);          /* Coluna Data (index 1) */
-    var iPer = ci(['periodo','period']); /* Período (fallback) */
-    var iPP  = ci(['pague play','pagueplay','24,96','24.96','pague_play']);
+    if(!ops[usuario]) ops[usuario] = {
+      nome:usuario, equipe:subgrupo,
+      gerados:0, pagos:0, quebrados:0, agendados:0,
+      valQuebrado:0, valPago:0, ag_futuro:{}
+    };
 
-    if(iPP<0) return {err:'Coluna "Pague Play (24,96%)" não encontrada. Headers: '+hdrs.slice(0,8).join(' | ')};
+    ops[usuario].gerados++;
+    totalGerados++;
 
-    var ano={}, mes={}, semana={}, dia={};
-    var total=0, n=0, dMin=null, dMax=null;
-
-    for(var i=1;i<lines.length;i++) {
-      var cells=lines[i].split(sep).map(function(c){return c.trim().replace(/^"|"$/g,'');});
-      if(cells.length<3) continue;
-      var fc=cells[0].toLowerCase().trim();
-      if(fc===''||fc==='total'||fc.indexOf('soma')===0) continue;
-
-      var pp=pN(cells[iPP]);
-      if(pp<=0) continue;
-
-      /* Tentar coluna Data primeiro (data real), depois Período */
-      var ds=null;
-      var isRealDate=false;
-      if(iDt>=0) {
-        var dtRaw=cells[iDt].trim();
-        /* Só aceitar como data real se parece DD/MM/YYYY ou serial ou YYYY-MM-DD */
-        if(/^\d{5}(\.\d+)?$/.test(dtRaw) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dtRaw) || /^\d{4}-\d{2}-\d{2}$/.test(dtRaw)) {
-          ds=parseDtISO(dtRaw);
-          if(ds) isRealDate=true;
-        }
-      }
-      if(!ds && iPer>=0) {
-        /* Período dá apenas ano-mes, não dia real */
-        var perRaw=cells[iPer].trim();
-        var mp=perRaw.match(/(\d{4})[\/\-](\d{2})/);
-        if(mp) {
-          var mesPer=mp[1]+'-'+mp[2].padStart(2,'0');
-          mes[mesPer]=(mes[mesPer]||0)+pp;
-          ano[mp[1]]=(ano[mp[1]]||0)+pp;
-          /* Não agregar em semana/dia pois não temos a data real */
-          total+=pp; n++;
-          continue;
-        }
-      }
-      if(!ds) continue;
-
-      /* Validar que é data real (tem dia) para semana e dia */
-      var hasDay=ds.match(/^\d{4}-\d{2}-\d{2}$/) && ds.slice(8,10)!=='01' || isRealDate;
-
-      if(!dMin||ds<dMin) dMin=ds;
-      if(!dMax||ds>dMax) dMax=ds;
-
-      var a_=ds.slice(0,4);
-      var m_=ds.slice(0,7);
-      ano[a_]=(ano[a_]||0)+pp;
-      mes[m_]=(mes[m_]||0)+pp;
-
-      if(isRealDate) {
-        /* Só agrupa por semana e dia se temos data real */
-        var sw=isoWeek(ds);
-        var d_=ds.slice(0,10);
-        semana[sw]=(semana[sw]||0)+pp;
-        dia[d_]=(dia[d_]||0)+pp;
-      }
-
-      total+=pp; n++;
-    }
-
-    return {total:total, ano:ano, mes:mes, semana:semana, dia:dia, dMin:dMin, dMax:dMax, n:n};
-  }
-
-  /* Preview */
-  window.empPreview = function(raw) {
-    var result=empParse(raw);
-    var el=document.getElementById('emp-prev');
-    if(!result||result.err) {
-      el.innerHTML='<span style="color:red">❌ '+(result?result.err:'Formato não reconhecido')+'</span>';
-      el.style.display='block'; _eparsed=null; return;
-    }
-    _eparsed=result;
-    /* Resumo por mês */
-    var mesesKeys=Object.keys(result.mes).sort();
-    var mesesHtml=mesesKeys.map(function(k){
-      var MP=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-      var p=k.match(/(\d{4})-(\d{2})/);
-      var lbl=p?MP[parseInt(p[2])-1]+'/'+p[1].slice(2):k;
-      return '<div style="padding:5px 8px;background:#FFF;border:1px solid #FCD34D;border-radius:5px;text-align:center">'
-        +'<div style="font-size:9px;color:#92400E;font-weight:700">'+lbl+'</div>'
-        +'<div style="font-size:13px;font-weight:800;color:#D97706">'+fRK(result.mes[k])+'</div></div>';
-    }).join('');
-    el.innerHTML='<div style="font-weight:800;color:#D97706;margin-bottom:8px">✅ '+result.n+' registros · '+(result.dMin||'')+' → '+(result.dMax||'')+'</div>'
-      +'<div style="margin-bottom:8px;padding:8px;background:#FFF;border:1px solid #FCD34D;border-radius:6px;text-align:center">'
-      +'<div style="font-size:10px;color:#92400E;font-weight:700;text-transform:uppercase">Total PaguePay</div>'
-      +'<div style="font-size:20px;font-weight:800;color:#D97706">'+fR(result.total)+'</div></div>'
-      +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px">'+mesesHtml+'</div>';
-    el.style.display='block';
-  };
-
-  /* Aplicar */
-  window.empAplicar = function() {
-    var raw=document.getElementById('emp-txt').value;
-    var stEl=document.getElementById('emp-st');
-    stEl.style.display='block';
-    if(!raw.trim()){stEl.textContent='⚠️ Nenhum conteúdo';stEl.style.background='#FEF9C3';stEl.style.color='#92400E';return;}
-    var result=_eparsed||empParse(raw);
-    if(!result||result.err){stEl.textContent='❌ '+(result?result.err:'Erro');stEl.style.background='#FEF2F2';stEl.style.color='#991B1B';return;}
-    empDB=result;
-    try{localStorage.setItem(EMP_KEY,JSON.stringify(empDB));}catch(e){}
-    empRender();
-    stEl.innerHTML='✅ Aplicado! <strong>'+result.n+'</strong> registros · PaguePay Total: '+fRK(result.total);
-    stEl.style.background='#F0FDF4'; stEl.style.color='#065F46';
-    setTimeout(function(){document.getElementById('modal-emp').style.display='none';},1600);
-  };
-
-  /* Aba */
-  window.empSetTab = function(btn,tab) {
-    empAba=tab;
-    document.querySelectorAll('.emp-tab').forEach(function(b){
-      b.style.borderBottomColor='transparent'; b.style.color='rgba(255,255,255,.4)';
-    });
-    btn.style.borderBottomColor='#FCD34D'; btn.style.color='#FCD34D';
-    empRenderTabela();
-  };
-
-  /* Render principal */
-  function empRender() {
-    if(!empDB) return;
-
-    var now=new Date();
-    var mesAtual=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
-    var MP=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    var mesAtualNome=MP[now.getMonth()]+'/'+String(now.getFullYear()).slice(2);
-    var anoAtual=String(now.getFullYear());
-    var valAno=empDB.ano[anoAtual]||empDB.total;
-    var valMes=empDB.mes[mesAtual]||0;
-    var nMes=Object.keys(empDB.mes).length;
-
-    /* KPI Total Ano */
-    var elAno=document.getElementById('emp-val-ano');
-    if(elAno) elAno.textContent=fRK(valAno);
-    var elAnoLbl=document.getElementById('emp-ano-label');
-    if(elAnoLbl) elAnoLbl.textContent=anoAtual+' · '+nMes+' mes'+(nMes!==1?'es':'');
-
-    /* KPI Total Mês Atual */
-    var elMes=document.getElementById('emp-val-mes');
-    if(elMes) elMes.textContent=valMes>0?fRK(valMes):'—';
-    var elMesTit=document.getElementById('emp-mes-titulo');
-    if(elMesTit) elMesTit.textContent='🔥 '+mesAtualNome;
-    var elMesLbl=document.getElementById('emp-mes-label');
-    if(elMesLbl) {
-      if(valMes>0&&valAno>0) {
-        var pct=(valMes/valAno*100).toFixed(1);
-        elMesLbl.textContent=pct+'% do ano · '+fR(valMes);
+    if(hasPag){
+      ops[usuario].pagos++;
+      ops[usuario].valPago += valRec;
+      totalPagos++;
+      valPagoTotal += valRec;
+    } else if(dtPrev){
+      if(dtPrev < hojeISO){
+        ops[usuario].quebrados++;
+        ops[usuario].valQuebrado += valAb;
+        totalQuebrados++;
+        valQuebradoTotal += valAb;
       } else {
-        elMesLbl.textContent='Sem registros neste mês';
+        ops[usuario].agendados++;
+        totalAgendados++;
+        ops[usuario].ag_futuro[dtPrev] = (ops[usuario].ag_futuro[dtPrev]||0)+1;
       }
     }
-
-    /* Legacy IDs */
-    var elH=document.getElementById('h-arrecadado'); if(elH) elH.textContent=fRK(valAno);
-    var elHo=document.getElementById('h-arrecadado-ho'); if(elHo) elHo.textContent=fRK(valAno*0.25);
-
-    empRenderTabela();
   }
 
-  /* Render tabela */
-  function empRenderTabela() {
-    if(!empDB) return;
-    var mapSrc={mes:empDB.mes, semana:empDB.semana, dia:empDB.dia};
-    var map=mapSrc[empAba]||empDB.mes;
-    var keys=Object.keys(map).sort();
+  // Calcular taxa por equipe
+  var equipeStat = {};
+  Object.values(ops).forEach(function(op){
+    var eq = op.equipe;
+    if(!eq) eq = '—';
+    if(!equipeStat[eq]) equipeStat[eq] = {gerados:0,pagos:0,quebrados:0,valQuebrado:0};
+    equipeStat[eq].gerados    += op.gerados;
+    equipeStat[eq].pagos      += op.pagos;
+    equipeStat[eq].quebrados  += op.quebrados;
+    equipeStat[eq].valQuebrado += op.valQuebrado;
+  });
 
-    /* Verificar se aba semana/dia tem dados */
-    if(keys.length===0 && (empAba==='semana'||empAba==='dia')) {
-      var tbl=document.getElementById('emp-tabela');
-      if(tbl) tbl.innerHTML='<div style="padding:16px;text-align:center;font-size:12px;color:rgba(255,255,255,.4)">⚠️ Dados de '+empAba+' só ficam disponíveis quando o arquivo contém a coluna <strong style="color:#FCD34D">Data</strong> com datas reais (não apenas o Período). Importe o arquivo <strong style="color:#FCD34D">rec_empresa</strong> que contém a coluna Data.</div>';
-      return;
-    }
+  indDB = {
+    ops: Object.values(ops),
+    totais: {gerados:totalGerados, pagos:totalPagos, quebrados:totalQuebrados,
+             agendados:totalAgendados, valQuebrado:valQuebradoTotal, valPago:valPagoTotal},
+    equipes: equipeStat,
+    importadoEm: new Date().toISOString()
+  };
 
-    var MP=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    function lbl(k) {
-      if(empAba==='mes'){var p=k.match(/(\d{4})-(\d{2})/);return p?MP[parseInt(p[2])-1]+'/'+p[1].slice(2):k;}
-      if(empAba==='dia'){var p2=k.match(/(\d{4})-(\d{2})-(\d{2})/);return p2?p2[3]+'/'+p2[2]:k;}
-      /* semana: "2026-S14" → "Sem 14" */
-      if(empAba==='semana'){var p3=k.match(/(\d{4})-S(\d{2})/);return p3?'Sem '+p3[2]+'/'+p3[1].slice(2):k;}
-      return k;
-    }
+  try { localStorage.setItem(IND_KEY, JSON.stringify(indDB)); } catch(e){}
 
-    var totalPP=0;
-    keys.forEach(function(k){totalPP+=(map[k]||0);});
-    var maxVal=keys.reduce(function(mx,k){return Math.max(mx,map[k]||0);},0);
+  // Sync Firebase
+  if(typeof fbPush === 'function' && typeof fbRoom !== 'undefined' && fbRoom){
+    fbPush('inadimpl_summary', {
+      totais: indDB.totais,
+      ts: Date.now()
+    });
+  }
 
-    var rows=keys.map(function(k,ri){
-      var v=map[k]||0;
-      var pct=maxVal>0?(v/maxVal*100).toFixed(0):0;
-      var bg=ri%2?'rgba(255,255,255,.04)':'rgba(255,255,255,.02)';
-      var pctTotal=totalPP>0?((v/totalPP)*100).toFixed(1)+'%':'—';
-      return '<tr style="border-bottom:1px solid rgba(255,255,255,.06)">'
-        +'<td style="padding:6px 10px;font-weight:700;font-size:12px;color:rgba(255,255,255,.85);background:'+bg+'">'+lbl(k)+'</td>'
-        +'<td style="padding:6px 10px;text-align:right;font-family:\'Bebas Neue\',sans-serif;font-size:15px;color:#FCD34D;background:'+bg+'">'+fRK(v)+'</td>'
-        +'<td style="padding:6px 10px;text-align:right;font-size:10px;color:rgba(255,255,255,.4);background:'+bg+'">'+pctTotal+'</td>'
-        +'<td style="padding:6px 10px;background:'+bg+';width:120px">'
-          +'<div style="height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden">'
-            +'<div style="height:6px;width:'+pct+'%;background:linear-gradient(90deg,#FCD34D,#F59E0B);border-radius:3px"></div>'
+  if(stEl) stEl.textContent = '✅ '+totalGerados+' acordos processados · '+totalQuebrados+' quebrados encontrados';
+  indRender();
+  toast('🚨 '+totalQuebrados+' acordos quebrados! Valor em risco: R$ '+valQuebradoTotal.toLocaleString('pt-BR',{minimumFractionDigits:2}));
+}
+
+// ── Ordenação ──
+function indSort(campo, btn){
+  indSortField = campo;
+  document.querySelectorAll('.ind-sort-btn').forEach(function(b){
+    b.style.background='rgba(255,255,255,.1)'; b.style.color='rgba(255,255,255,.6)';
+  });
+  if(btn){ btn.style.background='rgba(255,255,255,.25)'; btn.style.color='#fff'; }
+  indRenderRanking();
+}
+
+// ── Render principal ──
+function indRender(){
+  if(!indDB) return;
+  var t = indDB.totais;
+  var fR = function(v){ return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var fRK = function(v){ return v>=1e6?'R$ '+(v/1e6).toFixed(2).replace('.',',')+'M':v>=1000?'R$ '+(v/1000).toFixed(1).replace('.',',')+'K':fR(v); };
+
+  function s(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
+  s('ind-total', t.gerados.toLocaleString('pt-BR'));
+  s('ind-pagos', t.pagos.toLocaleString('pt-BR'));
+  s('ind-pagos-pct', (t.gerados>0?(t.pagos/t.gerados*100).toFixed(1):0)+'% do total');
+  s('ind-quebrados', t.quebrados.toLocaleString('pt-BR'));
+  s('ind-quebrados-pct', (t.gerados>0?(t.quebrados/t.gerados*100).toFixed(1):0)+'% — vencidos sem pagar');
+  s('ind-valor', fRK(t.valQuebrado));
+  s('ind-agendados', t.agendados.toLocaleString('pt-BR'));
+
+  // Barra
+  var pctQ = t.gerados>0 ? (t.quebrados/t.gerados*100) : 0;
+  var barEl = document.getElementById('ind-bar');
+  var barPctEl = document.getElementById('ind-bar-pct');
+  if(barEl) setTimeout(function(){ barEl.style.width=Math.min(100,pctQ).toFixed(1)+'%'; }, 100);
+  if(barPctEl) barPctEl.textContent = pctQ.toFixed(1)+'% dos acordos quebraram';
+
+  // Equipes
+  var eqEl = document.getElementById('ind-equipes');
+  if(eqEl && indDB.equipes){
+    var eqHTML = '';
+    var eqSorted = Object.entries(indDB.equipes).sort(function(a,b){ return b[1].quebrados - a[1].quebrados; });
+    eqSorted.forEach(function(entry){
+      var nm = entry[0], d = entry[1];
+      // Tentar mapear para EQ config
+      var cfg = null;
+      var EQ_MAP = typeof EQ !== 'undefined' ? EQ : {};
+      Object.keys(EQ_MAP).forEach(function(k){ if(nm.indexOf(k.replace('COFEN ',''))>=0||k.indexOf(nm)>=0) cfg=EQ_MAP[k]; });
+      if(!cfg) cfg = {c:'#888', sh: nm.replace('COFEN ','').replace('COFEN','').trim() || nm};
+      var taxa = d.gerados>0?(d.quebrados/d.gerados*100).toFixed(1):0;
+      var cor = parseFloat(taxa)>=20?'#EF4444':parseFloat(taxa)>=10?'#F59E0B':'#4ADE80';
+      eqHTML += '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--g50);border-radius:var(--rm);border-left:4px solid '+(cfg.c||'#888')+'">'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:11px;font-weight:800;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(cfg.sh||nm)+'</div>'
+          +'<div style="background:var(--g200);border-radius:100px;height:4px;margin-top:5px;overflow:hidden">'
+            +'<div style="height:4px;width:'+taxa+'%;background:'+cor+';border-radius:100px"></div>'
           +'</div>'
-        +'</td>'
-        +'</tr>';
-    }).join('');
-
-    var tbl=document.getElementById('emp-tabela');
-    if(!tbl) return;
-    tbl.innerHTML='<table style="width:100%;border-collapse:collapse">'
-      +'<thead><tr style="border-bottom:2px solid rgba(251,191,36,.3)">'
-      +'<th style="padding:6px 10px;text-align:left;font-size:10px;font-weight:800;color:rgba(251,191,36,.7);text-transform:uppercase">Período</th>'
-      +'<th style="padding:6px 10px;text-align:right;font-size:10px;font-weight:800;color:rgba(251,191,36,.7);text-transform:uppercase">Pague Play</th>'
-      +'<th style="padding:6px 10px;text-align:right;font-size:10px;font-weight:800;color:rgba(251,191,36,.7);text-transform:uppercase">%</th>'
-      +'<th style="padding:6px 10px;font-size:10px;font-weight:800;color:rgba(251,191,36,.7);text-transform:uppercase">Participação</th>'
-      +'</tr></thead>'
-      +'<tbody>'+rows+'</tbody>'
-      +'<tfoot><tr style="border-top:2px solid rgba(251,191,36,.3)">'
-      +'<td style="padding:7px 10px;font-weight:800;font-size:12px;color:rgba(255,255,255,.9)">TOTAL</td>'
-      +'<td style="padding:7px 10px;text-align:right;font-family:\'Bebas Neue\',sans-serif;font-size:17px;color:#FCD34D">'+fRK(totalPP)+'</td>'
-      +'<td style="padding:7px 10px;text-align:right;font-size:11px;color:rgba(255,255,255,.5)">100%</td><td></td>'
-      +'</tr></tfoot>'
-      +'</table>';
+        +'</div>'
+        +'<div style="text-align:right;flex-shrink:0">'
+          +'<div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:'+cor+'">'+d.quebrados+'</div>'
+          +'<div style="font-size:9px;color:var(--g500);font-weight:600">'+taxa+'% quebra</div>'
+        +'</div>'
+        +'<div style="text-align:right;flex-shrink:0;min-width:70px">'
+          +'<div style="font-size:11px;font-weight:800;color:#EF4444">'+fRK(d.valQuebrado)+'</div>'
+          +'<div style="font-size:9px;color:var(--g500)">em risco</div>'
+        +'</div>'
+        +'</div>';
+    });
+    eqEl.innerHTML = eqHTML || '<div style="font-size:12px;color:var(--g400);padding:10px">Sem dados por equipe</div>';
   }
 
-  /* Carregar localStorage ao iniciar */
-  try {
-    var saved=localStorage.getItem(EMP_KEY);
-    if(saved){empDB=JSON.parse(saved); setTimeout(empRender,400);}
-  } catch(e){}
+  indRenderRanking();
+}
 
-})();
+// ── Render ranking ──
+function indRenderRanking(){
+  if(!indDB) return;
+  var fR = function(v){ return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var fRK = function(v){ return v>=1000?'R$ '+(v/1000).toFixed(1).replace('.',',')+'K':fR(v); };
+
+  var sorted = [].concat(indDB.ops);
+  if(indSortField==='valor'){
+    sorted.sort(function(a,b){ return b.valQuebrado-a.valQuebrado; });
+  } else if(indSortField==='taxa'){
+    sorted.sort(function(a,b){
+      var tA = a.gerados>0?a.quebrados/a.gerados:0;
+      var tB = b.gerados>0?b.quebrados/b.gerados:0;
+      return tB-tA;
+    });
+  } else {
+    sorted.sort(function(a,b){ return b.quebrados-a.quebrados; });
+  }
+
+  // Filtrar só quem tem quebrados > 0
+  var comQuebrados = sorted.filter(function(op){ return op.quebrados > 0; });
+  var semQuebrados = sorted.filter(function(op){ return op.quebrados === 0; });
+
+  var listEl = document.getElementById('ind-ranking-list');
+  if(!listEl) return;
+
+  var html = '';
+  var pos = 0;
+
+  comQuebrados.forEach(function(op){
+    pos++;
+    var taxa = op.gerados>0?(op.quebrados/op.gerados*100).toFixed(1):0;
+    var corTaxa = parseFloat(taxa)>=30?'#EF4444':parseFloat(taxa)>=20?'#F97316':parseFloat(taxa)>=10?'#F59E0B':'#4ADE80';
+    var isTop = pos<=3;
+    var bg = isTop?'linear-gradient(90deg,rgba(239,68,68,.06),transparent)':'var(--w)';
+
+    // Tentar match com ALL para pegar foto/avatar
+    var opObj = typeof ALL !== 'undefined' ? ALL.find(function(o){ return o.name===op.nome; }) : null;
+    var cfg = opObj && typeof EQ !== 'undefined' ? (EQ[opObj.eq]||{c:'#888',sh:opObj.eq}) : {c:'#888',sh:op.equipe||'—'};
+    var photo = typeof photoGet === 'function' ? photoGet(op.nome) : null;
+    var avatarHtml = photo
+      ? '<img src="'+photo+'" style="width:100%;height:100%;object-fit:cover;object-position:top">'
+      : '<span style="font-weight:900;font-size:10px;color:#fff">'+(op.nome.replace(/_/g,' ').split(' ').map(function(w){ return w[0]||''; }).slice(0,2).join('').toUpperCase())+'</span>';
+
+    html += '<div style="display:grid;grid-template-columns:40px 1fr 80px 80px 80px 120px 110px 100px;gap:8px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--g100);background:'+bg+';transition:background .2s"'
+      +' onmouseover="this.style.background=\'var(--g50)\'" onmouseout="this.style.background=\''+bg+'\'">'
+      +'<div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:'+(isTop?'#EF4444':'var(--g300)')+';text-align:center">'+(pos<=3?['🥇','🥈','🥉'][pos-1]:pos+'°')+'</div>'
+      +'<div style="display:flex;align-items:center;gap:8px;min-width:0">'
+        +'<div style="width:32px;height:32px;border-radius:8px;overflow:hidden;background:'+(cfg.c||'#888')+';display:flex;align-items:center;justify-content:center;flex-shrink:0">'+avatarHtml+'</div>'
+        +'<div style="min-width:0">'
+          +'<div style="font-weight:800;font-size:12px;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+op.nome.replace(/_/g,' ')+'</div>'
+          +'<div style="font-size:10px;color:'+(cfg.c||'#888')+';font-weight:700">'+(cfg.sh||op.equipe||'—')+'</div>'
+        +'</div>'
+      +'</div>'
+      +'<div style="text-align:center;font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--g700)">'+op.gerados+'</div>'
+      +'<div style="text-align:center;font-family:Bebas Neue,sans-serif;font-size:18px;color:#4ADE80">'+op.pagos+'</div>'
+      +'<div style="text-align:center">'
+        +'<div style="font-family:Bebas Neue,sans-serif;font-size:20px;color:#EF4444">'+op.quebrados+'</div>'
+      +'</div>'
+      +'<div style="text-align:right">'
+        +'<div style="font-family:Bebas Neue,sans-serif;font-size:15px;color:#EF4444">'+fRK(op.valQuebrado)+'</div>'
+        +'<div style="font-size:9px;color:var(--g500)">valor aberto</div>'
+      +'</div>'
+      +'<div style="text-align:center">'
+        +'<div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:'+corTaxa+'">'+taxa+'%</div>'
+        +'<div style="background:var(--g100);border-radius:100px;height:4px;overflow:hidden;margin-top:2px">'
+          +'<div style="height:4px;width:'+Math.min(100,parseFloat(taxa))+'%;background:'+corTaxa+';border-radius:100px"></div>'
+        +'</div>'
+      +'</div>'
+      +'<div style="text-align:center;font-family:Bebas Neue,sans-serif;font-size:16px;color:var(--info)">'+op.agendados+'</div>'
+      +'</div>';
+  });
+
+  // Seção: operadores sem quebrados
+  if(semQuebrados.length > 0){
+    html += '<div style="padding:8px 18px;background:var(--g50);border-top:2px solid var(--g200)">'
+      +'<div style="font-size:10px;font-weight:800;color:#4ADE80;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">✅ OPERADORES SEM QUEBRADOS ('+semQuebrados.length+')</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:6px">'
+      +semQuebrados.map(function(op){
+        var pct = op.gerados>0?(op.pagos/op.gerados*100).toFixed(0):0;
+        return '<div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;color:#065F46">'+op.nome.replace(/_/g,' ')+'</div>';
+      }).join('')
+      +'</div></div>';
+  }
+
+  if(!html) html = '<div style="padding:32px;text-align:center;font-size:13px;color:var(--g400)">Nenhum acordo quebrado encontrado ✅</div>';
+  listEl.innerHTML = html;
+}
 </script>
 
 </body>
