@@ -446,15 +446,20 @@ select.ev-inp{cursor:pointer}
       </div>
     </div>
     <div id="h-arrecadado-wrap" style="margin-top:12px;padding:12px 14px;background:rgba(251,191,36,.07);border-radius:var(--rl);border:1px solid rgba(251,191,36,.2)">
-      <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.7);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💼 Total Arrecadado — Valor que entra para a empresa</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+        <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.7);letter-spacing:1.5px;text-transform:uppercase">💼 PaguePay — Coluna do Arquivo Empresa</div>
+        <button onclick="importarEmpresa()" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.12);color:#FCD34D;font-family:Nunito,sans-serif;font-weight:700;font-size:10px;cursor:pointer">📥 Importar Empresa</button>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">💼 Total Arrecadado</div>
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">📊 PaguePay Total Ano</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#FCD34D" id="h-arrecadado">—</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:3px">Jan → Hoje (col. Pague Play)</div>
         </div>
         <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">HO (25%) — Honorários PaguePay</div>
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">📅 PaguePay Abril</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#67E8F9" id="h-arrecadado-ho">—</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:3px">Só Abril 2026</div>
         </div>
       </div>
       <span id="h-arrecadado-falta" style="display:none"></span><span id="h-arrecadado-meta-s" style="display:none"></span>
@@ -622,34 +627,36 @@ select.ev-inp{cursor:pointer}
         </div>
       </div>
 
-      <!-- ── TOTAL ARRECADADO + META 2 ── -->
+      <!-- ── PAGUE PLAY DO ARQUIVO EMPRESA ── -->
       <div style="background:#FFFBEB;border:1.5px solid #FCD34D;border-radius:var(--rl);padding:14px 16px;margin-bottom:10px">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-          <div style="font-size:10px;font-weight:800;color:#92400E;letter-spacing:.8px;text-transform:uppercase">
-            💼 Total Arrecadado — Valor que entra para a empresa (meta separada)
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+          <div>
+            <div style="font-size:10px;font-weight:800;color:#92400E;letter-spacing:.8px;text-transform:uppercase">💼 PaguePay — Arquivo Empresa (rec_total_empresa)</div>
+            <div style="font-size:11px;color:#B45309;font-weight:600;margin-top:3px">Puxado automaticamente da coluna <strong>Pague Play (24,96%)</strong></div>
           </div>
           <button onclick="importarEmpresa()"
-            style="display:flex;align-items:center;gap:6px;background:#D97706;padding:6px 13px;border-radius:var(--rm);border:none;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;color:#fff;transition:all .2s"
-            onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            💼 Importar Total Empresa
+            style="display:flex;align-items:center;gap:6px;background:#D97706;padding:8px 16px;border-radius:var(--rm);border:none;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;color:#fff;transition:all .2s;box-shadow:0 4px 12px rgba(217,119,6,.3)"
+            onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            📥 Importar Arquivo Empresa
           </button>
         </div>
-        <div class="ep-row" style="margin-bottom:10px">
-          <div class="ep-group">
-            <label class="ep-label" style="color:#92400E">💼 Total Arrecadado — Valor Recebido (R$)</label>
-            <input class="ep-input yellow" type="number" id="inp-arrecadado" placeholder="Ex: 520000.00" step="0.01" min="0" oninput="liveCalcArrecadado()">
+        <!-- Cards: PaguePay Ano + PaguePay Abril -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="res-arrecadado-cards">
+          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D;border:1.5px solid #FCD34D">
+            <div class="res-l">📊 PaguePay Total Ano (Jan → Hoje)</div>
+            <div class="res-v" style="color:#D97706;font-family:'Bebas Neue',sans-serif;font-size:26px" id="res-arrecadado-bruto">—</div>
+            <div class="res-s">Soma da coluna Pague Play — arquivo empresa</div>
           </div>
-          <input type="hidden" id="inp-meta-arrecadado" value="2000000">
-          <button class="btn-calc" style="background:linear-gradient(135deg,#F59E0B,#D97706)" onclick="applyArrecadado()">⚡ Aplicar</button>
-          <button class="btn-outline" onclick="resetArrecadado()">↩ Resetar</button>
+          <div class="res-card" style="background:#FFF9EC;border-color:#FCD34D;border:1.5px solid #FCD34D">
+            <div class="res-l">📅 PaguePay Abril 2026</div>
+            <div class="res-v" style="color:#F59E0B;font-family:'Bebas Neue',sans-serif;font-size:26px" id="res-arrecadado-ho">—</div>
+            <div class="res-s">Soma de Abril na coluna Pague Play</div>
+          </div>
         </div>
-        <!-- Resultados Arrecadado em tempo real -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="res-arrecadado-cards">
-          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">💼 Total Arrecadado (Valor Recebido)</div><div class="res-v" style="color:#D97706" id="res-arrecadado-bruto">—</div><div class="res-s">Valor bruto recebido pela empresa</div></div>
-          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D"><div class="res-l">HO (25%) — Honorários PaguePay</div><div class="res-v" style="color:#F59E0B" id="res-arrecadado-ho">—</div><div class="res-s">25% sobre o Total Arrecadado</div></div>
-        </div>
-        <!-- IDs ocultos preservados para compatibilidade com liveCalcArrecadado -->
+        <!-- IDs ocultos preservados -->
+        <input type="hidden" id="inp-arrecadado" value="0">
+        <input type="hidden" id="inp-meta-arrecadado" value="2000000">
         <span id="res-arrecadado-falta" style="display:none"></span>
         <span id="res-arrecadado-meta-lbl" style="display:none"></span>
         <span id="res-arrecadado-media" style="display:none"></span>
@@ -1983,6 +1990,7 @@ let corenCE = parseFloat(localStorage.getItem('cofen_coren_ce') || '0');
 // ── TOTAL ARRECADADO: valor que entra para a empresa (diferente do Total Real) ──
 let totalArrecadado    = parseFloat(localStorage.getItem('cofen_arrecadado')    || '0');
 let metaArrecadado     = parseFloat(localStorage.getItem('cofen_meta_arrecadado')|| '1000000');
+let ppEmpresaAbril     = parseFloat(localStorage.getItem('cofen_pp_abril')       || '0');
 
 const EQ={
   "COFEN MARILIA BRENDA":   {c:"#00A86B",bg:"#E6F7F1",ico:"🏙",sh:"Marília Brenda"},
@@ -2249,7 +2257,11 @@ function initHero(){
   const pct2     = metaArrecadado>0 ? Math.min(100, totalArrecadado/metaArrecadado*100) : 0;
 
   s('h-arrecadado',       totalArrecadado>0 ? fRK(totalArrecadado) : '—');
-  s('h-arrecadado-ho',    totalArrecadado>0 ? fRK(hoArr) : '—');
+  s('h-arrecadado-ho',    ppEmpresaAbril>0 ? fRK(ppEmpresaAbril) : '—');
+  // Atualizar também os cards do editor
+  const _sE=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  _sE('res-arrecadado-bruto', totalArrecadado>0 ? fR(totalArrecadado) : '—');
+  _sE('res-arrecadado-ho',    ppEmpresaAbril>0 ? fR(ppEmpresaAbril) : '—');
   s('h-arrecadado-falta', faltaArr>0 ? fRK(faltaArr) : totalArrecadado>0 ? '✅ Meta 2!' : '—');
   document.getElementById('h-arrecadado-falta').style.color = faltaArr>0 ? '#FCA5A5' : '#4ADE80';
   s('h-arrecadado-meta-s', 'Meta 2: '+fRK(metaArrecadado));
@@ -2451,7 +2463,7 @@ function liveCalcArrecadado(){
   const s=(id,v2)=>{const e=document.getElementById(id);if(e)e.textContent=v2;};
   // Cards visíveis
   s('res-arrecadado-bruto', v>0 ? fR(v) : '—');
-  s('res-arrecadado-ho',    v>0 ? fR(ho) : '—');
+  s('res-arrecadado-ho',    ppEmpresaAbril>0 ? fR(ppEmpresaAbril) : (v>0 ? fR(ho) : '—'));
   // IDs ocultos (preservados para compatibilidade)
   s('res-arrecadado-falta', v>0 ? (falta>0?fR(falta):'✅ Meta 2!') : '—');
   s('res-arrecadado-meta-lbl', 'Meta 2: '+fRK(m));
@@ -2480,15 +2492,16 @@ function applyArrecadado(){
   localStorage.setItem('cofen_coren_ma', ma);
   localStorage.setItem('cofen_coren_ce', ce);
   initHero();
-  fbPush('arrecadado', {v, m:metaArrecadado, mt, pi, ma, ce});
-  toast('✅ Total Arrecadado e CORENs salvos!');
+  fbPush('arrecadado', {v, m:metaArrecadado, mt, pi, ma, ce, ppAbril:ppEmpresaAbril});
+  toast('✅ PaguePay e CORENs salvos!');
 }
 
 function resetArrecadado(){
   if(!confirm('Resetar Total Arrecadado, Meta 2 e CORENs?')) return;
   totalArrecadado=0; metaArrecadado=1000000;
   corenMT=0; corenPI=0; corenMA=0; corenCE=0;
-  ['cofen_arrecadado','cofen_meta_arrecadado',
+  ppEmpresaAbril=0;
+  ['cofen_arrecadado','cofen_meta_arrecadado','cofen_pp_abril',
    'cofen_coren_mt','cofen_coren_pi','cofen_coren_ma','cofen_coren_ce']
     .forEach(k=>localStorage.removeItem(k));
   ['inp-arrecadado','inp-meta-arrecadado',
@@ -2918,7 +2931,18 @@ function aplicarEmpresa(){
 
   if(ppVal <= 0){ statusEl.textContent='⚠️ Nenhum valor encontrado no arquivo.'; statusEl.style.background='#FFFBEB'; statusEl.style.color='#92400E'; return; }
 
-  // Preencher campo Total Arrecadado
+  // Calcular PaguePay de Abril separadamente — extrair .pp do objeto mensal
+  const mesAtualKey2 = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
+  const mesalEmpTemp = _parseMensal(raw);
+  // _parseMensal retorna {rec, pp, corens} por mês — precisa pegar .pp
+  const _mesAbril = mesalEmpTemp[mesAtualKey2] || mesalEmpTemp['2026-04'] || null;
+  const ppAbrilCalc = _mesAbril
+    ? (typeof _mesAbril === 'object' ? (_mesAbril.pp || _mesAbril.rec || 0) : _mesAbril)
+    : 0;
+  ppEmpresaAbril = Math.round(ppAbrilCalc * 100) / 100;
+  localStorage.setItem('cofen_pp_abril', ppEmpresaAbril);
+
+  // Preencher campo Total Arrecadado (oculto)
   const inpArr = document.getElementById('inp-arrecadado');
   if(inpArr){ inpArr.value = ppVal.toFixed(2); liveCalcArrecadado(); }
 
@@ -2928,10 +2952,11 @@ function aplicarEmpresa(){
   initHero();
   if(fbDb && fbRoom) fbPush('arrecadado', {
     v: ppVal, m: metaArrecadado,
-    mt: corenMT, pi: corenPI, ma: corenMA, ce: corenCE
+    mt: corenMT, pi: corenPI, ma: corenMA, ce: corenCE,
+    ppAbril: ppEmpresaAbril
   });
 
-  statusEl.innerHTML = `✅ Total Arrecadado atualizado: <strong>${fR(ppVal)}</strong>${result.hasSplit?' (Pague Play 24,96%)':' (Valor Recebido)'}`;
+  statusEl.innerHTML = `✅ PaguePay Ano: <strong>${fR(ppVal)}</strong> · Abril: <strong>${fR(ppEmpresaAbril)}</strong>`;
   statusEl.style.background = '#FFFBEB';
   statusEl.style.color = '#065F46';
 
@@ -6422,6 +6447,10 @@ function fbStartListening(){
     if(typeof remote.v === 'number' && remote.v !== totalArrecadado){
       totalArrecadado = remote.v;
       localStorage.setItem('cofen_arrecadado', remote.v);
+    }
+    if(typeof remote.ppAbril === 'number'){
+      ppEmpresaAbril = remote.ppAbril;
+      localStorage.setItem('cofen_pp_abril', remote.ppAbril);
     }
     if(typeof remote.m === 'number' && remote.m !== metaArrecadado){
       metaArrecadado = remote.m;
