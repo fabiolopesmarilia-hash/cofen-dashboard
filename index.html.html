@@ -352,6 +352,77 @@ select.ev-inp{cursor:pointer}
 #resumo-editor-bloco{animation:fadeInDown .3s ease}
 @keyframes fadeInDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 #resumo-editor-bloco canvas{width:100%!important;height:180px!important}
+
+/* ── METAS 2026 ── */
+.mts-hero{background:linear-gradient(135deg,var(--ppd),#1B4332 55%,#0D3D2B);border-radius:var(--rxl);padding:22px 26px;position:relative;overflow:hidden;margin-bottom:6px}
+.mts-hero::before{content:"";position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(0,200,127,.07);pointer-events:none}
+.mts-hero-title{font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.mts-hero-h{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#fff;line-height:1;margin-bottom:6px}
+.mts-hero-sub{font-size:12px;color:rgba(255,255,255,.5);font-weight:600}
+
+.mts-ql{display:flex;flex-wrap:wrap;gap:7px;align-items:center;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm);padding:10px 14px;margin-bottom:4px;box-shadow:var(--sh)}
+.mts-ql-title{font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;margin-right:4px}
+.mts-qb{font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;white-space:nowrap}
+.mts-qb-meta{background:#E6F7F1;color:#065F46;border:1px solid rgba(0,168,107,.3)}
+.mts-qb-1{background:#EBF8FF;color:#1A6B9A;border:1px solid rgba(59,130,246,.3)}
+.mts-qb-2{background:#FFFBEB;color:#92400E;border:1px solid rgba(245,158,11,.3)}
+.mts-qb-3{background:#FEF2F2;color:#991B1B;border:1px solid rgba(239,68,68,.3)}
+
+.mts-month-block{background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px;box-shadow:var(--sh)}
+.mts-month-hdr{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.mts-month-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--g900)}
+.mts-month-rule{flex:1;height:1px;background:var(--g200)}
+.mts-badge{font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:4px 12px;border-radius:100px;white-space:nowrap}
+.mts-badge-done{background:#E6F7F1;color:#065F46;border:1px solid rgba(0,168,107,.25)}
+.mts-badge-active{background:#EBF8FF;color:#1A6B9A;border:1px solid rgba(59,130,246,.25)}
+
+.mts-total-bar{background:linear-gradient(135deg,rgba(0,168,107,.08),rgba(0,184,169,.05));border:1px solid rgba(0,168,107,.2);border-radius:var(--rm);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.mts-total-bar.blue{background:rgba(59,130,246,.06);border-color:rgba(59,130,246,.2)}
+.mts-total-label{font-size:10px;font-weight:800;color:var(--ok);letter-spacing:.8px;text-transform:uppercase}
+.mts-total-bar.blue .mts-total-label{color:var(--info)}
+.mts-total-value{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;color:var(--ppd)}
+.mts-total-bar.blue .mts-total-value{color:var(--info)}
+
+.mts-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.mts-card{background:var(--g50);border:1px solid var(--g200);border-radius:var(--rm);padding:14px;position:relative;overflow:hidden;transition:all .2s}
+.mts-card:hover{transform:translateY(-2px);box-shadow:var(--sh-md);border-color:var(--g300)}
+.mts-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--rm) var(--rm) 0 0}
+.mts-card.c-meta::before{background:linear-gradient(90deg,var(--ok),var(--pp3))}
+.mts-card.c-q1::before{background:linear-gradient(90deg,var(--info),#60A5FA)}
+.mts-card.c-q2::before{background:linear-gradient(90deg,var(--warn),#FCD34D)}
+.mts-card.c-q3::before{background:linear-gradient(90deg,var(--danger),#F87171)}
+
+.mts-av{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;margin-bottom:10px;flex-shrink:0}
+.mts-av-bb{background:rgba(124,58,237,.15);color:#7C3AED}
+.mts-av-st{background:rgba(0,168,107,.12);color:var(--ppd)}
+.mts-av-lu{background:rgba(245,158,11,.12);color:#92400E}
+.mts-av-br{background:rgba(239,68,68,.1);color:#991B1B}
+
+.mts-name{font-size:12px;font-weight:800;color:var(--g900);margin-bottom:2px}
+.mts-sub{font-size:10px;color:var(--g500);font-weight:600;margin-bottom:10px}
+.mts-fl{font-size:9px;font-weight:800;color:var(--g500);letter-spacing:.9px;text-transform:uppercase;margin-bottom:2px}
+.mts-fv{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.3px;color:var(--g900);margin-bottom:8px}
+
+.mts-divider{height:1px;background:var(--g200);margin:10px 0}
+
+.mts-rv{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.3px;margin-bottom:4px}
+.mts-rv.meta{color:var(--ok)}.mts-rv.q1{color:var(--info)}.mts-rv.q2{color:var(--warn)}.mts-rv.q3{color:var(--danger)}
+
+.mts-pct-row{display:flex;align-items:baseline;gap:4px;margin-bottom:8px}
+.mts-pct-num{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.5px;line-height:1}
+.mts-pct-num.meta{color:var(--ok)}.mts-pct-num.q1{color:var(--info)}.mts-pct-num.q2{color:var(--warn)}.mts-pct-num.q3{color:var(--danger)}
+.mts-pct-lbl{font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px}
+
+.mts-qbadge{display:inline-flex;font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;margin-bottom:8px}
+.mts-bar-bg{background:var(--g200);border-radius:100px;height:4px;overflow:hidden}
+.mts-bar-f{height:100%;border-radius:100px}
+.mts-bar-f.meta{background:var(--ok)}.mts-bar-f.q1{background:var(--info)}.mts-bar-f.q2{background:var(--warn)}.mts-bar-f.q3{background:var(--danger)}
+
+.mts-note{font-size:11px;color:var(--g500);font-weight:600;margin-top:10px;padding:8px 12px;background:var(--g50);border-radius:var(--r);border-left:3px solid var(--g300)}
+
+.mts-legend{display:flex;gap:16px;flex-wrap:wrap;padding:12px 0 4px}
+.mts-leg-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--g500)}
+.mts-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 </style>
 
 <!-- Firebase SDK -->
@@ -410,6 +481,7 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('check',this)">✅ Checklist Líder</div>
   <div class="tab"     onclick="go('comparativo',this)">📊 Comparativo Mês</div>
   <div class="tab"     onclick="go('inadimpl',this)">🚨 Inadimplência</div>
+  <div class="tab"     onclick="go('metas',this)">🎯 Metas 2026</div>
 </div>
 
 <!-- ══════════ PAGE: GERAL ══════════ -->
@@ -3787,6 +3859,8 @@ function refreshAll(){
   if(typeof gestaoRemoverInit==='function' && document.getElementById('gsub-remover')?.style.display!=='none') gestaoRemoverInit();
   // Atualiza resumo mensal do editor (carrega do localStorage se disponível)
   if(typeof renderResumoEditor==='function') renderResumoEditor();
+  // ── Atualiza Metas Abril em tempo real ──
+  if(typeof mtsAtualizarAbril==='function') mtsAtualizarAbril();
 }
 
 // ── TOAST ──
@@ -9142,7 +9216,315 @@ function indRenderRanking(){
   if(!html) html = '<div style="padding:32px;text-align:center;font-size:13px;color:var(--g400)">Nenhum acordo quebrado encontrado ✅</div>';
   listEl.innerHTML = html;
 }
+
+// ══════════════════════════════════════════
+// METAS ABRIL — Atualização Dinâmica
+// ══════════════════════════════════════════
+function mtsAtualizarAbril(){
+  const cardsEl  = document.getElementById('mts-abril-cards');
+  const totalEl  = document.getElementById('mts-abril-total');
+  if(!cardsEl || !totalEl) return;
+
+  // Config de cada supervisor: equipe no D, meta, avatar, nome exibição
+  const SUPERVISORES = [
+    { eq: 'COFEN MARILIA BRENDA',    meta: 300000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília' },
+    { eq: 'COFEN BIRIGUI BRUNA',     meta: 200000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'  },
+    { eq: 'COFEN BIRIGUI LUCIANO',   meta: 200000, av: 'LC',  avClass: 'mts-av-lu', nome: 'Luciano · Birigui'},
+    { eq: 'COFEN STEPHANIE 2° TURNO',meta: 200000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'  },
+  ];
+
+  const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+
+  function quartilInfo(pct){
+    if(pct >= 100) return { cardClass:'c-meta', rvClass:'meta', pctClass:'meta', badgeClass:'mts-qb-meta', label:'Meta batida',  barClass:'meta', barW: Math.min(pct, 150) };
+    if(pct >= 80)  return { cardClass:'c-q1',   rvClass:'q1',   pctClass:'q1',   badgeClass:'mts-qb-1',    label:'1° Quartil',  barClass:'q1',   barW: pct };
+    if(pct >= 50)  return { cardClass:'c-q2',   rvClass:'q2',   pctClass:'q2',   badgeClass:'mts-qb-2',    label:'2° Quartil',  barClass:'q2',   barW: pct };
+    return             { cardClass:'c-q3',   rvClass:'q3',   pctClass:'q3',   badgeClass:'mts-qb-3',    label:'3° Quartil',  barClass:'q3',   barW: pct };
+  }
+
+  let totalGeral = 0;
+  let html = '';
+
+  SUPERVISORES.forEach(sup => {
+    const eq = D.equipes.find(e => e.name === sup.eq);
+    const rec     = eq ? eq.rec     : 0;
+    const nOp     = eq ? eq.n_op    : 0;
+    const acordos = eq ? eq.acordos : 0;
+    totalGeral += rec;
+
+    const pct = sup.meta > 0 ? (rec / sup.meta * 100) : 0;
+    const q   = quartilInfo(pct);
+    const barW = Math.min(q.barW, 100).toFixed(1);
+
+    html += `
+    <div class="mts-card ${q.cardClass}">
+      <div class="mts-av ${sup.avClass}">${sup.av}</div>
+      <div class="mts-name">${sup.nome}</div>
+      <div class="mts-sub">${nOp} operadores · ${acordos} acordos</div>
+      <div class="mts-fl">Meta</div>
+      <div class="mts-fv">${fBR(sup.meta)}</div>
+      <div class="mts-divider"></div>
+      <div class="mts-fl">Recebido até agora</div>
+      <div class="mts-rv ${q.rvClass}">${fBR(rec)}</div>
+      <div class="mts-pct-row">
+        <span class="mts-pct-num ${q.pctClass}">${pct.toFixed(1)}%</span>
+        <span class="mts-pct-lbl">da meta</span>
+      </div>
+      <span class="mts-qbadge ${q.badgeClass}">${q.label}</span>
+      <div class="mts-bar-bg"><div class="mts-bar-f ${q.barClass}" style="width:${barW}%;transition:width .8s ease"></div></div>
+    </div>`;
+  });
+
+  cardsEl.innerHTML = html;
+  totalEl.textContent = fBR(totalGeral);
+}
 </script>
+
+<!-- ══════════ PAGE: METAS 2026 ══════════ -->
+<div class="page" id="pg-metas">
+
+  <!-- Hero -->
+  <div class="mts-hero">
+    <div class="mts-hero-title">Recebimento Geral · Equipe Comercial</div>
+    <div class="mts-hero-h">🎯 METAS & RESULTADOS — 2026</div>
+    <div class="mts-hero-sub">Janeiro · Fevereiro · Março · Abril</div>
+  </div>
+
+  <!-- Quartil Reference -->
+  <div class="mts-ql">
+    <span class="mts-ql-title">Quartis de meta:</span>
+    <span class="mts-qb mts-qb-meta">✅ Meta batida · 100%+</span>
+    <span class="mts-qb mts-qb-1">🔵 1° Quartil · 80% – 99,9%</span>
+    <span class="mts-qb mts-qb-2">🟡 2° Quartil · 50% – 79,9%</span>
+    <span class="mts-qb mts-qb-3">🔴 3° Quartil · abaixo de 50%</span>
+  </div>
+
+  <!-- JANEIRO -->
+  <div class="mts-month-block">
+    <div class="mts-month-hdr">
+      <span class="mts-month-name">JANEIRO</span>
+      <div class="mts-month-rule"></div>
+      <span class="mts-badge mts-badge-done">✔ Encerrado</span>
+    </div>
+    <div class="mts-total-bar">
+      <span class="mts-total-label">Total recebido no mês</span>
+      <span class="mts-total-value">R$ 87.220,46</span>
+    </div>
+    <div class="mts-cards">
+
+      <!-- Brenda+Belle Jan: 87220/50000 = 174,4% -->
+      <div class="mts-card c-meta">
+        <div class="mts-av mts-av-bb">B+B</div>
+        <div class="mts-name">Brenda &amp; Belle</div>
+        <div class="mts-sub">Meta conjunta</div>
+        <div class="mts-fl">Meta</div>
+        <div class="mts-fv">R$ 50.000</div>
+        <div class="mts-divider"></div>
+        <div class="mts-fl">Recebido</div>
+        <div class="mts-rv meta">R$ 87.220,46</div>
+        <div class="mts-pct-row">
+          <span class="mts-pct-num meta">174,4%</span>
+          <span class="mts-pct-lbl">da meta</span>
+        </div>
+        <span class="mts-qbadge mts-qb-meta">Meta batida</span>
+        <div class="mts-bar-bg"><div class="mts-bar-f meta" style="width:100%"></div></div>
+      </div>
+
+      <!-- Stephanie Jan: 87220/50000 = 174,4% -->
+      <div class="mts-card c-meta">
+        <div class="mts-av mts-av-st">ST</div>
+        <div class="mts-name">Stephanie</div>
+        <div class="mts-sub">&nbsp;</div>
+        <div class="mts-fl">Meta</div>
+        <div class="mts-fv">R$ 50.000</div>
+        <div class="mts-divider"></div>
+        <div class="mts-fl">Recebido</div>
+        <div class="mts-rv meta">R$ 87.220,46</div>
+        <div class="mts-pct-row">
+          <span class="mts-pct-num meta">174,4%</span>
+          <span class="mts-pct-lbl">da meta</span>
+        </div>
+        <span class="mts-qbadge mts-qb-meta">Meta batida</span>
+        <div class="mts-bar-bg"><div class="mts-bar-f meta" style="width:100%"></div></div>
+      </div>
+
+    </div>
+    <div class="mts-note">* Brenda &amp; Belle e Stephanie compartilhavam o mesmo recebimento geral em Janeiro.</div>
+  </div>
+
+  <!-- FEVEREIRO -->
+  <div class="mts-month-block">
+    <div class="mts-month-hdr">
+      <span class="mts-month-name">FEVEREIRO</span>
+      <div class="mts-month-rule"></div>
+      <span class="mts-badge mts-badge-done">✔ Encerrado</span>
+    </div>
+    <div class="mts-total-bar">
+      <span class="mts-total-label">Total recebido no mês</span>
+      <span class="mts-total-value">R$ 132.591,43</span>
+    </div>
+    <div class="mts-cards">
+
+      <!-- Brenda+Belle Fev: 132591/100000 = 132,6% -->
+      <div class="mts-card c-meta">
+        <div class="mts-av mts-av-bb">B+B</div>
+        <div class="mts-name">Brenda &amp; Belle</div>
+        <div class="mts-sub">Meta conjunta</div>
+        <div class="mts-fl">Meta</div>
+        <div class="mts-fv">R$ 100.000</div>
+        <div class="mts-divider"></div>
+        <div class="mts-fl">Recebido</div>
+        <div class="mts-rv meta">R$ 132.591,43</div>
+        <div class="mts-pct-row">
+          <span class="mts-pct-num meta">132,6%</span>
+          <span class="mts-pct-lbl">da meta</span>
+        </div>
+        <span class="mts-qbadge mts-qb-meta">Meta batida</span>
+        <div class="mts-bar-bg"><div class="mts-bar-f meta" style="width:100%"></div></div>
+      </div>
+
+      <!-- Stephanie Fev: 132591/100000 = 132,6% -->
+      <div class="mts-card c-meta">
+        <div class="mts-av mts-av-st">ST</div>
+        <div class="mts-name">Stephanie</div>
+        <div class="mts-sub">&nbsp;</div>
+        <div class="mts-fl">Meta</div>
+        <div class="mts-fv">R$ 100.000</div>
+        <div class="mts-divider"></div>
+        <div class="mts-fl">Recebido</div>
+        <div class="mts-rv meta">R$ 132.591,43</div>
+        <div class="mts-pct-row">
+          <span class="mts-pct-num meta">132,6%</span>
+          <span class="mts-pct-lbl">da meta</span>
+        </div>
+        <span class="mts-qbadge mts-qb-meta">Meta batida</span>
+        <div class="mts-bar-bg"><div class="mts-bar-f meta" style="width:100%"></div></div>
+      </div>
+
+    </div>
+    <div class="mts-note">* Brenda &amp; Belle e Stephanie compartilhavam o mesmo recebimento geral em Fevereiro.</div>
+  </div>
+
+  <!-- MARÇO -->
+  <div class="mts-month-block">
+    <div class="mts-month-hdr">
+      <span class="mts-month-name">MARÇO</span>
+      <div class="mts-month-rule"></div>
+      <span class="mts-badge mts-badge-done">✔ Encerrado</span>
+    </div>
+    <div class="mts-total-bar">
+      <span class="mts-total-label">Total recebido no mês</span>
+      <span class="mts-total-value">R$ 684.142,13</span>
+    </div>
+    <div class="mts-cards">
+
+      <!-- Brenda+Belle Mar: 300680/200000 = 150,3% -->
+      <div class="mts-card c-meta">
+        <div class="mts-av mts-av-bb">B+B</div>
+        <div class="mts-name">Brenda &amp; Belle</div>
+        <div class="mts-sub">Meta conjunta</div>
+        <div class="mts-fl">Meta</div>
+        <div class="mts-fv">R$ 200.000</div>
+        <div class="mts-divider"></div>
+        <div class="mts-fl">Recebido</div>
+        <div class="mts-rv meta">R$ 300.680,47</div>
+        <div class="mts-pct-row">
+          <span class="mts-pct-num meta">150,3%</span>
+          <span class="mts-pct-lbl">da meta</span>
+        </div>
+        <span class="mts-qbadge mts-qb-meta">Meta batida</span>
+        <div class="mts-bar-bg"><div class="mts-bar-f meta" style="width:100%"></div></div>
+      </div>
+
+      <!-- Stephanie Mar: 158581/150000 = 105,7% -->
+      <div class="mts-card c-meta">
+        <div class="mts-av mts-av-st">ST</div>
+        <div class="mts-name">Stephanie</div>
+        <div class="mts-sub">&nbsp;</div>
+        <div class="mts-fl">Meta</div>
+        <div class="mts-fv">R$ 150.000</div>
+        <div class="mts-divider"></div>
+        <div class="mts-fl">Recebido</div>
+        <div class="mts-rv meta">R$ 158.581,71</div>
+        <div class="mts-pct-row">
+          <span class="mts-pct-num meta">105,7%</span>
+          <span class="mts-pct-lbl">da meta</span>
+        </div>
+        <span class="mts-qbadge mts-qb-meta">Meta batida</span>
+        <div class="mts-bar-bg"><div class="mts-bar-f meta" style="width:100%"></div></div>
+      </div>
+
+      <!-- Luciano Mar: 83154/100000 = 83,2% → 1° quartil -->
+      <div class="mts-card c-q1">
+        <div class="mts-av mts-av-lu">LC</div>
+        <div class="mts-name">Luciano</div>
+        <div class="mts-sub">&nbsp;</div>
+        <div class="mts-fl">Meta</div>
+        <div class="mts-fv">R$ 100.000</div>
+        <div class="mts-divider"></div>
+        <div class="mts-fl">Recebido</div>
+        <div class="mts-rv q1">R$ 83.154,87</div>
+        <div class="mts-pct-row">
+          <span class="mts-pct-num q1">83,2%</span>
+          <span class="mts-pct-lbl">da meta</span>
+        </div>
+        <span class="mts-qbadge mts-qb-1">1° Quartil</span>
+        <div class="mts-bar-bg"><div class="mts-bar-f q1" style="width:83%"></div></div>
+      </div>
+
+      <!-- Bruna Mar: 141725/130000 = 109,0% -->
+      <div class="mts-card c-meta">
+        <div class="mts-av mts-av-br">BN</div>
+        <div class="mts-name">Bruna</div>
+        <div class="mts-sub">&nbsp;</div>
+        <div class="mts-fl">Meta</div>
+        <div class="mts-fv">R$ 130.000</div>
+        <div class="mts-divider"></div>
+        <div class="mts-fl">Recebido</div>
+        <div class="mts-rv meta">R$ 141.725,08</div>
+        <div class="mts-pct-row">
+          <span class="mts-pct-num meta">109,0%</span>
+          <span class="mts-pct-lbl">da meta</span>
+        </div>
+        <span class="mts-qbadge mts-qb-meta">Meta batida</span>
+        <div class="mts-bar-bg"><div class="mts-bar-f meta" style="width:100%"></div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ABRIL — atualiza automaticamente com os dados do dashboard -->
+  <div class="mts-month-block">
+    <div class="mts-month-hdr">
+      <span class="mts-month-name">ABRIL</span>
+      <div class="mts-month-rule"></div>
+      <span class="mts-badge mts-badge-active">⚡ Em andamento</span>
+    </div>
+    <div class="mts-total-bar blue" id="mts-abril-total-bar">
+      <div>
+        <span class="mts-total-label">Total parcial acumulado</span>
+        <div style="font-size:10px;color:var(--g500);margin-top:2px;font-weight:600">Atualiza conforme o dashboard</div>
+      </div>
+      <span class="mts-total-value" id="mts-abril-total">—</span>
+    </div>
+    <div class="mts-cards" id="mts-abril-cards">
+      <!-- Preenchido dinamicamente por mtsAtualizarAbril() -->
+      <div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">
+        ⏳ Carregando dados das equipes...
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="mts-legend">
+    <div class="mts-leg-item"><div class="mts-leg-dot" style="background:var(--ok)"></div> Meta batida (100%+)</div>
+    <div class="mts-leg-item"><div class="mts-leg-dot" style="background:var(--info)"></div> 1° Quartil (80–99,9%)</div>
+    <div class="mts-leg-item"><div class="mts-leg-dot" style="background:var(--warn)"></div> 2° Quartil (50–79,9%)</div>
+    <div class="mts-leg-item"><div class="mts-leg-dot" style="background:var(--danger)"></div> 3° Quartil (abaixo de 50%)</div>
+  </div>
+
+</div>
+<!-- ══════════ FIM PAGE: METAS 2026 ══════════ -->
 
 </body>
 </html>
