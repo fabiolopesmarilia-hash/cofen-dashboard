@@ -1581,48 +1581,25 @@ select.ev-inp{cursor:pointer}
 
   <!-- ── VIEW: IMPORTAR ACORDOS ── -->
   <div id="acv-import" class="acview" style="display:none">
-    <div style="background:linear-gradient(135deg,var(--ppd),#1B4332);border-radius:var(--rxl);padding:16px 22px;margin-bottom:16px">
-      <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">Importar Acordos</div>
-      <div style="font-family:Bebas Neue,sans-serif;font-size:22px;letter-spacing:3px;color:#fff;margin-bottom:5px">📥 ATUALIZAR ACORDOS</div>
-      <div style="font-size:12px;color:rgba(255,255,255,.55);font-weight:600;line-height:1.6">
-        Mesmo processo do relatório de recebimento.<br>
-        Cole o relatório — o sistema lê <strong style="color:#67E8F9">Cobradora</strong>, <strong style="color:#4ADE80">Gerados</strong> e <strong style="color:#FCD34D">Pagos</strong>.
+    <div style="background:var(--w);border:2px dashed var(--g200);border-radius:var(--rxl);padding:40px 24px;
+      text-align:center;box-shadow:var(--sh)">
+      <div style="font-size:48px;margin-bottom:16px">📥</div>
+      <div style="font-family:Bebas Neue,sans-serif;font-size:22px;letter-spacing:2px;color:var(--g900);margin-bottom:8px">
+        IMPORTAÇÃO CENTRALIZADA
       </div>
-    </div>
-    <div style="background:var(--w);border:2px dashed var(--g200);border-radius:var(--rxl);padding:18px">
-      <div style="font-size:11px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">
-        Cole o relatório aqui (Excel → Ctrl+A → Ctrl+C → Ctrl+V)
+      <div style="font-size:13px;color:var(--g500);font-weight:600;margin-bottom:24px;line-height:1.6;max-width:380px;margin-left:auto;margin-right:auto">
+        Todos os relatórios são importados em um único lugar.<br>
+        Acesse a <strong style="color:var(--pp)">Central de Importação</strong> para carregar o arquivo de acordos.
       </div>
-      <textarea id="ac-import-area"
-        placeholder="Cole aqui o relatório...&#10;&#10;Colunas esperadas:&#10;Cobradora | Gerados | Pagos (ou: Cobradora | NrDocumento | DtPgto)&#10;&#10;O sistema também aceita o relatório original de acordos do sistema."
-        style="width:100%;height:180px;background:var(--g50);border:1.5px solid var(--g200);
-        border-radius:var(--rm);padding:12px;font-family:Courier New,sans-serif,monospace;font-size:12px;
-        color:var(--g700);outline:none;resize:vertical;line-height:1.5"
-        onfocus="this.style.borderColor='var(--pp)'" onblur="this.style.borderColor='var(--g200)'"
-        oninput="acImportPreview(this.value)">
-      </textarea>
-      <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
-        <button onclick="acImportApply()"
-          style="padding:10px 24px;border-radius:var(--rm);border:none;cursor:pointer;
-          background:linear-gradient(135deg,var(--pp),var(--pp3));color:#fff;
-          font-family:Nunito,sans-serif;font-weight:800;font-size:14px">
-          ⚡ Processar e Atualizar
-        </button>
-        <button onclick="document.getElementById('ac-import-area').value='';document.getElementById('ac-import-status').textContent=''"
-          style="padding:10px 16px;border-radius:var(--rm);border:1.5px solid var(--g200);
-          background:var(--w);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;font-size:13px;cursor:pointer">
-          🗑 Limpar
-        </button>
-        <div id="ac-import-status" style="font-size:12px;font-weight:700;color:var(--g500)"></div>
-      </div>
-    </div>
-    <!-- Preview import acordos -->
-    <div id="ac-import-preview" style="display:none;margin-top:14px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rl)">
-      <div style="padding:12px 16px;border-bottom:1px solid var(--g200);background:var(--g50);
-        font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px">
-        👁 Preview — Acordos a Atualizar
-      </div>
-      <div id="ac-import-list" style="max-height:300px;overflow-y:auto"></div>
+      <button onclick="go('import',document.querySelector('.tab[onclick*=import]'));setTimeout(()=>{document.querySelectorAll('.imp-tab').forEach(t=>t.style.borderBottom='2px solid transparent');const t=document.querySelector('.imp-tab[onclick*=ac]');if(t){t.style.borderBottom='2px solid var(--info)';t.style.color='var(--info)';}document.querySelectorAll('.imp-view').forEach(v=>v.style.display='none');const v=document.getElementById('imp-ac');if(v)v.style.display='block';},100)"
+        style="padding:14px 36px;border-radius:var(--rm);border:none;cursor:pointer;
+        background:linear-gradient(135deg,var(--info),#6366F1);color:#fff;
+        font-family:Nunito,sans-serif;font-weight:800;font-size:15px;
+        box-shadow:0 4px 16px rgba(59,130,246,.3);transition:all .2s"
+        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(59,130,246,.4)'"
+        onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(59,130,246,.3)'">
+        📥 Ir para Importar Acordos
+      </button>
     </div>
   </div>
 
@@ -9247,10 +9224,10 @@ function mtsAtualizarAbril(){
   const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
 
   function quartilInfo(pct){
-    if(pct >= 100) return { cardClass:'c-meta', rvClass:'meta', pctClass:'meta', badgeClass:'mts-qb-meta', label:'Meta batida',  barClass:'meta', barW: Math.min(pct, 150) };
-    if(pct >= 80)  return { cardClass:'c-q1',   rvClass:'q1',   pctClass:'q1',   badgeClass:'mts-qb-1',    label:'1° Quartil',  barClass:'q1',   barW: pct };
-    if(pct >= 50)  return { cardClass:'c-q2',   rvClass:'q2',   pctClass:'q2',   badgeClass:'mts-qb-2',    label:'2° Quartil',  barClass:'q2',   barW: pct };
-    return             { cardClass:'c-q3',   rvClass:'q3',   pctClass:'q3',   badgeClass:'mts-qb-3',    label:'3° Quartil',  barClass:'q3',   barW: pct };
+    if(pct >= 100) return { cardClass:'c-meta', rvClass:'meta', pctClass:'meta', badgeClass:'mts-qb-meta', label:'1° Quartil',  barClass:'meta', barW: Math.min(pct, 150) };
+    if(pct >= 80)  return { cardClass:'c-q1',   rvClass:'q1',   pctClass:'q1',   badgeClass:'mts-qb-1',    label:'2° Quartil',  barClass:'q1',   barW: pct };
+    if(pct >= 50)  return { cardClass:'c-q2',   rvClass:'q2',   pctClass:'q2',   badgeClass:'mts-qb-2',    label:'3° Quartil',  barClass:'q2',   barW: pct };
+    return             { cardClass:'c-q3',   rvClass:'q3',   pctClass:'q3',   badgeClass:'mts-qb-3',    label:'4° Quartil',  barClass:'q3',   barW: pct };
   }
 
   let totalGeral = 0;
@@ -9304,10 +9281,10 @@ function mtsAtualizarAbril(){
   <!-- Quartil Reference -->
   <div class="mts-ql">
     <span class="mts-ql-title">Quartis de meta:</span>
-    <span class="mts-qb mts-qb-meta">✅ Meta batida · 100%+</span>
-    <span class="mts-qb mts-qb-1">🔵 1° Quartil · 80% – 99,9%</span>
-    <span class="mts-qb mts-qb-2">🟡 2° Quartil · 50% – 79,9%</span>
-    <span class="mts-qb mts-qb-3">🔴 3° Quartil · abaixo de 50%</span>
+    <span class="mts-qb mts-qb-meta">✅ 1° Quartil · acima de 99,99%</span>
+    <span class="mts-qb mts-qb-1">🔵 2° Quartil · 79,99% – 99,99%</span>
+    <span class="mts-qb mts-qb-2">🟡 3° Quartil · 49,99% – 79,99%</span>
+    <span class="mts-qb mts-qb-3">🔴 4° Quartil · abaixo de 49,99%</span>
   </div>
 
   <!-- JANEIRO -->
@@ -9528,10 +9505,10 @@ function mtsAtualizarAbril(){
 
   <!-- Legend -->
   <div class="mts-legend">
-    <div class="mts-leg-item"><div class="mts-leg-dot" style="background:var(--ok)"></div> Meta batida (100%+)</div>
-    <div class="mts-leg-item"><div class="mts-leg-dot" style="background:var(--info)"></div> 1° Quartil (80–99,9%)</div>
-    <div class="mts-leg-item"><div class="mts-leg-dot" style="background:var(--warn)"></div> 2° Quartil (50–79,9%)</div>
-    <div class="mts-leg-item"><div class="mts-leg-dot" style="background:var(--danger)"></div> 3° Quartil (abaixo de 50%)</div>
+    <div class="mts-leg-item"><div class="mts-leg-dot" style="background:var(--ok)"></div> 1° Quartil (acima de 99,99%)</div>
+    <div class="mts-leg-item"><div class="mts-leg-dot" style="background:var(--info)"></div> 2° Quartil (79,99% – 99,99%)</div>
+    <div class="mts-leg-item"><div class="mts-leg-dot" style="background:var(--warn)"></div> 3° Quartil (49,99% – 79,99%)</div>
+    <div class="mts-leg-item"><div class="mts-leg-dot" style="background:var(--danger)"></div> 4° Quartil (abaixo de 49,99%)</div>
   </div>
 
 </div>
