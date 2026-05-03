@@ -1647,7 +1647,7 @@ select.ev-inp{cursor:pointer}
   <!-- VIEW: GERAL -->
   <div id="cmpv-geral" class="cmpview">
     <div class="card">
-      <div class="sec">📈 Recebimento Acumulado por Dia — Março vs Abril</div>
+      <div class="sec">📈 Recebimento Acumulado por Dia Útil — Abril vs Maio</div>
       <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--g700)"><div style="width:20px;height:3px;background:#3B82F6;border-radius:2px;border:2px dashed #3B82F6"></div>Abril 2026</div>
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--g700)"><div style="width:20px;height:3px;background:#00A86B;border-radius:2px"></div>Maio 2026</div>
@@ -1661,8 +1661,8 @@ select.ev-inp{cursor:pointer}
           <thead>
             <tr style="background:var(--g50)">
               <th style="padding:9px 12px;text-align:left;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Dia</th>
-              <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Abril Acum.</th>
-              <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Maio Acum.</th>
+              <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Abril (DU)</th>
+              <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Maio (DU)</th>
               <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Diferença</th>
             </tr>
           </thead>
@@ -1675,7 +1675,7 @@ select.ev-inp{cursor:pointer}
   <!-- VIEW: EQUIPES -->
   <div id="cmpv-equipes" class="cmpview" style="display:none">
     <div class="card">
-      <div class="sec">🏢 Comparativo por Equipe — até dia 14 de cada mês</div>
+      <div class="sec">🏢 Comparativo por Equipe — mês cheio vs parcial Maio</div>
       <div style="position:relative;height:320px"><canvas id="cmp-chart-equipes"></canvas></div>
     </div>
     <div class="card" style="margin-top:0">
@@ -1696,7 +1696,7 @@ select.ev-inp{cursor:pointer}
   <!-- VIEW: OPERADORES -->
   <div id="cmpv-operadores" class="cmpview" style="display:none">
     <div class="card" style="margin-bottom:0">
-      <div class="sec">👤 Comparativo por Operador — até dia 14 de cada mês</div>
+      <div class="sec">👤 Comparativo por Operador — mês cheio vs parcial Maio</div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
         <button class="fbtn on" onclick="cmpSortOp('diff',this)">📉 Por Diferença</button>
         <button class="fbtn" onclick="cmpSortOp('abril',this)">💰 Por Maio</button>
@@ -3796,7 +3796,7 @@ function closeM(e){
 function go(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
-  ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl'].forEach(p=>document.getElementById('pg-'+p).classList.remove('on'));
+  ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
   document.getElementById('pg-'+id).classList.add('on');
   if(id==='geral'){mkGD();mkDist();buildDUManualGrid();}
   if(id==='editor') buildOpEditor();
@@ -3810,12 +3810,14 @@ function go(id,el){
   if(id==='check') checkInit();
   if(id==='comparativo') cmpInit();
   if(id==='inadimpl') inadimplInit();
+  if(id==='metas'){ mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); }
 }
 
 // ── REFRESH ALL ──
 function refreshAll(){
   rebuildAll();
   initHero();
+  if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio();
   // Sempre atualiza todos os componentes — independente de qual aba está visível
   mkGD(); mkDist(); mkTop5();
   mkEq();
@@ -3837,6 +3839,8 @@ function refreshAll(){
   if(typeof renderResumoEditor==='function') renderResumoEditor();
   // ── Atualiza Metas Abril em tempo real ──
   if(typeof mtsAtualizarAbril==='function') mtsAtualizarAbril();
+  // ── Atualiza dados do Comparativo Abril vs Maio ──
+  if(typeof cmpAtualizarCumul==='function') cmpAtualizarCumul();
 }
 
 // ── TOAST ──
@@ -7618,39 +7622,39 @@ function fbListenFeedback(){
 // COMPARATIVO MARÇO vs ABRIL
 // ══════════════════════════════════════════
 const CMP_MARCO_CUMUL = {1:48862.91,2:70972.28,3:71279.09,5:71966.31,6:152363.04,7:235692.76,8:290626.99,9:381245.76,10:453847.3,11:465021.05,12:468691.65,13:529486.27,14:569743.07,15:601234.18,16:634891.4,17:662104.55,18:693421.8,19:717843.2,20:739156.43,21:748392.11,22:756204.88,23:764819.33,24:771203.56,25:773902.14,26:774412.61,27:774568.93,28:774694.07,29:774752.19,30:774808.42};
-const CMP_MAIO_CUMUL = {};
+const CMP_MAIO_CUMUL = {1:49608.02,2:72247.78,3:152767.66,4:238328.68,5:293262.91,6:386174.14,7:459155.92,8:520644.5,9:607732.12,10:672337.74,11:748786.28,12:825885.78,13:895582.7,14:896929.77,15:947963.18,16:1009906.52,17:1090844.14,18:1167670.48,19:1270843.15,20:1351753.44,21:1491297.74};
 const CMP_ABRIL_CUMUL = CMP_MAIO_CUMUL;
 const CMP_TEAMS = [
-  {nome:'COFEN MARILIA BRENDA',marco:246029.9,abril:0.0},
-  {nome:'COFEN STEPHANIE 2° TURNO',marco:159705.21,abril:0.0},
-  {nome:'COFEN BIRIGUI BRUNA',marco:192326.22,abril:0.0},
-  {nome:'LIDERANÇA',marco:6162.93,abril:0.0},
-  {nome:'COFEN DIGITAL',marco:164.76,abril:0.0},
+  {nome:'COFEN MARILIA BRENDA',marco:246029.9,abril:506035.77},
+  {nome:'COFEN STEPHANIE 2° TURNO',marco:159705.21,abril:375163.25},
+  {nome:'COFEN BIRIGUI BRUNA',marco:192326.22,abril:368315.68},
+  {nome:'LIDERANÇA',marco:6162.93,abril:14521.25},
+  {nome:'COFEN DIGITAL',marco:164.76,abril:211876.64},
 ];
 const CMP_OPS = [
-  {nome:'STEPHANIE_FAGUNDES',marco:43916.26,abril:0},{nome:'MATHEUS_SOUZA',marco:28872.38,abril:0},
-  {nome:'katia_regina',marco:31864.47,abril:0},{nome:'thauany_moura',marco:25605.49,abril:0},
-  {nome:'itallo_cardamoni',marco:27396.5,abril:0},{nome:'caio_shimite',marco:23520.84,abril:0},
-  {nome:'KAROLAINE_SILVA',marco:27036.91,abril:0},{nome:'aline_pupim',marco:22268.82,abril:0},
-  {nome:'silva_beatriz',marco:25287.68,abril:0},{nome:'leticia_romeu',marco:24794.83,abril:0},
-  {nome:'raissa_paloma',marco:26451.31,abril:0},{nome:'kauane_azevedo',marco:22678.12,abril:0},
-  {nome:'geovanna_almeida',marco:17293.57,abril:0},{nome:'RENATARODRIGUES',marco:16371.4,abril:0},
-  {nome:'FRANCISCA_BRITO',marco:15396.14,abril:0},{nome:'BIANCA_V_SILVA',marco:16207.73,abril:0},
-  {nome:'MARIA_MOREIRASANTOS',marco:14749.06,abril:0},{nome:'HELTON_ROLDON',marco:14940.13,abril:0},
-  {nome:'jussara_pereira',marco:19924.95,abril:0},{nome:'AMABELLY_SANTOS',marco:11749.66,abril:0},
-  {nome:'MAYSA_OLIVEIRA',marco:12471.22,abril:0},{nome:'GIOVANA_SOUZA',marco:15255.71,abril:0},
-  {nome:'CLEBER_JUNIOR',marco:10592.22,abril:0},{nome:'thais_mayara',marco:11486.95,abril:0},
-  {nome:'LEONARDO_NUNES',marco:10976.36,abril:0},{nome:'ANA_BENTO',marco:10327.5,abril:0},
-  {nome:'JHONATA_NASCIMENTO',marco:6476.5,abril:0},{nome:'LYVIA_DIAS',marco:6867.48,abril:0},
-  {nome:'RAFAELA_MINHOTO',marco:6090.26,abril:0},{nome:'BRUNA_JUSTIMIANO',marco:5247.51,abril:0},
-  {nome:'pagueplay',marco:5470.75,abril:0},{nome:'MARIA_RODARTE',marco:4602.02,abril:0},
-  {nome:'ISABELA_MONTEIRO',marco:8563.52,abril:0},{nome:'THAYRA_FERREIRASILVA',marco:7203.93,abril:0},
-  {nome:'EDUARDO_SILVA',marco:3815.53,abril:0},{nome:'thais_c_ferreira',marco:3855.82,abril:0},
-  {nome:'MARIA_BRAIDOTI',marco:4052.23,abril:0},{nome:'thalia_thomaz',marco:4860.45,abril:0},
-  {nome:'carulini_santos',marco:7607.43,abril:0},{nome:'larissa_santana',marco:5158.88,abril:0},
-  {nome:'NAYARA_CRUZ',marco:164.76,abril:0},{nome:'BRENDA_FERREIRA',marco:915.42,abril:0},
-  {nome:'DEBORA_ANDRIELLY',marco:449.03,abril:0},{nome:'HELENA_SANTOS',marco:560.35,abril:0},
-  {nome:'JOAO_MIRANDA',marco:2132.02,abril:0},{nome:'FABIO_AQUINO',marco:0,abril:0},
+  {nome:'STEPHANIE_FAGUNDES',marco:43916.26,abril:69561.96},{nome:'MATHEUS_SOUZA',marco:28872.38,abril:60288.75},
+  {nome:'katia_regina',marco:31864.47,abril:65411.32},{nome:'thauany_moura',marco:25605.49,abril:51043.1},
+  {nome:'itallo_cardamoni',marco:27396.5,abril:42433.01},{nome:'caio_shimite',marco:23520.84,abril:50438.66},
+  {nome:'KAROLAINE_SILVA',marco:27036.91,abril:104557.05},{nome:'aline_pupim',marco:22268.82,abril:47025.09},
+  {nome:'silva_beatriz',marco:25287.68,abril:59007.94},{nome:'leticia_romeu',marco:24794.83,abril:58914.16},
+  {nome:'raissa_paloma',marco:26451.31,abril:59464.77},{nome:'kauane_azevedo',marco:22678.12,abril:43133.27},
+  {nome:'geovanna_almeida',marco:17293.57,abril:36453.74},{nome:'RENATARODRIGUES',marco:16371.4,abril:49408.66},
+  {nome:'FRANCISCA_BRITO',marco:15396.14,abril:37497.79},{nome:'BIANCA_V_SILVA',marco:16207.73,abril:34929.65},
+  {nome:'MARIA_MOREIRASANTOS',marco:14749.06,abril:51459.86},{nome:'HELTON_ROLDON',marco:14940.13,abril:45113.09},
+  {nome:'jussara_pereira',marco:19924.95,abril:41362.19},{nome:'AMABELLY_SANTOS',marco:11749.66,abril:45467.35},
+  {nome:'MAYSA_OLIVEIRA',marco:12471.22,abril:15489.37},{nome:'GIOVANA_SOUZA',marco:15255.71,abril:59241.12},
+  {nome:'CLEBER_JUNIOR',marco:10592.22,abril:26969.3},{nome:'thais_mayara',marco:11486.95,abril:36513.94},
+  {nome:'LEONARDO_NUNES',marco:10976.36,abril:58034.41},{nome:'ANA_BENTO',marco:10327.5,abril:15445.66},
+  {nome:'JHONATA_NASCIMENTO',marco:6476.5,abril:8733.63},{nome:'LYVIA_DIAS',marco:6867.48,abril:18992.82},
+  {nome:'RAFAELA_MINHOTO',marco:6090.26,abril:20616.3},{nome:'BRUNA_JUSTIMIANO',marco:5247.51,abril:6838.69},
+  {nome:'pagueplay',marco:5470.75,abril:30789.38},{nome:'MARIA_RODARTE',marco:4602.02,abril:14822.91},
+  {nome:'ISABELA_MONTEIRO',marco:8563.52,abril:32878.48},{nome:'THAYRA_FERREIRASILVA',marco:7203.93,abril:22208.0},
+  {nome:'EDUARDO_SILVA',marco:3815.53,abril:12937.63},{nome:'thais_c_ferreira',marco:3855.82,abril:3855.82},
+  {nome:'MARIA_BRAIDOTI',marco:4052.23,abril:11908.34},{nome:'thalia_thomaz',marco:4860.45,abril:4860.45},
+  {nome:'carulini_santos',marco:7607.43,abril:21001.4},{nome:'larissa_santana',marco:5158.88,abril:22057.42},
+  {nome:'NAYARA_CRUZ',marco:164.76,abril:966.23},{nome:'BRENDA_FERREIRA',marco:915.42,abril:6307.3},
+  {nome:'DEBORA_ANDRIELLY',marco:449.03,abril:2635.3},{nome:'HELENA_SANTOS',marco:560.35,abril:14373.7},
+  {nome:'JOAO_MIRANDA',marco:2132.02,abril:6780.71},{nome:'FABIO_AQUINO',marco:0,abril:0},
   {nome:'felipe_arruda',marco:4645.36,abril:0},{nome:'JESSICA_O_SILVA',marco:377.74,abril:0},
   {nome:'KELY_SILVA',marco:4047.6,abril:0},
 ];
@@ -7676,31 +7680,65 @@ function cmpTab(view, el){
   if(view==='operadores') cmpRenderOps();
 }
 
+// Reconstrói CMP_MAIO_CUMUL (por DU) a partir dos dados diários de D.global.daily
+function cmpAtualizarCumul(){
+  // Limpa e reconstrói por número de DU
+  Object.keys(CMP_MAIO_CUMUL).forEach(k=>delete CMP_MAIO_CUMUL[k]);
+  const daily = D.global.daily||{};
+  // Dias do calendário de Maio que têm dado, ordenados
+  const diasComDado = Object.keys(daily).map(Number).sort((a,b)=>a-b);
+  // Mapeia: para cada dia do calendário de Maio, qual DU é?
+  // CMP_MAIO_DU_DIAS[0] = dia do calendário do DU1, [1] = DU2...
+  let acum = 0;
+  CMP_MAIO_DU_DIAS.forEach((diaCalendario, idx)=>{
+    const du = idx + 1;
+    // Soma todos os dias do calendário até este DU (inclusive fins de semana entre DUs)
+    const prevDia = idx > 0 ? CMP_MAIO_DU_DIAS[idx-1] : 0;
+    for(let d = prevDia+1; d <= diaCalendario; d++){
+      if(daily[d]) acum += daily[d];
+    }
+    if(diasComDado.some(d=>d<=diaCalendario)) CMP_MAIO_CUMUL[du] = acum;
+  });
+  // Atualiza totais de equipes em CMP_TEAMS
+  CMP_TEAMS.forEach(t=>{
+    const eq = D.equipes.find(e=>e.name===t.nome);
+    if(eq) t.abril = eq.rec;
+  });
+  // Atualiza operadores
+  CMP_OPS.forEach(op=>{
+    const found = D.equipes.flatMap(e=>e.ops).find(o=>o.name===op.nome);
+    if(found) op.abril = found.rec;
+  });
+}
+
 function cmpInit(){
+  cmpAtualizarCumul();
   cmpRenderGeral();
   cmpBuildTableGeral();
   cmpBuildTableEquipes();
 }
 
 function cmpRenderGeral(){
-  const dias = Array.from({length:14},(_,i)=>i+1);
+  // Eixo X = DUs de 1 até 22 (total de DUs de Abril)
+  const maxDU = Math.max(...Object.keys(CMP_ABRIL_DU).map(Number));
+  const dus = Array.from({length:maxDU},(_,i)=>i+1);
   if(cmpCharts.geral){ cmpCharts.geral.destroy(); delete cmpCharts.geral; }
   const canvas = document.getElementById('cmp-chart-geral');
   if(!canvas) return;
   cmpCharts.geral = new Chart(canvas.getContext('2d'), {
     type:'line',
     data:{
-      labels: dias.map(d=>'Dia '+d),
+      labels: dus.map(d=>'DU '+d),
       datasets:[
-        { label:'Abril', data: dias.map(d=>CMP_MARCO_CUMUL[d]||null), borderColor:'#3B82F6', backgroundColor:'rgba(59,130,246,.07)', tension:.3, fill:true, borderDash:[5,3], borderWidth:2 },
-        { label:'Maio', data: dias.map(d=>CMP_ABRIL_CUMUL[d]||null), borderColor:'#00A86B', backgroundColor:'rgba(0,168,107,.08)', tension:.3, fill:true, borderWidth:2.5 }
+        { label:'Abril', data: dus.map(d=>CMP_ABRIL_DU[d]||null), borderColor:'#3B82F6', backgroundColor:'rgba(59,130,246,.07)', tension:.3, fill:true, borderDash:[5,3], borderWidth:2 },
+        { label:'Maio',  data: dus.map(d=>CMP_MAIO_CUMUL[d]||null), borderColor:'#00A86B', backgroundColor:'rgba(0,168,107,.08)', tension:.3, fill:true, borderWidth:2.5 }
       ]
     },
     options:{
       responsive:true, maintainAspectRatio:false,
       plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cmpFmt(ctx.raw)}}},
       scales:{
-        x:{grid:{display:false},ticks:{font:{size:10},color:'#7A8899',autoSkip:false,maxRotation:45}},
+        x:{grid:{display:false},ticks:{font:{size:10},color:'#7A8899',autoSkip:true,maxRotation:45}},
         y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:10},color:'#7A8899',callback:v=>'R$'+v/1000+'K'}}
       }
     }
@@ -7712,20 +7750,35 @@ function cmpBuildTableGeral(){
   const tbody = document.getElementById('cmp-table-geral');
   if(!tbody) return;
   tbody.innerHTML='';
-  for(let d=1;d<=14;d++){
-    const m = CMP_MARCO_CUMUL[d]||0;
-    const a = CMP_ABRIL_CUMUL[d];
-    const hasA = a !== undefined;
-    const diff = hasA ? a - m : null;
+  const maxDU = Math.max(...Object.keys(CMP_ABRIL_DU).map(Number)); // 22 DUs de Abril
+  const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+  for(let du=1; du<=maxDU; du++){
+    const a = CMP_ABRIL_DU[du] || 0;
+    const m = CMP_MAIO_CUMUL[du];
+    const hasM = m !== undefined;
+    // Dia do calendário de Maio para este DU
+    const diaCalMaio = CMP_MAIO_DU_DIAS[du-1] ? ' ('+('0'+CMP_MAIO_DU_DIAS[du-1]).slice(-2)+'/05)' : '';
+    const diff = hasM ? m - a : null;
     const cls = diff > 0 ? '#065F46' : diff < 0 ? '#991B1B' : '#555';
-    const bg = diff > 0 ? '#F0FDF4' : diff < 0 ? '#FEF2F2' : '';
+    const bg  = diff > 0 ? '#F0FDF4' : diff < 0 ? '#FEF2F2' : '';
     tbody.innerHTML += `<tr style="border-bottom:1px solid var(--g100);background:${bg}">
-      <td style="padding:8px 12px;font-weight:800;color:var(--g900)">Dia ${d}</td>
-      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#3B82F6">${cmpFmt(m)}</td>
-      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#00A86B">${hasA?cmpFmt(a):'—'}</td>
+      <td style="padding:8px 12px;font-weight:800;color:var(--g900)">DU ${du}<span style="font-size:10px;color:var(--g500);font-weight:600">${hasM?diaCalMaio:''}</span></td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#3B82F6">${a>0?cmpFmt(a):'—'}</td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#00A86B">${hasM?cmpFmt(m):'—'}</td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;font-weight:800;color:${cls}">${diff!==null?cmpFmtK(diff):'—'}</td>
     </tr>`;
   }
+  // Linha de total
+  const totalAbril = CMP_ABRIL_DU[maxDU] || 0;
+  const totalMaio  = dusMaio.length ? CMP_MAIO_CUMUL[Math.max(...dusMaio)] : null;
+  const totalDiff  = totalMaio !== null ? totalMaio - totalAbril : null;
+  const tcls = totalDiff !== null ? (totalDiff >= 0 ? '#065F46' : '#991B1B') : '#555';
+  tbody.innerHTML += `<tr style="border-top:2px solid var(--g200);background:var(--g50)">
+    <td style="padding:10px 12px;font-weight:900;color:var(--g900);font-size:13px">TOTAL (${dusMaio.length||0} DUs)</td>
+    <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#3B82F6">${cmpFmt(totalAbril)}</td>
+    <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#00A86B">${totalMaio!==null?cmpFmt(totalMaio):'—'}</td>
+    <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;font-weight:900;color:${tcls}">${totalDiff!==null?cmpFmtK(totalDiff):'—'}</td>
+  </tr>`;
 }
 
 function cmpRenderEquipes(){
@@ -7832,6 +7885,8 @@ initHero();
 fbAutoConnect();
 mkGD(); mkDist(); mkTop5();
 mkEq();
+// Inicializa cards de Abril na página Metas 2026
+setTimeout(()=>{ if(typeof mtsAtualizarAbril==='function') mtsAtualizarAbril(); }, 300);
 // ══════════════════════════════════════════════════════════════
 // SISTEMA DE EVENTOS DO CALENDÁRIO
 // ══════════════════════════════════════════════════════════════
@@ -9129,50 +9184,48 @@ function indRenderRanking(){
 // METAS ABRIL — Atualização Dinâmica
 // ══════════════════════════════════════════
 function mtsAtualizarAbril(){
-  const cardsEl  = document.getElementById('mts-abril-cards');
-  const totalEl  = document.getElementById('mts-abril-total');
-  if(!cardsEl || !totalEl) return;
+  const cardsEl = document.getElementById('mts-abril-cards');
+  if(!cardsEl) return;
 
-  // Config de cada supervisor: equipe no D, meta, avatar, nome exibição
+  // Valores FIXOS de Abril encerrado — vindos de CMP_TEAMS (campo marco = valor real de Abril)
+  // Abril total = 774.808,42 distribuído por equipe conforme CMP_TEAMS
+  const recAbrilPorEq = {};
+  CMP_TEAMS.forEach(t => { recAbrilPorEq[t.nome] = t.abril; });
+
+  // Config de cada supervisor: equipe, meta, avatar, nome exibição
   const SUPERVISORES = [
-    { eq: 'COFEN MARILIA BRENDA',    meta: 300000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília' },
-    { eq: 'COFEN BIRIGUI BRUNA',     meta: 200000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'  },
-    { eq: 'COFEN BIRIGUI BRUNA',   meta: 200000, av: 'LC',  avClass: 'mts-av-lu', nome: 'Luciano · Birigui'},
-    { eq: 'COFEN STEPHANIE 2° TURNO',meta: 200000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'  },
+    { eq: 'COFEN MARILIA BRENDA',     meta: 300000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: 200000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: 200000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
   ];
 
   const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
 
   function quartilInfo(pct){
-    if(pct >= 100) return { cardClass:'c-meta', rvClass:'meta', pctClass:'meta', badgeClass:'mts-qb-meta', label:'1° Quartil',  barClass:'meta', barW: Math.min(pct, 150) };
+    if(pct >= 100) return { cardClass:'c-meta', rvClass:'meta', pctClass:'meta', badgeClass:'mts-qb-meta', label:'Meta batida', barClass:'meta', barW: Math.min(pct, 150) };
     if(pct >= 80)  return { cardClass:'c-q1',   rvClass:'q1',   pctClass:'q1',   badgeClass:'mts-qb-1',    label:'2° Quartil',  barClass:'q1',   barW: pct };
     if(pct >= 50)  return { cardClass:'c-q2',   rvClass:'q2',   pctClass:'q2',   badgeClass:'mts-qb-2',    label:'3° Quartil',  barClass:'q2',   barW: pct };
     return             { cardClass:'c-q3',   rvClass:'q3',   pctClass:'q3',   badgeClass:'mts-qb-3',    label:'4° Quartil',  barClass:'q3',   barW: pct };
   }
 
-  let totalGeral = 0;
   let html = '';
 
   SUPERVISORES.forEach(sup => {
-    const eq = D.equipes.find(e => e.name === sup.eq);
-    const rec     = eq ? eq.rec     : 0;
-    const nOp     = eq ? eq.n_op    : 0;
-    const acordos = eq ? eq.acordos : 0;
-    totalGeral += rec;
-
-    const pct = sup.meta > 0 ? (rec / sup.meta * 100) : 0;
-    const q   = quartilInfo(pct);
+    // Usa o valor fixo de Abril encerrado
+    const rec  = recAbrilPorEq[sup.eq] || 0;
+    const pct  = sup.meta > 0 ? (rec / sup.meta * 100) : 0;
+    const q    = quartilInfo(pct);
     const barW = Math.min(q.barW, 100).toFixed(1);
 
     html += `
     <div class="mts-card ${q.cardClass}">
       <div class="mts-av ${sup.avClass}">${sup.av}</div>
       <div class="mts-name">${sup.nome}</div>
-      <div class="mts-sub">${nOp} operadores · ${acordos} acordos</div>
+      <div class="mts-sub">Abril encerrado</div>
       <div class="mts-fl">Meta</div>
       <div class="mts-fv">${fBR(sup.meta)}</div>
       <div class="mts-divider"></div>
-      <div class="mts-fl">Recebido até agora</div>
+      <div class="mts-fl">Recebido</div>
       <div class="mts-rv ${q.rvClass}">${fBR(rec)}</div>
       <div class="mts-pct-row">
         <span class="mts-pct-num ${q.pctClass}">${pct.toFixed(1)}%</span>
@@ -9184,8 +9237,95 @@ function mtsAtualizarAbril(){
   });
 
   cardsEl.innerHTML = html;
-  totalEl.textContent = fBR(totalGeral);
 }
+
+function mtsAtualizarMaio(){
+  const cardsEl  = document.getElementById('mts-maio-cards');
+  const totalEl  = document.getElementById('mts-maio-total');
+  if(!cardsEl) return;
+
+  // Lê os valores AO VIVO de D.equipes — atualiza sozinho a cada import
+  const SUPERVISORES = [
+    { eq: 'COFEN MARILIA BRENDA',     meta: 300000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: 200000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: 200000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
+  ];
+
+  const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+
+  // Busca rec de cada equipe diretamente de D.equipes (fonte viva)
+  const recPorEq = {};
+  (D.equipes || []).forEach(eq => { recPorEq[eq.name] = eq.rec || 0; });
+
+  // Total acumulado Maio = soma das 3 equipes principais
+  const totalMaio = SUPERVISORES.reduce((s, sup) => s + (recPorEq[sup.eq] || 0), 0);
+
+  // Atualiza total no header
+  if(totalEl) totalEl.textContent = totalMaio > 0 ? fBR(totalMaio) : '—';
+
+  // Se não tem dado ainda, mostra mensagem
+  if(totalMaio === 0){
+    cardsEl.innerHTML = '<div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">⏳ Importe o relatório de Maio para carregar os dados das equipes...</div>';
+    return;
+  }
+
+  function quartilInfo(pct){
+    if(pct >= 100) return { cardClass:'c-meta', rvClass:'meta', pctClass:'meta', badgeClass:'mts-qb-meta', label:'Meta batida',  barClass:'meta', barW: Math.min(pct,150) };
+    if(pct >= 80)  return { cardClass:'c-q1',   rvClass:'q1',   pctClass:'q1',   badgeClass:'mts-qb-1',    label:'2° Quartil',  barClass:'q1',   barW: pct };
+    if(pct >= 50)  return { cardClass:'c-q2',   rvClass:'q2',   pctClass:'q2',   badgeClass:'mts-qb-2',    label:'3° Quartil',  barClass:'q2',   barW: pct };
+    return             { cardClass:'c-q3',   rvClass:'q3',   pctClass:'q3',   badgeClass:'mts-qb-3',    label:'4° Quartil',  barClass:'q3',   barW: pct };
+  }
+
+  let html = '';
+  SUPERVISORES.forEach(sup => {
+    const rec  = recPorEq[sup.eq] || 0;
+    const pct  = sup.meta > 0 ? (rec / sup.meta * 100) : 0;
+    const q    = quartilInfo(pct);
+    const barW = Math.min(q.barW, 100).toFixed(1);
+
+    // Dias úteis de Maio (estimado) para projeção
+    const totalDU = 21; // dias úteis em Maio 2026
+    const daysElapsed = (() => {
+      const today = new Date();
+      if(today.getMonth() !== 4) return totalDU; // não é Maio
+      const FERIADOS_MAIO = ['2026-05-01'];
+      let count = 0;
+      for(let d = 1; d <= today.getDate(); d++){
+        const dt = new Date(2026, 4, d);
+        const key = dt.toISOString().slice(0,10);
+        if(dt.getDay() !== 0 && dt.getDay() !== 6 && !FERIADOS_MAIO.includes(key)) count++;
+      }
+      return count;
+    })();
+    const projecao = daysElapsed > 0 && daysElapsed < totalDU ? (rec / daysElapsed * totalDU) : 0;
+    const projPct  = sup.meta > 0 && projecao > 0 ? (projecao / sup.meta * 100) : 0;
+
+    html += `
+    <div class="mts-card ${q.cardClass}">
+      <div class="mts-av ${sup.avClass}">${sup.av}</div>
+      <div class="mts-name">${sup.nome}</div>
+      <div class="mts-sub">Maio · em andamento</div>
+      <div class="mts-fl">Meta</div>
+      <div class="mts-fv">${fBR(sup.meta)}</div>
+      <div class="mts-divider"></div>
+      <div class="mts-fl">Recebido até agora</div>
+      <div class="mts-rv ${q.rvClass}">${fBR(rec)}</div>
+      <div class="mts-pct-row">
+        <span class="mts-pct-num ${q.pctClass}">${pct.toFixed(1)}%</span>
+        <span class="mts-pct-lbl">da meta</span>
+      </div>
+      <span class="mts-qbadge ${q.badgeClass}">${q.label}</span>
+      <div class="mts-bar-bg"><div class="mts-bar-f ${q.barClass}" style="width:${barW}%;transition:width .8s ease"></div></div>
+      ${projecao > 0 ? `<div style="margin-top:10px;padding:8px 10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;font-size:10px;color:rgba(255,255,255,.5);display:flex;justify-content:space-between;align-items:center">
+        <span>📈 Projeção fim do mês</span>
+        <span style="font-weight:800;color:rgba(255,255,255,.8)">${fBR(projecao)} <span style="font-size:9px;color:rgba(255,255,255,.4)">(${projPct.toFixed(0)}%)</span></span>
+      </div>` : ''}
+    </div>`;
+  });
+
+  cardsEl.innerHTML = html;
+}
+
 </script>
 
 <!-- ══════════ PAGE: METAS 2026 ══════════ -->
@@ -9195,7 +9335,7 @@ function mtsAtualizarAbril(){
   <div class="mts-hero">
     <div class="mts-hero-title">Recebimento Geral · Equipe Comercial</div>
     <div class="mts-hero-h">🎯 METAS & RESULTADOS — 2026</div>
-    <div class="mts-hero-sub">Janeiro · Fevereiro · Março · Abril</div>
+    <div class="mts-hero-sub">Janeiro · Fevereiro · Março · Abril · Maio</div>
   </div>
 
   <!-- Quartil Reference -->
@@ -9410,7 +9550,7 @@ function mtsAtualizarAbril(){
     </div>
     <div class="mts-total-bar">
       <span class="mts-total-label">Total recebido no mês</span>
-      <span class="mts-total-value">R$ 774.808,42</span>
+      <span class="mts-total-value">R$ 1.249.514,70</span>
     </div>
     <div class="mts-cards" id="mts-abril-cards">
       <!-- Preenchido dinamicamente por mtsAtualizarAbril() -->
@@ -9430,7 +9570,7 @@ function mtsAtualizarAbril(){
     <div class="mts-total-bar blue" id="mts-maio-total-bar">
       <div>
         <span class="mts-total-label">Total parcial acumulado</span>
-        <div style="font-size:10px;color:var(--g500);margin-top:2px;font-weight:600">Atualiza conforme o dashboard</div>
+        <div style="font-size:10px;color:var(--g500);margin-top:2px;font-weight:600">Atualiza automaticamente a cada importação</div>
       </div>
       <span class="mts-total-value" id="mts-maio-total">—</span>
     </div>
