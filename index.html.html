@@ -472,6 +472,7 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('editor',this)">✏️ Editar Valores</div>
   <div class="tab"     onclick="go('equipes',this)">🏢 Equipes</div>
   <div class="tab"     onclick="go('ranking',this)">🏆 Ranking</div>
+  <div class="tab"     onclick="go('ranking-digital',this)">🖥️ Ranking Digital</div>
   <div class="tab"     onclick="go('diario',this)">📅 Diário</div>
   <div class="tab"     onclick="go('recdia',this)">⚡ Recebimento do Dia</div>
   <div class="tab"     onclick="go('gestao',this)">⚙️ Gestão de Equipes</div>
@@ -818,6 +819,19 @@ select.ev-inp{cursor:pointer}
   <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
   <div class="rk-list" id="rk-list"></div>
 </div>
+
+<!-- ══════════ PAGE: RANKING DIGITAL ══════════ -->
+<div class="page" id="pg-ranking-digital">
+  <div style="background:linear-gradient(135deg,#2D1B69,#4F46E5 55%,#7C3AED);border-radius:var(--rxl);padding:18px 24px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.05);pointer-events:none"></div>
+    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">Equipe Cofen Digital</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#fff;line-height:1;margin-bottom:14px">🖥️ RANKING DIGITAL — ABRIL 2026</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="rk-dig-kpis"></div>
+  </div>
+  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
+  <div class="rk-list" id="rk-list-digital"></div>
+</div>
+<!-- ══════════ FIM PAGE: RANKING DIGITAL ══════════ -->
 
 <!-- ══════════ PAGE: DIÁRIO ══════════ -->
 <div class="page" id="pg-diario">
@@ -2044,8 +2058,8 @@ let ppEmpresaAbril     = parseFloat(localStorage.getItem('cofen_pp_maio')       
 const EQ={
   "COFEN MARILIA BRENDA":   {c:"#00A86B",bg:"#E6F7F1",ico:"🏙",sh:"Marília Brenda"},
   "COFEN BIRIGUI BRUNA":    {c:"#4776E6",bg:"#EEF2FF",ico:"💙",sh:"Birigui Bruna"},
-  "COFEN STEPHANIE 2° TURNO":{c:"#F7971E",bg:"#FFF7ED",ico:"⭐",sh:"Stephanie 2°T"}
-
+  "COFEN STEPHANIE 2° TURNO":{c:"#F7971E",bg:"#FFF7ED",ico:"⭐",sh:"Stephanie 2°T"},
+  "COFEN DIGITAL":           {c:"#f953c6",bg:"#FDF2FF",ico:"🖥️",sh:"Digital"}
 };
 
 const fR=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
@@ -2058,7 +2072,7 @@ function rebuildAll(){
   // NÃO modifica D — apenas filtra ao montar ALL
   // Modificar D causava perda permanente de operadores a cada chamada
   const _BLOCKED=["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_BERNARDES"];
-  const _BLOCKED_TEAMS=["COFEN DIGITAL"];
+  const _BLOCKED_TEAMS=[];
   const _gOvR=gGetOverrides();
   const _allRemoved=new Set([...(_gOvR.removidos||[]),..._BLOCKED]);
   ALL=D.equipes
@@ -3559,6 +3573,94 @@ function setF(eq,btn){
   mkRanking();
 }
 
+// ── RANKING DIGITAL (COFEN DIGITAL) ──
+const DIG_EQ = 'COFEN DIGITAL';
+const DIG_COLOR = '#f953c6';
+
+function mkRankingDigital(){
+  const feedbackAll = feedbackGetAll();
+  const list = ALL.filter(o=>o.eq===DIG_EQ);
+  const maxV = list[0]?.rec||1;
+  const totalRec = list.reduce((s,o)=>s+o.rec,0);
+  const totalHO  = totalRec*0.25;
+  const totalAc  = list.reduce((s,o)=>s+(o.acordos||0),0);
+
+  const kpisEl = document.getElementById('rk-dig-kpis');
+  if(kpisEl) kpisEl.innerHTML=`
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Total Real</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;letter-spacing:.5px;line-height:1">${fRK(totalRec)}</div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">HO (25%)</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#67E8F9;letter-spacing:.5px;line-height:1">${fRK(totalHO)}</div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Acordos</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FCD34D;letter-spacing:.5px;line-height:1">${totalAc}</div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Operadores</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:.5px;line-height:1">${list.length}</div>
+    </div>`;
+
+  const listEl = document.getElementById('rk-list-digital');
+  if(!listEl) return;
+  if(!list.length){ listEl.innerHTML='<div style="padding:32px;text-align:center;font-size:13px;color:var(--g400)">Nenhum operador no time Digital</div>'; return; }
+
+  listEl.innerHTML=list.map((op,i)=>{
+    const r=i+1;
+    const cls=r===1?'r1':r===2?'r2':r===3?'r3':'';
+    const bp=Math.round(op.rec/maxV*100);
+    const metaInd = getMetaOp(op.name);
+    const projData = calcProjecao(op.rec, metaInd);
+    const fbDone = !!feedbackAll[op.name];
+    const fbDate = fbDone ? new Date(feedbackAll[op.name]).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : '';
+    const fbBtnStyle = fbDone
+      ? 'background:#D1FAE5;border:1.5px solid #6EE7B7;color:#065F46;cursor:pointer;'
+      : 'background:#FEF9C3;border:1.5px dashed #FCD34D;color:#92400E;cursor:pointer;';
+    return `<div class="rk-row ${cls}" style="animation-delay:${i*.03}s;--ra:${DIG_COLOR}" onclick="openM('${op.name}')">
+      <div class="r-pos">${r<=3?['🥇','🥈','🥉'][r-1]:r+'°'}</div>
+      <div class="r-info">
+        <div style="width:32px;height:32px;border-radius:8px;overflow:hidden;flex-shrink:0;background:${DIG_COLOR};display:flex;align-items:center;justify-content:center">
+          ${photoGet(op.name)?`<img src="${photoGet(op.name)}" style="width:100%;height:100%;object-fit:cover">`:`<span style="font-weight:900;font-size:11px;color:#fff">${ini(op.name)}</span>`}
+        </div>
+        <div>
+          <div class="r-n" style="display:flex;align-items:center;gap:5px">
+            ${op.name.replace(/_/g,' ')}
+            <button onclick="event.stopPropagation();feedbackToggle('${op.name.replace(/'/g,"\\'")}')"
+              style="padding:1px 6px;border-radius:100px;font-size:9px;font-weight:800;${fbBtnStyle}transition:all .2s;flex-shrink:0;line-height:1.6">
+              ${fbDone?'✅ FB '+fbDate:'○ Feedback'}
+            </button>
+          </div>
+          <div class="r-t" style="color:${DIG_COLOR}">🖥️ Equipe Digital</div>
+        </div>
+      </div>
+      <div class="r-bar-w">
+        <div class="r-val" style="color:${DIG_COLOR}">${fR(op.rec)}</div>
+        <div class="r-bar-bg"><div class="r-bar-f" style="width:${bp}%;background:${DIG_COLOR}"></div></div>
+      </div>
+      <div class="r-ho">HO: <b>${fR(op.ho)}</b></div>
+      <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:13px;color:${projData.color};letter-spacing:.3px">${fRK(metaInd)}</div>
+        <div style="font-size:10px;color:var(--g500);font-weight:600">${projData.label}</div>`:`<div style="font-size:10px;color:var(--g300);font-weight:600">—</div>`}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
+        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${projData.color};letter-spacing:.5px">${projData.pct.toFixed(0)}%</div>
+        <div style="background:var(--g100);border-radius:100px;height:4px;width:60px;overflow:hidden">
+          <div style="width:${Math.min(100,projData.pct)}%;height:100%;border-radius:100px;background:${projData.color};transition:width 1s"></div>
+        </div>`:`<div style="font-size:10px;color:var(--g300)">—</div>`}
+      </div>
+      <div class="r-ac">${op.acordos}</div>
+      <div style="padding:2px 0">${efBadge(op.gerados||0,op.pagos||0,op.acordos||0)}</div>
+      <div style="display:flex;gap:3px;align-items:flex-end;height:20px;margin-top:1px">
+        ${(()=>{const de=Object.entries(op.daily||{}).sort((a,b)=>Number(a[0])-Number(b[0]));if(!de.length)return '<span style="font-size:9px;color:#aaa">—</span>';const mv=Math.max(...de.map(([,v])=>v),1);return de.map(([d,v])=>`<div title="Dia ${d}: ${fR(v)}" style="width:5px;border-radius:2px 2px 0 0;background:${DIG_COLOR};opacity:${.35+.65*(v/mv)};height:${Math.max(3,Math.round(v/mv*18))}px"></div>`).join('');})()}
+      </div>
+      <div class="r-ag">${op.n_ag>0?'+'+op.n_ag:'—'}</div>
+    </div>`;
+  }).join('');
+}
+
 // ── DIÁRIO CHARTS ──
 function mkDf(){
   destroyC('df');
@@ -3796,11 +3898,12 @@ function closeM(e){
 function go(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
-  ['geral','editor','equipes','ranking','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
+  ['geral','editor','equipes','ranking','ranking-digital','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
   document.getElementById('pg-'+id).classList.add('on');
   if(id==='geral'){mkGD();mkDist();buildDUManualGrid();}
   if(id==='editor') buildOpEditor();
   if(id==='ranking') mkRanking();
+  if(id==='ranking-digital') mkRankingDigital();
   if(id==='diario'){mkDf();mkDe();buildCal('cal-grid2');}
   if(id==='recdia'){ rdInit(); setTimeout(rdRenderEqBreakdown,200); }
   if(id==='gestao') gestaoInit();
@@ -3822,7 +3925,7 @@ function refreshAll(){
   mkGD(); mkDist(); mkTop5();
   mkEq();
   mkRanking();
-  // Atualiza Diário se inicializado
+  if(document.getElementById('pg-ranking-digital')?.classList.contains('on')) mkRankingDigital();
   if(typeof buildDiario==='function') buildDiario();
   // Atualiza RecDia KPIs e lista
   if(typeof rdUpdateKPIs==='function') rdUpdateKPIs();
@@ -8117,7 +8220,11 @@ setInterval(()=>{
         font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
         ⭐ Stephanie
       </button>
-      
+      <button id="tv-btn-COFEN_DIGITAL" onclick="tvSetMode('COFEN DIGITAL',this)"
+        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
+        font-weight:800;font-size:11px;background:transparent;color:#f953c6;border:1px solid rgba(249,83,198,.3);letter-spacing:.5px;transition:all .2s">
+        🖥️ Digital
+      </button>
     </div>
     <!-- Nav -->
     <button onclick="tvPrev()"
