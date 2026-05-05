@@ -4959,6 +4959,9 @@ function metasSave(){
   gSetMetas(metas);
   fbPush('metas_eq', metas);
   gestaoMetasInit();
+  // Re-renderiza cards de Abril e Maio com as novas metas
+  if(typeof mtsAtualizarAbril === 'function') mtsAtualizarAbril();
+  if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio();
   toast('✅ Metas salvas e sincronizadas para todos!');
 }
 
@@ -6854,6 +6857,9 @@ function fbStartListening(){
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
     gSetMetas({...local,...remote});
     pulseSyncDot();
+    // Re-renderiza cards de metas com novos valores sincronizados
+    if(typeof mtsAtualizarAbril === 'function') mtsAtualizarAbril();
+    if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio();
   });
   fbListeners.metas_eq = true;
 
@@ -9627,11 +9633,15 @@ function mtsAtualizarAbril(){
   const recAbrilPorEq = {};
   CMP_TEAMS.forEach(t => { recAbrilPorEq[t.nome] = t.marco; });
 
-  // Config de cada supervisor: equipe, meta, avatar, nome exibição
+  // Metas por equipe — lidas do Gerenciador de Equipes (cofen_metas_eq)
+  const _metas_eq = gGetMetas();
+
+  // Config de cada supervisor: equipe, avatar, nome exibição
+  // meta puxada dinamicamente do Gerenciador de Equipes (Gestão de Equipes > Metas por Equipe)
   const SUPERVISORES = [
-    { eq: 'COFEN MARILIA BRENDA',     meta: 300000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
-    { eq: 'COFEN BIRIGUI BRUNA',      meta: 200000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
-    { eq: 'COFEN STEPHANIE 2° TURNO', meta: 200000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
+    { eq: 'COFEN MARILIA BRENDA',     meta: _metas_eq['COFEN MARILIA BRENDA']     || 300000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: _metas_eq['COFEN BIRIGUI BRUNA']      || 200000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _metas_eq['COFEN STEPHANIE 2° TURNO'] || 200000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
   ];
 
   const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
@@ -9679,11 +9689,15 @@ function mtsAtualizarMaio(){
   const totalEl  = document.getElementById('mts-maio-total');
   if(!cardsEl) return;
 
+  // Metas por equipe — lidas do Gerenciador de Equipes (cofen_metas_eq)
+  const _metas_eq_maio = gGetMetas();
+
+  // Config de cada supervisor — meta puxada dinamicamente do Gerenciador de Equipes
   // Lê os valores AO VIVO de D.equipes — atualiza sozinho a cada import
   const SUPERVISORES = [
-    { eq: 'COFEN MARILIA BRENDA',     meta: 300000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
-    { eq: 'COFEN BIRIGUI BRUNA',      meta: 200000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
-    { eq: 'COFEN STEPHANIE 2° TURNO', meta: 200000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
+    { eq: 'COFEN MARILIA BRENDA',     meta: _metas_eq_maio['COFEN MARILIA BRENDA']     || 300000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: _metas_eq_maio['COFEN BIRIGUI BRUNA']      || 200000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _metas_eq_maio['COFEN STEPHANIE 2° TURNO'] || 200000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
   ];
 
   const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
