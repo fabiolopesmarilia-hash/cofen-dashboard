@@ -524,16 +524,21 @@ select.ev-inp{cursor:pointer}
         <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.7);letter-spacing:1.5px;text-transform:uppercase">💼 PaguePay — Coluna do Arquivo Empresa</div>
         <button onclick="importarEmpresa()" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.12);color:#FCD34D;font-family:Nunito,sans-serif;font-weight:700;font-size:10px;cursor:pointer">📥 Importar Empresa</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">📊 PaguePay Total Ano</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#FCD34D" id="h-arrecadado">—</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:3px">Jan → Hoje (col. Pague Play)</div>
-        </div>
-        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rm);padding:10px 12px;text-align:center">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">📅 PaguePay Maio</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#67E8F9" id="h-arrecadado-ho">—</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:3px">Só Maio 2026</div>
+      <div style="background:rgba(0,0,0,.25);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(245,158,11,.06);pointer-events:none"></div>
+        <!-- Label -->
+        <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">📅 PAGUEPAY · MAIO 2026</div>
+        <!-- Valor principal -->
+        <div id="h-arrecadado-ho" style="font-family:'Bebas Neue',sans-serif;font-size:40px;line-height:1;background:linear-gradient(90deg,#F59E0B,#FBBF24,#FCD34D);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:3px;text-align:center;width:100%">—</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:12px">Soma de Maio · col. Pague Play</div>
+        <!-- Metas -->
+        <div id="h-pp-metas-wrap"></div>
+        <!-- Divisor -->
+        <div style="border-top:1px solid rgba(255,255,255,.08);margin:10px 0 8px"></div>
+        <!-- Total ano -->
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;white-space:nowrap">📊 Ano (Jan→Hoje):</div>
+          <div id="h-arrecadado" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:rgba(255,255,255,.65)">—</div>
         </div>
       </div>
       <span id="h-arrecadado-falta" style="display:none"></span><span id="h-arrecadado-meta-s" style="display:none"></span>
@@ -715,18 +720,36 @@ select.ev-inp{cursor:pointer}
             📥 Importar Arquivo Empresa
           </button>
         </div>
-        <!-- Cards: PaguePay Ano + PaguePay Maio -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="res-arrecadado-cards">
-          <div class="res-card" style="background:#FFFBEB;border-color:#FCD34D;border:1.5px solid #FCD34D">
-            <div class="res-l">📊 PaguePay Total Ano (Jan → Hoje)</div>
-            <div class="res-v" style="color:#D97706;font-family:'Bebas Neue',sans-serif;font-size:26px" id="res-arrecadado-bruto">—</div>
-            <div class="res-s">Soma da coluna Pague Play — arquivo empresa</div>
+        <!-- Cards: PaguePay Maio DESTAQUE + metas + ano -->
+        <div id="res-arrecadado-cards">
+
+          <!-- CARD PRINCIPAL: PaguePay Maio em destaque -->
+          <div id="pp-maio-hero" style="background:linear-gradient(135deg,#1A1A2E 0%,#16213E 50%,#0F3460 100%);border-radius:16px;padding:24px 28px;margin-bottom:10px;box-shadow:0 8px 32px rgba(0,0,0,.35);position:relative;overflow:hidden">
+            <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(245,158,11,.08);pointer-events:none"></div>
+            <div style="position:absolute;bottom:-30px;left:-20px;width:120px;height:120px;border-radius:50%;background:rgba(0,168,107,.06);pointer-events:none"></div>
+
+            <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:6px">📅 PAGUEPAY · MAIO 2026</div>
+
+            <div id="res-arrecadado-ho" style="font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;letter-spacing:1px;background:linear-gradient(90deg,#F59E0B,#FBBF24,#FCD34D);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;text-align:center;width:100%">—</div>
+
+            <div style="font-size:11px;color:rgba(255,255,255,.35);font-weight:600;margin-bottom:18px">Soma de Maio na coluna Pague Play</div>
+
+            <div id="pp-metas-wrap"></div>
+
+            <div style="border-top:1px solid rgba(255,255,255,.1);margin:16px 0 12px"></div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+              <div>
+                <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px">📊 Total Ano (Jan → Hoje)</div>
+                <div id="res-arrecadado-bruto" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:rgba(255,255,255,.75);letter-spacing:.5px">—</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px">Arquivo Empresa</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">Pague Play (24,96%)</div>
+              </div>
+            </div>
           </div>
-          <div class="res-card" style="background:#FFF9EC;border-color:#FCD34D;border:1.5px solid #FCD34D">
-            <div class="res-l">📅 PaguePay Maio 2026</div>
-            <div class="res-v" style="color:#F59E0B;font-family:'Bebas Neue',sans-serif;font-size:26px" id="res-arrecadado-ho">—</div>
-            <div class="res-s">Soma de Maio na coluna Pague Play</div>
-          </div>
+
         </div>
         <!-- IDs ocultos preservados -->
         <input type="hidden" id="inp-arrecadado" value="0">
@@ -2560,6 +2583,100 @@ function liveCalcCorens(){
 }
 
 // Atualiza resultados do Total Arrecadado em tempo real no editor
+// ── RENDER PP METAS (cada R$50k = 1 meta) ──
+function _buildMetasHtml(val, compact){
+  const META_STEP = 50000;
+  const metas   = Math.floor(val / META_STEP);
+  const prog    = val % META_STEP;
+  const pct     = (prog / META_STEP * 100);
+  const proxima = (metas + 1) * META_STEP;
+  const falta   = proxima - val;
+  const barColor = metas >= 4 ? '#A855F7' : metas >= 2 ? '#00A86B' : '#F59E0B';
+  const badgeColors = ['#F59E0B','#F59E0B','#00A86B','#00A86B','#A855F7','#A855F7'];
+  const fs = compact ? '11px' : '14px';
+  const pad = compact ? '3px 8px' : '5px 12px';
+  let badgesHtml = '';
+  for(let i = 1; i <= Math.max(metas, 1); i++){
+    const bat = i <= metas;
+    const c = badgeColors[Math.min(i-1, badgeColors.length-1)];
+    badgesHtml += `<div style="display:flex;align-items:center;gap:4px;padding:${pad};
+      border-radius:100px;border:1.5px solid ${bat?c:'rgba(255,255,255,.15)'};
+      background:${bat?c+'22':'rgba(255,255,255,.04)'};opacity:${bat?1:0.4}">
+      <span style="font-size:${fs}">${bat?'🏆':'🔒'}</span>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:${bat?c:'rgba(255,255,255,.3)'};letter-spacing:.5px">
+        META ${i} · R$${(i*50).toFixed(0)}K</span>
+    </div>`;
+  }
+  if(val < proxima){
+    badgesHtml += `<div style="display:flex;align-items:center;gap:4px;padding:${pad};
+      border-radius:100px;border:1.5px dashed rgba(255,255,255,.2);background:rgba(255,255,255,.03)">
+      <span style="font-size:${fs}">🎯</span>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:rgba(255,255,255,.35);letter-spacing:.5px">
+        META ${metas+1} · R$${((metas+1)*50).toFixed(0)}K</span>
+    </div>`;
+  }
+  return `
+    <div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:5px">${badgesHtml}</div>
+    <div style="margin-bottom:4px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:${compact?'9px':'10px'};font-weight:800;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase">
+        Progresso Meta ${metas+1}</span>
+      <span style="font-size:${compact?'10px':'11px'};font-weight:800;color:${barColor}">
+        ${pct.toFixed(1)}% · faltam ${fR(falta)}</span>
+    </div>
+    <div style="height:${compact?'5px':'8px'};border-radius:100px;background:rgba(255,255,255,.08);overflow:hidden">
+      <div style="height:100%;width:${Math.min(pct,100)}%;border-radius:100px;
+        background:linear-gradient(90deg,${barColor},${barColor}cc);
+        transition:width .8s ease;box-shadow:0 0 8px ${barColor}66"></div>
+    </div>`;
+}
+function _buildTeamsHtml(compact){
+  const MAIN = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL'];
+  const rows = MAIN.map(name=>{
+    const eq  = D.equipes.find(e=>e.name===name);
+    const cfg = EQ[name]||{c:'#888',sh:name};
+    const rec = eq ? eq.rec : 0;
+    return {sh: cfg.sh, c: cfg.c, ico: cfg.ico||'', rec};
+  }).sort((a,b)=>b.rec-a.rec);
+  const total = rows.reduce((s,r)=>s+r.rec,0);
+  const fs  = compact ? '11px' : '13px';
+  const fs2 = compact ? '10px' : '12px';
+  const pad = compact ? '6px 10px' : '8px 12px';
+  const items = rows.map((r,i)=>{
+    const pct  = total>0 ? (r.rec/total*100) : 0;
+    const rank = ['🥇','🥈','🥉','4º'][i]||'—';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:${pad};
+      border-bottom:1px solid rgba(255,255,255,.06);transition:background .2s"
+      onmouseover="this.style.background='rgba(255,255,255,.04)'"
+      onmouseout="this.style.background='transparent'">
+      <span style="font-size:${fs};width:20px;text-align:center">${rank}</span>
+      <div style="width:8px;height:8px;border-radius:50%;background:${r.c};flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;font-size:${fs};color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.sh}</div>
+        <div style="height:3px;border-radius:100px;background:rgba(255,255,255,.08);margin-top:3px;overflow:hidden">
+          <div style="height:100%;width:${pct.toFixed(1)}%;background:${r.c};border-radius:100px;transition:width .8s ease"></div>
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:${compact?'14px':'16px'};color:${r.c}">${fRK(r.rec)}</div>
+        <div style="font-size:${compact?'9px':'10px'};color:rgba(255,255,255,.35);font-weight:600">${pct.toFixed(1)}%</div>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div style="border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden;margin-top:${compact?'8px':'12px'}">
+    <div style="padding:${compact?'5px 10px':'7px 12px'};background:rgba(255,255,255,.06);
+      font-size:${compact?'8px':'9px'};font-weight:800;color:rgba(255,255,255,.35);
+      letter-spacing:1.5px;text-transform:uppercase">📊 RECEBIMENTO POR EQUIPE</div>
+    ${items}
+  </div>`;
+}
+function renderPpMetas(){
+  const val = ppEmpresaAbril || 0;
+  const w1 = document.getElementById('pp-metas-wrap');
+  if(w1) w1.innerHTML = _buildMetasHtml(val, false) + _buildTeamsHtml(false);
+  const w2 = document.getElementById('h-pp-metas-wrap');
+  if(w2) w2.innerHTML = _buildMetasHtml(val, true) + _buildTeamsHtml(true);
+}
+
 function liveCalcArrecadado(){
   const v = parseFloat(document.getElementById('inp-arrecadado')?.value)||0;
   const m = parseFloat(document.getElementById('inp-meta-arrecadado')?.value)||0;
@@ -2578,6 +2695,7 @@ function liveCalcArrecadado(){
   s('res-arrecadado-need',     need>0 ? fR(need) : '—');
   s('res-arrecadado-du-lbl',   DU.passou+' D.U. passados');
   s('res-arrecadado-rest-lbl', DU.restam+' D.U. restam');
+  renderPpMetas();
 }
 
 // Salva Total Arrecadado + Meta 2
