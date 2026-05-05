@@ -5604,57 +5604,52 @@ function acImportPreview(raw){
 }
 
 function acImportApply(){
-  if(!acImportParsed.length){toast('⚠️ Nenhum dado para importar!');return;}
+  if(!acImportParsed.length){toast("⚠️ Nenhum dado para importar!");return;}
+
+  // ── 1. Montar objeto de acordos ──
+  const acordosLocal = {};
   acImportParsed.forEach(r=>{
-    const op=ALL.find(o=>o.name===r.opName);
-    if(!op) return;
-    op.gerados      = r.g;
-    op['pagos']     = r.p;
-    op['pendentes'] = r.g - r.p;
-    op['agendados'] = r.ag;
-    op['avista']    = r.avista  || 0;
-    op['ate3dias']  = r.ate3d   || 0;
-    op['mais3dias'] = r.mais3d  || 0;
-    op['ag_futuro'] = r.ag_futuro || {};
-        op['ag_futuro_val'] = r.ag_futuro_val || {};
-    op['eficiencia']= r.g>0 ? parseFloat((r.p/r.g*100).toFixed(1)) : 0;
-    if(r.p>0) op['ticket'] = parseFloat((op.rec/r.p).toFixed(2));
+    acordosLocal[r.opName]={
+      g:r.g, p:r.p, ef:r.g>0?parseFloat((r.p/r.g*100).toFixed(1)):0,
+      ag:r.ag||0, avista:r.avista||0, ate3d:r.ate3d||0, mais3d:r.mais3d||0,
+      ag_futuro:r.ag_futuro||{}, ag_futuro_val:r.ag_futuro_val||{}
+    };
   });
 
-  // Atualizar TODOS os componentes
+  // ── 2. Salvar no localStorage ANTES do rebuildAll ──
+  localStorage.setItem("cofen_acordos_override", JSON.stringify(acordosLocal));
+
+  // ── 3. Reconstruir ALL (já restaura acordos do localStorage via rebuildAll) ──
   rebuildAll();
+
+  // ── 4. Atualizar ticket médio nos ops que têm pagos ──
+  ALL.forEach(op=>{
+    if(op.pagos>0 && op.rec>0) op.ticket = parseFloat((op.rec/op.pagos).toFixed(2));
+  });
+
+  // ── 5. Renderizar todas as abas ──
   acordosInit();
   acRenderRanking();
-  if(typeof acRenderFechamento==='function') acRenderFechamento();
-  if(typeof acRenderEficiencia==='function') acRenderEficiencia();
+  if(typeof acRenderFechamento==="function") acRenderFechamento();
+  if(typeof acRenderEficiencia==="function") acRenderEficiencia();
   initHero();
   mkGD(); mkDist(); mkTop5(); mkEq(); mkRanking();
-  markImportDone('ac');
+  markImportDone("ac");
 
-  // ── SINCRONIZAR acordos via Firebase ──
+  // ── 6. Sincronizar via Firebase ──
   if(fbDb && fbRoom){
     const acordosData = {};
     ALL.forEach(op=>{
       if(op.gerados||op.pagos){
         acordosData[op.name]={g:op.gerados||0,p:op.pagos||0,ef:op.eficiencia||0,ag:op.agendados||0,
-          avista:op.avista||0,ate3d:op.ate3dias||0,mais3d:op.mais3dias||0,ag_futuro:op.ag_futuro||{},ag_futuro_val:op.ag_futuro_val||{}};
+          avista:op.avista||0,ate3d:op.ate3dias||0,mais3d:op.mais3dias||0,
+          ag_futuro:op.ag_futuro||{},ag_futuro_val:op.ag_futuro_val||{}};
       }
     });
-    fbPush('acordos', {...acordosData, _ts: Date.now()});
+    fbPush("acordos", {...acordosData, _ts: Date.now()});
   }
 
-  // ── PERSISTIR acordos no localStorage (backup offline) ──
-  const acordosLocal = {};
-  ALL.forEach(op=>{
-    if(op.gerados||op.pagos){
-      acordosLocal[op.name]={g:op.gerados||0,p:op.pagos||0,ef:op.eficiencia||0,ag:op.agendados||0,
-        avista:op.avista||0,ate3d:op.ate3dias||0,mais3d:op.mais3dias||0,
-        ag_futuro:op.ag_futuro||{},ag_futuro_val:op.ag_futuro_val||{}};
-    }
-  });
-  localStorage.setItem('cofen_acordos_override', JSON.stringify(acordosLocal));
-
-  toast('2705 Acordos atualizados para '+acImportParsed.length+' operadores e sincronizados!');
+  toast("✅ Acordos atualizados para "+acImportParsed.length+" operadores e sincronizados!");
 }
 
 
