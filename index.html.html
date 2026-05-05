@@ -7207,13 +7207,21 @@ function impFileOpen(e, areaId, previewFn){
   impReadFile(file, areaId, previewFn);
 }
 function impReadFile(file, areaId, previewFn){
+  const isXLS = /\.(xls|xlsx)$/i.test(file.name);
+  if(isXLS){
+    _lerXLS(file, function(csv){
+      const ta = document.getElementById(areaId);
+      if(ta){ ta.value = csv; window[previewFn](csv); toast("📁 "+file.name+" carregado!"); }
+    });
+    return;
+  }
   const reader = new FileReader();
   reader.onload = ev => {
     const text = ev.target.result;
     const ta = document.getElementById(areaId);
-    if(ta){ ta.value = text; window[previewFn](text); toast('📁 '+file.name+' carregado!'); }
+    if(ta){ ta.value = text; window[previewFn](text); toast("📁 "+file.name+" carregado!"); }
   };
-  reader.readAsText(file, 'UTF-8');
+  reader.readAsText(file, "UTF-8");
 }
 async function impPasteClipboard(areaId, previewFn){
   try {
