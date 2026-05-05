@@ -2120,6 +2120,21 @@ function rebuildAll(){
     eq.n_op=visibleOps.length;
     eq.acordos=visibleOps.reduce((s,o)=>s+(o.acordos||0),0);
   });
+  // Restaurar acordos do localStorage (persistência offline)
+  try {
+    const _ac = JSON.parse(localStorage.getItem("cofen_acordos_override")||"{}");
+    ALL.forEach(op=>{
+      const saved = _ac[op.name];
+      if(saved){
+        op.gerados=saved.g||0; op.pagos=saved.p||0; op.eficiencia=saved.ef||0;
+        op.agendados=saved.ag||0; op.avista=saved.avista||0;
+        op.ate3dias=saved.ate3d||0; op.mais3dias=saved.mais3d||0;
+        op.ag_futuro=saved.ag_futuro||{}; op.ag_futuro_val=saved.ag_futuro_val||{};
+        if(op.pagos>0) op.ticket=parseFloat((op.rec/op.pagos).toFixed(2));
+      }
+    });
+  } catch(e){}
+
 }
 rebuildAll();
 
@@ -5628,7 +5643,18 @@ function acImportApply(){
     fbPush('acordos', {...acordosData, _ts: Date.now()});
   }
 
-  toast('✅ Acordos atualizados para '+acImportParsed.length+' operadores e sincronizados!');
+  // ── PERSISTIR acordos no localStorage (backup offline) ──
+  const acordosLocal = {};
+  ALL.forEach(op=>{
+    if(op.gerados||op.pagos){
+      acordosLocal[op.name]={g:op.gerados||0,p:op.pagos||0,ef:op.eficiencia||0,ag:op.agendados||0,
+        avista:op.avista||0,ate3d:op.ate3dias||0,mais3d:op.mais3dias||0,
+        ag_futuro:op.ag_futuro||{},ag_futuro_val:op.ag_futuro_val||{}};
+    }
+  });
+  localStorage.setItem('cofen_acordos_override', JSON.stringify(acordosLocal));
+
+  toast('2705 Acordos atualizados para '+acImportParsed.length+' operadores e sincronizados!');
 }
 
 
