@@ -6742,23 +6742,81 @@ function tvShow(idx){
           }
         </div>
 
-        <!-- BADGE COMPARATIVO MÊS ANTERIOR -->
+        <!-- MODALIDADES DE PAGAMENTO — totais por tipo (Cartão / Boleto / PIX) -->
+        ${(()=>{
+          if(tiposAll.length === 0) return '';
+          // Agrupa por categoria
+          const grpMap = {'PIX':0,'CARTÃO':0,'BOLETO':0};
+          const grpCor = {'PIX':'#4ADE80','CARTÃO':'#67E8F9','BOLETO':'#FCD34D'};
+          const grpIco = {'PIX':'🟢','CARTÃO':'💳','BOLETO':'📄'};
+          tiposAll.forEach(([k,v])=>{
+            const kl = k.toUpperCase();
+            if(kl.includes('PIX')) grpMap['PIX'] += v;
+            else if(kl.includes('CART')) grpMap['CARTÃO'] += v;
+            else if(kl.includes('BOLETO')) grpMap['BOLETO'] += v;
+            else grpMap['BOLETO'] += v; // fallback
+          });
+          const entries = Object.entries(grpMap).filter(([,v])=>v>0);
+          if(entries.length === 0) return '';
+          const total = entries.reduce((s,[,v])=>s+v,0);
+          return `<div style="display:grid;grid-template-columns:repeat(${entries.length},1fr);gap:8px;margin-bottom:2px">
+            ${entries.map(([nm,v])=>{
+              const cor = grpCor[nm];
+              const ico = grpIco[nm];
+              const pct = total>0?(v/total*100).toFixed(0):0;
+              return `<div style="background:${cor}12;border:1px solid ${cor}35;border-radius:12px;padding:11px 14px;position:relative;overflow:hidden">
+                <div style="position:absolute;top:-10px;right:-6px;font-size:38px;opacity:.08">${ico}</div>
+                <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">${ico} ${nm}</div>
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${cor};line-height:1;letter-spacing:.5px">${fR(v)}</div>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:5px">
+                  <div style="flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden">
+                    <div style="height:100%;width:${pct}%;background:${cor};border-radius:100px"></div>
+                  </div>
+                  <span style="font-size:9px;color:${cor};font-weight:800">${pct}%</span>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>`;
+        })()}
+
+        <!-- BADGE COMPARATIVO MÊS ANTERIOR — DU a DU -->
         ${(()=>{
           const opCmp = CMP_OPS_DEDUP.find(c=>c.nome===op.name);
           if(!opCmp) return '';
-          const diff = opCmp.abril - opCmp.marco;
-          const pct = opCmp.marco > 0 ? ((diff/opCmp.marco)*100).toFixed(0) : 0;
-          const col = diff >= 0 ? '#4ADE80' : '#FCA5A5';
-          const bg = diff >= 0 ? 'rgba(74,222,128,.12)' : 'rgba(252,165,165,.12)';
-          const bd = diff >= 0 ? 'rgba(74,222,128,.35)' : 'rgba(252,165,165,.35)';
+
+          // DU atual de Maio (quantos DUs já passaram)
+          const duAtual = DU.passou || 0;
+
+          // Valor do operador em Abril no mesmo DU proporcional
+          // CMP_ABRIL_DU contém o acumulado GERAL de Abril por DU
+          // Calculamos a fatia do operador proporcionalmente ao total de Abril
+          const abrilDuTotal = CMP_ABRIL_DU[duAtual] || 0;           // acumulado geral de Abril até este DU
+          const abrilDuMax   = CMP_ABRIL_DU[21] || CMP_ABRIL_DU[Object.keys(CMP_ABRIL_DU).map(Number).sort((a,b)=>b-a)[0]] || 1; // total de Abril (último DU)
+          // Proporção do operador no total de Abril
+          const propOp = abrilDuMax > 0 ? opCmp.marco / abrilDuMax : 0;
+          // Estimativa do valor deste operador em Abril até o DU atual
+          const abrilOpDu = abrilDuTotal * propOp;
+
+          // Valor atual de Maio deste operador (op.rec)
+          const maioOp = op.rec || 0;
+
+          if(duAtual === 0 && maioOp === 0) return '';
+
+          const diff = maioOp - abrilOpDu;
+          const pct  = abrilOpDu > 0 ? ((diff / abrilOpDu) * 100).toFixed(0) : 0;
+          const col  = diff >= 0 ? '#4ADE80' : '#FCA5A5';
+          const bg   = diff >= 0 ? 'rgba(74,222,128,.12)' : 'rgba(252,165,165,.12)';
+          const bd   = diff >= 0 ? 'rgba(74,222,128,.35)' : 'rgba(252,165,165,.35)';
           const icon = diff >= 0 ? '▲' : '▼';
+          const diaCalendario = duAtual > 0 ? (CMP_MAIO_DU_DIAS[duAtual-1] || '?') : '?';
+
           return `<div style="background:${bg};border:1px solid ${bd};border-radius:10px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase">📊 vs Março (até dia 14)</div>
+            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase">📊 vs Abril (até ${duAtual}° DU — dia ${diaCalendario})</div>
             <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:11px;color:rgba(255,255,255,.4)">Março: <b style="color:rgba(255,255,255,.7)">${fR(opCmp.marco)}</b></span>
-              <span style="font-size:11px;color:rgba(255,255,255,.4)">Abril: <b style="color:#4ADE80">${fR(opCmp.abril)}</b></span>
+              <span style="font-size:11px;color:rgba(255,255,255,.4)">Abril/${duAtual}DU: <b style="color:rgba(255,255,255,.7)">${fR(abrilOpDu)}</b></span>
+              <span style="font-size:11px;color:rgba(255,255,255,.4)">Maio: <b style="color:#4ADE80">${fR(maioOp)}</b></span>
               <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:${col};letter-spacing:.5px">${icon} ${Math.abs(pct)}%</span>
-              <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${col}">${fR(Math.abs(diff))}</span>
+              <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${col}">${diff >= 0 ? '+' : '-'}${fR(Math.abs(diff))}</span>
             </div>
           </div>`;
         })()}
@@ -6849,19 +6907,22 @@ function tvShow(idx){
           <!-- Formas de pagamento -->
           <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
               border-radius:12px;padding:11px 13px">
-            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💳 Formas de Pgto</div>
+            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💳 Formas de Pgto por Operador</div>
             ${tiposAll.length>0
               ? tiposAll.map(([k,v])=>{
                   const pct=tiposTotal>0?Math.round(v/tiposTotal*100):0;
                   const cor=tCores[k]||'rgba(255,255,255,.6)';
                   const nm=k.replace('NEGOCIAÇÃO','').replace('Padrão','').replace('DE CRÉDITO','').trim();
-                  return `<div style="margin-bottom:6px">
-                    <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+                  return `<div style="margin-bottom:7px">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
                       <span style="font-size:10px;color:rgba(255,255,255,.6)">${nm}</span>
-                      <span style="font-size:10px;color:${cor};font-weight:800">${pct}% · ${fRK(v)}</span>
+                      <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:${cor};letter-spacing:.3px">${fR(v)}</span>
                     </div>
-                    <div style="height:4px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden">
-                      <div style="height:100%;width:${pct}%;background:${cor};border-radius:100px"></div>
+                    <div style="display:flex;align-items:center;gap:5px">
+                      <div style="flex:1;height:4px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden">
+                        <div style="height:100%;width:${pct}%;background:${cor};border-radius:100px"></div>
+                      </div>
+                      <span style="font-size:9px;color:${cor};font-weight:800;min-width:28px;text-align:right">${pct}%</span>
                     </div>
                   </div>`;
                 }).join('')
