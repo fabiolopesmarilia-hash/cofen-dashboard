@@ -4232,7 +4232,16 @@ function refreshAll(){
   // ── Atualiza Metas Abril em tempo real ──
   if(typeof mtsAtualizarAbril==='function') mtsAtualizarAbril();
   // ── Atualiza dados do Comparativo Abril vs Maio ──
-  if(typeof cmpAtualizarCumul==='function') cmpAtualizarCumul();
+  if(typeof cmpAtualizarCumul==='function'){
+    cmpAtualizarCumul();
+    // Se a aba comparativo estiver ativa, re-renderiza gráfico e tabela
+    if(document.getElementById('pg-comparativo')?.classList.contains('on')){
+      if(typeof cmpRenderGeral==='function') cmpRenderGeral();
+      if(typeof cmpBuildTableGeral==='function') cmpBuildTableGeral();
+      if(typeof cmpBuildTableEquipes==='function') cmpBuildTableEquipes();
+      if(typeof cmpInit==='function') cmpInit();
+    }
+  }
 }
 
 // ── TOAST ──
@@ -4258,6 +4267,7 @@ function loadSavedOverrides(){
     // Novo arquivo: limpar overrides do mes anterior
     localStorage.removeItem('cofen_op_overrides');
     localStorage.removeItem('cofen_total');
+    localStorage.removeItem('cofen_daily_hist');
     localStorage.setItem('cofen_file_version', FILE_VERSION);
     // Gravar valores do ORIG como overrides iniciais de Maio
     const initOv = {};
@@ -4290,6 +4300,19 @@ function loadSavedOverrides(){
     });
     rebuildAll();
   }
+  // Restaurar daily breakdown salvo localmente
+  try{
+    const savedDaily = JSON.parse(localStorage.getItem('cofen_daily_hist')||'{}');
+    if(Object.keys(savedDaily).length > 0){
+      D.equipes.forEach(eq=>{
+        eq.ops.forEach(op=>{
+          if(savedDaily[op.name]) op.daily = savedDaily[op.name];
+        });
+      });
+      rebuildAll();
+      if(typeof cmpAtualizarCumul==='function') cmpAtualizarCumul();
+    }
+  }catch(e){}
 }
 
 // ══════════════════════════════════════════
@@ -5645,6 +5668,12 @@ function importApply(){
       if(r.daily && Object.keys(r.daily).length > 0) dailyData[r.opName] = r.daily;
     });
     if(Object.keys(dailyData).length > 0) fbPush('rd_hist', dailyData);
+    // Persistir daily no localStorage para restaurar ao reabrir
+    try{
+      const savedDaily = JSON.parse(localStorage.getItem('cofen_daily_hist')||'{}');
+      Object.assign(savedDaily, dailyData);
+      localStorage.setItem('cofen_daily_hist', JSON.stringify(savedDaily));
+    }catch(e){}
 
     toast('✅ Importado e sincronizado para todos os dispositivos!');
   }
@@ -6979,6 +7008,12 @@ function fbStartListening(){
         const cmpOp = CMP_OPS_DEDUP.find(c=>c.nome===op.name);
         if(cmpOp && op.rec > 0) cmpOp.abril = op.rec;
       });
+      // Atualizar acumulado do comparativo com os novos daily
+      if(typeof cmpAtualizarCumul==='function') cmpAtualizarCumul();
+      if(document.getElementById('pg-comparativo')?.classList.contains('on')){
+        if(typeof cmpRenderGeral==='function') cmpRenderGeral();
+        if(typeof cmpBuildTableGeral==='function') cmpBuildTableGeral();
+      }
       pulseSyncDot();
     }
   });
@@ -8350,18 +8385,39 @@ function cmpAtualizarCumul(){
   const daily = D.global.daily||{};
   // Dias do calendário de Maio que têm dado, ordenados
   const diasComDado = Object.keys(daily).map(Number).sort((a,b)=>a-b);
-  // Mapeia: para cada dia do calendário de Maio, qual DU é?
-  // CMP_MAIO_DU_DIAS[0] = dia do calendário do DU1, [1] = DU2...
-  let acum = 0;
-  CMP_MAIO_DU_DIAS.forEach((diaCalendario, idx)=>{
-    const du = idx + 1;
-    // Soma todos os dias do calendário até este DU (inclusive fins de semana entre DUs)
-    const prevDia = idx > 0 ? CMP_MAIO_DU_DIAS[idx-1] : 0;
-    for(let d = prevDia+1; d <= diaCalendario; d++){
-      if(daily[d]) acum += daily[d];
+
+  if(diasComDado.length > 0){
+    // Modo normal: temos breakdown diário — acumula por DU
+    let acum = 0;
+    CMP_MAIO_DU_DIAS.forEach((diaCalendario, idx)=>{
+      const du = idx + 1;
+      const prevDia = idx > 0 ? CMP_MAIO_DU_DIAS[idx-1] : 0;
+      for(let d = prevDia+1; d <= diaCalendario; d++){
+        if(daily[d]) acum += daily[d];
+      }
+      if(diasComDado.some(d=>d<=diaCalendario)) CMP_MAIO_CUMUL[du] = acum;
+    });
+  } else {
+    // Fallback: sem breakdown diário — usa o total rec atual e o dia de hoje
+    // para posicionar no DU correto do mês
+    const totalMaioRec = D.equipes.reduce((s,e)=>s+e.rec, 0);
+    if(totalMaioRec > 0){
+      const hoje = new Date().getDate(); // dia do calendário atual
+      // Encontra o DU mais próximo até hoje
+      let duHoje = 0;
+      CMP_MAIO_DU_DIAS.forEach((dia, idx)=>{
+        if(dia <= hoje) duHoje = idx + 1;
+      });
+      if(duHoje > 0){
+        // Popula os DUs de 1 até duHoje com acumulado crescente proporcional
+        // (distribui linearmente — melhor que nada)
+        for(let du=1; du<=duHoje; du++){
+          CMP_MAIO_CUMUL[du] = Math.round(totalMaioRec * (du/duHoje) * 100)/100;
+        }
+      }
     }
-    if(diasComDado.some(d=>d<=diaCalendario)) CMP_MAIO_CUMUL[du] = acum;
-  });
+  }
+
   // Atualiza totais de equipes em CMP_TEAMS
   CMP_TEAMS.forEach(t=>{
     const eq = D.equipes.find(e=>e.name===t.nome);
