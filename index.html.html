@@ -5279,7 +5279,7 @@ function removeNovo(idx){
   ov.novos.splice(idx,1);
   gSetOverrides(ov);
   fbPush('gestao', ov);
-  fbPush('rd', rdGetSaved());
+  {const _today=new Date();const _dk=_today.getFullYear()+'_'+(_today.getMonth()+1)+'_'+_today.getDate(); fbPush('rd', {...rdGetSaved(), _date:_dk});}
   rebuildAll(); refreshAll(); renderNovoAdicionados();
   toast('↩ Operador removido!');
 }
@@ -7157,12 +7157,29 @@ function fbStartListening(){
   fbDb.ref(fbRoom+'/rd').on('value', snap=>{
     const remote = snap.val();
     if(!remote) return;
-    // Merge with local — remote wins per key
+    // ── Verificar se os dados são do dia de hoje ──
+    const today = new Date();
+    const dateKey = today.getFullYear()+'_'+(today.getMonth()+1)+'_'+today.getDate();
+    if(remote._date && remote._date !== dateKey){
+      // Dados de outro dia — ignorar, não sobrescrever o localStorage de hoje
+      console.log('[RD] Firebase tem dados de '+remote._date+' — ignorando (hoje é '+dateKey+')');
+      return;
+    }
+    // Limpar campo de controle antes de mesclar
+    const remoteClean = {...remote};
+    delete remoteClean._date;
+    // Merge com local — remoto complementa local (não sobrescreve)
     const local = rdGetSaved();
-    const merged = {...local, ...remote};
-    // Only update if different from what we have
+    const merged = {};
+    // Pega todas as chaves de ambos, prefere o maior valor para cada operador
+    const allKeys = new Set([...Object.keys(local), ...Object.keys(remoteClean)]);
+    allKeys.forEach(k=>{
+      const vLocal  = parseFloat(local[k]||0);
+      const vRemote = parseFloat(remoteClean[k]||0);
+      merged[k] = Math.max(vLocal, vRemote);
+    });
     const localStr = JSON.stringify(local);
-    if(JSON.stringify(remote)!==localStr){
+    if(JSON.stringify(merged) !== localStr){
       localStorage.setItem(rdTodayKey(), JSON.stringify(merged));
       if(document.getElementById('pg-recdia')?.classList.contains('on')) rdRender();
       pulseSyncDot();
@@ -7387,7 +7404,10 @@ const _rdSetSaved_fb = rdSetSaved;
 function rdSetSaved(map){
   localStorage.setItem(rdTodayKey(), JSON.stringify(map));
   syncBroadcast('rd_update', JSON.stringify(map));
-  fbPush('rd', map);
+  // Salva no Firebase com data do dia para não colidir com dias anteriores
+  const today = new Date();
+  const dateKey = today.getFullYear()+'_'+(today.getMonth()+1)+'_'+today.getDate();
+  fbPush('rd', {...map, _date: dateKey});
 }
 
 // applyOps — lê editor, atualiza D.equipes e sincroniza Firebase
@@ -7500,7 +7520,7 @@ function fbPushAllLocal(){
   const photos=photoGetAll();
   if(Object.keys(photos).length>0) fbPush('photos',photos);
   const rd=rdGetSaved();
-  if(Object.keys(rd).length>0) fbPush('rd',rd);
+  if(Object.keys(rd).length>0){const _today=new Date();const _dk=_today.getFullYear()+'_'+(_today.getMonth()+1)+'_'+_today.getDate(); fbPush('rd',{...rd,_date:_dk});}
   const gestao=gGetOverrides();
   if(Object.keys(gestao).length>0) fbPush('gestao',gestao);
 }
@@ -7963,7 +7983,7 @@ function removerOpApply(){
   // Sincronizar Firebase
   fbPush('gestao', gOv);
   fbPush('overrides', {...ov, _ts: Date.now()});
-  fbPush('rd', rdGetSaved());
+  {const _today=new Date();const _dk=_today.getFullYear()+'_'+(_today.getMonth()+1)+'_'+_today.getDate(); fbPush('rd', {...rdGetSaved(), _date:_dk});}
   if(fbDb && fbRoom){
     const allPhotos = JSON.parse(localStorage.getItem('cofen_photos')||'{}');
     fbPush('photos', allPhotos);
