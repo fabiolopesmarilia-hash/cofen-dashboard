@@ -1901,7 +1901,7 @@ select.ev-inp{cursor:pointer}
         <div class="ag-box" id="m-ag"></div>
         <div class="mc"><div class="mc-t">Eficiência</div><div id="m-efic"></div></div>
       </div>
-      <div class="mc"><div class="mc-t">Total Real por Dia</div><div class="dbars" id="m-daily"></div></div>
+      <div class="mc"><div class="mc-t" id="m-daily-title">Recebimento por Dia</div><div class="dbars" id="m-daily"></div></div>
       <div class="mc"><div class="mc-t">📈 Evolução Semanal</div><div style="height:140px;position:relative"><canvas id="m-weekly-chart"></canvas></div></div>
       <div class="mc"><div class="mc-t">Forma de Pagamento (Total Real)</div><div class="tlist" id="m-tipos"></div></div>
     </div>
@@ -4139,8 +4139,17 @@ function openM(opName){
     </div>`:''}
     `;
 
-  const days=Array.from({length:22},(_,i)=>i+1);
-  const maxD=Math.max(...Object.values(op.daily),1);
+  // Usa todos os dias do mês que têm dado, ou pelo menos até o dia de hoje
+  // Atualiza título do gráfico com mês/ano atual
+  const _nowModal = new Date();
+  const _mTitle = document.getElementById('m-daily-title');
+  if(_mTitle) _mTitle.textContent = `Recebimento por Dia — ${String(_nowModal.getMonth()+1).padStart(2,'0')}/${_nowModal.getFullYear()}`;
+
+  const _todayDay = _nowModal.getDate();
+  const _maxDayWithData = Math.max(...Object.keys(op.daily).map(Number), 0);
+  const _lastDay = Math.max(_maxDayWithData, _todayDay, 1);
+  const days=Array.from({length:_lastDay},(_,i)=>i+1);
+  const maxD=Math.max(...Object.values(op.daily).concat([1]));
   const totalDailyRec = Object.values(op.daily).reduce((s,v)=>s+v,0);
   const daysWithData = Object.keys(op.daily).length;
   document.getElementById('m-daily').innerHTML=
@@ -4268,6 +4277,7 @@ function loadSavedOverrides(){
     localStorage.removeItem('cofen_op_overrides');
     localStorage.removeItem('cofen_total');
     localStorage.removeItem('cofen_daily_hist');
+    localStorage.removeItem('cofen_op_hist');
     localStorage.setItem('cofen_file_version', FILE_VERSION);
     // Gravar valores do ORIG como overrides iniciais de Maio
     const initOv = {};
@@ -4300,13 +4310,22 @@ function loadSavedOverrides(){
     });
     rebuildAll();
   }
-  // Restaurar daily breakdown salvo localmente
+  // Restaurar daily e tipos salvos localmente
   try{
-    const savedDaily = JSON.parse(localStorage.getItem('cofen_daily_hist')||'{}');
-    if(Object.keys(savedDaily).length > 0){
+    // Novo formato: cofen_op_hist (daily + tipos por operador)
+    const savedOpHist = JSON.parse(localStorage.getItem('cofen_op_hist')||'{}');
+    // Retrocompatibilidade: cofen_daily_hist (só daily)
+    const savedDaily  = JSON.parse(localStorage.getItem('cofen_daily_hist')||'{}');
+    const hasHist = Object.keys(savedOpHist).length > 0 || Object.keys(savedDaily).length > 0;
+    if(hasHist){
       D.equipes.forEach(eq=>{
         eq.ops.forEach(op=>{
-          if(savedDaily[op.name]) op.daily = savedDaily[op.name];
+          if(savedOpHist[op.name]){
+            if(savedOpHist[op.name].daily) op.daily = savedOpHist[op.name].daily;
+            if(savedOpHist[op.name].tipos) op.tipos = savedOpHist[op.name].tipos;
+          } else if(savedDaily[op.name]){
+            op.daily = savedDaily[op.name];
+          }
         });
       });
       rebuildAll();
@@ -5353,10 +5372,11 @@ function importParse(raw){
     return -1;
   };
 
-  const iCob = colIdx(['cobradora','operador','cobrador','nome']);
-  const iRec = colIdx(['recebido','rec ','valor rec','total rec','vlr rec']);
-  const iHO  = colIdx(['total ho','ho','honorar']);
-  const iDate= colIdx(['data baixa','dt.baixa','dt baixa','data pgto','data pag','data','dt','date']);
+  const iCob  = colIdx(['cobradora','operador','cobrador','nome']);
+  const iRec  = colIdx(['recebido','rec ','valor rec','total rec','vlr rec']);
+  const iHO   = colIdx(['total ho','ho','honorar']);
+  const iDate = colIdx(['data baixa','dt.baixa','dt baixa','data pgto','data pag','data','dt','date']);
+  const iTipo = colIdx(['forma pgto','forma pag','tipo pgto','tipo pag','forma de pag','tipo de pag','tipo','forma','pagamento']);
 
   if(iCob < 0 || iRec < 0){
     return {error: `Colunas não encontradas. Encontrado: ${headers.join(', ')}. Necessário: "Cobradora" e "Recebido".`};
@@ -5390,7 +5410,7 @@ function importParse(raw){
     const rawName = row[iCob].trim();
     if(!rawName) continue;
     const recVal = parseFloat(row[iRec].replace(/\./g,'').replace(',','.')) || 0;
-    if(!acc[rawName]) acc[rawName] = {total:0, daily:{}};
+    if(!acc[rawName]) acc[rawName] = {total:0, daily:{}, tipos:{}};
     acc[rawName].total += recVal;
     // Parse date para daily breakdown
     if(iDate >= 0 && recVal > 0){
@@ -5398,6 +5418,11 @@ function importParse(raw){
       if(day && day >= 1 && day <= 31){
         acc[rawName].daily[day] = (acc[rawName].daily[day]||0) + recVal;
       }
+    }
+    // Parse tipo de pagamento
+    if(iTipo >= 0 && recVal > 0 && row[iTipo]){
+      const tipo = row[iTipo].trim().toUpperCase() || 'OUTROS';
+      acc[rawName].tipos[tipo] = (acc[rawName].tipos[tipo]||0) + recVal;
     }
   }
 
@@ -5452,6 +5477,7 @@ function importParse(raw){
         recCurrent:matched.rec, hoCurrent:matched.ho,
         diff:totalReal-matched.rec,
         daily: daily,
+        tipos: accData.tipos || {},
       });
     } else {
       missing.push({rawName, ho:totalReal * 0.25, totalReal});
@@ -5618,6 +5644,10 @@ function importApply(){
       if(r.daily && Object.keys(r.daily).length > 0){
         opReal.daily = r.daily;
       }
+      // Aplicar tipos de pagamento se existir
+      if(r.tipos && Object.keys(r.tipos).length > 0){
+        opReal.tipos = r.tipos;
+      }
       updated++;
     });
   });
@@ -5662,14 +5692,28 @@ function importApply(){
     const ovFinal = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
     fbPush('overrides', {...ovFinal, _ts: Date.now()});
 
-    // Sincronizar daily breakdown via rd_hist
+    // Sincronizar daily e tipos via rd_hist
     const dailyData = {};
     importParsed.found.forEach(r=>{
       if(r.daily && Object.keys(r.daily).length > 0) dailyData[r.opName] = r.daily;
     });
     if(Object.keys(dailyData).length > 0) fbPush('rd_hist', dailyData);
-    // Persistir daily no localStorage para restaurar ao reabrir
+    // Sincronizar tipos de pagamento via op_tipos
+    const tiposData = {};
+    importParsed.found.forEach(r=>{
+      if(r.tipos && Object.keys(r.tipos).length > 0) tiposData[r.opName] = r.tipos;
+    });
+    if(Object.keys(tiposData).length > 0) fbPush('op_tipos', tiposData);
+    // Persistir daily e tipos no localStorage para restaurar ao reabrir
     try{
+      const savedOpHist = JSON.parse(localStorage.getItem('cofen_op_hist')||'{}');
+      importParsed.found.forEach(r=>{
+        if(!savedOpHist[r.opName]) savedOpHist[r.opName] = {};
+        if(r.daily && Object.keys(r.daily).length > 0) savedOpHist[r.opName].daily = r.daily;
+        if(r.tipos && Object.keys(r.tipos).length > 0) savedOpHist[r.opName].tipos = r.tipos;
+      });
+      localStorage.setItem('cofen_op_hist', JSON.stringify(savedOpHist));
+      // compatibilidade: manter cofen_daily_hist também
       const savedDaily = JSON.parse(localStorage.getItem('cofen_daily_hist')||'{}');
       Object.assign(savedDaily, dailyData);
       localStorage.setItem('cofen_daily_hist', JSON.stringify(savedDaily));
@@ -6577,8 +6621,10 @@ function tvShow(idx){
   const dailyEntries = Object.entries(op.daily||{})
     .map(([d,v])=>[parseInt(d),parseFloat(v)]).filter(([,v])=>v>0).sort((a,b)=>a[0]-b[0]);
   const maxDiaNum = dailyEntries.length?Math.max(...dailyEntries.map(([d])=>d)):1;
-  const mesRef    = maxDiaNum>22?2:3;
-  const anoRef    = 2026;
+  // Usa o mês/ano atual do dashboard (Maio 2026 = índice 4)
+  const _now   = new Date();
+  const mesRef = _now.getMonth(); // 0=Jan...4=Maio
+  const anoRef = _now.getFullYear();
   const maxV      = dailyEntries.length?Math.max(...dailyEntries.map(([,v])=>v)):1;
   const melhorDia = dailyEntries.length?dailyEntries.reduce((b,c)=>c[1]>b[1]?c:b,dailyEntries[0]):null;
   const totalRec  = dailyEntries.reduce((s,[,v])=>s+v,0);
@@ -6956,6 +7002,7 @@ function fbSyncModalClose_auto(){
 function syncDisconnect(){
   if(fbListeners.rd)        { fbDb?.ref(fbRoom+'/rd').off(); }
   if(fbListeners.rd_hist)   { fbDb?.ref(fbRoom+'/rd_hist').off(); }
+  if(fbListeners.op_tipos)  { fbDb?.ref(fbRoom+'/op_tipos').off(); }
   if(fbListeners.overrides) { fbDb?.ref(fbRoom+'/overrides').off(); }
   if(fbListeners.photos)    { fbDb?.ref(fbRoom+'/photos').off(); }
   if(fbListeners.meta)      { fbDb?.ref(fbRoom+'/meta').off(); }
@@ -7018,6 +7065,32 @@ function fbStartListening(){
     }
   });
   fbListeners.rd_hist = true;
+
+  // ── Tipos de pagamento por operador (op_tipos) ──
+  if(fbListeners.op_tipos) { fbDb?.ref(fbRoom+'/op_tipos').off(); }
+  fbDb.ref(fbRoom+'/op_tipos').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    let changed = false;
+    Object.entries(remote).forEach(([nm, tipos])=>{
+      if(!tipos || typeof tipos !== 'object') return;
+      D.equipes.forEach(eq=>{
+        const opReal = eq.ops.find(o=>o.name===nm);
+        if(opReal){ opReal.tipos = tipos; changed = true; }
+      });
+    });
+    // Persistir tipos no localStorage
+    try{
+      const savedOpHist = JSON.parse(localStorage.getItem('cofen_op_hist')||'{}');
+      Object.entries(remote).forEach(([nm, tipos])=>{
+        if(!savedOpHist[nm]) savedOpHist[nm] = {};
+        savedOpHist[nm].tipos = tipos;
+      });
+      localStorage.setItem('cofen_op_hist', JSON.stringify(savedOpHist));
+    }catch(e){}
+    if(changed) pulseSyncDot();
+  });
+  fbListeners.op_tipos = true;
 
   // ── Recebimento do dia (rd) ──
   fbDb.ref(fbRoom+'/rd').on('value', snap=>{
