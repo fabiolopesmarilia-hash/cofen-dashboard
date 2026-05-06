@@ -1676,14 +1676,14 @@ select.ev-inp{cursor:pointer}
         <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">30 dias completos</div>
       </div>
       <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Maio (até dia 3)</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#4ADE80;letter-spacing:.5px;line-height:1">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">início do mês</div>
+        <div id="cmp-hero-maio-label" style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Maio (parcial)</div>
+        <div id="cmp-hero-maio-val" style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#4ADE80;letter-spacing:.5px;line-height:1">—</div>
+        <div id="cmp-hero-maio-sub" style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">aguardando importação</div>
       </div>
       <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
         <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Diferença acumulada</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#FCD34D;letter-spacing:.5px;line-height:1">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700">Maio em construção</div>
+        <div id="cmp-hero-diff-val" style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#FCD34D;letter-spacing:.5px;line-height:1">—</div>
+        <div id="cmp-hero-diff-sub" style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700">Maio em construção</div>
       </div>
       <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
         <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Total Abril (mês cheio)</div>
@@ -2150,6 +2150,7 @@ function rebuildAll(){
       const saved = _ac[op.name];
       if(saved){
         op.gerados=saved.g||0; op.pagos=saved.p||0; op.eficiencia=saved.ef||0;
+        op.acordos=saved.p||0; // acordos = pagos (links pagos)
         op.agendados=saved.ag||0; op.avista=saved.avista||0;
         op.ate3dias=saved.ate3d||0; op.mais3dias=saved.mais3d||0;
         op.ag_futuro=saved.ag_futuro||{}; op.ag_futuro_val=saved.ag_futuro_val||{};
@@ -2157,6 +2158,20 @@ function rebuildAll(){
       }
     });
   } catch(e){}
+
+  // ── Reconstrói D.global.daily a partir dos daily de todos os operadores visíveis ──
+  const _newDaily = {};
+  D.equipes.forEach(eq=>{
+    eq.ops.forEach(op=>{
+      if(_allRemoved.has(op.name)) return;
+      Object.entries(op.daily||{}).forEach(([d,v])=>{
+        _newDaily[d] = (_newDaily[d]||0) + v;
+      });
+    });
+  });
+  // Substitui conteúdo de D.global.daily sem trocar a referência do objeto
+  Object.keys(D.global.daily).forEach(k=>delete D.global.daily[k]);
+  Object.assign(D.global.daily, _newDaily);
 
 }
 rebuildAll();
@@ -4248,6 +4263,15 @@ function loadSavedOverrides(){
     const initOv = {};
     D.equipes.forEach(eq=>{ eq.ops.forEach(op=>{ if(op.rec>0) initOv[op.name]=op.rec; }); });
     localStorage.setItem('cofen_op_overrides', JSON.stringify(initOv));
+    // Redefinir metas de equipe para os valores corretos de Maio 2026
+    const metasCorretas = {
+      'COFEN MARILIA BRENDA':     300000,
+      'COFEN BIRIGUI BRUNA':      200000,
+      'COFEN STEPHANIE 2° TURNO': 200000,
+    };
+    const metasAtuais = {};
+    try{ Object.assign(metasAtuais, JSON.parse(localStorage.getItem('cofen_metas_eq')||'{}')); }catch(e){}
+    localStorage.setItem('cofen_metas_eq', JSON.stringify({...metasAtuais, ...metasCorretas}));
     rebuildAll();
     return;
   }
@@ -5309,6 +5333,7 @@ function importParse(raw){
   const iCob = colIdx(['cobradora','operador','cobrador','nome']);
   const iRec = colIdx(['recebido','rec ','valor rec','total rec','vlr rec']);
   const iHO  = colIdx(['total ho','ho','honorar']);
+  const iDate= colIdx(['data baixa','dt.baixa','dt baixa','data pgto','data pag','data','dt','date']);
 
   if(iCob < 0 || iRec < 0){
     return {error: `Colunas não encontradas. Encontrado: ${headers.join(', ')}. Necessário: "Cobradora" e "Recebido".`};
@@ -5321,6 +5346,19 @@ function importParse(raw){
       .replace(/[\s_.-]+/g,'');
   }
 
+  // Extrai dia do mês de uma string de data (DD/MM/YYYY ou YYYY-MM-DD)
+  function extractDay(str){
+    if(!str) return null;
+    str = str.trim();
+    // formato YYYY-MM-DD
+    let m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(m) return parseInt(m[3]);
+    // formato DD/MM/YYYY ou DD-MM-YYYY
+    m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+    if(m) return parseInt(m[1]);
+    return null;
+  }
+
   // Acumula por operador (nome raw do arquivo)
   const acc = {};
   for(let i=1; i<lines.length; i++){
@@ -5329,8 +5367,15 @@ function importParse(raw){
     const rawName = row[iCob].trim();
     if(!rawName) continue;
     const recVal = parseFloat(row[iRec].replace(/\./g,'').replace(',','.')) || 0;
-    if(!acc[rawName]) acc[rawName] = 0;
-    acc[rawName] += recVal; // Recebido = Total Real (valor direto)
+    if(!acc[rawName]) acc[rawName] = {total:0, daily:{}};
+    acc[rawName].total += recVal;
+    // Parse date para daily breakdown
+    if(iDate >= 0 && recVal > 0){
+      const day = extractDay(row[iDate]);
+      if(day && day >= 1 && day <= 31){
+        acc[rawName].daily[day] = (acc[rawName].daily[day]||0) + recVal;
+      }
+    }
   }
 
   // Build lookup: norm(name) -> op object (from D.equipes directly)
@@ -5344,8 +5389,9 @@ function importParse(raw){
   // Match each raw name to an operator
   const found = [], missing = [];
 
-  Object.entries(acc).forEach(([rawName, recSum])=>{
-    const totalReal = recSum; // valor real direto (sem multiplicação)
+  Object.entries(acc).forEach(([rawName, accData])=>{
+    const totalReal = accData.total; // valor real direto (sem multiplicação)
+    const daily     = accData.daily || {};
     const normRaw = norm(rawName);
 
     // 1. Exact normalized match
@@ -5382,6 +5428,7 @@ function importParse(raw){
         hoImport:totalReal * 0.25, recImport:totalReal,
         recCurrent:matched.rec, hoCurrent:matched.ho,
         diff:totalReal-matched.rec,
+        daily: daily,
       });
     } else {
       missing.push({rawName, ho:totalReal * 0.25, totalReal});
@@ -5541,9 +5588,13 @@ function importApply(){
       const opReal = eq.ops.find(o=>o.name===r.opName);
       if(!opReal) return;
       found = true;
-      if(Math.abs(r.recImport - opReal.rec) < 0.01){ unchanged++; return; }
+      if(Math.abs(r.recImport - opReal.rec) < 0.01 && Object.keys(r.daily||{}).length===0){ unchanged++; return; }
       opReal.rec = r.recImport;
       opReal.ho  = r.recImport * 0.25;
+      // Aplicar daily breakdown se existir
+      if(r.daily && Object.keys(r.daily).length > 0){
+        opReal.daily = r.daily;
+      }
       updated++;
     });
   });
@@ -5566,6 +5617,12 @@ function importApply(){
   const totalImportado = importParsed.found.reduce((s,r)=>s+r.recImport,0);
   toast(`✅ ${updated} operadores atualizados! Total: ${fRK(totalImportado)} · HO: ${fRK(totalImportado*0.25)}`);
 
+  // Atualizar CMP_OPS_DEDUP.abril com valores importados (mês atual)
+  importParsed.found.forEach(r=>{
+    const cmpOp = CMP_OPS_DEDUP.find(c=>c.nome===r.opName);
+    if(cmpOp) cmpOp.abril = r.recImport;
+  });
+
   markImportDone('rec');
 
   document.getElementById('import-status').textContent =
@@ -5581,6 +5638,14 @@ function importApply(){
   if(fbDb && fbRoom){
     const ovFinal = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
     fbPush('overrides', {...ovFinal, _ts: Date.now()});
+
+    // Sincronizar daily breakdown via rd_hist
+    const dailyData = {};
+    importParsed.found.forEach(r=>{
+      if(r.daily && Object.keys(r.daily).length > 0) dailyData[r.opName] = r.daily;
+    });
+    if(Object.keys(dailyData).length > 0) fbPush('rd_hist', dailyData);
+
     toast('✅ Importado e sincronizado para todos os dispositivos!');
   }
 }
@@ -6861,6 +6926,7 @@ function fbSyncModalClose_auto(){
 
 function syncDisconnect(){
   if(fbListeners.rd)        { fbDb?.ref(fbRoom+'/rd').off(); }
+  if(fbListeners.rd_hist)   { fbDb?.ref(fbRoom+'/rd_hist').off(); }
   if(fbListeners.overrides) { fbDb?.ref(fbRoom+'/overrides').off(); }
   if(fbListeners.photos)    { fbDb?.ref(fbRoom+'/photos').off(); }
   if(fbListeners.meta)      { fbDb?.ref(fbRoom+'/meta').off(); }
@@ -6893,6 +6959,30 @@ function syncUpdateStatus(){
 // ── FIREBASE LISTENERS ──
 function fbStartListening(){
   if(!fbDb||!fbRoom) return;
+
+  fbDb.ref(fbRoom+'/rd_hist').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    let changed = false;
+    Object.entries(remote).forEach(([nm,daily])=>{
+      if(!daily || typeof daily !== 'object') return;
+      // Atualizar D.equipes diretamente
+      D.equipes.forEach(eq=>{
+        const opReal = eq.ops.find(o=>o.name===nm);
+        if(opReal){ opReal.daily = daily; changed = true; }
+      });
+    });
+    if(changed){
+      rebuildAll();
+      // Atualizar CMP_OPS_DEDUP.abril com rec atualizado
+      ALL.forEach(op=>{
+        const cmpOp = CMP_OPS_DEDUP.find(c=>c.nome===op.name);
+        if(cmpOp && op.rec > 0) cmpOp.abril = op.rec;
+      });
+      pulseSyncDot();
+    }
+  });
+  fbListeners.rd_hist = true;
 
   // ── Recebimento do dia (rd) ──
   fbDb.ref(fbRoom+'/rd').on('value', snap=>{
@@ -6937,6 +7027,11 @@ function fbStartListening(){
       eq.ho  = eq.ops.reduce((s,o)=>s+o.ho, 0);
     });
     rebuildAll();
+    // Atualizar CMP_OPS_DEDUP.abril com valores recebidos
+    ALL.forEach(op=>{
+      const cmpOp = CMP_OPS_DEDUP.find(c=>c.nome===op.name);
+      if(cmpOp && op.rec > 0) cmpOp.abril = op.rec;
+    });
     refreshAll();
     localStorage.setItem('cofen_op_overrides', JSON.stringify({...local,...remote}));
     pulseSyncDot();
@@ -7093,7 +7188,7 @@ function fbStartListening(){
       if(nm==='_ts'||nm.startsWith('_')) return;
       const op = ALL.find(o=>o.name===nm);
       if(!op) return;
-      if(val.g !== undefined){ op.gerados=val.g; op.pagos=val.p; op.eficiencia=val.ef||0; op.agendados=val.ag||0; op['ag_futuro_val']=val.ag_futuro_val||{};
+      if(val.g !== undefined){ op.gerados=val.g; op.pagos=val.p; op.acordos=val.p||0; op.eficiencia=val.ef||0; op.agendados=val.ag||0; op['ag_futuro_val']=val.ag_futuro_val||{};
         op.avista=val.avista||0; op.ate3dias=val.ate3d||0; op.mais3dias=val.mais3d||0;
         op.ag_futuro=val.ag_futuro||{}; changed=true; }
     });
@@ -8284,6 +8379,32 @@ function cmpInit(){
   cmpRenderGeral();
   cmpBuildTableGeral();
   cmpBuildTableEquipes();
+  // Atualiza hero cards dinamicos
+  const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+  const totalAbril = CMP_ABRIL_DU[Math.max(...Object.keys(CMP_ABRIL_DU).map(Number))] || 0;
+  const totalMaio  = dusMaio.length ? CMP_MAIO_CUMUL[Math.max(...dusMaio)] : null;
+  const heroDia = dusMaio.length ? CMP_MAIO_DU_DIAS[Math.max(...dusMaio)-1] : null;
+  const heroLabel = document.getElementById('cmp-hero-maio-label');
+  const heroVal   = document.getElementById('cmp-hero-maio-val');
+  const heroSub   = document.getElementById('cmp-hero-maio-sub');
+  const heroDiff  = document.getElementById('cmp-hero-diff-val');
+  const heroDSub  = document.getElementById('cmp-hero-diff-sub');
+  if(heroVal){
+    if(totalMaio !== null){
+      if(heroLabel) heroLabel.textContent = heroDia ? 'Maio (ate dia '+heroDia+')' : 'Maio (parcial)';
+      heroVal.textContent = cmpFmt(totalMaio);
+      if(heroSub) heroSub.textContent = dusMaio.length+' DU(s) registrados';
+      if(heroDiff){
+        const diff = totalMaio - totalAbril;
+        heroDiff.textContent = cmpFmtK(diff);
+        heroDiff.style.color = diff >= 0 ? '#4ADE80' : '#F87171';
+        if(heroDSub) heroDSub.textContent = diff >= 0 ? 'acima de Abril' : 'abaixo de Abril';
+      }
+    } else {
+      heroVal.textContent = '-';
+      if(heroSub) heroSub.textContent = 'aguardando importacao';
+    }
+  }
 }
 
 function cmpRenderGeral(){
@@ -10130,7 +10251,7 @@ function mtsAtualizarMaio(){
     </div>
     <div class="mts-total-bar">
       <span class="mts-total-label">Total recebido no mês</span>
-      <span class="mts-total-value">R$ 1.249.514,70</span>
+      <span class="mts-total-value">R$ 1.475.912,59</span>
     </div>
     <div class="mts-cards" id="mts-abril-cards">
       <!-- Preenchido dinamicamente por mtsAtualizarAbril() -->
