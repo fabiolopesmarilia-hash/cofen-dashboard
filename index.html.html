@@ -1757,11 +1757,11 @@ select.ev-inp{cursor:pointer}
     </div>
     <div class="card" style="margin-top:0">
       <table style="width:100%;border-collapse:collapse;font-size:12px">
-        <thead>
+        <thead id="cmp-thead-equipes">
           <tr style="background:var(--g50)">
             <th style="padding:9px 12px;text-align:left;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Equipe</th>
-            <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Abril (até 30)</th>
-            <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Maio (até dia)</th>
+            <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;color:#3B82F6;letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Abril (mesmo DU)</th>
+            <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;color:#00A86B;letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Maio (parcial)</th>
             <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Diferença</th>
           </tr>
         </thead>
@@ -8720,17 +8720,31 @@ function cmpBuildTableGeral(){
   </tr>`;
 }
 
+function cmpGetAbrilProporcional(totalAbrilMes){
+  // Retorna o valor de Abril proporcional ao mesmo DU atual de Maio
+  const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+  const duAtual = dusMaio.length ? Math.max(...dusMaio) : 0;
+  if(duAtual === 0) return totalAbrilMes; // sem dados de Maio, retorna total
+  const totalAbrilDuAtual = CMP_ABRIL_DU[duAtual] || 0;
+  const totalAbrilFinal   = CMP_ABRIL_DU[Math.max(...Object.keys(CMP_ABRIL_DU).map(Number))] || 1;
+  const proporcao = totalAbrilFinal > 0 ? totalAbrilDuAtual / totalAbrilFinal : 1;
+  return Math.round(totalAbrilMes * proporcao * 100) / 100;
+}
+
 function cmpRenderEquipes(){
   const labels = CMP_TEAMS.map(t=>(EQ[t.nome]||{sh:t.nome}).sh);
   if(cmpCharts.equipes){ cmpCharts.equipes.destroy(); delete cmpCharts.equipes; }
   const canvas = document.getElementById('cmp-chart-equipes');
   if(!canvas) return;
+  const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+  const duAtual = dusMaio.length ? Math.max(...dusMaio) : 0;
+  const labelAbril = duAtual > 0 ? `Abril (até ${duAtual}° DU)` : 'Abril (mês cheio)';
   cmpCharts.equipes = new Chart(canvas.getContext('2d'), {
     type:'bar',
     data:{
       labels,
       datasets:[
-        { label:'Abril (mês cheio)', data:CMP_TEAMS.map(t=>t.marco), backgroundColor:'rgba(59,130,246,.75)', borderRadius:4 },
+        { label:labelAbril, data:CMP_TEAMS.map(t=>cmpGetAbrilProporcional(t.marco)), backgroundColor:'rgba(59,130,246,.75)', borderRadius:4 },
         { label:'Maio (parcial)', data:CMP_TEAMS.map(t=>t.abril), backgroundColor:'rgba(0,168,107,.75)', borderRadius:4 }
       ]
     },
@@ -8750,9 +8764,21 @@ function cmpBuildTableEquipes(){
   const tbody = document.getElementById('cmp-table-equipes');
   if(!tbody) return;
   tbody.innerHTML='';
+  const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+  const duAtual = dusMaio.length ? Math.max(...dusMaio) : 0;
+  const labelAbril = duAtual > 0 ? `Abril (até ${duAtual}° DU)` : 'Abril (mês cheio)';
+  // Cabeçalho dinâmico
+  const thead = document.getElementById('cmp-thead-equipes');
+  if(thead) thead.innerHTML = `<tr style="background:var(--g50)">
+    <th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:800;color:var(--g500)">EQUIPE</th>
+    <th style="padding:9px 12px;text-align:right;font-size:11px;font-weight:800;color:#3B82F6">${labelAbril.toUpperCase()}</th>
+    <th style="padding:9px 12px;text-align:right;font-size:11px;font-weight:800;color:#00A86B">MAIO (PARCIAL)</th>
+    <th style="padding:9px 12px;text-align:right;font-size:11px;font-weight:800;color:var(--g500)">DIFERENÇA</th>
+  </tr>`;
   CMP_TEAMS.forEach(t=>{
     const cfg = EQ[t.nome]||{c:'#888',sh:t.nome};
-    const diff = t.abril - t.marco;
+    const abrilProp = cmpGetAbrilProporcional(t.marco);
+    const diff = t.abril - abrilProp;
     const cls = diff >= 0 ? '#065F46' : '#991B1B';
     const bg = diff >= 0 ? '#F0FDF4' : '#FEF2F2';
     tbody.innerHTML += `<tr style="border-bottom:1px solid var(--g100);background:${bg}">
@@ -8762,7 +8788,7 @@ function cmpBuildTableEquipes(){
           <span style="font-weight:800;font-size:12px;color:var(--g900)">${cfg.sh}</span>
         </div>
       </td>
-      <td style="padding:9px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#3B82F6">${cmpFmt(t.marco)}</td>
+      <td style="padding:9px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#3B82F6">${cmpFmt(abrilProp)}</td>
       <td style="padding:9px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#00A86B">${cmpFmt(t.abril)}</td>
       <td style="padding:9px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;font-weight:800;color:${cls}">${cmpFmtK(diff)}</td>
     </tr>`;
@@ -8777,22 +8803,33 @@ function cmpSortOp(field, btn){
 }
 
 function cmpRenderOps(){
+  const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+  const duAtual = dusMaio.length ? Math.max(...dusMaio) : 0;
+  // Proporção geral de Abril no DU atual vs total de Abril
+  const totalAbrilDuAtual = duAtual > 0 ? (CMP_ABRIL_DU[duAtual] || 0) : 0;
+  const totalAbrilFinal   = CMP_ABRIL_DU[Math.max(...Object.keys(CMP_ABRIL_DU).map(Number))] || 1;
+  const propAbril = totalAbrilFinal > 0 ? totalAbrilDuAtual / totalAbrilFinal : 1;
+
   const list = [...CMP_OPS_DEDUP].sort((a,b)=>{
+    const aAbrilProp = Math.round(a.marco * propAbril * 100)/100;
+    const bAbrilProp = Math.round(b.marco * propAbril * 100)/100;
     if(cmpSortField==='nome') return cmpSortDir*a.nome.localeCompare(b.nome);
     if(cmpSortField==='abril') return cmpSortDir*(a.abril-b.abril);
-    return cmpSortDir*((a.abril-a.marco)-(b.abril-b.marco));
+    return cmpSortDir*((a.abril-aAbrilProp)-(b.abril-bAbrilProp));
   });
-  const maxVal = Math.max(...list.map(o=>Math.max(o.marco,o.abril)));
+  const maxVal = Math.max(...list.map(o=>Math.max(o.marco * propAbril, o.abril)));
   const container = document.getElementById('cmp-op-list');
   if(!container) return;
+  const labelAbril = duAtual > 0 ? `abril/${duAtual}DU` : 'abril';
   container.innerHTML = list.map(op=>{
     const opObj = ALL.find(o=>o.name===op.nome);
     const cfg = EQ[opObj?.eq||'']||{c:'#888',sh:''};
     const photo = photoGet(op.nome);
-    const diff = op.abril - op.marco;
+    const abrilProp = Math.round(op.marco * propAbril * 100) / 100;
+    const diff = op.abril - abrilProp;
     const diffCls = diff >= 0 ? '#065F46' : '#991B1B';
     const diffBg = diff >= 0 ? '#F0FDF4' : '#FEF2F2';
-    const barM = maxVal > 0 ? (op.marco/maxVal*100).toFixed(1) : 0;
+    const barM = maxVal > 0 ? (abrilProp/maxVal*100).toFixed(1) : 0;
     const barA = maxVal > 0 ? (op.abril/maxVal*100).toFixed(1) : 0;
     const avatarHtml = photo
       ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;object-position:top">`
@@ -8805,11 +8842,11 @@ function cmpRenderOps(){
         <div style="font-weight:800;font-size:12px;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${op.nome.replace(/_/g,' ')}</div>
         <div style="font-size:10px;color:${cfg.c};font-weight:700">${cfg.sh||'—'}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:4px">
-          <div title="Abril"><div style="height:4px;background:#3B82F6;border-radius:2px;width:${barM}%"></div></div>
+          <div title="Abril (${labelAbril})"><div style="height:4px;background:#3B82F6;border-radius:2px;width:${barM}%"></div></div>
           <div title="Maio"><div style="height:4px;background:#00A86B;border-radius:2px;width:${barA}%"></div></div>
         </div>
       </div>
-      <div style="text-align:right"><div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#3B82F6">${cmpFmt(op.marco)}</div><div style="font-size:10px;color:var(--g500)">abril</div></div>
+      <div style="text-align:right"><div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#3B82F6">${cmpFmt(abrilProp)}</div><div style="font-size:10px;color:var(--g500)">${labelAbril}</div></div>
       <div style="text-align:right"><div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#00A86B">${cmpFmt(op.abril)}</div><div style="font-size:10px;color:var(--g500)">maio</div></div>
       <div style="text-align:right"><div style="font-family:'Bebas Neue',sans-serif;font-size:16px;font-weight:800;color:${diffCls}">${cmpFmtK(diff)}</div><div style="font-size:9px;color:${diffCls};font-weight:700">${diff>=0?'▲ acima':'▼ abaixo'}</div></div>
     </div>`;
