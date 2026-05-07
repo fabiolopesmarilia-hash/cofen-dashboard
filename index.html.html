@@ -922,70 +922,72 @@ select.ev-inp{cursor:pointer}
 <!-- ══════════ PAGE: RECEBIMENTO DO DIA ══════════ -->
 <div class="page" id="pg-recdia">
 
-  <!-- TOPO: KPIs GERAL em tempo real -->
-  <div style="background:linear-gradient(135deg,var(--ppd),#1B4332 55%,#0D3D2B);border-radius:var(--rxl);padding:18px 24px">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
-      <div>
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">⚡ Painel em Tempo Real</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:22px;letter-spacing:3px;color:#fff" id="rd-data-hoje">— / — / —</div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button onclick="rdClearDay()"
-          style="padding:7px 14px;border-radius:var(--rm);border:1px solid rgba(255,100,100,.4);
-          background:rgba(255,60,60,.15);color:#FCA5A5;font-family:Nunito,sans-serif;font-weight:700;
-          font-size:11px;cursor:pointer">🗑 Zerar Dia</button>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Recebido Hoje</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:24px;color:#4ADE80;letter-spacing:.5px;line-height:1;margin-bottom:2px" id="rd-hoje-total">R$ 0,00</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">Soma de todas equipes</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">HO Hoje (25%)</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:24px;color:#67E8F9;letter-spacing:.5px;line-height:1;margin-bottom:2px" id="rd-hoje-ho">R$ 0,00</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">Honorários do dia</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Total Acumulado</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:24px;color:#fff;letter-spacing:.5px;line-height:1;margin-bottom:2px" id="rd-total-acc">R$ 0,00</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">Base + hoje</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">HO Acumulado</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:24px;color:#FCD34D;letter-spacing:.5px;line-height:1;margin-bottom:2px" id="rd-ho-acc">R$ 0,00</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">HO total do mês</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Ativos Hoje</div>
-        <div style="font-family:Bebas Neue,sans-serif;font-size:24px;color:#4ADE80;letter-spacing:.5px;line-height:1;margin-bottom:2px" id="rd-ativos">0</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">Operadores com entrada</div>
-      </div>
-    </div>
-  </div>
+  <!-- TOPO: KPIs GERAL em tempo real — HERO EXPANDIDO -->
+  <div style="background:linear-gradient(135deg,var(--ppd) 0%,#1B4332 45%,#0D3D2B 100%);
+    border-radius:var(--rxl);padding:28px 32px;position:relative;overflow:hidden;
+    margin:-4px;box-shadow:0 8px 40px rgba(0,0,0,.25)">
 
-  <!-- BARRA META DO DIA -->
-  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:14px 18px;box-shadow:var(--sh)">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:800;color:var(--g700)">🎯 Progresso da Meta Diária</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <label style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.8px">Meta do Dia (R$)</label>
-        <input type="number" id="rd-meta-dia" value="30680" step="100" min="0"
-          style="background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);padding:6px 10px;
-          font-family:Nunito,sans-serif;font-size:13px;font-weight:800;color:var(--g900);outline:none;width:130px;transition:all .2s"
-          oninput="rdUpdateMeta()"
-          onfocus="this.style.borderColor='var(--pp)'" onblur="this.style.borderColor='var(--g200)'">
+    <!-- Decorative blobs -->
+    <div style="position:absolute;top:-80px;right:-80px;width:320px;height:320px;border-radius:50%;
+      background:radial-gradient(circle,rgba(0,200,127,.12),transparent 70%);pointer-events:none"></div>
+    <div style="position:absolute;bottom:-60px;left:-60px;width:240px;height:240px;border-radius:50%;
+      background:radial-gradient(circle,rgba(0,184,169,.08),transparent 70%);pointer-events:none"></div>
+
+    <!-- Header row -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;position:relative;z-index:1">
+      <div>
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:4px">⚡ Painel em Tempo Real</div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:4px;color:#fff;line-height:1" id="rd-data-hoje">— / — / —</div>
+      </div>
+      <button onclick="rdClearDay()"
+        style="padding:8px 16px;border-radius:var(--rm);border:1px solid rgba(255,100,100,.4);
+        background:rgba(255,60,60,.15);color:#FCA5A5;font-family:Nunito,sans-serif;font-weight:700;
+        font-size:11px;cursor:pointer;transition:all .2s"
+        onmouseover="this.style.background='rgba(255,60,60,.3)'" onmouseout="this.style.background='rgba(255,60,60,.15)'">🗑 Zerar Dia</button>
+    </div>
+
+    <!-- DESTAQUE PRINCIPAL: Recebido Hoje + mini cards por equipe -->
+    <div style="position:relative;z-index:1;margin-bottom:0">
+      <div style="background:rgba(74,222,128,.1);border:1.5px solid rgba(74,222,128,.25);border-radius:var(--rxl);
+        padding:20px 28px;display:flex;align-items:stretch;gap:24px;
+        box-shadow:0 0 40px rgba(74,222,128,.08)">
+        <!-- Valor principal -->
+        <div style="display:flex;flex-direction:column;justify-content:center;min-width:220px">
+          <div style="font-size:10px;font-weight:700;color:rgba(74,222,128,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">RECEBIDO HOJE</div>
+          <div style="font-family:Bebas Neue,sans-serif;font-size:52px;color:#4ADE80;letter-spacing:1px;line-height:1;
+            text-shadow:0 0 40px rgba(74,222,128,.4)" id="rd-hoje-total">R$ 0,00</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.3);font-weight:600;margin-top:6px">Soma de todas equipes</div>
+          <!-- Meta inline -->
+          <div style="margin-top:12px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+              <span style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase">Meta</span>
+              <input type="number" id="rd-meta-dia" value="30680" step="100" min="0"
+                style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:4px 8px;
+                font-family:Nunito,sans-serif;font-size:11px;font-weight:800;color:#fff;outline:none;width:95px;text-align:right"
+                oninput="rdUpdateMeta()"
+                onfocus="this.style.borderColor='rgba(74,222,128,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.12)'">
+              <span id="rd-meta-pct-lbl" style="color:#4ADE80;font-size:11px;font-weight:800">0%</span>
+            </div>
+            <div style="background:rgba(255,255,255,.1);border-radius:100px;height:5px;overflow:hidden">
+              <div id="rd-meta-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#4ADE80,#00C97F);
+                transition:width .8s cubic-bezier(.4,0,.2,1);width:0%"></div>
+            </div>
+            <div id="rd-meta-falta-lbl" style="color:rgba(255,255,255,.35);font-size:10px;margin-top:4px">Falta R$ 0,00</div>
+          </div>
+        </div>
+        <!-- Divisor vertical -->
+        <div style="width:1px;background:rgba(255,255,255,.1);flex-shrink:0;margin:4px 0"></div>
+        <!-- Mini cards das equipes -->
+        <div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:center" id="rd-eq-hero-cards">
+        </div>
       </div>
     </div>
-    <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:5px">
-      <span id="rd-meta-pct-lbl" style="color:var(--pp)">0%</span>
-      <span id="rd-meta-falta-lbl" style="color:var(--g500)">Falta R$ 0,00</span>
-    </div>
-    <div style="background:var(--g100);border-radius:100px;height:9px;overflow:hidden">
-      <div id="rd-meta-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,var(--pp),var(--pp3));
-        transition:width .8s cubic-bezier(.4,0,.2,1);width:0%"></div>
-    </div>
+
+    <!-- IDs ocultos necessários para o JS funcionar -->
+    <span id="rd-hoje-ho" style="display:none"></span>
+    <span id="rd-total-acc" style="display:none"></span>
+    <span id="rd-ho-acc" style="display:none"></span>
+    <span id="rd-ativos" style="display:none"></span>
   </div>
 
   <!-- SUB-TABS POR EQUIPE -->
@@ -4403,6 +4405,29 @@ function rdUpdateKPIs(){
   const ds=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
   s('rd-data-hoje',ds.charAt(0).toUpperCase()+ds.slice(1));
   rdRenderEqBreakdown();
+  rdRenderEqHeroCards();
+}
+
+function rdRenderEqHeroCards(){
+  var el=document.getElementById('rd-eq-hero-cards');
+  if(!el) return;
+  var saved=rdGetSaved();
+  el.innerHTML=D.equipes.map(function(eq){
+    var cfg=EQ[eq.name]||{c:'#888',sh:eq.name,ico:'\u{1F3E2}'};
+    var hoje=eq.ops.reduce(function(s,op){ return s+(parseFloat(saved[op.name])||0); },0);
+    var total=eq.rec+hoje;
+    var hojeColor=hoje>0?'#4ADE80':'rgba(255,255,255,.3)';
+    return '<div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);'
+      +'border-radius:12px;padding:12px 14px;border-top:2px solid '+cfg.c+'">'
+      +'<div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;'
+      +'text-transform:uppercase;margin-bottom:6px">'+cfg.ico+' '+cfg.sh+'</div>'
+      +'<div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600;margin-bottom:1px">Hoje</div>'
+      +'<div style="font-family:Bebas Neue,sans-serif;font-size:20px;color:'+hojeColor+';letter-spacing:.5px;line-height:1;margin-bottom:7px">'+fR(hoje)+'</div>'
+      +'<div style="height:1px;background:rgba(255,255,255,.08);margin-bottom:7px"></div>'
+      +'<div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600;margin-bottom:1px">Total mês</div>'
+      +'<div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:rgba(255,255,255,.7);letter-spacing:.3px;line-height:1">'+fR(total)+'</div>'
+      +'</div>';
+  }).join('');
 }
 
 function rdUpdateMeta(){rdUpdateKPIs()}
