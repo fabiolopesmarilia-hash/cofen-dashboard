@@ -489,6 +489,48 @@ select.ev-inp{cursor:pointer}
 <!-- ══════════ PAGE: GERAL ══════════ -->
 <div class="page on" id="pg-geral">
 
+<!-- ══ PAGUEPAY TOPO ══ -->
+<div id="pp-topo-block" style="background:linear-gradient(135deg,#1a1200,#2d2000 55%,#1a1000);border-radius:var(--rxl);padding:28px 32px;border:2px solid rgba(245,158,11,.35);box-shadow:0 8px 40px rgba(245,158,11,.2),inset 0 1px 0 rgba(255,255,255,.05);margin-bottom:4px;position:relative;overflow:hidden">
+  <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:rgba(245,158,11,.06);pointer-events:none"></div>
+  <div style="position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;border-radius:50%;background:rgba(245,158,11,.04);pointer-events:none"></div>
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-size:10px;font-weight:800;color:rgba(251,191,36,.55);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px">💼 PaguePay — Coluna do Arquivo Empresa</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:rgba(255,255,255,.9);letter-spacing:2px">MAIO 2026 · RECEBIMENTO PAGUEPAY</div>
+    </div>
+    <button onclick="importarEmpresa()" style="padding:9px 20px;border-radius:10px;border:1.5px solid rgba(251,191,36,.5);background:rgba(251,191,36,.14);color:#FCD34D;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(251,191,36,.25)'" onmouseout="this.style.background='rgba(251,191,36,.14)'">📥 Importar Empresa</button>
+  </div>
+
+  <!-- Main row: valor + falta -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:22px;align-items:center">
+
+    <!-- Valor principal -->
+    <div>
+      <div style="font-size:11px;font-weight:800;color:rgba(251,191,36,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Total Arrecadado Maio</div>
+      <div id="h-arrecadado-ho" style="font-family:'Bebas Neue',sans-serif;font-size:80px;line-height:1;background:linear-gradient(90deg,#F59E0B,#FBBF24,#FCD34D,#FBBF24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;letter-spacing:2px">—</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.35);font-weight:600">Soma de Maio · coluna Pague Play</div>
+    </div>
+
+    <!-- Falta para próximo objetivo -->
+    <div id="pp-falta-destaque" style="background:rgba(245,158,11,.1);border:2px solid rgba(245,158,11,.35);border-radius:18px;padding:22px 26px;text-align:center;position:relative">
+      <div style="font-size:10px;font-weight:800;color:rgba(251,191,36,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">🎯 FALTA PARA O PRÓXIMO OBJETIVO</div>
+      <div id="pp-falta-valor-big" style="font-family:'Bebas Neue',sans-serif;font-size:54px;line-height:1;color:#F59E0B;letter-spacing:1px;margin-bottom:6px">—</div>
+      <div id="pp-falta-label-big" style="font-size:14px;font-weight:800;color:rgba(255,255,255,.5)">importe o arquivo para calcular</div>
+    </div>
+  </div>
+
+  <!-- Metas + Equipes (não compact = fontes maiores) -->
+  <div id="h-pp-metas-wrap"></div>
+
+  <!-- Total Ano -->
+  <div style="border-top:1px solid rgba(255,255,255,.1);margin-top:18px;padding-top:14px;display:flex;align-items:center;gap:16px">
+    <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase">📊 Ano (Jan→Hoje):</div>
+    <div id="h-arrecadado" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:rgba(255,255,255,.75);letter-spacing:1px">—</div>
+  </div>
+</div>
+
   <!-- HERO ORIGINAL MANTIDO -->
   <div class="hero">
     <div class="htitle">Recebimento Global · Maio 2026</div>
@@ -519,31 +561,10 @@ select.ev-inp{cursor:pointer}
         <div id="h-meta-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,#4ADE80,#00C97F);width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
       </div>
     </div>
-    <div id="h-arrecadado-wrap" style="margin-top:12px;padding:12px 14px;background:rgba(251,191,36,.07);border-radius:var(--rl);border:1px solid rgba(251,191,36,.2)">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
-        <div style="font-size:9px;font-weight:700;color:rgba(251,191,36,.7);letter-spacing:1.5px;text-transform:uppercase">💼 PaguePay — Coluna do Arquivo Empresa</div>
-        <button onclick="importarEmpresa()" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.12);color:#FCD34D;font-family:Nunito,sans-serif;font-weight:700;font-size:10px;cursor:pointer">📥 Importar Empresa</button>
-      </div>
-      <div style="background:rgba(0,0,0,.25);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden">
-        <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(245,158,11,.06);pointer-events:none"></div>
-        <!-- Label -->
-        <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">📅 PAGUEPAY · MAIO 2026</div>
-        <!-- Valor principal -->
-        <div id="h-arrecadado-ho" style="font-family:'Bebas Neue',sans-serif;font-size:40px;line-height:1;background:linear-gradient(90deg,#F59E0B,#FBBF24,#FCD34D);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:3px;text-align:center;width:100%">—</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:12px">Soma de Maio · col. Pague Play</div>
-        <!-- Metas -->
-        <div id="h-pp-metas-wrap"></div>
-        <!-- Divisor -->
-        <div style="border-top:1px solid rgba(255,255,255,.08);margin:10px 0 8px"></div>
-        <!-- Total ano -->
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;white-space:nowrap">📊 Ano (Jan→Hoje):</div>
-          <div id="h-arrecadado" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:rgba(255,255,255,.65)">—</div>
-        </div>
-      </div>
-      <span id="h-arrecadado-falta" style="display:none"></span><span id="h-arrecadado-meta-s" style="display:none"></span>
-      <span id="h-arrecadado-media" style="display:none"></span><span id="h-arrecadado-need" style="display:none"></span>
-      <span id="h-arrecadado-pct" style="display:none"></span><div id="h-arrecadado-bar" style="display:none"></div>
+    <div id="h-arrecadado-wrap" style="display:none">
+      <span id="h-arrecadado-falta"></span><span id="h-arrecadado-meta-s"></span>
+      <span id="h-arrecadado-media"></span><span id="h-arrecadado-need"></span>
+      <span id="h-arrecadado-pct"></span><div id="h-arrecadado-bar"></div>
     </div>
   </div>
 
@@ -2608,13 +2629,14 @@ function _buildMetasHtml(val, compact){
   const falta   = proxima - val;
   const barColor = metas >= 4 ? '#A855F7' : metas >= 2 ? '#00A86B' : '#F59E0B';
   const badgeColors = ['#F59E0B','#F59E0B','#00A86B','#00A86B','#A855F7','#A855F7'];
-  const fs = compact ? '11px' : '14px';
-  const pad = compact ? '3px 8px' : '5px 12px';
+  // Sempre usa fonte grande (bloco foi movido para o topo)
+  const fs  = '13px';
+  const pad = '5px 14px';
   let badgesHtml = '';
   for(let i = 1; i <= Math.max(metas, 1); i++){
     const bat = i <= metas;
     const c = badgeColors[Math.min(i-1, badgeColors.length-1)];
-    badgesHtml += `<div style="display:flex;align-items:center;gap:4px;padding:${pad};
+    badgesHtml += `<div style="display:flex;align-items:center;gap:5px;padding:${pad};
       border-radius:100px;border:1.5px solid ${bat?c:'rgba(255,255,255,.15)'};
       background:${bat?c+'22':'rgba(255,255,255,.04)'};opacity:${bat?1:0.4}">
       <span style="font-size:${fs}">${bat?'🏆':'🔒'}</span>
@@ -2623,25 +2645,32 @@ function _buildMetasHtml(val, compact){
     </div>`;
   }
   if(val < proxima){
-    badgesHtml += `<div style="display:flex;align-items:center;gap:4px;padding:${pad};
-      border-radius:100px;border:1.5px dashed rgba(255,255,255,.2);background:rgba(255,255,255,.03)">
+    badgesHtml += `<div style="display:flex;align-items:center;gap:5px;padding:${pad};
+      border-radius:100px;border:1.5px dashed rgba(255,255,255,.25);background:rgba(255,255,255,.04)">
       <span style="font-size:${fs}">🎯</span>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:rgba(255,255,255,.35);letter-spacing:.5px">
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:rgba(255,255,255,.4);letter-spacing:.5px">
         META ${metas+1} · R$${((metas+1)*50).toFixed(0)}K</span>
     </div>`;
   }
+  // Atualiza o destaque de "falta" no topo (se existir)
+  const faltaEl = document.getElementById('pp-falta-valor-big');
+  const faltaLbl= document.getElementById('pp-falta-label-big');
+  if(faltaEl && val>0){
+    faltaEl.textContent = fR(falta);
+    if(faltaLbl) faltaLbl.textContent = 'para o objetivo de R$'+((metas+1)*50)+'K';
+  }
   return `
-    <div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:5px">${badgesHtml}</div>
-    <div style="margin-bottom:4px;display:flex;justify-content:space-between;align-items:center">
-      <span style="font-size:${compact?'9px':'10px'};font-weight:800;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase">
+    <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:7px">${badgesHtml}</div>
+    <div style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:1px;text-transform:uppercase">
         Progresso Meta ${metas+1}</span>
-      <span style="font-size:${compact?'10px':'11px'};font-weight:800;color:${barColor}">
+      <span style="font-size:14px;font-weight:900;color:${barColor}">
         ${pct.toFixed(1)}% · faltam ${fR(falta)}</span>
     </div>
-    <div style="height:${compact?'5px':'8px'};border-radius:100px;background:rgba(255,255,255,.08);overflow:hidden">
+    <div style="height:10px;border-radius:100px;background:rgba(255,255,255,.1);overflow:hidden">
       <div style="height:100%;width:${Math.min(pct,100)}%;border-radius:100px;
         background:linear-gradient(90deg,${barColor},${barColor}cc);
-        transition:width .8s ease;box-shadow:0 0 8px ${barColor}66"></div>
+        transition:width .8s ease;box-shadow:0 0 12px ${barColor}88"></div>
     </div>`;
 }
 function _buildTeamsHtml(compact){
@@ -2653,34 +2682,34 @@ function _buildTeamsHtml(compact){
     return {sh: cfg.sh, c: cfg.c, ico: cfg.ico||'', rec};
   }).sort((a,b)=>b.rec-a.rec);
   const total = rows.reduce((s,r)=>s+r.rec,0);
-  const fs  = compact ? '11px' : '13px';
-  const fs2 = compact ? '10px' : '12px';
-  const pad = compact ? '6px 10px' : '8px 12px';
+  // Sempre grande (bloco no topo)
+  const fs  = '14px';
+  const pad = '11px 14px';
   const items = rows.map((r,i)=>{
     const pct  = total>0 ? (r.rec/total*100) : 0;
     const rank = ['🥇','🥈','🥉','4º'][i]||'—';
-    return `<div style="display:flex;align-items:center;gap:8px;padding:${pad};
-      border-bottom:1px solid rgba(255,255,255,.06);transition:background .2s"
-      onmouseover="this.style.background='rgba(255,255,255,.04)'"
+    return `<div style="display:flex;align-items:center;gap:10px;padding:${pad};
+      border-bottom:1px solid rgba(255,255,255,.07);transition:background .2s"
+      onmouseover="this.style.background='rgba(255,255,255,.05)'"
       onmouseout="this.style.background='transparent'">
-      <span style="font-size:${fs};width:20px;text-align:center">${rank}</span>
-      <div style="width:8px;height:8px;border-radius:50%;background:${r.c};flex-shrink:0"></div>
+      <span style="font-size:18px;width:24px;text-align:center">${rank}</span>
+      <div style="width:10px;height:10px;border-radius:50%;background:${r.c};flex-shrink:0;box-shadow:0 0 6px ${r.c}88"></div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:800;font-size:${fs};color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.sh}</div>
-        <div style="height:3px;border-radius:100px;background:rgba(255,255,255,.08);margin-top:3px;overflow:hidden">
-          <div style="height:100%;width:${pct.toFixed(1)}%;background:${r.c};border-radius:100px;transition:width .8s ease"></div>
+        <div style="font-weight:800;font-size:${fs};color:rgba(255,255,255,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px">${r.sh}</div>
+        <div style="height:5px;border-radius:100px;background:rgba(255,255,255,.1);overflow:hidden">
+          <div style="height:100%;width:${pct.toFixed(1)}%;background:${r.c};border-radius:100px;transition:width .8s ease;box-shadow:0 0 8px ${r.c}66"></div>
         </div>
       </div>
-      <div style="text-align:right;flex-shrink:0">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:${compact?'14px':'16px'};color:${r.c}">${fRK(r.rec)}</div>
-        <div style="font-size:${compact?'9px':'10px'};color:rgba(255,255,255,.35);font-weight:600">${pct.toFixed(1)}%</div>
+      <div style="text-align:right;flex-shrink:0;min-width:90px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${r.c};letter-spacing:.5px">${fRK(r.rec)}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700">${pct.toFixed(1)}%</div>
       </div>
     </div>`;
   }).join('');
-  return `<div style="border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden;margin-top:${compact?'8px':'12px'}">
-    <div style="padding:${compact?'5px 10px':'7px 12px'};background:rgba(255,255,255,.06);
-      font-size:${compact?'8px':'9px'};font-weight:800;color:rgba(255,255,255,.35);
-      letter-spacing:1.5px;text-transform:uppercase">📊 RECEBIMENTO POR EQUIPE</div>
+  return `<div style="border:1px solid rgba(255,255,255,.12);border-radius:12px;overflow:hidden;margin-top:16px">
+    <div style="padding:9px 14px;background:rgba(255,255,255,.07);
+      font-size:10px;font-weight:800;color:rgba(255,255,255,.4);
+      letter-spacing:2px;text-transform:uppercase">📊 RECEBIMENTO POR EQUIPE</div>
     ${items}
   </div>`;
 }
@@ -5279,7 +5308,7 @@ function removeNovo(idx){
   ov.novos.splice(idx,1);
   gSetOverrides(ov);
   fbPush('gestao', ov);
-  {const _today=new Date();const _dk=_today.getFullYear()+'_'+(_today.getMonth()+1)+'_'+_today.getDate(); fbPush('rd', {...rdGetSaved(), _date:_dk});}
+  {if(typeof fbUpdateRD==='function') fbUpdateRD(rdGetSaved());}
   rebuildAll(); refreshAll(); renderNovoAdicionados();
   toast('↩ Operador removido!');
 }
@@ -7396,18 +7425,29 @@ function fbPush(path, data){
   if(!fbDb||!fbRoom) return;
   fbDb.ref(fbRoom+'/'+path).set(data).catch(e=>console.warn('FB push err:',e));
 }
-
+// ── fbUpdateRD: usa .update() para não sobrescrever dados de outros supervisores ──
+function fbUpdateRD(map){
+  if(!fbDb||!fbRoom) return;
+  const today   = new Date();
+  const dateKey = today.getFullYear()+'_'+(today.getMonth()+1)+'_'+today.getDate();
+  const payload = {...map, _date: dateKey};
+  const rdRef   = fbDb.ref(fbRoom+'/rd');
+  rdRef.child('_date').once('value', snap=>{
+    const remoteDate = snap.val();
+    if(remoteDate && remoteDate === dateKey){
+      rdRef.update(payload).catch(e=>console.warn('FB update(rd) err:',e));
+    } else {
+      rdRef.set(payload).catch(e=>console.warn('FB set(rd) err:',e));
+    }
+  });
+}
 // ── PATCH LOCAL FUNCTIONS TO PUSH TO FIREBASE ──
-
-// Patch rdSetSaved
+// Patch rdSetSaved — usa fbUpdateRD para preservar dados de outros supervisores
 const _rdSetSaved_fb = rdSetSaved;
 function rdSetSaved(map){
   localStorage.setItem(rdTodayKey(), JSON.stringify(map));
   syncBroadcast('rd_update', JSON.stringify(map));
-  // Salva no Firebase com data do dia para não colidir com dias anteriores
-  const today = new Date();
-  const dateKey = today.getFullYear()+'_'+(today.getMonth()+1)+'_'+today.getDate();
-  fbPush('rd', {...map, _date: dateKey});
+  fbUpdateRD(map);
 }
 
 // applyOps — lê editor, atualiza D.equipes e sincroniza Firebase
@@ -7520,7 +7560,7 @@ function fbPushAllLocal(){
   const photos=photoGetAll();
   if(Object.keys(photos).length>0) fbPush('photos',photos);
   const rd=rdGetSaved();
-  if(Object.keys(rd).length>0){const _today=new Date();const _dk=_today.getFullYear()+'_'+(_today.getMonth()+1)+'_'+_today.getDate(); fbPush('rd',{...rd,_date:_dk});}
+  if(Object.keys(rd).length>0){if(typeof fbUpdateRD==='function') fbUpdateRD(rd);}
   const gestao=gGetOverrides();
   if(Object.keys(gestao).length>0) fbPush('gestao',gestao);
 }
@@ -7983,7 +8023,7 @@ function removerOpApply(){
   // Sincronizar Firebase
   fbPush('gestao', gOv);
   fbPush('overrides', {...ov, _ts: Date.now()});
-  {const _today=new Date();const _dk=_today.getFullYear()+'_'+(_today.getMonth()+1)+'_'+_today.getDate(); fbPush('rd', {...rdGetSaved(), _date:_dk});}
+  {if(typeof fbUpdateRD==='function') fbUpdateRD(rdGetSaved());}
   if(fbDb && fbRoom){
     const allPhotos = JSON.parse(localStorage.getItem('cofen_photos')||'{}');
     fbPush('photos', allPhotos);
