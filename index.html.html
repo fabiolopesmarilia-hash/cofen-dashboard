@@ -8624,7 +8624,8 @@ function renderMiniComparativo(){
   }).sort((a,b)=>b.maio-a.maio);
 
   const eqTotalAbril = eqRows.reduce((s,r)=>s+r.abril,0);
-  const eqTotalMaio  = eqRows.reduce((s,r)=>s+r.maio, 0);
+  // Total Maio: usa rec geral (respeita override do editor) em vez de somar só as equipes principais
+  const eqTotalMaio  = getTotalRec() > 0 ? getTotalRec() : eqRows.reduce((s,r)=>s+r.maio, 0);
   const eqTotalDiff  = eqTotalMaio - eqTotalAbril;
   const eqTP = eqTotalDiff >= 0;
   const eqTDTxt = (eqTP?'+ ':'- ')+'R$ '+Math.abs(eqTotalDiff).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -8737,47 +8738,88 @@ function cmpTab(view, el){
   if(view==='operadores') cmpRenderOps();
 }
 
-// Reconstrói CMP_MAIO_CUMUL (por DU) a partir dos dados diários de D.global.daily
+// Reconstrói CMP_MAIO_CUMUL (por DU) a partir da fonte correta:
+// - Se overrideTotalRec > 0 (Importar Total Geral / Editor): usa esse total como acumulado
+// - Senão: tenta D.global.daily (operadores importados)
 function cmpAtualizarCumul(){
   // Limpa e reconstrói por número de DU
   Object.keys(CMP_MAIO_CUMUL).forEach(k=>delete CMP_MAIO_CUMUL[k]);
-  const daily = D.global.daily||{};
-  // Dias do calendário de Maio que têm dado, ordenados
-  const diasComDado = Object.keys(daily).map(Number).sort((a,b)=>a-b);
 
-  if(diasComDado.length > 0){
-    // Modo normal: temos breakdown diário — acumula por DU
-    let acum = 0;
-    CMP_MAIO_DU_DIAS.forEach((diaCalendario, idx)=>{
-      const du = idx + 1;
-      const prevDia = idx > 0 ? CMP_MAIO_DU_DIAS[idx-1] : 0;
-      for(let d = prevDia+1; d <= diaCalendario; d++){
-        if(daily[d]) acum += daily[d];
-      }
-      if(diasComDado.some(d=>d<=diaCalendario)) CMP_MAIO_CUMUL[du] = acum;
-    });
-  } else {
-    // Fallback: sem breakdown diário — usa o total rec atual e o dia de hoje
-    // para posicionar no DU correto do mês
-    const totalMaioRec = D.equipes.reduce((s,e)=>s+e.rec, 0);
-    if(totalMaioRec > 0){
-      const hoje = new Date().getDate(); // dia do calendário atual
-      // Encontra o DU mais próximo até hoje
-      let duHoje = 0;
-      CMP_MAIO_DU_DIAS.forEach((dia, idx)=>{
-        if(dia <= hoje) duHoje = idx + 1;
-      });
-      if(duHoje > 0){
-        // Popula os DUs de 1 até duHoje com acumulado crescente proporcional
-        // (distribui linearmente — melhor que nada)
+  // Fonte de verdade: total geral (Importar Total Geral / Editor)
+  const totalGeralRec = overrideTotalRec > 0 ? overrideTotalRec : 0;
+
+  if(totalGeralRec > 0){
+    // ── MODO TOTAL GERAL: distribui o total geral proporcionalmente pelos DUs até hoje ──
+    // NÃO usa D.global.daily (que é só da empresa/PaguePay, não o total geral)
+    const hoje = new Date().getDate();
+    let duHoje = 0;
+    CMP_MAIO_DU_DIAS.forEach((dia, idx)=>{ if(dia <= hoje) duHoje = idx + 1; });
+    if(duHoje > 0){
+      // Verifica se há dados diários para usar como forma da curva
+      const daily = D.global.daily||{};
+      const diasComDado = Object.keys(daily).map(Number).sort((a,b)=>a-b);
+      if(diasComDado.length > 0){
+        // Tem diário: usa a FORMA da curva mas recalibra o total para o geral
+        let acum = 0;
+        const duVals = {};
+        CMP_MAIO_DU_DIAS.forEach((diaCalendario, idx)=>{
+          const du = idx + 1;
+          const prevDia = idx > 0 ? CMP_MAIO_DU_DIAS[idx-1] : 0;
+          for(let d = prevDia+1; d <= diaCalendario; d++){ if(daily[d]) acum += daily[d]; }
+          if(diasComDado.some(d=>d<=diaCalendario)) duVals[du] = acum;
+        });
+        const dusComDado = Object.keys(duVals).map(Number).sort((a,b)=>a-b);
+        if(dusComDado.length > 0){
+          const totalDiario = duVals[Math.max(...dusComDado)] || 0;
+          if(totalDiario > 0){
+            // Escala proporcional: mantém a forma da curva, ajusta para o total geral
+            const fator = totalGeralRec / totalDiario;
+            dusComDado.forEach(du=>{
+              CMP_MAIO_CUMUL[du] = Math.round(duVals[du] * fator * 100) / 100;
+            });
+          } else {
+            // Sem valor diário: linear
+            for(let du=1; du<=duHoje; du++){
+              CMP_MAIO_CUMUL[du] = Math.round(totalGeralRec * (du/duHoje) * 100)/100;
+            }
+          }
+        }
+      } else {
+        // Sem dados diários: distribui linearmente
         for(let du=1; du<=duHoje; du++){
-          CMP_MAIO_CUMUL[du] = Math.round(totalMaioRec * (du/duHoje) * 100)/100;
+          CMP_MAIO_CUMUL[du] = Math.round(totalGeralRec * (du/duHoje) * 100)/100;
+        }
+      }
+    }
+  } else {
+    // ── MODO OPERADORES: sem total geral definido, usa D.global.daily ──
+    const daily = D.global.daily||{};
+    const diasComDado = Object.keys(daily).map(Number).sort((a,b)=>a-b);
+    if(diasComDado.length > 0){
+      let acum = 0;
+      CMP_MAIO_DU_DIAS.forEach((diaCalendario, idx)=>{
+        const du = idx + 1;
+        const prevDia = idx > 0 ? CMP_MAIO_DU_DIAS[idx-1] : 0;
+        for(let d = prevDia+1; d <= diaCalendario; d++){ if(daily[d]) acum += daily[d]; }
+        if(diasComDado.some(d=>d<=diaCalendario)) CMP_MAIO_CUMUL[du] = acum;
+      });
+    } else {
+      // Último fallback: soma bruta de equipes, distribuída linearmente
+      const totalBruto = D.equipes.reduce((s,e)=>s+e.rec,0);
+      if(totalBruto > 0){
+        const hoje = new Date().getDate();
+        let duHoje = 0;
+        CMP_MAIO_DU_DIAS.forEach((dia, idx)=>{ if(dia <= hoje) duHoje = idx + 1; });
+        if(duHoje > 0){
+          for(let du=1; du<=duHoje; du++){
+            CMP_MAIO_CUMUL[du] = Math.round(totalBruto * (du/duHoje) * 100)/100;
+          }
         }
       }
     }
   }
 
-  // Atualiza totais de equipes em CMP_TEAMS
+  // Atualiza totais de equipes em CMP_TEAMS (rec por equipe, da importação de operadores)
   CMP_TEAMS.forEach(t=>{
     const eq = D.equipes.find(e=>e.name===t.nome);
     if(eq) t.abril = eq.rec;
@@ -8798,7 +8840,10 @@ function cmpInit(){
   // Atualiza hero cards dinamicos
   const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
   const totalAbril = CMP_ABRIL_DU[Math.max(...Object.keys(CMP_ABRIL_DU).map(Number))] || 0;
-  const totalMaio  = dusMaio.length ? CMP_MAIO_CUMUL[Math.max(...dusMaio)] : null;
+  // Fonte de verdade: total geral (overrideTotalRec) se disponível, senão último DU do cumul
+  const totalMaio  = overrideTotalRec > 0
+    ? overrideTotalRec
+    : (dusMaio.length ? CMP_MAIO_CUMUL[Math.max(...dusMaio)] : null);
   const heroDia = dusMaio.length ? CMP_MAIO_DU_DIAS[Math.max(...dusMaio)-1] : null;
   const heroLabel = document.getElementById('cmp-hero-maio-label');
   const heroVal   = document.getElementById('cmp-hero-maio-val');
@@ -8873,9 +8918,11 @@ function cmpBuildTableGeral(){
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;font-weight:800;color:${cls}">${diff!==null?cmpFmtK(diff):'—'}</td>
     </tr>`;
   }
-  // Linha de total
+  // Linha de total — usa total geral (overrideTotalRec) como fonte de verdade quando disponível
   const totalAbril = CMP_ABRIL_DU[maxDU] || 0;
-  const totalMaio  = dusMaio.length ? CMP_MAIO_CUMUL[Math.max(...dusMaio)] : null;
+  const totalMaio  = overrideTotalRec > 0
+    ? overrideTotalRec
+    : (dusMaio.length ? CMP_MAIO_CUMUL[Math.max(...dusMaio)] : null);
   const totalDiff  = totalMaio !== null ? totalMaio - totalAbril : null;
   const tcls = totalDiff !== null ? (totalDiff >= 0 ? '#065F46' : '#991B1B') : '#555';
   tbody.innerHTML += `<tr style="border-top:2px solid var(--g200);background:var(--g50)">
