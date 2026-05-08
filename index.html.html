@@ -2265,6 +2265,32 @@ function rebuildAll(){
 }
 rebuildAll();
 
+// ── METAS DE EQUIPE — Abril e Maio em chaves separadas ──
+(function forcarMetasCorretas(){
+  // ABRIL encerrado: Brenda=300k, Bruna=200k, Stephanie=200k
+  const metasAbril = {
+    'COFEN MARILIA BRENDA':     300000,
+    'COFEN BIRIGUI BRUNA':      200000,
+    'COFEN STEPHANIE 2° TURNO': 200000,
+  };
+  // MAIO ativo: todas as equipes = 450k
+  const metasMaio = {
+    'COFEN MARILIA BRENDA':     450000,
+    'COFEN BIRIGUI BRUNA':      450000,
+    'COFEN STEPHANIE 2° TURNO': 450000,
+  };
+  function forcar(key, corretas){
+    const atuais = {};
+    try { Object.assign(atuais, JSON.parse(localStorage.getItem(key)||'{}')); } catch(e){}
+    const precisa = Object.entries(corretas).some(([k,v]) => atuais[k] !== v);
+    if(precisa) localStorage.setItem(key, JSON.stringify({...atuais, ...corretas}));
+  }
+  forcar('cofen_metas_eq_abril', metasAbril);
+  forcar('cofen_metas_eq_maio',  metasMaio);
+  // Mantém cofen_metas_eq com Maio (compatibilidade com resto do sistema)
+  forcar('cofen_metas_eq', metasMaio);
+})();
+
 // ── CALENDAR & DU ──
 let DU = {total:20, passou:13, restam:7};
 
@@ -7469,7 +7495,20 @@ function fbStartListening(){
     if(!remote) return;
     const local = gGetMetas();
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
-    gSetMetas({...local,...remote});
+    // Metas Maio = 450k por equipe — Firebase não sobrescreve valores corretos
+    const corretasMaio = {
+      'COFEN MARILIA BRENDA':     450000,
+      'COFEN BIRIGUI BRUNA':      450000,
+      'COFEN STEPHANIE 2° TURNO': 450000,
+    };
+    const merged = {...local, ...remote, ...corretasMaio};
+    gSetMetas(merged);
+    // Também atualiza localStorage separado de Maio
+    const _mmAtual = {}; try{Object.assign(_mmAtual,JSON.parse(localStorage.getItem('cofen_metas_eq_maio')||'{}'));}catch(e){}
+    localStorage.setItem('cofen_metas_eq_maio', JSON.stringify({..._mmAtual,...corretasMaio}));
+    // Se o Firebase não tem os valores corretos, corrige lá também
+    const fbTemErro = Object.entries(corretasMaio).some(([k,v])=>(remote[k]||0)!==v);
+    if(fbTemErro && typeof fbPush==='function') fbPush('metas_eq', merged);
     pulseSyncDot();
     if(typeof mtsAtualizarAbril === 'function') mtsAtualizarAbril();
     if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio();
@@ -10624,12 +10663,12 @@ function mtsAtualizarAbril(){
   const recAbrilPorEq = {};
   CMP_TEAMS.forEach(t => { recAbrilPorEq[t.nome] = t.marco; });
 
-  // Metas por equipe — lidas do Gerenciador de Equipes (Gestão de Equipes > Metas por Equipe)
-  const _metas_eq_abril = gGetMetas();
+  // Metas FIXAS de Abril — chave separada cofen_metas_eq_abril
+  const _ma = {}; try{ Object.assign(_ma, JSON.parse(localStorage.getItem('cofen_metas_eq_abril')||'{}')); }catch(e){}
   const SUPERVISORES = [
-    { eq: 'COFEN MARILIA BRENDA',     meta: _metas_eq_abril['COFEN MARILIA BRENDA']     || 300000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
-    { eq: 'COFEN BIRIGUI BRUNA',      meta: _metas_eq_abril['COFEN BIRIGUI BRUNA']      || 200000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
-    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _metas_eq_abril['COFEN STEPHANIE 2° TURNO'] || 200000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
+    { eq: 'COFEN MARILIA BRENDA',     meta: _ma['COFEN MARILIA BRENDA']     || 300000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: _ma['COFEN BIRIGUI BRUNA']      || 200000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _ma['COFEN STEPHANIE 2° TURNO'] || 200000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
   ];
 
   const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
@@ -10677,13 +10716,13 @@ function mtsAtualizarMaio(){
   const totalEl  = document.getElementById('mts-maio-total');
   if(!cardsEl) return;
 
-  // Metas por equipe — lidas do Gerenciador de Equipes (Gestão de Equipes > Metas por Equipe)
-  const _metas_eq_maio = gGetMetas();
+  // Metas ATIVAS de Maio — chave separada cofen_metas_eq_maio, default 450k por equipe
+  const _mm = {}; try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_metas_eq_maio')||'{}')); }catch(e){}
   // Lê os valores AO VIVO de D.equipes — atualiza sozinho a cada import
   const SUPERVISORES = [
-    { eq: 'COFEN MARILIA BRENDA',     meta: _metas_eq_maio['COFEN MARILIA BRENDA']     || 300000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
-    { eq: 'COFEN BIRIGUI BRUNA',      meta: _metas_eq_maio['COFEN BIRIGUI BRUNA']      || 200000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
-    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _metas_eq_maio['COFEN STEPHANIE 2° TURNO'] || 200000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
+    { eq: 'COFEN MARILIA BRENDA',     meta: _mm['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mm['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mm['COFEN STEPHANIE 2° TURNO'] || 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
   ];
 
   const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
