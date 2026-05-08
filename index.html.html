@@ -8632,28 +8632,29 @@ function renderMiniComparativo(){
   const eqRowsHtml = eqRows.map((r,i)=>{
     const rank=['🥇','🥈','🥉','4º'][i]||'';
     const bg = i%2===0?'rgba(255,255,255,.025)':'transparent';
-    return `<tr style="border-bottom:1px solid rgba(255,255,255,.05);background:${bg}">
-      <td style="padding:6px 10px;font-size:12px;font-weight:800;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:7px">
-        <span>${rank}</span>
-        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${r.c};flex-shrink:0"></span>
+    const rowBg = i%2===0?'#fff':'#f8fafc';
+    return `<tr style="border-bottom:1px solid #e2e8f0;background:${rowBg}">
+      <td style="padding:7px 10px;font-size:12px;font-weight:800;color:#1e293b">
+        <span style="margin-right:4px">${rank}</span>
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${r.c};margin-right:5px;vertical-align:middle"></span>
         ${r.sh}
       </td>
-      <td style="padding:6px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#3B82F6">${r.abril>0?cmpFmt(r.abril):'—'}</td>
-      <td style="padding:6px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#00A86B">${r.maio>0?cmpFmt(r.maio):'—'}</td>
-      <td style="padding:6px 10px;text-align:right;font-size:12px;font-weight:800;color:${r.clr}">${r.maio>0?r.diffTxt:'—'}</td>
-      <td style="padding:6px 10px;text-align:center">
-        <span style="font-size:10px;font-weight:800;color:${r.clr};background:${r.pos?'rgba(74,222,128,.15)':'rgba(248,113,113,.15)'};border:1px solid ${r.clr}44;border-radius:100px;padding:2px 8px;white-space:nowrap">${r.maio>0?(r.pos?'✅ Positivo':'⚠️ Abaixo'):'—'}</span>
+      <td style="padding:7px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#3B82F6">${r.abril>0?cmpFmt(r.abril):'—'}</td>
+      <td style="padding:7px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#059669">${r.maio>0?cmpFmt(r.maio):'—'}</td>
+      <td style="padding:7px 10px;text-align:right;font-size:12px;font-weight:800;color:${r.pos?'#16a34a':'#dc2626'}">${r.maio>0?r.diffTxt:'—'}</td>
+      <td style="padding:7px 10px;text-align:center">
+        <span style="font-size:10px;font-weight:800;color:${r.pos?'#16a34a':'#dc2626'};background:${r.pos?'#dcfce7':'#fee2e2'};border:1px solid ${r.pos?'#86efac':'#fca5a5'};border-radius:100px;padding:2px 8px;white-space:nowrap">${r.maio>0?(r.pos?'✅ Positivo':'⚠️ Abaixo'):'—'}</span>
       </td>
     </tr>`;
   }).join('');
 
-  const eqTotalRow = `<tr style="border-top:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07)">
-    <td style="padding:8px 10px;font-size:12px;font-weight:900;color:rgba(255,255,255,.9)">TOTAL GERAL</td>
+  const eqTotalRow = `<tr style="border-top:2px solid #cbd5e1;background:#f1f5f9">
+    <td style="padding:8px 10px;font-size:12px;font-weight:900;color:#0f172a">TOTAL GERAL</td>
     <td style="padding:8px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#3B82F6">${cmpFmt(eqTotalAbril)}</td>
-    <td style="padding:8px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#00A86B">${cmpFmt(eqTotalMaio)}</td>
-    <td style="padding:8px 10px;text-align:right;font-size:13px;font-weight:900;color:${eqTP?'#4ADE80':'#F87171'}">${eqTDTxt}</td>
+    <td style="padding:8px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#059669">${cmpFmt(eqTotalMaio)}</td>
+    <td style="padding:8px 10px;text-align:right;font-size:13px;font-weight:900;color:${eqTP?'#16a34a':'#dc2626'}">${eqTDTxt}</td>
     <td style="padding:8px 10px;text-align:center">
-      <span style="font-size:11px;font-weight:900;color:${eqTP?'#4ADE80':'#F87171'};background:${eqTP?'rgba(74,222,128,.18)':'rgba(248,113,113,.18)'};border:1px solid ${eqTP?'#4ADE8066':'#F8717166'};border-radius:100px;padding:3px 10px">${eqTP?'✅ Positivo':'⚠️ Abaixo'}</span>
+      <span style="font-size:11px;font-weight:900;color:${eqTP?'#16a34a':'#dc2626'};background:${eqTP?'#dcfce7':'#fee2e2'};border:1px solid ${eqTP?'#86efac':'#fca5a5'};border-radius:100px;padding:3px 10px">${eqTP?'✅ Positivo':'⚠️ Abaixo'}</span>
     </td>
   </tr>`;
 
@@ -8696,14 +8697,22 @@ function renderMiniComparativo(){
     <th style="padding:6px 10px;font-size:10px;font-weight:800;color:rgba(255,255,255,.45);text-align:right">DIFERENÇA</th>
     <th style="padding:6px 10px;font-size:10px;font-weight:800;color:rgba(255,255,255,.45);text-align:center">STATUS</th>
   </tr></thead>`;
+  // Cabeçalho para tabela com fundo branco
+  const tableHeadDark = `<thead><tr style="background:#f1f5f9;border-bottom:2px solid #e2e8f0">
+    <th style="padding:7px 10px;font-size:10px;font-weight:800;color:#475569;letter-spacing:1px;text-align:left">EQUIPE</th>
+    <th style="padding:7px 10px;font-size:10px;font-weight:800;color:#3B82F6;text-align:right">ABRIL</th>
+    <th style="padding:7px 10px;font-size:10px;font-weight:800;color:#059669;text-align:right">MAIO</th>
+    <th style="padding:7px 10px;font-size:10px;font-weight:800;color:#475569;text-align:right">DIFERENÇA</th>
+    <th style="padding:7px 10px;font-size:10px;font-weight:800;color:#475569;text-align:center">STATUS</th>
+  </tr></thead>`;
 
   el.innerHTML=`
   <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">🔁 COMPARATIVO DE RESULTADOS: ABRIL VS MAIO</div>
 
   <!-- TOTAL EQUIPES -->
-  <div style="overflow:hidden;border-radius:10px;border:1px solid rgba(255,255,255,.1);margin-bottom:10px">
-    <table style="width:100%;border-collapse:collapse;font-family:Nunito,sans-serif">
-      ${tableHead}
+  <div style="overflow:hidden;border-radius:10px;border:1px solid rgba(0,0,0,.12);margin-bottom:10px;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.18)">
+    <table style="width:100%;border-collapse:collapse;font-family:Nunito,sans-serif;background:#fff">
+      ${tableHeadDark}
       <tbody>${eqRowsHtml}${eqTotalRow}</tbody>
     </table>
   </div>
