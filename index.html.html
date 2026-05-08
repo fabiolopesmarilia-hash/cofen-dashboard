@@ -4317,8 +4317,6 @@ function go(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
   ['geral','editor','equipes','ranking','ranking-digital','ranking-bb','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
-  // Parar polling ao sair da aba recdia
-  if(typeof rdStopPolling==='function') rdStopPolling();
   document.getElementById('pg-'+id).classList.add('on');
   if(id==='geral'){mkGD();mkDist();buildDUManualGrid();}
   if(id==='editor') buildOpEditor();
@@ -4326,36 +4324,7 @@ function go(id,el){
   if(id==='ranking-digital') mkRankingDigital();
   if(id==='ranking-bb') mkRankingBB();
   if(id==='diario'){mkDf();mkDe();buildCal('cal-grid2');}
-  if(id==='recdia'){
-    rdInit();
-    setTimeout(rdRenderEqBreakdown,200);
-    // Forçar leitura do Firebase ao entrar na aba para garantir dados atualizados
-    setTimeout(function(){
-      if(!fbDb||!fbRoom) return;
-      const today = new Date();
-      const dateKey = today.getFullYear()+'_'+(today.getMonth()+1)+'_'+today.getDate();
-      fbDb.ref(fbRoom+'/rd').once('value', snap=>{
-        const remote = snap.val();
-        if(!remote) return;
-        if(remote._date && remote._date !== dateKey) return;
-        const remoteClean = {...remote};
-        delete remoteClean._date;
-        const local = rdGetSaved();
-        const merged = {};
-        const allKeys = new Set([...Object.keys(local), ...Object.keys(remoteClean)]);
-        allKeys.forEach(k=>{
-          const vLocal  = parseFloat(local[k]||0);
-          const vRemote = parseFloat(remoteClean[k]||0);
-          merged[k] = Math.max(vLocal, vRemote);
-        });
-        if(JSON.stringify(merged) !== JSON.stringify(local)){
-          localStorage.setItem(rdTodayKey(), JSON.stringify(merged));
-          rdRender();
-          rdUpdateKPIs();
-        }
-      });
-    }, 300);
-  }
+  if(id==='recdia'){ rdInit(); setTimeout(rdRenderEqBreakdown,200); }
   if(id==='gestao') gestaoInit();
   if(id==='import') importInit();
   if(id==='acordos') acordosInit();
@@ -4983,45 +4952,6 @@ function rdInit(){
   rdBuildSubTabs();
   rdRender();
   rdRenderEqBreakdown();
-  rdStartPolling();
-}
-
-// AUTO-REFRESH: polling a cada 10s quando a aba recdia estiver ativa
-let _rdPollInterval = null;
-function rdStartPolling(){
-  rdStopPolling();
-  _rdPollInterval = setInterval(function(){
-    if(!document.getElementById('pg-recdia')?.classList.contains('on')){
-      rdStopPolling(); return;
-    }
-    if(!fbDb||!fbRoom) return;
-    const today = new Date();
-    const dateKey = today.getFullYear()+'_'+(today.getMonth()+1)+'_'+today.getDate();
-    fbDb.ref(fbRoom+'/rd').once('value', function(snap){
-      const remote = snap.val();
-      if(!remote) return;
-      if(remote._date && remote._date !== dateKey) return;
-      const remoteClean = Object.assign({}, remote);
-      delete remoteClean._date;
-      const local = rdGetSaved();
-      const merged = {};
-      const allKeys = new Set(Object.keys(local).concat(Object.keys(remoteClean)));
-      allKeys.forEach(function(k){
-        const vLocal  = parseFloat(local[k]||0);
-        const vRemote = parseFloat(remoteClean[k]||0);
-        merged[k] = Math.max(vLocal, vRemote);
-      });
-      if(JSON.stringify(merged) !== JSON.stringify(local)){
-        localStorage.setItem(rdTodayKey(), JSON.stringify(merged));
-        if(typeof pulseSyncDot==='function') pulseSyncDot();
-      }
-      rdRender();
-      rdUpdateKPIs();
-    });
-  }, 10000);
-}
-function rdStopPolling(){
-  if(_rdPollInterval){ clearInterval(_rdPollInterval); _rdPollInterval=null; }
 }
 
 
@@ -6590,20 +6520,7 @@ try {
     }
     if(e.data.type === 'rd_update'){
       // Recebimento do dia update from another tab
-      // Aplicar dados recebidos ao localStorage local antes de renderizar
-      try{
-        const remoteMap = JSON.parse(e.data.payload||'{}');
-        const local = rdGetSaved();
-        const merged = {};
-        const allKeys = new Set([...Object.keys(local), ...Object.keys(remoteMap)]);
-        allKeys.forEach(k=>{
-          const vLocal  = parseFloat(local[k]||0);
-          const vRemote = parseFloat(remoteMap[k]||0);
-          merged[k] = Math.max(vLocal, vRemote);
-        });
-        localStorage.setItem(rdTodayKey(), JSON.stringify(merged));
-      }catch(ex){}
-      if(document.getElementById('pg-recdia')?.classList.contains('on')){ rdRender(); rdUpdateKPIs(); }
+      if(document.getElementById('pg-recdia')?.classList.contains('on')) rdRender();
     }
     if(e.data.type === 'photo_update'){
       const photos = JSON.parse(e.data.payload||'{}');
@@ -7397,26 +7314,21 @@ function fbStartListening(){
     // Limpar campo de controle antes de mesclar
     const remoteClean = {...remote};
     delete remoteClean._date;
-    // Merge com local — remoto complementa local (não sobrescreve)
+    // Merge com local — local tem prioridade (evita sobrescrever atualizações do dia com dados antigos do Firebase)
     const local = rdGetSaved();
     const merged = {};
-    // Pega todas as chaves de ambos, prefere o maior valor para cada operador
+    // Se local tem valor lançado, ele prevalece; remoto só entra se local estiver zerado
     const allKeys = new Set([...Object.keys(local), ...Object.keys(remoteClean)]);
     allKeys.forEach(k=>{
       const vLocal  = parseFloat(local[k]||0);
       const vRemote = parseFloat(remoteClean[k]||0);
-      merged[k] = Math.max(vLocal, vRemote);
+      merged[k] = vLocal > 0 ? vLocal : vRemote;
     });
     const localStr = JSON.stringify(local);
-    const mergedStr = JSON.stringify(merged);
-    if(mergedStr !== localStr){
+    if(JSON.stringify(merged) !== localStr){
       localStorage.setItem(rdTodayKey(), JSON.stringify(merged));
+      if(document.getElementById('pg-recdia')?.classList.contains('on')) rdRender();
       pulseSyncDot();
-    }
-    // Sempre atualizar a tela se a aba recdia estiver ativa
-    if(document.getElementById('pg-recdia')?.classList.contains('on')){
-      rdRender();
-      rdUpdateKPIs();
     }
   });
   fbListeners.rd = true;
@@ -7639,10 +7551,12 @@ function fbUpdateRD(map){
   const rdRef   = fbDb.ref(fbRoom+'/rd');
   rdRef.child('_date').once('value', snap=>{
     const remoteDate = snap.val();
-    if(remoteDate && remoteDate === dateKey){
-      rdRef.update(payload).catch(e=>console.warn('FB update(rd) err:',e));
-    } else {
+    if(remoteDate && remoteDate !== dateKey){
+      // Firebase tem dados de outro dia — limpar tudo antes de salvar o dia novo
       rdRef.set(payload).catch(e=>console.warn('FB set(rd) err:',e));
+    } else {
+      // Mesmo dia (ou Firebase vazio) — sempre usar .update() para não apagar dados de outros supervisores
+      rdRef.update(payload).catch(e=>console.warn('FB update(rd) err:',e));
     }
   });
 }
