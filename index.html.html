@@ -1748,10 +1748,18 @@ select.ev-inp{cursor:pointer}
         <table style="width:100%;border-collapse:collapse;font-size:12px">
           <thead>
             <tr style="background:var(--g50)">
-              <th style="padding:9px 12px;text-align:left;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Dia</th>
-              <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Abril (DU)</th>
-              <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Maio (DU)</th>
-              <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200)">Diferença</th>
+              <th rowspan="2" style="padding:9px 12px;text-align:left;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200);vertical-align:middle">Dia</th>
+              <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#3B82F6;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(59,130,246,.3);border-left:2px solid rgba(59,130,246,.25);background:rgba(59,130,246,.06)">🔵 ABRIL</th>
+              <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#00A86B;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(0,168,107,.3);border-left:2px solid rgba(0,168,107,.25);background:rgba(0,168,107,.06)">🟢 MAIO</th>
+              <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--g200);border-left:2px solid var(--g200);background:var(--g50)">⚡ DIFERENÇA</th>
+            </tr>
+            <tr style="background:var(--g50)">
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#3B82F6;letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200);border-left:2px solid rgba(59,130,246,.25);background:rgba(59,130,246,.04)">Rec. do Dia</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#3B82F6;letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200);background:rgba(59,130,246,.04)">Acumulado</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#00A86B;letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200);border-left:2px solid rgba(0,168,107,.25);background:rgba(0,168,107,.04)">Rec. do Dia</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#00A86B;letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200);background:rgba(0,168,107,.04)">Acumulado</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200);border-left:2px solid var(--g200)">No Dia</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200)">No Total</th>
             </tr>
           </thead>
           <tbody id="cmp-table-geral"></tbody>
@@ -1959,18 +1967,19 @@ select.ev-inp{cursor:pointer}
       <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:var(--rm);padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1E40AF;line-height:1.6">
         <strong>Arquivo:</strong> <code>rec_total_geral_*.csv</code><br>
         Colunas usadas: <strong>Coren</strong> (MT/PI/MA/CE) · <strong>Valor Recebido</strong> · <strong>Valor Tarifa</strong> · <strong>Pague Play (24,96%)</strong> · <strong>Coren (56,28%)</strong> · <strong>Cofen (18,76%)</strong><br>
-        <span style="color:#6B7280">Abra o CSV, selecione tudo (Ctrl+A), copie (Ctrl+C) e cole abaixo</span>
+        <span style="color:#059669;font-weight:700">⚡ Ao carregar o arquivo, os valores são aplicados automaticamente!</span>
       </div>
 
       <!-- Upload area -->
       <div id="drop-geral-modal" onclick="document.getElementById('file-geral-modal').click()"
-        ondragover="event.preventDefault();this.style.background='var(--ppl)'"
-        ondragleave="this.style.background=''"
-        ondrop="event.preventDefault();this.style.background='';processarArquivoGeral(event.dataTransfer.files[0])"
-        style="border:2px dashed var(--g300);border-radius:var(--rl);padding:16px;text-align:center;cursor:pointer;margin-bottom:10px;transition:all .2s">
-        <div style="font-size:28px;margin-bottom:6px">📂</div>
-        <div style="font-size:13px;font-weight:700;color:var(--g700)">Clique para selecionar arquivo ou arraste aqui</div>
-        <div style="font-size:11px;color:var(--g500);margin-top:3px">.csv · .xls · .xlsx · .txt</div>
+        ondragover="event.preventDefault();this.style.background='var(--ppl)';this.style.borderColor='var(--pp)'"
+        ondragleave="this.style.background='';this.style.borderColor='var(--g300)'"
+        ondrop="event.preventDefault();this.style.background='';this.style.borderColor='var(--g300)';processarArquivoGeral(event.dataTransfer.files[0])"
+        style="border:2px dashed var(--g300);border-radius:var(--rl);padding:20px 16px;text-align:center;cursor:pointer;margin-bottom:10px;transition:all .2s;background:var(--g50)">
+        <div style="font-size:32px;margin-bottom:8px">📂</div>
+        <div style="font-size:14px;font-weight:800;color:var(--pp)">Clique ou arraste o arquivo aqui</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:4px">.csv · .xls · .xlsx · .txt</div>
+        <div style="font-size:10px;font-weight:700;color:#059669;margin-top:6px;background:#F0FDF4;border:1px solid rgba(0,168,107,.3);border-radius:100px;display:inline-block;padding:3px 12px">⚡ Aplica automaticamente ao carregar</div>
         <input id="file-geral-modal" type="file" accept=".csv,.txt,.tsv,.xls,.xlsx" style="display:none" onchange="processarArquivoGeral(this.files[0])">
       </div>
 
@@ -2824,23 +2833,26 @@ function fecharModalEmpresa(){
   document.getElementById('modal-import-empresa').style.display = 'none';
 }
 
-// Ler arquivo como texto e processar
+// Ler arquivo como texto e processar — aplica automaticamente ao carregar
 function processarArquivoGeral(file){
   if(!file) return;
+  function _aoLer(txt){
+    document.getElementById('txt-geral-modal').value = txt.slice(0,50000);
+    previewGeral(txt);
+    // Auto-aplicar após parse bem-sucedido
+    if(_geralParsed && !_geralParsed.error){
+      aplicarGeral();
+      // Fechar modal após 900ms para o usuário ver o status de confirmação
+      setTimeout(()=>fecharModalGeral(), 900);
+    }
+  }
   const ext = file.name.split('.').pop().toLowerCase();
   if(ext==='xls'||ext==='xlsx'){
-    _lerXLS(file, txt => {
-      document.getElementById('txt-geral-modal').value = txt.slice(0,50000);
-      previewGeral(txt);
-    });
+    _lerXLS(file, _aoLer);
     return;
   }
   const reader = new FileReader();
-  reader.onload = e => {
-    const txt = e.target.result;
-    document.getElementById('txt-geral-modal').value = txt.slice(0, 50000);
-    previewGeral(txt);
-  };
+  reader.onload = e => _aoLer(e.target.result);
   reader.readAsText(file, 'latin1');
 }
 function processarArquivoEmpresa(file){
@@ -2891,6 +2903,7 @@ function _lerXLS(file, callback){
 // Vars globais para historico mensal (preenchidas ao importar)
 let _histMensalGeral   = {};  // { '2026-01': {rec, pp, corens:{PI,MA,MT,CE}} }
 let _histMensalEmpresa = {};  // { '2026-01': pp }
+let _geralDailyMaio    = {};  // { 4: rec, 5: rec, 6: rec, ... } — dia calendário → rec do dia (Maio)
 
 // Carregar historico mensal do localStorage ao iniciar
 try{
@@ -2898,7 +2911,53 @@ try{
   if(_sg) _histMensalGeral = JSON.parse(_sg);
   const _se = localStorage.getItem('cofen_hist_empresa');
   if(_se) _histMensalEmpresa = JSON.parse(_se);
+  const _sd = localStorage.getItem('cofen_geral_daily_maio');
+  if(_sd) _geralDailyMaio = JSON.parse(_sd);
 }catch(e){}
+
+// ── Parser diário do arquivo geral: agrupa rec por dia do calendário de Maio ──
+function _parseGeralDiario(raw){
+  const lines = raw.trim().split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length < 2) return {};
+  const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
+  const norm = s => s.trim().replace(/^"|"$/g,'').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const headers = lines[0].split(sep).map(norm);
+  const col = cands => { for(const c of cands){ const i=headers.findIndex(h=>h.includes(c)); if(i>=0)return i; } return -1; };
+
+  const iData  = col(['data','dt.baixa','dt baixa','date','dt baixa','data baixa']);
+  const iRec   = col(['valor recebido','vlr recebido','recebido','valor rec']);
+  if(iData < 0 || iRec < 0) return {};
+
+  const pN = s => {
+    if(!s||s.trim()===''||s.trim()==='-') return 0;
+    let v = s.trim().replace(/^"/,'').replace(/"$/,'').replace(/R\$\s*/,'').trim();
+    if(/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(v)) return parseFloat(v.replace(/\./g,'').replace(',','.'));
+    return parseFloat(v.replace(',','.')) || 0;
+  };
+
+  const daily = {};
+  for(let i=1;i<lines.length;i++){
+    const cells = lines[i].split(sep).map(c=>c.trim().replace(/^"|"$/g,''));
+    if(cells.length < 3) continue;
+    const fc = cells[0].toLowerCase().trim();
+    if(fc===''||fc.includes('total')||fc.includes('soma')) continue;
+    const vRec = pN(cells[iRec]);
+    if(vRec === 0) continue;
+    // Detectar data: DD/MM/YYYY ou YYYY-MM-DD
+    const dtRaw = cells[iData]||'';
+    let dia = 0, mes = 0;
+    const m1 = dtRaw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    const m2 = dtRaw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(m1){ dia=parseInt(m1[1]); mes=parseInt(m1[2]); }
+    else if(m2){ dia=parseInt(m2[3]); mes=parseInt(m2[2]); }
+    if(dia===0 || mes!==5) continue; // só Maio
+    daily[dia] = (daily[dia]||0) + vRec;
+  }
+  // Arredondar
+  Object.keys(daily).forEach(k=>{ daily[k]=Math.round(daily[k]*100)/100; });
+  return daily;
+}
 
 // Parser auxiliar — extrai totais por mes/COREN (complementa _parseImportCSV)
 function _parseMensal(raw){
@@ -3158,6 +3217,28 @@ function aplicarGeral(){
   // Salvar historico mensal
   _histMensalGeral = _parseMensal(raw);
   localStorage.setItem('cofen_hist_geral', JSON.stringify(_histMensalGeral));
+
+  // Salvar breakdown diário de Maio (para comparativo DU a DU)
+  _geralDailyMaio = _parseGeralDiario(raw);
+  localStorage.setItem('cofen_geral_daily_maio', JSON.stringify(_geralDailyMaio));
+
+  // ── NOVO: popular vgDB (Visão Geral / Comparativo) com o mesmo arquivo ──
+  if(typeof vgParse === 'function'){
+    const vgResult = vgParse(raw);
+    if(vgResult && !vgResult.err && vgResult.n > 0){
+      try { localStorage.setItem('cofen_vg3', JSON.stringify(vgResult)); } catch(e){}
+      if(typeof cmpAtualizarCumul === 'function'){
+        cmpAtualizarCumul();
+        if(typeof cmpRenderGeral === 'function') cmpRenderGeral();
+        if(typeof cmpInit === 'function') cmpInit();
+      }
+      if(typeof renderMiniComparativo === 'function') renderMiniComparativo();
+      if(typeof window.vgRender === 'function') window.vgRender();
+      const nReg = vgResult.n;
+      statusEl.innerHTML += ' · <span style="color:#1a6ef5;font-weight:800">📊 Comparativo atualizado (' + nReg + ' reg)</span>';
+    }
+  }
+
   renderResumoEditor();
 
   setTimeout(() => fecharModalGeral(), 2000);
@@ -8598,6 +8679,22 @@ let cmpSortDir = -1;
 function cmpFmt(v){ return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
 function cmpFmtK(v){ const a=Math.abs(v); const s=v>=0?'+':'-'; return s+'R$ '+(a>=1000?(a/1000).toFixed(1).replace('.',',')+'k':Math.round(a).toLocaleString('pt-BR')); }
 
+// Retorna o total real de Maio do arquivo Visão Geral Financeira (vgDB)
+function cmpGetTotalMaioGeral(){
+  try{
+    const vgRaw = localStorage.getItem('cofen_vg3');
+    if(vgRaw){
+      const vg = JSON.parse(vgRaw);
+      if(vg && vg.mes){
+        const maio = vg.mes['2026-05'];
+        if(maio && maio.vr > 0) return maio.vr;
+      }
+    }
+  }catch(e){}
+  // Fallback: overrideTotalRec (editor manual)
+  return overrideTotalRec > 0 ? overrideTotalRec : 0;
+}
+
 // ── Mini Comparativo Abril vs Maio (bloco no topo da Visão Geral) ──
 function renderMiniComparativo(){
   const el = document.getElementById('pp-mini-comp');
@@ -8624,8 +8721,9 @@ function renderMiniComparativo(){
   }).sort((a,b)=>b.maio-a.maio);
 
   const eqTotalAbril = eqRows.reduce((s,r)=>s+r.abril,0);
-  // Total Maio: usa rec geral (respeita override do editor) em vez de somar só as equipes principais
-  const eqTotalMaio  = getTotalRec() > 0 ? getTotalRec() : eqRows.reduce((s,r)=>s+r.maio, 0);
+  // Total Maio: usa rec geral (Visão Geral Financeira) como fonte de verdade
+  const _totalMaioGeral = cmpGetTotalMaioGeral();
+  const eqTotalMaio  = _totalMaioGeral > 0 ? _totalMaioGeral : eqRows.reduce((s,r)=>s+r.maio, 0);
   const eqTotalDiff  = eqTotalMaio - eqTotalAbril;
   const eqTP = eqTotalDiff >= 0;
   const eqTDTxt = (eqTP?'+ ':'- ')+'R$ '+Math.abs(eqTotalDiff).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -8659,45 +8757,90 @@ function renderMiniComparativo(){
     </td>
   </tr>`;
 
-  // ── BLOCO 2: RECEBIMENTO POR DU ───────────────────────────────────────────
-  let rows='', totalA=0, totalM=0;
-  for(let du=1;du<=maxDU;du++){
-    const a=dailyDU(CMP_ABRIL_DU,du), m=dailyDU(CMP_MAIO_CUMUL,du);
-    totalA+=a; totalM+=m;
-    const diff=m-a, pos=diff>=0;
-    const diffTxt=(pos?'+ ':'- ')+'R$ '+Math.abs(diff).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-    const clr=pos?'#4ADE80':'#F87171';
-    const bg=du%2===0?'rgba(255,255,255,.025)':'transparent';
+  // ── BLOCO 2: RECEBIMENTO POR DU — 6 colunas igual ao comparativo principal ──
+  // Helper: valor acumulado até DU
+  function acumDU(obj, du){ return obj[du] || 0; }
+
+  let rows='';
+  let totalAbrilAcum=0, totalMaioAcum=0, totalAbrilDia=0, totalMaioDia=0;
+  const maxDUAbril = Math.max(...Object.keys(CMP_ABRIL_DU).map(Number));
+
+  for(let du=1; du<=maxDU; du++){
+    const abrilDia  = dailyDU(CMP_ABRIL_DU, du);
+    const abrilAcum = acumDU(CMP_ABRIL_DU, du);
+    const hasM      = CMP_MAIO_CUMUL[du] !== undefined;
+    const maioDia   = hasM ? dailyDU(CMP_MAIO_CUMUL, du) : null;
+    const maioAcum  = hasM ? acumDU(CMP_MAIO_CUMUL, du) : null;
+
+    const diffDia   = hasM ? maioDia  - abrilDia  : null;
+    const diffAcum  = hasM ? maioAcum - abrilAcum : null;
+
+    const posDia  = diffDia  >= 0;
+    const posAcum = diffAcum >= 0;
+    const clrDia  = posDia  ? '#4ADE80' : '#F87171';
+    const clrAcum = posAcum ? '#4ADE80' : '#F87171';
+
+    const fmtDiff = (v, pos) => (pos?'+ ':'- ')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+    const diaCalMaio = CMP_MAIO_DU_DIAS[du-1] ? ' ('+String(CMP_MAIO_DU_DIAS[du-1]).padStart(2,'0')+'/05)' : '';
+    const bg = du%2===0 ? 'rgba(255,255,255,.03)' : 'transparent';
+
+    if(hasM){ totalAbrilDia+=abrilDia; totalMaioDia+=maioDia; }
+    totalAbrilAcum = abrilAcum;
+    if(hasM) totalMaioAcum = maioAcum;
+
     rows+=`<tr style="border-bottom:1px solid rgba(255,255,255,.05);background:${bg}">
-      <td style="padding:6px 10px;font-size:12px;font-weight:800;color:rgba(255,255,255,.8)">DU ${du}</td>
-      <td style="padding:6px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#3B82F6">${a>0?cmpFmt(a):'—'}</td>
-      <td style="padding:6px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#00A86B">${m>0?cmpFmt(m):'—'}</td>
-      <td style="padding:6px 10px;text-align:right;font-size:12px;font-weight:800;color:${clr}">${a>0&&m>0?diffTxt:'—'}</td>
-      <td style="padding:6px 10px;text-align:center">
-        <span style="font-size:10px;font-weight:800;color:${clr};background:${pos?'rgba(74,222,128,.15)':'rgba(248,113,113,.15)'};border:1px solid ${clr}44;border-radius:100px;padding:2px 8px;white-space:nowrap">${a>0&&m>0?(pos?'✅ Positivo':'⚠️ Abaixo'):'—'}</span>
+      <td style="padding:6px 10px;font-size:11px;font-weight:800;color:rgba(255,255,255,.85);white-space:nowrap">DU ${du}<span style="font-size:9px;color:rgba(255,255,255,.35);font-weight:500">${hasM?diaCalMaio:''}</span></td>
+      <td style="padding:6px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#3B82F6;border-left:1px solid rgba(59,130,246,.2)">${abrilDia>0?cmpFmt(abrilDia):'—'}</td>
+      <td style="padding:6px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(59,130,246,.6)">${abrilAcum>0?cmpFmt(abrilAcum):'—'}</td>
+      <td style="padding:6px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#00A86B;border-left:1px solid rgba(0,168,107,.2)">${hasM&&maioDia!==null?cmpFmt(maioDia):'—'}</td>
+      <td style="padding:6px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(0,168,107,.7)">${hasM?cmpFmt(maioAcum):'—'}</td>
+      <td style="padding:6px 8px;text-align:right;font-size:11px;font-weight:800;color:${clrDia};border-left:1px solid rgba(255,255,255,.08)">${diffDia!==null?fmtDiff(diffDia,posDia):'—'}</td>
+      <td style="padding:6px 8px;text-align:right;font-size:11px;font-weight:800;color:${clrAcum}">${diffAcum!==null?fmtDiff(diffAcum,posAcum):'—'}</td>
+      <td style="padding:6px 8px;text-align:center">
+        <span style="font-size:9px;font-weight:800;color:${clrDia};background:${posDia?'rgba(74,222,128,.15)':'rgba(248,113,113,.15)'};border:1px solid ${clrDia}44;border-radius:100px;padding:2px 7px;white-space:nowrap">${diffDia!==null?(posDia?'✅':'⚠️'):'—'}</span>
       </td>
     </tr>`;
   }
-  const td=totalM-totalA, tp=td>=0;
-  const tdTxt=(tp?'+ ':'- ')+'R$ '+Math.abs(td).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const tclr=tp?'#4ADE80':'#F87171';
+
+  // Linha total
+  const totalDiffDia  = totalMaioDia  - totalAbrilDia;
+  const totalDiffAcum = totalMaioAcum - totalAbrilAcum;
+  const tpDia  = totalDiffDia  >= 0;
+  const tpAcum = totalDiffAcum >= 0;
+  const tclrDia  = tpDia  ? '#4ADE80' : '#F87171';
+  const tclrAcum = tpAcum ? '#4ADE80' : '#F87171';
+  const fmtT = (v, pos) => (pos?'+ ':'- ')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   rows+=`<tr style="border-top:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07)">
-    <td style="padding:8px 10px;font-size:12px;font-weight:900;color:rgba(255,255,255,.9)">TOTAL (${maxDU} DUs)</td>
-    <td style="padding:8px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#3B82F6">${cmpFmt(totalA)}</td>
-    <td style="padding:8px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#00A86B">${cmpFmt(totalM)}</td>
-    <td style="padding:8px 10px;text-align:right;font-size:13px;font-weight:900;color:${tclr}">${tdTxt}</td>
-    <td style="padding:8px 10px;text-align:center">
-      <span style="font-size:11px;font-weight:900;color:${tclr};background:${tp?'rgba(74,222,128,.18)':'rgba(248,113,113,.18)'};border:1px solid ${tclr}66;border-radius:100px;padding:3px 10px">${tp?'✅ Positivo':'⚠️ Abaixo'}</span>
+    <td style="padding:8px 10px;font-size:11px;font-weight:900;color:rgba(255,255,255,.9)">TOTAL (${maxDU} DUs)</td>
+    <td style="padding:8px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#3B82F6;border-left:1px solid rgba(59,130,246,.2)">—</td>
+    <td style="padding:8px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(59,130,246,.7)">${cmpFmt(totalAbrilAcum)}</td>
+    <td style="padding:8px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#00A86B;border-left:1px solid rgba(0,168,107,.2)">—</td>
+    <td style="padding:8px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(0,168,107,.7)">${cmpFmt(totalMaioAcum)}</td>
+    <td style="padding:8px 8px;text-align:right;font-size:12px;font-weight:900;color:${tclrDia};border-left:1px solid rgba(255,255,255,.08)">—</td>
+    <td style="padding:8px 8px;text-align:right;font-size:12px;font-weight:900;color:${tclrAcum}">${fmtT(totalDiffAcum,tpAcum)}</td>
+    <td style="padding:8px 8px;text-align:center">
+      <span style="font-size:10px;font-weight:900;color:${tclrAcum};background:${tpAcum?'rgba(74,222,128,.18)':'rgba(248,113,113,.18)'};border:1px solid ${tclrAcum}66;border-radius:100px;padding:3px 9px">${tpAcum?'✅ Positivo':'⚠️ Abaixo'}</span>
     </td>
   </tr>`;
 
-  const tableHead = `<thead><tr style="background:rgba(255,255,255,.07)">
-    <th style="padding:6px 10px;font-size:10px;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:1px;text-align:left">EQUIPE / DIA ÚTIL</th>
-    <th style="padding:6px 10px;font-size:10px;font-weight:800;color:#3B82F6;text-align:right">ABRIL</th>
-    <th style="padding:6px 10px;font-size:10px;font-weight:800;color:#00A86B;text-align:right">MAIO</th>
-    <th style="padding:6px 10px;font-size:10px;font-weight:800;color:rgba(255,255,255,.45);text-align:right">DIFERENÇA</th>
-    <th style="padding:6px 10px;font-size:10px;font-weight:800;color:rgba(255,255,255,.45);text-align:center">STATUS</th>
-  </tr></thead>`;
+  const tableHead = `<thead>
+    <tr style="background:rgba(255,255,255,.08)">
+      <th rowspan="2" style="padding:6px 10px;font-size:9px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1px;text-align:left;vertical-align:middle">DIA ÚTIL</th>
+      <th colspan="2" style="padding:5px 8px;font-size:9px;font-weight:800;color:#3B82F6;text-align:center;border-left:1px solid rgba(59,130,246,.3);border-bottom:1px solid rgba(59,130,246,.2);letter-spacing:.8px">🔵 ABRIL</th>
+      <th colspan="2" style="padding:5px 8px;font-size:9px;font-weight:800;color:#00A86B;text-align:center;border-left:1px solid rgba(0,168,107,.3);border-bottom:1px solid rgba(0,168,107,.2);letter-spacing:.8px">🟢 MAIO</th>
+      <th colspan="2" style="padding:5px 8px;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);text-align:center;border-left:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);letter-spacing:.8px">⚡ DIFERENÇA</th>
+      <th rowspan="2" style="padding:6px 8px;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);text-align:center;vertical-align:middle;letter-spacing:.8px">STATUS</th>
+    </tr>
+    <tr style="background:rgba(255,255,255,.05)">
+      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(59,130,246,.8);text-align:right;border-left:1px solid rgba(59,130,246,.2)">Rec. Dia</th>
+      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(59,130,246,.55);text-align:right">Acumulado</th>
+      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(0,168,107,.8);text-align:right;border-left:1px solid rgba(0,168,107,.2)">Rec. Dia</th>
+      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(0,168,107,.55);text-align:right">Acumulado</th>
+      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(255,255,255,.35);text-align:right;border-left:1px solid rgba(255,255,255,.08)">No Dia</th>
+      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(255,255,255,.35);text-align:right">No Total</th>
+    </tr>
+  </thead>`;
   // Cabeçalho para tabela com fundo branco
   const tableHeadDark = `<thead><tr style="background:#f1f5f9;border-bottom:2px solid #e2e8f0">
     <th style="padding:7px 10px;font-size:10px;font-weight:800;color:#475569;letter-spacing:1px;text-align:left">EQUIPE</th>
@@ -8738,61 +8881,45 @@ function cmpTab(view, el){
   if(view==='operadores') cmpRenderOps();
 }
 
-// Reconstrói CMP_MAIO_CUMUL (por DU) a partir da fonte correta:
-// - Se overrideTotalRec > 0 (Importar Total Geral / Editor): usa esse total como acumulado
-// - Senão: tenta D.global.daily (operadores importados)
+// Reconstrói CMP_MAIO_CUMUL (por DU) usando vgDB.dia (Visão Geral Financeira) como fonte principal
+// Hierarquia: 1) vgDB.dia (rec diário real do arquivo geral) → 2) overrideTotalRec linear → 3) operadores
 function cmpAtualizarCumul(){
-  // Limpa e reconstrói por número de DU
   Object.keys(CMP_MAIO_CUMUL).forEach(k=>delete CMP_MAIO_CUMUL[k]);
 
-  // Fonte de verdade: total geral (Importar Total Geral / Editor)
-  const totalGeralRec = overrideTotalRec > 0 ? overrideTotalRec : 0;
+  // Tenta carregar vgDB do localStorage (Visão Geral Financeira)
+  let vgDia = {};
+  try{
+    const vgRaw = localStorage.getItem('cofen_vg3');
+    if(vgRaw){ const vg = JSON.parse(vgRaw); if(vg && vg.dia) vgDia = vg.dia; }
+  }catch(e){}
 
-  if(totalGeralRec > 0){
-    // ── MODO TOTAL GERAL: distribui o total geral proporcionalmente pelos DUs até hoje ──
-    // NÃO usa D.global.daily (que é só da empresa/PaguePay, não o total geral)
+  // Verifica se tem dados de Maio no vgDB.dia (chaves '2026-05-XX')
+  const diasVgMaio = Object.keys(vgDia).filter(k=>k.startsWith('2026-05'));
+
+  if(diasVgMaio.length > 0){
+    // ── MODO 1: Dados reais do arquivo Visão Geral — acumula por DU ──
+    let acum = 0;
+    CMP_MAIO_DU_DIAS.forEach((diaCalendario, idx)=>{
+      const du = idx + 1;
+      const prevDia = idx > 0 ? CMP_MAIO_DU_DIAS[idx-1] : 0;
+      for(let d = prevDia+1; d <= diaCalendario; d++){
+        const key = '2026-05-' + String(d).padStart(2,'0');
+        if(vgDia[key]) acum += vgDia[key].vr || 0;
+      }
+      if(diasVgMaio.some(k=> parseInt(k.slice(8)) <= diaCalendario)){
+        CMP_MAIO_CUMUL[du] = Math.round(acum*100)/100;
+      }
+    });
+  } else if(overrideTotalRec > 0){
+    // ── MODO 2: Só tem total (editor/importar total geral) → linear ──
     const hoje = new Date().getDate();
     let duHoje = 0;
     CMP_MAIO_DU_DIAS.forEach((dia, idx)=>{ if(dia <= hoje) duHoje = idx + 1; });
-    if(duHoje > 0){
-      // Verifica se há dados diários para usar como forma da curva
-      const daily = D.global.daily||{};
-      const diasComDado = Object.keys(daily).map(Number).sort((a,b)=>a-b);
-      if(diasComDado.length > 0){
-        // Tem diário: usa a FORMA da curva mas recalibra o total para o geral
-        let acum = 0;
-        const duVals = {};
-        CMP_MAIO_DU_DIAS.forEach((diaCalendario, idx)=>{
-          const du = idx + 1;
-          const prevDia = idx > 0 ? CMP_MAIO_DU_DIAS[idx-1] : 0;
-          for(let d = prevDia+1; d <= diaCalendario; d++){ if(daily[d]) acum += daily[d]; }
-          if(diasComDado.some(d=>d<=diaCalendario)) duVals[du] = acum;
-        });
-        const dusComDado = Object.keys(duVals).map(Number).sort((a,b)=>a-b);
-        if(dusComDado.length > 0){
-          const totalDiario = duVals[Math.max(...dusComDado)] || 0;
-          if(totalDiario > 0){
-            // Escala proporcional: mantém a forma da curva, ajusta para o total geral
-            const fator = totalGeralRec / totalDiario;
-            dusComDado.forEach(du=>{
-              CMP_MAIO_CUMUL[du] = Math.round(duVals[du] * fator * 100) / 100;
-            });
-          } else {
-            // Sem valor diário: linear
-            for(let du=1; du<=duHoje; du++){
-              CMP_MAIO_CUMUL[du] = Math.round(totalGeralRec * (du/duHoje) * 100)/100;
-            }
-          }
-        }
-      } else {
-        // Sem dados diários: distribui linearmente
-        for(let du=1; du<=duHoje; du++){
-          CMP_MAIO_CUMUL[du] = Math.round(totalGeralRec * (du/duHoje) * 100)/100;
-        }
-      }
+    for(let du=1; du<=duHoje; du++){
+      CMP_MAIO_CUMUL[du] = Math.round(overrideTotalRec * (du/duHoje) * 100) / 100;
     }
   } else {
-    // ── MODO OPERADORES: sem total geral definido, usa D.global.daily ──
+    // ── MODO 3: Sem geral → usa daily dos operadores (empresa/PaguePay) ──
     const daily = D.global.daily||{};
     const diasComDado = Object.keys(daily).map(Number).sort((a,b)=>a-b);
     if(diasComDado.length > 0){
@@ -8803,19 +8930,6 @@ function cmpAtualizarCumul(){
         for(let d = prevDia+1; d <= diaCalendario; d++){ if(daily[d]) acum += daily[d]; }
         if(diasComDado.some(d=>d<=diaCalendario)) CMP_MAIO_CUMUL[du] = acum;
       });
-    } else {
-      // Último fallback: soma bruta de equipes, distribuída linearmente
-      const totalBruto = D.equipes.reduce((s,e)=>s+e.rec,0);
-      if(totalBruto > 0){
-        const hoje = new Date().getDate();
-        let duHoje = 0;
-        CMP_MAIO_DU_DIAS.forEach((dia, idx)=>{ if(dia <= hoje) duHoje = idx + 1; });
-        if(duHoje > 0){
-          for(let du=1; du<=duHoje; du++){
-            CMP_MAIO_CUMUL[du] = Math.round(totalBruto * (du/duHoje) * 100)/100;
-          }
-        }
-      }
     }
   }
 
@@ -8840,9 +8954,9 @@ function cmpInit(){
   // Atualiza hero cards dinamicos
   const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
   const totalAbril = CMP_ABRIL_DU[Math.max(...Object.keys(CMP_ABRIL_DU).map(Number))] || 0;
-  // Fonte de verdade: total geral (overrideTotalRec) se disponível, senão último DU do cumul
-  const totalMaio  = overrideTotalRec > 0
-    ? overrideTotalRec
+  // Fonte de verdade: total geral (Visão Geral Financeira / overrideTotalRec) se disponível, senão último DU do cumul
+  const totalMaio  = cmpGetTotalMaioGeral() > 0
+    ? cmpGetTotalMaioGeral()
     : (dusMaio.length ? CMP_MAIO_CUMUL[Math.max(...dusMaio)] : null);
   const heroDia = dusMaio.length ? CMP_MAIO_DU_DIAS[Math.max(...dusMaio)-1] : null;
   const heroLabel = document.getElementById('cmp-hero-maio-label');
@@ -8902,34 +9016,55 @@ function cmpBuildTableGeral(){
   tbody.innerHTML='';
   const maxDU = Math.max(...Object.keys(CMP_ABRIL_DU).map(Number)); // 22 DUs de Abril
   const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+
+  // Helper: valor diário (não acumulado) a partir de objeto acumulado
+  function recDia(obj, du){ return Math.max(0, (obj[du]||0) - (obj[du-1]||0)); }
+
   for(let du=1; du<=maxDU; du++){
-    const a = CMP_ABRIL_DU[du] || 0;
-    const m = CMP_MAIO_CUMUL[du];
-    const hasM = m !== undefined;
+    const abrilAcum = CMP_ABRIL_DU[du] || 0;
+    const abrilDia  = recDia(CMP_ABRIL_DU, du);
+    const maioAcum  = CMP_MAIO_CUMUL[du];
+    const hasM      = maioAcum !== undefined;
+    const maioDia   = hasM ? recDia(CMP_MAIO_CUMUL, du) : null;
+
     // Dia do calendário de Maio para este DU
     const diaCalMaio = CMP_MAIO_DU_DIAS[du-1] ? ' ('+('0'+CMP_MAIO_DU_DIAS[du-1]).slice(-2)+'/05)' : '';
-    const diff = hasM ? m - a : null;
-    const cls = diff > 0 ? '#065F46' : diff < 0 ? '#991B1B' : '#555';
-    const bg  = diff > 0 ? '#F0FDF4' : diff < 0 ? '#FEF2F2' : '';
-    tbody.innerHTML += `<tr style="border-bottom:1px solid var(--g100);background:${bg}">
-      <td style="padding:8px 12px;font-weight:800;color:var(--g900)">DU ${du}<span style="font-size:10px;color:var(--g500);font-weight:600">${hasM?diaCalMaio:''}</span></td>
-      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#3B82F6">${a>0?cmpFmt(a):'—'}</td>
-      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#00A86B">${hasM?cmpFmt(m):'—'}</td>
-      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;font-weight:800;color:${cls}">${diff!==null?cmpFmtK(diff):'—'}</td>
+
+    // Diferenças
+    const diffDia  = hasM ? (maioDia - abrilDia) : null;
+    const diffAcum = hasM ? (maioAcum - abrilAcum) : null;
+
+    const clsDia  = diffDia  > 0 ? '#065F46' : diffDia  < 0 ? '#991B1B' : '#555';
+    const clsAcum = diffAcum > 0 ? '#065F46' : diffAcum < 0 ? '#991B1B' : '#555';
+    const bgDia   = diffDia  > 0 ? '#F0FDF4' : diffDia  < 0 ? '#FEF2F2' : '';
+
+    tbody.innerHTML += `<tr style="border-bottom:1px solid var(--g100);background:${bgDia}">
+      <td style="padding:8px 12px;font-weight:800;color:var(--g900);white-space:nowrap">DU ${du}<span style="font-size:10px;color:var(--g500);font-weight:600">${hasM?diaCalMaio:''}</span></td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#3B82F6;border-left:2px solid rgba(59,130,246,.15)">${abrilDia>0?cmpFmt(abrilDia):'—'}</td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#3B82F6;opacity:.75">${abrilAcum>0?cmpFmt(abrilAcum):'—'}</td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#00A86B;border-left:2px solid rgba(0,168,107,.15)">${hasM&&maioDia!==null?cmpFmt(maioDia):'—'}</td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#00A86B;opacity:.75">${hasM?cmpFmt(maioAcum):'—'}</td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;font-weight:800;color:${clsDia};border-left:2px solid var(--g200)">${diffDia!==null?cmpFmtK(diffDia):'—'}</td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;font-weight:800;color:${clsAcum}">${diffAcum!==null?cmpFmtK(diffAcum):'—'}</td>
     </tr>`;
   }
-  // Linha de total — usa total geral (overrideTotalRec) como fonte de verdade quando disponível
+
+  // Linha de total — usa total geral (Visão Geral Financeira) como fonte de verdade quando disponível
   const totalAbril = CMP_ABRIL_DU[maxDU] || 0;
-  const totalMaio  = overrideTotalRec > 0
-    ? overrideTotalRec
+  const _vgTotal = cmpGetTotalMaioGeral();
+  const totalMaio  = _vgTotal > 0
+    ? _vgTotal
     : (dusMaio.length ? CMP_MAIO_CUMUL[Math.max(...dusMaio)] : null);
   const totalDiff  = totalMaio !== null ? totalMaio - totalAbril : null;
   const tcls = totalDiff !== null ? (totalDiff >= 0 ? '#065F46' : '#991B1B') : '#555';
   tbody.innerHTML += `<tr style="border-top:2px solid var(--g200);background:var(--g50)">
-    <td style="padding:10px 12px;font-weight:900;color:var(--g900);font-size:13px">TOTAL (${dusMaio.length||0} DUs)</td>
-    <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#3B82F6">${cmpFmt(totalAbril)}</td>
-    <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#00A86B">${totalMaio!==null?cmpFmt(totalMaio):'—'}</td>
-    <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;font-weight:900;color:${tcls}">${totalDiff!==null?cmpFmtK(totalDiff):'—'}</td>
+    <td style="padding:10px 12px;font-weight:900;color:var(--g900);font-size:13px" colspan="1">TOTAL (${dusMaio.length||0} DUs)</td>
+    <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#3B82F6;border-left:2px solid rgba(59,130,246,.2)">—</td>
+    <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#3B82F6">${cmpFmt(totalAbril)}</td>
+    <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#00A86B;border-left:2px solid rgba(0,168,107,.2)">—</td>
+    <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#00A86B">${totalMaio!==null?cmpFmt(totalMaio):'—'}</td>
+    <td style="padding:10px 12px;text-align:right;font-size:15px;font-weight:900;color:${tcls};border-left:2px solid var(--g200)">—</td>
+    <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;font-weight:900;color:${tcls}">${totalDiff!==null?cmpFmtK(totalDiff):'—'}</td>
   </tr>`;
 }
 
@@ -9822,6 +9957,10 @@ setInterval(()=>{
 
     return {tot:tot, mes:mes, sem:sem, dia:dia, cor:cor, for_:for_, oper:oper, dMin:dMin, dMax:dMax, n:tot.n};
   }
+
+  /* Expor funções globalmente para que aplicarGeral() possa usar */
+  window.vgParse  = vgParse;
+  window.vgRender = function(){ vgRender(); };
 
   /* ── Preview ──────────────────────────────────────────── */
   window.vgPreview = function (raw) {
