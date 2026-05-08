@@ -575,7 +575,49 @@ select.ev-inp{cursor:pointer}
       <span id="h-arrecadado-media"></span><span id="h-arrecadado-need"></span>
       <span id="h-arrecadado-pct"></span><div id="h-arrecadado-bar"></div>
     </div>
+
+    <!-- ══ TABELA METAS & PROJEÇÕES — dentro do hero ══ -->
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap;gap:6px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase">🏆 METAS & PROJEÇÕES — EQUIPES MAIO 2026</div>
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.3);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:3px 10px" id="eq-mt-badge">— DIAS ÚTEIS RESTANTES</div>
+      </div>
+      <div style="background:rgba(252,211,77,.12);border:1px solid rgba(252,211,77,.3);border-radius:var(--r);padding:6px 12px;font-size:10px;font-weight:700;color:#FCD34D;margin-bottom:8px;letter-spacing:.3px">
+        ⚡ TEMOS HOJE E AMANHÃ PARA MELHORAR ESTES NÚMEROS
+      </div>
+      <div style="overflow-x:auto;border-radius:var(--rm)">
+        <table style="width:100%;border-collapse:collapse;font-family:Nunito,sans-serif;min-width:560px">
+          <thead>
+            <tr style="background:rgba(255,255,255,.06)">
+              <th style="padding:7px 12px;text-align:left;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">LÍDERES</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#4ADE80;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">VALOR REC.</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">META</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#67E8F9;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">REC POR DIA</th>
+              <th id="eq-mt-col-header" style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#FCD34D;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">META DE HOJE — DUs</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#C084FC;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">DEVERIA ESTAR HOJE</th>
+              <th id="eq-mt-col-pct-header" style="padding:7px 12px;text-align:center;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">% S/ META HOJE</th>
+            </tr>
+          </thead>
+          <tbody id="eq-metas-tbody">
+            <tr><td colspan="6" style="padding:14px;text-align:center;color:rgba(255,255,255,.3);font-size:11px">⏳ Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
+
+  <!-- ══ JS TABELA METAS — inicializa após dados prontos ══ -->
+  <script>
+  (function waitAndRender(){
+    try {
+      if(typeof D !== 'undefined' && D && D.equipes && D.equipes.length > 0 && typeof renderEqMetasTable === 'function'){
+        renderEqMetasTable();
+        return;
+      }
+    } catch(e){}
+    setTimeout(waitAndRender, 300);
+  })();
+  </script>
 
   <!-- VISÃO GERAL FINANCEIRA -->
   <div style="background:var(--w);border:1.5px solid var(--g200);border-radius:var(--rl);overflow:hidden;box-shadow:var(--sh);margin-bottom:12px">
@@ -2129,8 +2171,14 @@ function agFuturoBlock(agFuturo, agFuturoVal, ticket){
 
 
 // FERIADOS março 2026 — editável
-const FERIADOS_BASE = ['2026-04-03','2026-04-04'];
-function getFeriados(){try{return JSON.parse(localStorage.getItem('cofen_feriados')||JSON.stringify(FERIADOS_BASE));}catch(e){return FERIADOS_BASE;}}
+const FERIADOS_BASE = ['2026-01-01','2026-04-03','2026-04-21','2026-05-01','2026-09-07','2026-10-12','2026-11-02','2026-11-20','2026-12-25'];
+function getFeriados(){
+  try{
+    const saved = JSON.parse(localStorage.getItem('cofen_feriados')||JSON.stringify(FERIADOS_BASE));
+    // Garante feriados nacionais sempre incluídos (mesmo sem localStorage salvo)
+    return Array.from(new Set([...FERIADOS_BASE, ...saved]));
+  }catch(e){return FERIADOS_BASE;}
+}
 function setFeriados(arr){localStorage.setItem('cofen_feriados',JSON.stringify(arr));}
 
 // ─ Config ─
@@ -4374,6 +4422,8 @@ function refreshAll(){
       if(typeof cmpInit==='function') cmpInit();
     }
   }
+  // ── Atualiza tabela de Metas & Projeções por equipe na tela principal ──
+  if(typeof renderEqMetasTable==='function') renderEqMetasTable();
 }
 
 // ── TOAST ──
@@ -10973,6 +11023,116 @@ function mtsAtualizarMaio(){
 
 </div>
 <!-- ══════════ FIM PAGE: METAS 2026 ══════════ -->
+
+<script>
+// ══════════════════════════════════════════
+// TABELA METAS & PROJEÇÕES — EQUIPES MAIO
+// Declarada aqui (após D, DU, gGetMetas estarem disponíveis)
+// ══════════════════════════════════════════
+function renderEqMetasTable(){
+  if(typeof D === 'undefined' || !D || !D.equipes) return;
+  const tbody = document.getElementById('eq-metas-tbody');
+  if(!tbody) return;
+
+  const META_EQ_DEFAULT = 450000;
+
+  // ── Dias úteis reais do objeto DU (atualizado pelo dashboard a cada dia) ──
+  const duPass  = (typeof DU !== 'undefined' && DU && DU.passou  > 0) ? DU.passou  : 1;
+  const duRest  = (typeof DU !== 'undefined' && DU && DU.restam  > 0) ? DU.restam  : 1;
+  const duTotal = (typeof DU !== 'undefined' && DU && DU.total   > 0) ? DU.total   : (duPass + duRest);
+
+  // ── Atualizar badge e cabeçalho da coluna com o número real de DUs restantes ──
+  const badge = document.getElementById('eq-mt-badge');
+  if(badge) badge.textContent = duRest + ' DIAS ÚTEIS RESTANTES';
+
+  const colHeader = document.getElementById('eq-mt-col-header');
+  if(colHeader) colHeader.textContent = 'META ' + duRest + ' DU' + (duRest !== 1 ? 's' : '') + ' RESTANTES';
+
+  // Atualizar cabeçalho da coluna %
+  const pctHeader = document.getElementById('eq-mt-col-pct-header');
+  if(pctHeader) pctHeader.textContent = '% S/ META HOJE (' + duPass + ' DUs)';
+
+  const fR = v => 'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const pctColor = p => p>=100?'#4ADE80':p>=70?'#67E8F9':p>=50?'#FCD34D':'#F87171';
+  const pctBg    = p => p>=100?'rgba(74,222,128,.15)':p>=70?'rgba(103,232,249,.12)':p>=50?'rgba(252,211,77,.12)':'rgba(248,113,113,.12)';
+
+  const ORDER = ['COFEN BIRIGUI BRUNA','COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL'];
+  const EQ_LABELS = {
+    'COFEN BIRIGUI BRUNA'     : 'COFEN BIRIGUI BRUNA',
+    'COFEN MARILIA BRENDA'    : 'COFEN MARILIA BRENDA',
+    'COFEN STEPHANIE 2° TURNO': 'COFEN STEPHANIE 2° TURNO',
+    'COFEN DIGITAL'           : 'EQUIPE COFEN DIGITAL',
+  };
+
+  let rows = '';
+  ORDER.forEach(eqName => {
+    const eq = D.equipes.find(e => e.name === eqName);
+    if(!eq) return;
+
+    // Meta da equipe (usa metas configuradas ou padrão R$ 450k)
+    let metaEq = META_EQ_DEFAULT;
+    try { const m = gGetMetas(); if(m && m[eqName]) metaEq = parseFloat(m[eqName]) || META_EQ_DEFAULT; } catch(e){}
+
+    const rec      = eq.rec || 0;
+
+    // Quanto falta para bater a meta
+    const falta    = Math.max(0, metaEq - rec);
+
+    // Rec por dia = meta ÷ total de DUs do mês
+    const recDia   = duTotal > 0 ? metaEq / duTotal : 0;
+
+    // Meta para os DUs restantes = quanto falta ÷ DUs restantes
+    // (o que precisa arrecadar por dia nos dias que sobram para bater a meta)
+    const metaRestante = duRest > 0 ? falta / duRest : 0;
+
+    // Total necessário nos DUs restantes (= falta, mas exibido como "meta dos próximos X DUs")
+    const metaDuRest = falta; // = metaRestante × duRest
+
+    // ── % = rec ÷ meta_de_hoje (meta/totalDU × duPassado) ──
+    // Exemplo: meta R$450k, 20 DUs totais, 5 DUs passados → meta hoje = 450k/20×5 = 112,5k
+    // Se recebeu R$100k → 100/112,5 = 88,9%
+    const metaHoje = duTotal > 0 ? (metaEq / duTotal) * duPass : 0;
+    const pct      = metaHoje > 0 ? (rec / metaHoje * 100) : 0;
+    const pc    = pctColor(pct);
+    const pb    = pctBg(pct);
+    const barW  = Math.min(100, pct).toFixed(1);
+
+    // Cor de urgência para a coluna de meta restante
+    const urgColor = duRest <= 2 ? '#F87171' : duRest <= 5 ? '#FCD34D' : '#67E8F9';
+
+    rows += `<tr style="border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s"
+      onmouseover="this.style.background='rgba(255,255,255,.04)'"
+      onmouseout="this.style.background=''">
+      <td style="padding:8px 12px">
+        <div style="font-weight:800;font-size:11px;color:rgba(255,255,255,.85);margin-bottom:3px">${EQ_LABELS[eqName]||eqName}</div>
+        <div style="background:rgba(255,255,255,.1);border-radius:100px;height:3px;overflow:hidden;width:90px">
+          <div style="height:100%;border-radius:100px;background:${pc};width:${barW}%;transition:width 1s"></div>
+        </div>
+      </td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#4ADE80">${fR(rec)}</td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:rgba(255,255,255,.45)">${fR(metaEq)}</td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#67E8F9">
+        ${fR(recDia)}
+        <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">por dia útil</div>
+      </td>
+      <td style="padding:8px 12px;text-align:right">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:${urgColor}">${fR(metaDuRest)}</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">${fR(metaRestante)}/dia × ${duRest} DUs</div>
+      </td>
+      <td style="padding:8px 12px;text-align:right">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:#C084FC">${fR(metaHoje)}</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">${duPass} DUs × ${fR(recDia)}</div>
+      </td>
+      <td style="padding:8px 12px;text-align:center">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:${pc};background:${pb};padding:2px 9px;border-radius:6px;display:inline-block">${pct.toFixed(0)}%</span>
+      </td>
+    </tr>`;
+  });
+  tbody.innerHTML = rows || '<tr><td colspan="7" style="padding:14px;text-align:center;color:rgba(255,255,255,.3);font-size:11px">Nenhuma equipe encontrada</td></tr>';
+}
+// Chamar na inicialização (após todos os dados estarem prontos)
+renderEqMetasTable();
+</script>
 
 </body>
 </html>
