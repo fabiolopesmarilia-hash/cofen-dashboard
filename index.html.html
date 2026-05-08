@@ -7314,15 +7314,15 @@ function fbStartListening(){
     // Limpar campo de controle antes de mesclar
     const remoteClean = {...remote};
     delete remoteClean._date;
-    // Merge com local — local tem prioridade (evita sobrescrever atualizações do dia com dados antigos do Firebase)
+    // Merge com local — remoto complementa local (não sobrescreve)
     const local = rdGetSaved();
     const merged = {};
-    // Se local tem valor lançado, ele prevalece; remoto só entra se local estiver zerado
+    // Pega todas as chaves de ambos, prefere o maior valor para cada operador
     const allKeys = new Set([...Object.keys(local), ...Object.keys(remoteClean)]);
     allKeys.forEach(k=>{
       const vLocal  = parseFloat(local[k]||0);
       const vRemote = parseFloat(remoteClean[k]||0);
-      merged[k] = vLocal > 0 ? vLocal : vRemote;
+      merged[k] = Math.max(vLocal, vRemote);
     });
     const localStr = JSON.stringify(local);
     if(JSON.stringify(merged) !== localStr){
@@ -7552,10 +7552,10 @@ function fbUpdateRD(map){
   rdRef.child('_date').once('value', snap=>{
     const remoteDate = snap.val();
     if(remoteDate && remoteDate !== dateKey){
-      // Firebase tem dados de outro dia — limpar tudo antes de salvar o dia novo
+      // Firebase tem dados de outro dia — limpar e iniciar novo dia
       rdRef.set(payload).catch(e=>console.warn('FB set(rd) err:',e));
     } else {
-      // Mesmo dia (ou Firebase vazio) — sempre usar .update() para não apagar dados de outros supervisores
+      // Mesmo dia ou Firebase vazio — SEMPRE .update() para não apagar dados de outros supervisores
       rdRef.update(payload).catch(e=>console.warn('FB update(rd) err:',e));
     }
   });
@@ -7566,7 +7566,9 @@ const _rdSetSaved_fb = rdSetSaved;
 function rdSetSaved(map){
   localStorage.setItem(rdTodayKey(), JSON.stringify(map));
   syncBroadcast('rd_update', JSON.stringify(map));
-  fbUpdateRD(map);
+  // Só envia ao Firebase se há valores reais para não sobrescrever dados de outros supervisores com mapa vazio
+  const hasData = Object.values(map).some(v=>(parseFloat(v)||0)>0);
+  if(hasData) fbUpdateRD(map);
 }
 
 // applyOps — lê editor, atualiza D.equipes e sincroniza Firebase
