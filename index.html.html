@@ -8772,6 +8772,9 @@ function renderMiniComparativo(){
   const abrilRecDiaGlobal = dailyDU(CMP_ABRIL_DU, duAtualEq);
   const maioRecDiaGlobal  = dailyDU(CMP_MAIO_CUMUL, duAtualEq);
 
+  // Soma total dos marcos das equipes (base correta para calcular o peso de cada uma)
+  const somaMarcos = MAIN_EQ.reduce((s, n) => s + ((CMP_TEAMS.find(t=>t.nome===n)||{marco:0}).marco), 0) || 1;
+
   const eqRows = MAIN_EQ.map(nome => {
     const cfg        = EQ[nome] || {c:'#888', sh:nome};
     const abrilTotal = (CMP_TEAMS.find(t => t.nome === nome) || {marco:0}).marco;
@@ -8779,9 +8782,9 @@ function renderMiniComparativo(){
 
     // Abril acumulado proporcional ao DU atual
     const abrilAcumEq = Math.round(abrilTotal * propAbril * 100) / 100;
-    // Rec do dia estimado pela fatia proporcional de cada equipe
-    const pesoAbril  = abrilAcumFinal > 0 ? abrilTotal / abrilAcumFinal : 0;
-    const abrilDiaEq = Math.round(abrilRecDiaGlobal * pesoAbril * 100) / 100;
+    // Rec do dia: distribui o rec dia global pelo peso de cada equipe dentro da soma dos marcos
+    const pesoAbril  = somaMarcos > 0 ? abrilTotal / somaMarcos : 0;
+    const abrilDiaEq = Math.round((abrilRecDiaGlobal * (somaMarcos / abrilAcumFinal)) * pesoAbril * 100) / 100;
     const pesoMaio   = maioAcumTotal > 0 ? maioAcum / maioAcumTotal : 0;
     const maioDiaEq  = Math.round(maioRecDiaGlobal * pesoMaio * 100) / 100;
 
