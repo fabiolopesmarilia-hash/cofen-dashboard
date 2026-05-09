@@ -4935,6 +4935,7 @@ function rdAddAgora(opName){
   rdUpdateKPIs();
   toast('💰 +'+fR(v)+' adicionado a '+opName.replace(/_/g,' '));
   try{ rdBC&&rdBC.postMessage({type:'rd',key:rdTodayKey(),data:map}); }catch{}
+  if(typeof tvRefresh==='function') tvRefresh();
 }
 
 
@@ -5037,6 +5038,7 @@ function rdConfirmarEdicao(opName){
   rdUpdateKPIs();
 
   try{ rdBC&&rdBC.postMessage({type:'rd',key:rdTodayKey(),data:map}); }catch{}
+  if(typeof tvRefresh==='function') tvRefresh();
 
   if(novoVal===0)
     toast('🗑️ Recebimento de '+opName.replace(/_/g,' ')+' zerado!');
@@ -5059,6 +5061,7 @@ function rdZerarOperador(opName){
   rdRenderList();
   rdUpdateKPIs();
   try{ rdBC&&rdBC.postMessage({type:'rd',key:rdTodayKey(),data:map}); }catch{}
+  if(typeof tvRefresh==='function') tvRefresh();
   toast('🗑️ '+opName.replace(/_/g,' ')+' zerado com sucesso!');
 }
 
@@ -6795,17 +6798,38 @@ function tvSetMode(mode, btnEl){
   tvSchedule();
 }
 
+// Retorna recebimento total do operador (base + lançamento manual do dia)
+function tvGetRec(op){
+  try{
+    const saved = rdGetSaved ? rdGetSaved() : {};
+    return (op.rec||0) + (parseFloat(saved[op.name]||0));
+  } catch(e){ return op.rec||0; }
+}
+
 function tvBuildList(){
   let _removidos=[];
   try{ _removidos=(gGetOverrides().removidos)||[]; }catch(e){}
   const base = [...ALL].filter(o=>!_removidos.includes(o.name));
   if(tvMode==='geral'){
-    tvList = base.sort((a,b)=>b.rec-a.rec);
+    tvList = base.sort((a,b)=>tvGetRec(b)-tvGetRec(a));
   } else if(tvMode==='bb'){
-    tvList = base.filter(o=>['COFEN BIRIGUI BRUNA','COFEN MARILIA BRENDA'].includes(o.eq)).sort((a,b)=>b.rec-a.rec);
+    tvList = base.filter(o=>['COFEN BIRIGUI BRUNA','COFEN MARILIA BRENDA'].includes(o.eq)).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
   } else {
-    tvList = base.filter(o=>o.eq===tvMode).sort((a,b)=>b.rec-a.rec);
+    tvList = base.filter(o=>o.eq===tvMode).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
   }
+}
+
+// Atualiza TV ao vivo sem mudar de slide
+function tvRefresh(){
+  if(!document.getElementById('tv-overlay')?.classList.contains('on')) return;
+  const curName = tvList[tvIdx]?.name;
+  tvBuildList();
+  tvBuildDots();
+  // Mantém o mesmo operador na tela
+  const newIdx = tvList.findIndex(o=>o.name===curName);
+  if(newIdx>=0) tvIdx=newIdx;
+  if(tvIdx >= tvList.length) tvIdx=0;
+  tvShow(tvIdx);
 }
 
 function tvStart(){
@@ -6910,7 +6934,7 @@ function tvDailyBlock(op, melhorDia){
     +'<div style="font-family:Bebas Neue,sans-serif;font-size:20px;line-height:1.2;color:'+medC+'">'+( med/1000).toFixed(1)+'k</div></div>'
     +'<div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px 10px;text-align:center">'
     +'<div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.8px">Total Mês</div>'
-    +'<div style="font-family:Bebas Neue,sans-serif;font-size:20px;color:#4ADE80;line-height:1.2">'+fRK(op.rec)+'</div></div>'
+    +'<div style="font-family:Bebas Neue,sans-serif;font-size:20px;color:#4ADE80;line-height:1.2">'+fRK(tvGetRec(op))+'</div></div>'
     +'</div>';
 }
 
@@ -6922,7 +6946,7 @@ function tvShow(idx){
   const pos     = idx + 1;
   // posição GLOBAL (no ranking geral) — para mostrar ranking global mesmo em modo equipe
   const posGlobal = [...ALL].filter(o=>{ let r=[];try{r=(gGetOverrides().removidos)||[];}catch(e){}return !r.includes(o.name);})
-    .sort((a,b)=>b.rec-a.rec).findIndex(o=>o.name===op.name) + 1;
+    .sort((a,b)=>tvGetRec(b)-tvGetRec(a)).findIndex(o=>o.name===op.name) + 1;
 
   const cfg     = EQ[op.eq]||{c:'#888',bg:'#1a2330',ico:'⭐',sh:op.eq};
   const photo   = photoGet(op.name);
@@ -6950,8 +6974,9 @@ function tvShow(idx){
     : '';
 
   // Tier
-  const tier      = op.rec>=20000?'S-TIER':op.rec>=10000?'A — ALTA':op.rec>=5000?'B — BOA':'C — DEV';
-  const tierColor = op.rec>=20000?'#4ADE80':op.rec>=10000?'#67E8F9':op.rec>=5000?'#FCD34D':'#FCA5A5';
+  const _tvRec    = tvGetRec(op);
+  const tier      = _tvRec>=20000?'S-TIER':_tvRec>=10000?'A — ALTA':_tvRec>=5000?'B — BOA':'C — DEV';
+  const tierColor = _tvRec>=20000?'#4ADE80':_tvRec>=10000?'#67E8F9':_tvRec>=5000?'#FCD34D':'#FCA5A5';
 
   // Eficiência
   const gerados  = op.gerados  ||0;
@@ -7050,7 +7075,7 @@ function tvShow(idx){
             ${(()=>{
               const metaInd = getMetaOp(op.name);
               if(!metaInd||metaInd<=0) return '';
-              const proj = calcProjecao(op.rec, metaInd);
+              const proj = calcProjecao(tvGetRec(op), metaInd);
               const pCor = proj.status==='ok'?'#4ADE80':proj.status==='info'?'#67E8F9':proj.status==='warn'?'#FCD34D':'#FCA5A5';
               return `<div style="font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:2px;
                 color:${pCor};line-height:1;white-space:nowrap;flex-shrink:0;
@@ -7071,7 +7096,8 @@ function tvShow(idx){
           <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);
               border-radius:12px;padding:12px;text-align:center">
             <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">💰 Total Real</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;line-height:1">${fR(op.rec)}</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;line-height:1">${fR(tvGetRec(op))}</div>
+            ${(()=>{ try{ const _s=rdGetSaved(); const _h=parseFloat(_s[op.name]||0); if(_h>0) return '<div style="font-size:9px;color:#FCD34D;font-weight:800;margin-top:3px">+'+fR(_h)+' hoje</div>'; }catch(e){} return ''; })()}
           </div>
           <div style="background:rgba(103,232,249,.1);border:1px solid rgba(103,232,249,.25);
               border-radius:12px;padding:12px;text-align:center">
@@ -7091,7 +7117,7 @@ function tvShow(idx){
                </div>`
             : `<div style="background:rgba(252,211,77,.08);border:1px solid rgba(252,211,77,.2);border-radius:12px;padding:12px;text-align:center">
                 <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎫 Ticket Médio</div>
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FCD34D;line-height:1">${(op.acordos||0)>0?fRK(op.rec/(op.acordos||1)):'—'}</div>
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FCD34D;line-height:1">${(op.acordos||0)>0?fRK(tvGetRec(op)/(op.acordos||1)):'—'}</div>
                </div>`
           }
         </div>
@@ -7152,7 +7178,7 @@ function tvShow(idx){
           const abrilOpDu = abrilDuTotal * propOp;
 
           // Valor atual de Maio deste operador (op.rec)
-          const maioOp = op.rec || 0;
+          const maioOp = tvGetRec(op) || 0;
 
           if(duAtual === 0 && maioOp === 0) return '';
 
