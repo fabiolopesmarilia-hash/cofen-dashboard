@@ -8962,7 +8962,12 @@ function cmpTab(view, el){
 // Reconstrói CMP_MAIO_CUMUL (por DU) usando vgDB.dia (Visão Geral Financeira) como fonte principal
 // Hierarquia: 1) vgDB.dia (rec diário real do arquivo geral) → 2) overrideTotalRec linear → 3) operadores
 function cmpAtualizarCumul(){
+  // Preserva os dados estáticos do XLS como base — só sobrescreve com dados dinâmicos se disponíveis
   Object.keys(CMP_MAIO_CUMUL).forEach(k=>delete CMP_MAIO_CUMUL[k]);
+  // Restaura dados do XLS como ponto de partida
+  if(typeof CMP_MAIO_CUMUL_STATIC !== 'undefined'){
+    Object.assign(CMP_MAIO_CUMUL, CMP_MAIO_CUMUL_STATIC);
+  }
 
   // Tenta carregar vgDB do localStorage (Visão Geral Financeira)
   let vgDia = {};
@@ -9009,6 +9014,25 @@ function cmpAtualizarCumul(){
         if(diasComDado.some(d=>d<=diaCalendario)) CMP_MAIO_CUMUL[du] = acum;
       });
     }
+  }
+  // ── FALLBACK: se nenhum modo populou, garante que dados do XLS estão presentes ──
+  if(typeof CMP_MAIO_CUMUL_STATIC !== 'undefined' && Object.keys(CMP_MAIO_CUMUL).length === 0){
+    Object.assign(CMP_MAIO_CUMUL, CMP_MAIO_CUMUL_STATIC);
+  }
+
+  // Atualiza CMP_MAIO_EQ com dados dinâmicos (proporcional ao acumulado por equipe de D.equipes)
+  // Só aplica se tiver dados de Maio reais em D.equipes
+  const _maioEqTotal = D.equipes.reduce((s,e)=>s+(e.rec||0),0);
+  if(_maioEqTotal > 0 && Object.keys(CMP_MAIO_CUMUL).length > 0){
+    const _maxDuMaio = Math.max(...Object.keys(CMP_MAIO_CUMUL).map(Number));
+    const _maioTotal = CMP_MAIO_CUMUL[_maxDuMaio] || 1;
+    D.equipes.forEach(eq=>{
+      if(!CMP_MAIO_EQ[eq.name]) return;
+      const pct = (eq.rec||0) / _maioTotal;
+      Object.keys(CMP_MAIO_CUMUL).forEach(du=>{
+        CMP_MAIO_EQ[eq.name][du] = Math.round(CMP_MAIO_CUMUL[du] * pct * 100)/100;
+      });
+    });
   }
 
   // Atualiza totais de equipes em CMP_TEAMS (rec por equipe, da importação de operadores)
