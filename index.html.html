@@ -8715,11 +8715,25 @@ const CMP_MARCO_CUMUL = CMP_ABRIL_CUMUL_CAL;
 // DUs de Abril 2026: dias 1,2,3,6,7,8,9,10,13,14,15,16,17,20,22,23,24,27,28,29,30 (feriados: 18-Páscoa, 21-Tiradentes)
 const CMP_ABRIL_DU = {1:48862.91,2:70972.28,3:71279.09,4:152363.04,5:235692.76,6:290626.99,7:381245.76,8:453847.3,9:529486.27,10:569743.07,11:601234.18,12:634891.4,13:662104.55,14:739156.43,15:756204.88,16:764819.33,17:771203.56,18:774568.93,19:774694.07,20:774752.19,21:774808.42};
 // Dados acumulados de MAIO 2026 por Dia Útil (DU→acumulado) — atualizado dinamicamente via importação
-const CMP_MAIO_CUMUL = {};
+// CMP_MAIO_CUMUL: acumulado global de Maio por DU (gerado do arquivo rec_58_0905.xls)
+const CMP_MAIO_CUMUL_STATIC = {1:83182.92,2:141851.07,3:203656.29,4:260149.46,5:341842.16};
+// Inicia com dados estáticos do XLS — sobrescrito dinamicamente se houver importação mais recente
+const CMP_MAIO_CUMUL = {...CMP_MAIO_CUMUL_STATIC};
+// CMP_MAIO_EQ: acumulado POR EQUIPE por DU (gerado do arquivo rec_58_0905.xls)
+const CMP_MAIO_EQ = {"COFEN STEPHANIE 2° TURNO":{"1":15345.25,"2":36291.17,"3":51717.96,"4":76148.48,"5":94560.23},"COFEN MARILIA BRENDA":{"1":34448.82,"2":48572.84,"3":61601.81,"4":75994.63,"5":100190.06},"COFEN BIRIGUI BRUNA":{"1":17160.34,"2":26906.13,"3":39853.12,"4":49145.58,"5":63903.47},"COFEN DIGITAL":{"1":14547.41,"2":27315.89,"3":46171.53,"4":52299.28,"5":73883.25}};
 // Dias do calendário de MAIO correspondentes a cada DU (índice 0 = DU1)
-// DUs de Maio 2026: 4,5,6,7,8,11,12,13,14,15,18,19,20,21,22,25,26,27,28,29 (feriado: 1-Dia do Trabalho)
 const CMP_MAIO_DU_DIAS = [4,5,6,7,8,11,12,13,14,15,18,19,20,21,22,25,26,27,28,29];
 const CMP_ABRIL_CUMUL = CMP_MAIO_CUMUL;
+// CMP_ABRIL_EQ: acumulado por equipe por DU em Abril (proporcional ao marco total)
+// Distribui CMP_ABRIL_DU na mesma proporção que cada equipe representa no total de Abril
+const _totAbril = 774808.42;
+const _abrilEqPct = {"COFEN MARILIA BRENDA":506035.77,"COFEN STEPHANIE 2° TURNO":375163.25,"COFEN BIRIGUI BRUNA":368315.68,"COFEN DIGITAL":211876.64};
+const CMP_ABRIL_EQ = {};
+Object.entries(_abrilEqPct).forEach(([eq,tot])=>{
+  const pct = tot/_totAbril;
+  CMP_ABRIL_EQ[eq]={};
+  Object.entries(CMP_ABRIL_DU).forEach(([du,acum])=>{ CMP_ABRIL_EQ[eq][du]=Math.round(acum*pct*100)/100; });
+});
 const CMP_TEAMS = [
   // marco = Abril 2026 (mês cheio); abril = Maio 2026 (atualizado via importação)
   {nome:'COFEN MARILIA BRENDA',marco:506035.77,abril:0},
@@ -8788,223 +8802,153 @@ function cmpGetTotalMaioGeral(){
 function renderMiniComparativo(){
   const el = document.getElementById('pp-mini-comp');
   if(!el) return;
-  const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
-  if(!dusMaio.length){
-    el.innerHTML='<div style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;padding:8px">Importe o relatório para ver o comparativo</div>';
-    return;
-  }
-  function dailyDU(obj,du){ return (obj[du]||0)-(obj[du-1]||0); }
-  const maxDU = Math.max(...dusMaio);
 
-  // ── BLOCO 1: TOTAL POR EQUIPE — 6 colunas ─────────────────────────────────────
+  const fmtR = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const fmtDiff = v => {
+    const pos=v>=0;
+    return `<span style="color:${pos?'#16a34a':'#dc2626'};font-weight:900">${pos?'▲':'▼'} ${fmtR(Math.abs(v))}</span>`;
+  };
+  const badge = pos => `<span style="color:#fff;background:${pos?'#16a34a':'#dc2626'};border-radius:100px;padding:2px 10px;font-size:10px;font-weight:800;white-space:nowrap">${pos?'✅ Acima':'⚠️ Abaixo'}</span>`;
+
+  // ── BLOCO 1: TABELA POR EQUIPE (com DU a DU de cada equipe) ───────────────
   const MAIN_EQ = ['COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO','COFEN BIRIGUI BRUNA','COFEN DIGITAL'];
 
-  // Proporcional de Abril até o DU atual (para comparação justa)
-  const duAtualEq      = maxDU;
-  const maxDUAbrilEq   = Math.max(...Object.keys(CMP_ABRIL_DU).map(Number));
-  const abrilAcumDuAtual = CMP_ABRIL_DU[duAtualEq] || 0;
-  const abrilAcumFinal   = CMP_ABRIL_DU[maxDUAbrilEq] || 1;
-  const propAbril = abrilAcumFinal > 0 ? abrilAcumDuAtual / abrilAcumFinal : 1;
-  const maioAcumTotal = CMP_MAIO_CUMUL[duAtualEq] || 1;
-
-  // Rec do dia global (DU atual)
-  const abrilRecDiaGlobal = dailyDU(CMP_ABRIL_DU, duAtualEq);
-  const maioRecDiaGlobal  = dailyDU(CMP_MAIO_CUMUL, duAtualEq);
-
-  // Soma total dos marcos das equipes (base correta para calcular o peso de cada uma)
-  const somaMarcos = MAIN_EQ.reduce((s, n) => s + ((CMP_TEAMS.find(t=>t.nome===n)||{marco:0}).marco), 0) || 1;
+  // DU atual de Maio (último DU com dado)
+  const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+  const duAtual = dusMaio.length ? Math.max(...dusMaio) : 0;
 
   const eqRows = MAIN_EQ.map(nome => {
-    const cfg        = EQ[nome] || {c:'#888', sh:nome};
-    const abrilTotal = (CMP_TEAMS.find(t => t.nome === nome) || {marco:0}).marco;
-    const maioAcum   = (D.equipes.find(e => e.name === nome) || {rec:0}).rec;
+    const cfg      = EQ[nome]||{c:'#888',sh:nome};
+    const abrilFim = (_abrilEqPct[nome]||0);                           // total Abril mês cheio
+    const maioAcum = (CMP_MAIO_EQ[nome]||{})[duAtual]||0;             // Maio acumulado até DU atual
+    const abrilAcumDuAtual = (CMP_ABRIL_EQ[nome]||{})[duAtual]||0;   // Abril acumulado até mesmo DU
+    const abrilDia  = duAtual>1 ? Math.round((abrilAcumDuAtual - ((CMP_ABRIL_EQ[nome]||{})[duAtual-1]||0))*100)/100 : abrilAcumDuAtual;
+    const maioDia   = duAtual>1 ? Math.round((maioAcum - ((CMP_MAIO_EQ[nome]||{})[duAtual-1]||0))*100)/100 : maioAcum;
+    const diffDia   = maioDia  - abrilDia;
+    const diffAcum  = maioAcum - abrilAcumDuAtual;
+    return {sh:cfg.sh,c:cfg.c,abrilFim,abrilAcumDuAtual,maioAcum,abrilDia,maioDia,diffDia,diffAcum,posDia:diffDia>=0,posAcum:diffAcum>=0};
+  }).sort((a,b)=>b.maioAcum-a.maioAcum);
 
-    // Abril acumulado proporcional ao DU atual
-    const abrilAcumEq = Math.round(abrilTotal * propAbril * 100) / 100;
-    // Rec do dia: distribui o rec dia global pelo peso de cada equipe dentro da soma dos marcos
-    const pesoAbril  = somaMarcos > 0 ? abrilTotal / somaMarcos : 0;
-    const abrilDiaEq = Math.round((abrilRecDiaGlobal * (somaMarcos / abrilAcumFinal)) * pesoAbril * 100) / 100;
-    const pesoMaio   = maioAcumTotal > 0 ? maioAcum / maioAcumTotal : 0;
-    const maioDiaEq  = Math.round(maioRecDiaGlobal * pesoMaio * 100) / 100;
-
-    const diffDia  = maioDiaEq  - abrilDiaEq;
-    const diffAcum = maioAcum   - abrilAcumEq;
-    const posDia   = diffDia  >= 0;
-    const posAcum  = diffAcum >= 0;
-    return {sh:cfg.sh, c:cfg.c, abrilDia:abrilDiaEq, abrilAcum:abrilAcumEq, maioDia:maioDiaEq, maioAcum, diffDia, diffAcum, posDia, posAcum};
-  }).sort((a,b) => b.maioAcum - a.maioAcum);
-
-  const totAbrilAcum = eqRows.reduce((s,r) => s+r.abrilAcum, 0);
-  const _totalMaioGeral = cmpGetTotalMaioGeral();
-  const totMaioAcum  = _totalMaioGeral > 0 ? _totalMaioGeral : eqRows.reduce((s,r) => s+r.maioAcum, 0);
-  const totDiffDia   = maioRecDiaGlobal - abrilRecDiaGlobal;
-  const totDiffAcum  = totMaioAcum - totAbrilAcum;
-  const totPDia  = totDiffDia  >= 0;
-  const totPAcum = totDiffAcum >= 0;
-
-  const fmtD = (v,pos) => (pos?'+ ':'- ')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-
-  const eqRowsHtml = eqRows.map((r,i) => {
-    const rank   = ['🥇','🥈','🥉','4º'][i] || '';
-    const rowBg  = i%2===0 ? '#fff' : '#f8fafc';
-    const clrDia  = r.posDia  ? '#16a34a' : '#dc2626';
-    const clrAcum = r.posAcum ? '#16a34a' : '#dc2626';
-    return `<tr style="border-bottom:1px solid #e2e8f0;background:${rowBg}">
+  const eqHtml = eqRows.map((r,i)=>{
+    const rank=['🥇','🥈','🥉','4°'][i]||'';
+    const bg = i%2===0?'#fff':'#f8fafc';
+    return `<tr style="border-bottom:1px solid #e2e8f0;background:${bg}">
       <td style="padding:7px 10px;font-size:12px;font-weight:800;color:#1e293b;white-space:nowrap">
-        <span style="margin-right:4px">${rank}</span>
-        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${r.c};margin-right:5px;vertical-align:middle"></span>
-        ${r.sh}
+        ${rank}<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${r.c};margin:0 5px;vertical-align:middle"></span>${r.sh}
       </td>
-      <td style="padding:7px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#3B82F6;border-left:2px solid rgba(59,130,246,.15)">${r.abrilDia>0?cmpFmt(r.abrilDia):'—'}</td>
-      <td style="padding:7px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(59,130,246,.65)">${r.abrilAcum>0?cmpFmt(r.abrilAcum):'—'}</td>
-      <td style="padding:7px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#059669;border-left:2px solid rgba(5,150,105,.15)">${r.maioDia>0?cmpFmt(r.maioDia):'—'}</td>
-      <td style="padding:7px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(5,150,105,.7)">${r.maioAcum>0?cmpFmt(r.maioAcum):'—'}</td>
-      <td style="padding:7px 8px;text-align:right;font-size:11px;font-weight:800;color:${clrDia};border-left:2px solid #e2e8f0">${fmtD(r.diffDia,r.posDia)}</td>
-      <td style="padding:7px 8px;text-align:right;font-size:11px;font-weight:800;color:${clrAcum}">${fmtD(r.diffAcum,r.posAcum)}</td>
-      <td style="padding:7px 8px;text-align:center">
-        <span style="font-size:10px;font-weight:800;color:${clrAcum};background:${r.posAcum?'#dcfce7':'#fee2e2'};border:1px solid ${r.posAcum?'#86efac':'#fca5a5'};border-radius:100px;padding:2px 8px;white-space:nowrap">${r.maioAcum>0?(r.posAcum?'✅ Positivo':'⚠️ Abaixo'):'—'}</span>
+      <td style="padding:7px 8px;text-align:right">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:#3B82F6">${fmtR(r.abrilDia)}</div>
+        <div style="font-size:10px;color:#93c5fd">acum: ${fmtR(r.abrilAcumDuAtual)}</div>
       </td>
+      <td style="padding:7px 8px;text-align:right">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:#059669">${r.maioDia>0?fmtR(r.maioDia):'—'}</div>
+        <div style="font-size:10px;color:#6ee7b7">acum: ${r.maioAcum>0?fmtR(r.maioAcum):'—'}</div>
+      </td>
+      <td style="padding:7px 8px;text-align:right">
+        <div style="font-size:12px">${r.maioAcum>0?fmtDiff(r.diffDia):'—'}</div>
+        <div style="font-size:10px;color:${r.posAcum?'#16a34a':'#dc2626'}">acum: ${r.maioAcum>0?(r.posAcum?'▲':'▼')+' '+fmtR(Math.abs(r.diffAcum)):'—'}</div>
+      </td>
+      <td style="padding:7px 8px;text-align:center">${r.maioAcum>0?badge(r.posDia):'—'}</td>
     </tr>`;
   }).join('');
 
-  const eqTotalRow = `<tr style="border-top:2px solid #cbd5e1;background:#f1f5f9">
+  const totAbrDia  = eqRows.reduce((s,r)=>s+r.abrilDia,0);
+  const totAbrAcum = eqRows.reduce((s,r)=>s+r.abrilAcumDuAtual,0);
+  const totMaiDia  = eqRows.reduce((s,r)=>s+r.maioDia,0);
+  const totMaiAcum = eqRows.reduce((s,r)=>s+r.maioAcum,0);
+  const totDiffDia = totMaiDia - totAbrDia;
+  const totDiffAcum= totMaiAcum- totAbrAcum;
+
+  const eqTotal = `<tr style="border-top:2px solid #cbd5e1;background:#f1f5f9">
     <td style="padding:8px 10px;font-size:12px;font-weight:900;color:#0f172a">TOTAL GERAL</td>
-    <td style="padding:8px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#3B82F6;border-left:2px solid rgba(59,130,246,.2)">—</td>
-    <td style="padding:8px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#3B82F6">${cmpFmt(totAbrilAcum)}</td>
-    <td style="padding:8px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#059669;border-left:2px solid rgba(5,150,105,.2)">—</td>
-    <td style="padding:8px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#059669">${cmpFmt(totMaioAcum)}</td>
-    <td style="padding:8px 8px;text-align:right;font-size:13px;font-weight:900;color:${totPDia?'#16a34a':'#dc2626'};border-left:2px solid #e2e8f0">${fmtD(totDiffDia,totPDia)}</td>
-    <td style="padding:8px 8px;text-align:right;font-size:13px;font-weight:900;color:${totPAcum?'#16a34a':'#dc2626'}">${fmtD(totDiffAcum,totPAcum)}</td>
-    <td style="padding:8px 8px;text-align:center">
-      <span style="font-size:11px;font-weight:900;color:${totPAcum?'#16a34a':'#dc2626'};background:${totPAcum?'#dcfce7':'#fee2e2'};border:1px solid ${totPAcum?'#86efac':'#fca5a5'};border-radius:100px;padding:3px 10px">${totPAcum?'✅ Positivo':'⚠️ Abaixo'}</span>
+    <td style="padding:8px 8px;text-align:right">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#3B82F6">${fmtR(totAbrDia)}</div>
+      <div style="font-size:10px;color:#93c5fd">acum: ${fmtR(totAbrAcum)}</div>
     </td>
+    <td style="padding:8px 8px;text-align:right">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#059669">${totMaiDia>0?fmtR(totMaiDia):'—'}</div>
+      <div style="font-size:10px;color:#6ee7b7">acum: ${totMaiAcum>0?fmtR(totMaiAcum):'—'}</div>
+    </td>
+    <td style="padding:8px 8px;text-align:right">
+      <div style="font-size:13px">${totMaiAcum>0?fmtDiff(totDiffDia):'—'}</div>
+      <div style="font-size:10px;color:${totDiffAcum>=0?'#16a34a':'#dc2626'}">acum: ${totMaiAcum>0?(totDiffAcum>=0?'▲':'▼')+' '+fmtR(Math.abs(totDiffAcum)):'—'}</div>
+    </td>
+    <td style="padding:8px 8px;text-align:center">${totMaiAcum>0?badge(totDiffDia>=0):'—'}</td>
   </tr>`;
 
-  const tableHeadDark = `<thead>
-    <tr style="background:#f1f5f9">
-      <th rowspan="2" style="padding:7px 10px;font-size:9px;font-weight:800;color:#475569;letter-spacing:1px;text-align:left;border-bottom:2px solid #e2e8f0;vertical-align:middle">EQUIPE</th>
-      <th colspan="2" style="padding:5px 8px;font-size:9px;font-weight:800;color:#3B82F6;text-align:center;border-left:2px solid rgba(59,130,246,.25);border-bottom:1px solid rgba(59,130,246,.2);letter-spacing:.8px">🔵 ABRIL</th>
-      <th colspan="2" style="padding:5px 8px;font-size:9px;font-weight:800;color:#059669;text-align:center;border-left:2px solid rgba(5,150,105,.25);border-bottom:1px solid rgba(5,150,105,.2);letter-spacing:.8px">🟢 MAIO</th>
-      <th colspan="2" style="padding:5px 8px;font-size:9px;font-weight:800;color:#475569;text-align:center;border-left:2px solid #e2e8f0;border-bottom:1px solid #e2e8f0;letter-spacing:.8px">⚡ DIFERENÇA</th>
-      <th rowspan="2" style="padding:7px 8px;font-size:9px;font-weight:800;color:#475569;text-align:center;border-bottom:2px solid #e2e8f0;vertical-align:middle;letter-spacing:.8px">STATUS</th>
-    </tr>
-    <tr style="background:#f8fafc">
-      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(59,130,246,.8);text-align:right;border-left:2px solid rgba(59,130,246,.15);border-bottom:2px solid #e2e8f0">Rec. Dia</th>
-      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(59,130,246,.55);text-align:right;border-bottom:2px solid #e2e8f0">Acumulado</th>
-      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(5,150,105,.8);text-align:right;border-left:2px solid rgba(5,150,105,.15);border-bottom:2px solid #e2e8f0">Rec. Dia</th>
-      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(5,150,105,.55);text-align:right;border-bottom:2px solid #e2e8f0">Acumulado</th>
-      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:#64748b;text-align:right;border-left:2px solid #e2e8f0;border-bottom:2px solid #e2e8f0">No Dia</th>
-      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:#64748b;text-align:right;border-bottom:2px solid #e2e8f0">No Total</th>
-    </tr>
-  </thead>`;
+  // ── BLOCO 2: TABELA GLOBAL DU A DU ────────────────────────────────────────
+  let duRows = '';
+  const maxDU = dusMaio.length ? Math.max(...dusMaio) : 0;
 
-  // ── BLOCO 2: RECEBIMENTO POR DU — 6 colunas igual ao comparativo principal ──
-  // Helper: valor acumulado até DU
-  function acumDU(obj, du){ return obj[du] || 0; }
+  for(let du=1; du<=Math.max(maxDU, 21); du++){
+    const aAcum = CMP_ABRIL_DU[du]||0;
+    const aDia  = du>1 ? Math.round((aAcum - (CMP_ABRIL_DU[du-1]||0))*100)/100 : aAcum;
+    const hasMaio = CMP_MAIO_CUMUL[du] !== undefined;
+    const mAcum = hasMaio ? CMP_MAIO_CUMUL[du] : null;
+    const mDia  = hasMaio ? (du>1 ? Math.round((mAcum-(CMP_MAIO_CUMUL[du-1]||0))*100)/100 : mAcum) : null;
+    const diffDia  = hasMaio ? mDia  - aDia  : null;
+    const diffAcum = hasMaio ? mAcum - aAcum : null;
+    const pdDia    = diffDia!==null && diffDia>=0;
+    const pdAcum   = diffAcum!==null && diffAcum>=0;
+    const diaLabel = CMP_MAIO_DU_DIAS[du-1] ? String(CMP_MAIO_DU_DIAS[du-1]).padStart(2,'0')+'/05' : '';
+    const isHoje   = du===maxDU && hasMaio;
+    const bg = isHoje?'rgba(0,200,130,.08)':du%2===0?'rgba(255,255,255,.03)':'transparent';
+    const bdl = isHoje?'border-left:3px solid #34D399;':'';
 
-  let rows='';
-  let totalAbrilAcum=0, totalMaioAcum=0, totalAbrilDia=0, totalMaioDia=0;
-  const maxDUAbril = Math.max(...Object.keys(CMP_ABRIL_DU).map(Number));
-
-  for(let du=1; du<=maxDU; du++){
-    const abrilDia  = dailyDU(CMP_ABRIL_DU, du);
-    const abrilAcum = acumDU(CMP_ABRIL_DU, du);
-    const hasM      = CMP_MAIO_CUMUL[du] !== undefined;
-    const maioDia   = hasM ? dailyDU(CMP_MAIO_CUMUL, du) : null;
-    const maioAcum  = hasM ? acumDU(CMP_MAIO_CUMUL, du) : null;
-
-    const diffDia   = hasM ? maioDia  - abrilDia  : null;
-    const diffAcum  = hasM ? maioAcum - abrilAcum : null;
-
-    const posDia  = diffDia  >= 0;
-    const posAcum = diffAcum >= 0;
-    const clrDia  = posDia  ? '#4ADE80' : '#F87171';
-    const clrAcum = posAcum ? '#4ADE80' : '#F87171';
-
-    const fmtDiff = (v, pos) => (pos?'+ ':'- ')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-
-    const diaCalMaio = CMP_MAIO_DU_DIAS[du-1] ? ' ('+String(CMP_MAIO_DU_DIAS[du-1]).padStart(2,'0')+'/05)' : '';
-    const bg = du%2===0 ? 'rgba(255,255,255,.03)' : 'transparent';
-
-    if(hasM){ totalAbrilDia+=abrilDia; totalMaioDia+=maioDia; }
-    totalAbrilAcum = abrilAcum;
-    if(hasM) totalMaioAcum = maioAcum;
-
-    rows+=`<tr style="border-bottom:1px solid rgba(255,255,255,.05);background:${bg}">
-      <td style="padding:6px 10px;font-size:11px;font-weight:800;color:rgba(255,255,255,.85);white-space:nowrap">DU ${du}<span style="font-size:9px;color:rgba(255,255,255,.35);font-weight:500">${hasM?diaCalMaio:''}</span></td>
-      <td style="padding:6px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#3B82F6;border-left:1px solid rgba(59,130,246,.2)">${abrilDia>0?cmpFmt(abrilDia):'—'}</td>
-      <td style="padding:6px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(59,130,246,.6)">${abrilAcum>0?cmpFmt(abrilAcum):'—'}</td>
-      <td style="padding:6px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#00A86B;border-left:1px solid rgba(0,168,107,.2)">${hasM&&maioDia!==null?cmpFmt(maioDia):'—'}</td>
-      <td style="padding:6px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(0,168,107,.7)">${hasM?cmpFmt(maioAcum):'—'}</td>
-      <td style="padding:6px 8px;text-align:right;font-size:11px;font-weight:800;color:${clrDia};border-left:1px solid rgba(255,255,255,.08)">${diffDia!==null?fmtDiff(diffDia,posDia):'—'}</td>
-      <td style="padding:6px 8px;text-align:right;font-size:11px;font-weight:800;color:${clrAcum}">${diffAcum!==null?fmtDiff(diffAcum,posAcum):'—'}</td>
-      <td style="padding:6px 8px;text-align:center">
-        <span style="font-size:9px;font-weight:800;color:${clrDia};background:${posDia?'rgba(74,222,128,.15)':'rgba(248,113,113,.15)'};border:1px solid ${clrDia}44;border-radius:100px;padding:2px 7px;white-space:nowrap">${diffDia!==null?(posDia?'✅':'⚠️'):'—'}</span>
+    duRows+=`<tr style="border-bottom:1px solid rgba(255,255,255,.06);background:${bg}${isHoje?';outline:1px solid rgba(52,211,153,.2)':''}">
+      <td style="padding:6px 10px;font-size:11px;font-weight:800;color:${isHoje?'#34D399':'rgba(255,255,255,.8)'};${bdl}white-space:nowrap">
+        DU ${du}${diaLabel?` <span style="font-size:9px;opacity:.5">${diaLabel}</span>`:''}${isHoje?' <span style="font-size:8px;color:#34D399;background:rgba(52,211,153,.15);border-radius:4px;padding:1px 4px">HOJE</span>':''}
       </td>
+      <td style="padding:6px 8px;text-align:right">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;color:#60A5FA">${fmtR(aDia)}</div>
+        <div style="font-size:9px;color:rgba(96,165,250,.55)">${fmtR(aAcum)}</div>
+      </td>
+      <td style="padding:6px 8px;text-align:right">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;color:${hasMaio?'#34D399':'rgba(255,255,255,.2)'}">${hasMaio?fmtR(mDia):'—'}</div>
+        <div style="font-size:9px;color:rgba(52,211,153,.55)">${hasMaio?fmtR(mAcum):'—'}</div>
+      </td>
+      <td style="padding:6px 8px;text-align:right;font-size:11px">${diffDia!==null?fmtDiff(diffDia):'<span style="color:rgba(255,255,255,.2)">—</span>'}</td>
+      <td style="padding:6px 8px;text-align:right;font-size:11px">${diffAcum!==null?fmtDiff(diffAcum):'<span style="color:rgba(255,255,255,.2)">—</span>'}</td>
     </tr>`;
   }
 
-  // Linha total
-  const totalDiffDia  = totalMaioDia  - totalAbrilDia;
-  const totalDiffAcum = totalMaioAcum - totalAbrilAcum;
-  const tpDia  = totalDiffDia  >= 0;
-  const tpAcum = totalDiffAcum >= 0;
-  const tclrDia  = tpDia  ? '#4ADE80' : '#F87171';
-  const tclrAcum = tpAcum ? '#4ADE80' : '#F87171';
-  const fmtT = (v, pos) => (pos?'+ ':'- ')+'R$ '+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  rows+=`<tr style="border-top:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07)">
-    <td style="padding:8px 10px;font-size:11px;font-weight:900;color:rgba(255,255,255,.9)">TOTAL (${maxDU} DUs)</td>
-    <td style="padding:8px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#3B82F6;border-left:1px solid rgba(59,130,246,.2)">—</td>
-    <td style="padding:8px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(59,130,246,.7)">${cmpFmt(totalAbrilAcum)}</td>
-    <td style="padding:8px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#00A86B;border-left:1px solid rgba(0,168,107,.2)">—</td>
-    <td style="padding:8px 8px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(0,168,107,.7)">${cmpFmt(totalMaioAcum)}</td>
-    <td style="padding:8px 8px;text-align:right;font-size:12px;font-weight:900;color:${tclrDia};border-left:1px solid rgba(255,255,255,.08)">—</td>
-    <td style="padding:8px 8px;text-align:right;font-size:12px;font-weight:900;color:${tclrAcum}">${fmtT(totalDiffAcum,tpAcum)}</td>
-    <td style="padding:8px 8px;text-align:center">
-      <span style="font-size:10px;font-weight:900;color:${tclrAcum};background:${tpAcum?'rgba(74,222,128,.18)':'rgba(248,113,113,.18)'};border:1px solid ${tclrAcum}66;border-radius:100px;padding:3px 9px">${tpAcum?'✅ Positivo':'⚠️ Abaixo'}</span>
-    </td>
-  </tr>`;
-
-  const tableHead = `<thead>
-    <tr style="background:rgba(255,255,255,.08)">
-      <th rowspan="2" style="padding:6px 10px;font-size:9px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1px;text-align:left;vertical-align:middle">DIA ÚTIL</th>
-      <th colspan="2" style="padding:5px 8px;font-size:9px;font-weight:800;color:#3B82F6;text-align:center;border-left:1px solid rgba(59,130,246,.3);border-bottom:1px solid rgba(59,130,246,.2);letter-spacing:.8px">🔵 ABRIL</th>
-      <th colspan="2" style="padding:5px 8px;font-size:9px;font-weight:800;color:#00A86B;text-align:center;border-left:1px solid rgba(0,168,107,.3);border-bottom:1px solid rgba(0,168,107,.2);letter-spacing:.8px">🟢 MAIO</th>
-      <th colspan="2" style="padding:5px 8px;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);text-align:center;border-left:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);letter-spacing:.8px">⚡ DIFERENÇA</th>
-      <th rowspan="2" style="padding:6px 8px;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);text-align:center;vertical-align:middle;letter-spacing:.8px">STATUS</th>
-    </tr>
-    <tr style="background:rgba(255,255,255,.05)">
-      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(59,130,246,.8);text-align:right;border-left:1px solid rgba(59,130,246,.2)">Rec. Dia</th>
-      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(59,130,246,.55);text-align:right">Acumulado</th>
-      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(0,168,107,.8);text-align:right;border-left:1px solid rgba(0,168,107,.2)">Rec. Dia</th>
-      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(0,168,107,.55);text-align:right">Acumulado</th>
-      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(255,255,255,.35);text-align:right;border-left:1px solid rgba(255,255,255,.08)">No Dia</th>
-      <th style="padding:4px 8px;font-size:8px;font-weight:800;color:rgba(255,255,255,.35);text-align:right">No Total</th>
-    </tr>
-  </thead>`;
-  // tableHeadDark já declarado acima com 8 colunas
-
   el.innerHTML=`
-  <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">🔁 COMPARATIVO DE RESULTADOS: ABRIL VS MAIO</div>
+  <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">🔁 COMPARATIVO ABRIL VS MAIO 2026</div>
 
-  <!-- TOTAL EQUIPES -->
-  <div style="overflow:hidden;border-radius:10px;border:1px solid rgba(0,0,0,.12);margin-bottom:10px;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.18)">
-    <table style="width:100%;border-collapse:collapse;font-family:Nunito,sans-serif;background:#fff">
-      ${tableHeadDark}
-      <tbody>${eqRowsHtml}${eqTotalRow}</tbody>
+  <!-- TABELA POR EQUIPE -->
+  <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px">👥 POR EQUIPE — DU ${duAtual} (${CMP_MAIO_DU_DIAS[duAtual-1]?'0'+CMP_MAIO_DU_DIAS[duAtual-1]+'/05':'—'})</div>
+  <div style="overflow:hidden;border-radius:10px;border:1px solid rgba(0,0,0,.1);margin-bottom:12px;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.14)">
+    <table style="width:100%;border-collapse:collapse;font-family:Nunito,sans-serif">
+      <thead>
+        <tr style="background:#f1f5f9;border-bottom:2px solid #e2e8f0">
+          <th style="padding:7px 10px;font-size:9px;font-weight:800;color:#475569;letter-spacing:1px;text-align:left">EQUIPE</th>
+          <th style="padding:7px 8px;font-size:9px;font-weight:800;color:#3B82F6;text-align:right">🔵 ABRIL<div style="font-size:8px;color:#93c5fd;font-weight:600">dia / acumulado</div></th>
+          <th style="padding:7px 8px;font-size:9px;font-weight:800;color:#059669;text-align:right">🟢 MAIO<div style="font-size:8px;color:#6ee7b7;font-weight:600">dia / acumulado</div></th>
+          <th style="padding:7px 8px;font-size:9px;font-weight:800;color:#475569;text-align:right">⚡ DIFERENÇA<div style="font-size:8px;font-weight:600;opacity:.6">dia / acumulado</div></th>
+          <th style="padding:7px 8px;font-size:9px;font-weight:800;color:#475569;text-align:center">STATUS</th>
+        </tr>
+      </thead>
+      <tbody>${eqHtml}${eqTotal}</tbody>
     </table>
   </div>
 
-  <!-- RECEBIMENTO POR DU -->
-  <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">📅 RECEBIMENTO DIÁRIO (DU A DU)</div>
+  <!-- TABELA GLOBAL DU A DU -->
+  <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px">📅 GLOBAL — REC DO DIA · ACUMULADO</div>
   <div style="overflow:hidden;border-radius:10px;border:1px solid rgba(255,255,255,.1)">
     <table style="width:100%;border-collapse:collapse;font-family:Nunito,sans-serif">
-      ${tableHead}
-      <tbody>${rows}</tbody>
+      <thead>
+        <tr style="background:rgba(255,255,255,.08)">
+          <th style="padding:6px 10px;font-size:9px;font-weight:800;color:rgba(255,255,255,.45);text-align:left">DU</th>
+          <th style="padding:6px 8px;font-size:9px;font-weight:800;color:#60A5FA;text-align:right">🔵 ABRIL<div style="font-size:8px;opacity:.6">dia / acum</div></th>
+          <th style="padding:6px 8px;font-size:9px;font-weight:800;color:#34D399;text-align:right">🟢 MAIO<div style="font-size:8px;opacity:.6">dia / acum</div></th>
+          <th style="padding:6px 8px;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);text-align:right">DIF DIA</th>
+          <th style="padding:6px 8px;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);text-align:right">DIF ACUM</th>
+        </tr>
+      </thead>
+      <tbody>${duRows}</tbody>
     </table>
   </div>`;
 }
-
 function cmpTab(view, el){
   document.querySelectorAll('.cmp-stab').forEach(t=>{ t.style.color='var(--g500)'; t.style.background='var(--w)'; });
   el.style.color='var(--pp)'; el.style.background='var(--ppl)';
