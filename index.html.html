@@ -534,10 +534,7 @@ select.ev-inp{cursor:pointer}
     <div id="h-arrecadado" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#00E5FF;letter-spacing:1px">—</div>
   </div>
 
-  <!-- Mini Comparativo Abril vs Maio -->
-  <div id="pp-mini-comp" style="margin-top:14px;border-top:1px solid rgba(0,188,212,.15);padding-top:12px">
-    <div style="font-size:11px;color:rgba(255,255,255,.2);text-align:center;padding:8px">Importe o relatório para ver o comparativo</div>
-  </div>
+
 </div>
 
   <!-- HERO ORIGINAL MANTIDO -->
@@ -8901,8 +8898,10 @@ function cmpGetTotalMaioGeral(){
   return overrideTotalRec > 0 ? overrideTotalRec : 0;
 }
 
-// ── Mini Comparativo Abril vs Maio (bloco no topo da Visão Geral) ──
+// ── Mini Comparativo removido ──
 function renderMiniComparativo(){
+  // removido
+  return;
   const el = document.getElementById('pp-mini-comp');
   if(!el) return;
 
