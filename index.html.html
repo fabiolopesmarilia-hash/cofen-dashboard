@@ -5952,11 +5952,10 @@ function importParse(raw){
     m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
     if(m) return parseInt(m[1]);
     // Número serial do Excel (dias desde 1900-01-01)
-    const num = parseFloat(str);
-    if(!isNaN(num) && num > 40000 && num < 60000){
-      // Converte serial Excel para data JS
-      const d = new Date(Math.round((num - 25569) * 86400 * 1000));
-      return d.getUTCDate();
+    const _n = parseFloat(str);
+    if(!isNaN(_n) && _n > 40000 && _n < 60000){
+      const _d = new Date(Math.round((_n - 25569) * 86400 * 1000));
+      return _d.getUTCDate();
     }
     return null;
   }
@@ -5978,7 +5977,6 @@ function importParse(raw){
         acc[rawName].daily[day] = (acc[rawName].daily[day]||0) + recVal;
       }
     } else if(iDate < 0 && recVal > 0){
-      // Sem coluna de data: marca para atribuir ao dia de hoje após loop
       acc[rawName]._semData = true;
     }
     // Parse tipo de pagamento
@@ -5988,7 +5986,7 @@ function importParse(raw){
     }
   }
 
-  // Se arquivo sem coluna de data, atribui total ao dia de hoje (para aparecer na tabela)
+  // Sem coluna de data: atribui total ao dia de hoje
   const _todayDay = new Date().getDate();
   Object.values(acc).forEach(a => {
     if(a._semData && a.total > 0 && Object.keys(a.daily).length === 0){
@@ -6259,11 +6257,9 @@ function importApply(){
 
   // ── Atualizar aba Recebimento por Dia/Operador automaticamente ──
   rdopRender();
-  // Atualiza badge de fonte de dados
   const _rdopBadge = document.getElementById('rdop-src-badge');
   if(_rdopBadge){
-    const _now = new Date();
-    const _ts = _now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    const _ts = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     _rdopBadge.style.color = 'var(--ok)';
     _rdopBadge.textContent = '✅ Dados atualizados via importação — ' + _ts;
   }
@@ -11663,24 +11659,21 @@ function rdopGetDados(){
 
   // Detecta quais dias (1-31) têm dados nos daily dos operadores
   // Usa os dias do mês de maio 2026 com dados disponíveis
-  const diasAtivos = new Set();
   const _hoje = new Date().getDate();
-
+  const diasAtivos = new Set();
   D.equipes.forEach(eq => {
     (eq.ops||[]).forEach(op => {
       if(op.rec > 0) {
         if(op.daily && typeof op.daily === 'object' && Object.keys(op.daily).length > 0) {
-          // Tem breakdown por dia — usa os dias reais
           Object.keys(op.daily).forEach(d => { if(op.daily[d]>0) diasAtivos.add(parseInt(d)); });
         } else {
-          // Sem daily: aparece na coluna do dia de hoje
           diasAtivos.add(_hoje);
         }
       }
     });
   });
 
-  // Dias ordenados — fallback para dia de hoje se ainda vazio
+  // Dias ordenados — fallback para dia de hoje se vazio
   let diasOrdenados = [...diasAtivos].sort((a,b)=>a-b);
   if(!diasOrdenados.length) diasOrdenados = [_hoje];
 
@@ -11710,14 +11703,12 @@ function rdopGetDados(){
   const resultado = [];
   D.equipes.forEach(eq => {
     (eq.ops||[]).forEach(op => {
-      if(op.rec <= 0) return; // ignora operadores sem rec
+      if(op.rec <= 0) return;
       const hasDailyKeys = op.daily && typeof op.daily === 'object' && Object.keys(op.daily).length > 0;
       let dArr;
       if(hasDailyKeys){
-        // Tem breakdown diário — usa os valores reais por dia
         dArr = diasOrdenados.map(dia => (op.daily[dia]) ? op.daily[dia] : 0);
       } else {
-        // Sem breakdown: coloca o total inteiro na coluna de hoje
         dArr = diasOrdenados.map(dia => dia === _hoje ? (op.rec||0) : 0);
       }
       const totalDias = dArr.reduce((s,v)=>s+v,0);
