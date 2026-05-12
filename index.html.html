@@ -469,6 +469,7 @@ select.ev-inp{cursor:pointer}
 <!-- TABS -->
 <div class="tabs">
   <div class="tab on"  onclick="go('geral',this)">📊 Visão Geral</div>
+  <div class="tab"     onclick="go('recdia-op',this);rdopRender()">📆 Receb. por Dia/Op</div>
   <div class="tab"     onclick="go('editor',this)">✏️ Editar Valores</div>
   <div class="tab"     onclick="go('equipes',this)">🏢 Equipes</div>
   <div class="tab"     onclick="go('ranking',this)">🏆 Ranking Equipe Stephanie</div>
@@ -4660,7 +4661,7 @@ function closeM(e){
 function go(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
-  ['geral','editor','equipes','ranking','ranking-digital','ranking-bb','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
+  ['geral','editor','equipes','ranking','ranking-digital','ranking-bb','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas','recdia-op'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
   document.getElementById('pg-'+id).classList.add('on');
   if(id==='geral'){mkGD();mkDist();buildDUManualGrid();}
   if(id==='editor') buildOpEditor();
@@ -4677,6 +4678,7 @@ function go(id,el){
   if(id==='comparativo') cmpInit();
   if(id==='inadimpl') inadimplInit();
   if(id==='metas'){ mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); }
+  if(id==='recdia-op') rdopRender();
 }
 
 // ── REFRESH ALL ──
@@ -4720,6 +4722,8 @@ function refreshAll(){
   }
   // ── Atualiza tabela de Metas & Projeções por equipe na tela principal ──
   if(typeof renderEqMetasTable==='function') renderEqMetasTable();
+  // ── Atualiza aba Recebimento por Dia/Operador ──
+  if(typeof rdopRender==='function') rdopRender();
 }
 
 // ── TOAST ──
@@ -5966,6 +5970,9 @@ function importParse(raw){
       if(day && day >= 1 && day <= 31){
         acc[rawName].daily[day] = (acc[rawName].daily[day]||0) + recVal;
       }
+    } else if(iDate < 0 && recVal > 0){
+      // Sem coluna de data: marca para atribuir ao dia de hoje após loop
+      acc[rawName]._semData = true;
     }
     // Parse tipo de pagamento
     if(iTipo >= 0 && recVal > 0 && row[iTipo]){
@@ -5973,6 +5980,14 @@ function importParse(raw){
       acc[rawName].tipos[tipo] = (acc[rawName].tipos[tipo]||0) + recVal;
     }
   }
+
+  // Se arquivo sem coluna de data, atribui total ao dia de hoje (para aparecer na tabela)
+  const _todayDay = new Date().getDate();
+  Object.values(acc).forEach(a => {
+    if(a._semData && a.total > 0 && Object.keys(a.daily).length === 0){
+      a.daily[_todayDay] = a.total;
+    }
+  });
 
   // Build lookup: norm(name) -> op object (from D.equipes directly)
   const lookup = {};
@@ -6234,6 +6249,17 @@ function importApply(){
 
   // Força atualização do ranking (garante ordem correta após importação)
   mkRanking();
+
+  // ── Atualizar aba Recebimento por Dia/Operador automaticamente ──
+  rdopRender();
+  // Atualiza badge de fonte de dados
+  const _rdopBadge = document.getElementById('rdop-src-badge');
+  if(_rdopBadge){
+    const _now = new Date();
+    const _ts = _now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    _rdopBadge.style.color = 'var(--ok)';
+    _rdopBadge.textContent = '✅ Dados atualizados via importação — ' + _ts;
+  }
 
   // Sincronizar para todos via Firebase
   if(fbDb && fbRoom){
@@ -11428,6 +11454,486 @@ function mtsAtualizarMaio(){
 
 </div>
 <!-- ══════════ FIM PAGE: METAS 2026 ══════════ -->
+
+<!-- ══════════ PAGE: RECEBIMENTO POR DIA / OPERADOR ══════════ -->
+<div class="page" id="pg-recdia-op">
+
+  <!-- Hero -->
+  <div style="background:linear-gradient(135deg,var(--ppd),#1B4332 55%,#0D3D2B);border-radius:var(--rxl);padding:20px 24px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-50px;right:-50px;width:220px;height:220px;border-radius:50%;background:rgba(0,200,127,.07);pointer-events:none"></div>
+    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">Análise Detalhada</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:#fff;line-height:1;margin-bottom:10px">RECEBIMENTO POR DIA · OPERADOR</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:10px 16px;min-width:120px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px">Operadores</div>
+        <div id="rdop-count" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff">43</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:10px 16px;min-width:140px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px">Total Geral</div>
+        <div id="rdop-total" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80">R$ 434.827,73</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:10px 16px;min-width:140px">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px">Período</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#67E8F9">01–12/05/2026</div>
+      </div>
+    </div>
+    <div id="rdop-src-badge" style="margin-top:10px;font-size:11px;font-weight:700;color:var(--warn)">🟡 Dados iniciais (importe o arquivo para atualizar)</div>
+  </div>
+
+  <!-- Filtros -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:14px 18px;box-shadow:var(--sh);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div style="font-size:11px;font-weight:800;color:var(--g700);letter-spacing:.6px;text-transform:uppercase">Filtrar Equipe:</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap" id="rdop-fbtns">
+      <button class="fbtn on" onclick="rdopFiltrar('TODAS',this)">Todas</button>
+      <button class="fbtn" onclick="rdopFiltrar('COFEN BIRIGUI BRUNA',this)">Birigui Bruna</button>
+      <button class="fbtn" onclick="rdopFiltrar('COFEN MARILIA BRENDA',this)">Marília Brenda</button>
+      <button class="fbtn" onclick="rdopFiltrar('COFEN STEPHANIE 2° TURNO',this)">Stephanie 2°T</button>
+      <button class="fbtn" onclick="rdopFiltrar('COFEN DIGITAL',this)">Digital</button>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <input id="rdop-search" type="text" placeholder="🔍 Buscar operador..." oninput="rdopRender()"
+        style="padding:7px 12px;border-radius:var(--rm);border:1.5px solid var(--g200);font-family:Nunito,sans-serif;font-size:12px;font-weight:700;color:var(--g900);outline:none;width:190px;transition:all .2s"
+        onfocus="this.style.borderColor='var(--pp)'" onblur="this.style.borderColor='var(--g200)'">
+      <button class="fbtn" onclick="rdopSortBy('nome')" id="rdop-sort-nome" style="font-size:10px">A–Z</button>
+      <button class="fbtn on" onclick="rdopSortBy('total')" id="rdop-sort-total" style="font-size:10px">Maior Total</button>
+    </div>
+  </div>
+
+  <!-- Tabela -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden">
+    <div style="overflow-x:auto">
+      <table id="rdop-table" style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead>
+          <tr style="background:var(--ppd);color:rgba(255,255,255,.85)">
+            <th style="padding:10px 14px;text-align:left;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;position:sticky;left:0;background:var(--ppd);z-index:2">#</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;position:sticky;left:28px;background:var(--ppd);z-index:2">Operador</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap">Equipe</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">01/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">02/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">03/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">04/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">05/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">06/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">07/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">08/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">09/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">10/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">11/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">12/05</th>
+            <th style="padding:10px 14px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;background:rgba(74,222,128,.15);color:#4ADE80">Total</th>
+          </tr>
+        </thead>
+        <tbody id="rdop-tbody"></tbody>
+        <tfoot id="rdop-tfoot"></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Gráfico de barras por dia -->
+  <div class="card">
+    <div class="sec">📊 Recebimento Total por Dia</div>
+    <div style="height:200px;position:relative"><canvas id="rdop-chart-dias"></canvas></div>
+  </div>
+
+  <!-- Top 10 operadores -->
+  <div class="card">
+    <div class="sec">🏆 Top 10 Operadores por Total</div>
+    <div style="height:240px;position:relative"><canvas id="rdop-chart-ops"></canvas></div>
+  </div>
+
+</div>
+<!-- ══════════ FIM PAGE: RECEBIMENTO POR DIA / OPERADOR ══════════ -->
+
+<script>
+// ══════════════════════════════════════════
+// DADOS: Recebimento por Dia / Operador
+// ══════════════════════════════════════════
+const RDOP_DADOS = [
+  // ── COFEN STEPHANIE 2° TURNO ──
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"aline_pupim",           d:[898.89,0,0,1182.3,1099.63,134.9,2970.42,1920.28,0,0,1079.91,0],        total:9286.33},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"AMABELLY_SANTOS",       d:[280.52,0,0,2015.66,1785.24,147.49,2125.17,896.36,0,0,720.7,199.51],    total:8170.65},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"geovanna_almeida",      d:[0,0,0,1743.79,3220.55,4659.73,299.07,2457.65,0,0,1779.12,0],           total:14159.91},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"ISABELA_MONTEIRO",      d:[0,0,0,0,1214.93,1163.42,3477.91,1574.87,222.84,0,1278.34,0],           total:8932.31},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"jussara_pereira",       d:[0,0,0,2314.27,146.24,3754.21,1265.99,587.24,0,0,2014.75,0],            total:10082.7},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"katia_regina",          d:[163.55,1029.67,0,444.23,5874.46,2943.2,5774.23,1576.1,299.07,299.07,1508.98,0],total:19912.56},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"kauane_azevedo",        d:[575.32,0,0,436.53,1730.98,893.55,6775.91,5838.63,0,0,1614.28,0],       total:17865.2},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"larissa_santana",       d:[0,0,0,57.57,4709.36,130.99,0,1695.08,0,0,3598.6,0],                    total:10191.6},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"STEPHANIE_FAGUNDES",    d:[1289.33,0,299.07,2471.59,582.56,1848.77,1887.02,1552.44,200.02,0,1357.45,0],total:11488.25},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"thais_mayara",          d:[0,268.12,0,3934.83,1164.53,1599.3,1741.82,1865.54,0,0,1039.49,0],      total:11613.63},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"thauany_moura",         d:[0,870.87,344.24,4438.52,1998.25,1778.88,1689.71,2085.89,371.95,147.02,1336.03,0],total:15061.36},
+  // ── COFEN BIRIGUI BRUNA ──
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"ANA_BENTO",             d:[0,0,0,0,0,0,184.5,0,0,0,95.57,0],                                      total:280.07},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"BRUNA_JUSTIMIANO",      d:[0,0,0,0,100.64,0,0,0,0,0,0,0],                                         total:100.64},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"DEBORA_ANDRIELLY",      d:[0,213.7,0,0,0,0,0,0,0,0,0,0],                                          total:213.7},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"EDUARDO_SILVA",         d:[0,151.71,0,310.14,1164.45,2569.3,881.96,937.58,155.05,0,4070.48,0],    total:10240.67},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"FRANCISCA_BRITO",       d:[0,388.94,0,645.11,1454.68,2787.17,238.38,194.2,0,0,0,0],               total:5708.48},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"HELENA_SANTOS",         d:[0,0,0,829.98,575.68,605.72,0,329.85,0,0,124.42,0],                     total:2465.65},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"HELTON_ROLDON",         d:[487.38,0,0,0,2339.09,444.5,1238.88,1628.14,0,0,1341.58,0],             total:7479.57},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"JOAO_MIRANDA",          d:[0,0,0,546.64,650.84,0,285.46,1369.96,0,0,1400.83,0],                   total:4253.73},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"LEONARDO_NUNES",        d:[0,280.96,0,4204.43,330.95,442.25,1132.39,3425.61,595.91,0,521.64,0],   total:10934.14},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"LYVIA_DIAS",            d:[0,117.44,0,2023.21,0,1684.86,2383.09,1732.84,0,0,918.9,0],             total:8860.34},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"MARIA_BRAIDOTI",        d:[0,0,0,580.94,871.02,99.66,742.48,67.55,0,0,0,0],                       total:2361.65},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"MARIA_MOREIRASANTOS",   d:[105.5,79.21,0,352.11,581.61,58.72,199.22,0,0,0,253.96,0],              total:1630.33},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"MARIA_RODARTE",         d:[0,0,0,1185.13,303.01,63.51,618.92,3640.03,0,0,0,0],                    total:5810.6},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"MATHEUS_SOUZA",         d:[699.1,84.01,194.98,3571.29,1474.46,4191.3,1413.52,4399.26,0,0,1976.07,0],total:18003.99},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"NAYARA_CRUZ",           d:[0,0,0,164.76,0,0,0,0,0,0,0,0],                                         total:164.76},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"RAFAELA_MINHOTO",       d:[0,0,0,322.13,0,0,158.16,0,0,0,0,0],                                    total:480.29},
+  // ── COFEN MARILIA BRENDA ──
+  {equipe:"COFEN MARILIA BRENDA",     nome:"BIANCA_V_SILVA",        d:[289.1,0,0,1368.79,0,0,0,0,0,0,0,0],                                    total:1657.89},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"BRENDA_FERREIRA",       d:[0,0,0,0,0,0,1033.23,1311.88,0,0,0,0],                                  total:2345.11},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"CAIO_SHIMITE",          d:[517.58,0,0,4269.38,3030.16,580.66,4253.24,1587.69,216.24,0,2344.2,0],  total:16799.15},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"carulini_santos",       d:[216.9,0,0,0,0,0,0,0,0,0,0,0],                                          total:216.9},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"GIOVANA_SOUZA",         d:[207.99,0,0,2671.73,1203.14,2681.41,1304.55,1816.72,307.5,0,2259.98,142.1],total:12595.12},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"itallo_cardamoni",      d:[0,0,0,838.81,1001.48,230.07,2121.92,2227.03,1112.33,0,8025.68,0],      total:15557.32},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"leticia_romeu",         d:[584.06,1248.64,244.86,3890.39,799.22,1494.13,474.67,6701.42,1857.71,0,2571.65,0],total:19866.75},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"raissa_paloma",         d:[0,0,0,6797.27,2023.27,1314.4,845.91,3112.43,438.98,0,2781.56,0],       total:17313.82},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"silva_beatriz",         d:[0,580.66,0,1009.04,3485.94,3100.65,1815.8,5111.81,697.69,0,3017.86,0], total:18819.45},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"STEPHANIE_FAGUNDES",    d:[1289.33,0,299.07,2471.59,582.56,1848.77,1887.02,1552.44,200.02,0,1357.45,0],total:11488.25},
+  // ── COFEN DIGITAL ──
+  {equipe:"COFEN DIGITAL",            nome:"CLEBER_JUNIOR",         d:[0,1935.77,0,583.8,859.46,2374.32,199.35,6045.1,280.52,0,152.82,0],     total:12431.14},
+  {equipe:"COFEN DIGITAL",            nome:"JHONATA_NASCIMENTO",    d:[0,0,280.52,0,2446.61,1532.24,2131.01,884.37,0,0,693.5,0],              total:7968.25},
+  {equipe:"COFEN DIGITAL",            nome:"KAROLAINE_SILVA",       d:[0,1510.38,0,7138.44,2188.43,8953.03,333.91,7689.81,1294.97,0,11348.35,0],total:40457.32},
+  {equipe:"COFEN DIGITAL",            nome:"RENATARODRIGUES",       d:[0,597.29,0,93.5,3992.93,1670.09,2560.36,5506.05,371.29,135.09,5005.47,0],total:19932.07},
+  {equipe:"COFEN DIGITAL",            nome:"THAYRA_FERREIRASILVA",  d:[462.24,280.52,0,1500.19,3281.05,4325.96,903.12,1458.64,415.97,0,12154.56,0],total:24782.25},
+  // ── SEM EQUIPE DEFINIDA ──
+  {equipe:"—",                        nome:"LYVIA_DIAS",            d:[0,117.44,0,2023.21,0,1684.86,2383.09,1732.84,0,0,918.9,0],             total:8860.34},
+  {equipe:"—",                        nome:"MARIA_BRAIDOTI",        d:[0,0,0,580.94,871.02,99.66,742.48,67.55,0,0,0,0],                       total:2361.65},
+  {equipe:"—",                        nome:"pagueplay",             d:[99.46,164.17,91.03,1112.74,983.3,1546.83,1031.89,857.82,592.27,0,1852.57,0],total:8332.08},
+];
+
+const RDOP_DIAS_LABELS = ['01/05','02/05','03/05','04/05','05/05','06/05','07/05','08/05','09/05','10/05','11/05','12/05'];
+
+// Fallback estático (quando arquivo ainda não foi importado)
+const RDOP_DADOS_STATIC = [
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"aline_pupim",           d:[898.89,0,0,1182.3,1099.63,134.9,2970.42,1920.28,0,0,1079.91,0],        total:9286.33},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"AMABELLY_SANTOS",       d:[280.52,0,0,2015.66,1785.24,147.49,2125.17,896.36,0,0,720.7,199.51],    total:8170.65},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"geovanna_almeida",      d:[0,0,0,1743.79,3220.55,4659.73,299.07,2457.65,0,0,1779.12,0],           total:14159.91},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"ISABELA_MONTEIRO",      d:[0,0,0,0,1214.93,1163.42,3477.91,1574.87,222.84,0,1278.34,0],           total:8932.31},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"jussara_pereira",       d:[0,0,0,2314.27,146.24,3754.21,1265.99,587.24,0,0,2014.75,0],            total:10082.7},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"katia_regina",          d:[163.55,1029.67,0,444.23,5874.46,2943.2,5774.23,1576.1,299.07,299.07,1508.98,0],total:19912.56},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"kauane_azevedo",        d:[575.32,0,0,436.53,1730.98,893.55,6775.91,5838.63,0,0,1614.28,0],       total:17865.2},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"larissa_santana",       d:[0,0,0,57.57,4709.36,130.99,0,1695.08,0,0,3598.6,0],                    total:10191.6},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"STEPHANIE_FAGUNDES",    d:[1289.33,0,299.07,2471.59,582.56,1848.77,1887.02,1552.44,200.02,0,1357.45,0],total:11488.25},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"thais_mayara",          d:[0,268.12,0,3934.83,1164.53,1599.3,1741.82,1865.54,0,0,1039.49,0],      total:11613.63},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"thauany_moura",         d:[0,870.87,344.24,4438.52,1998.25,1778.88,1689.71,2085.89,371.95,147.02,1336.03,0],total:15061.36},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"ANA_BENTO",             d:[0,0,0,0,0,0,184.5,0,0,0,95.57,0],                                      total:280.07},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"BRUNA_JUSTIMIANO",      d:[0,0,0,0,100.64,0,0,0,0,0,0,0],                                         total:100.64},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"DEBORA_ANDRIELLY",      d:[0,213.7,0,0,0,0,0,0,0,0,0,0],                                          total:213.7},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"EDUARDO_SILVA",         d:[0,151.71,0,310.14,1164.45,2569.3,881.96,937.58,155.05,0,4070.48,0],    total:10240.67},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"FRANCISCA_BRITO",       d:[0,388.94,0,645.11,1454.68,2787.17,238.38,194.2,0,0,0,0],               total:5708.48},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"HELENA_SANTOS",         d:[0,0,0,829.98,575.68,605.72,0,329.85,0,0,124.42,0],                     total:2465.65},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"HELTON_ROLDON",         d:[487.38,0,0,0,2339.09,444.5,1238.88,1628.14,0,0,1341.58,0],             total:7479.57},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"JOAO_MIRANDA",          d:[0,0,0,546.64,650.84,0,285.46,1369.96,0,0,1400.83,0],                   total:4253.73},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"LEONARDO_NUNES",        d:[0,280.96,0,4204.43,330.95,442.25,1132.39,3425.61,595.91,0,521.64,0],   total:10934.14},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"LYVIA_DIAS",            d:[0,117.44,0,2023.21,0,1684.86,2383.09,1732.84,0,0,918.9,0],             total:8860.34},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"MARIA_BRAIDOTI",        d:[0,0,0,580.94,871.02,99.66,742.48,67.55,0,0,0,0],                       total:2361.65},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"MARIA_MOREIRASANTOS",   d:[105.5,79.21,0,352.11,581.61,58.72,199.22,0,0,0,253.96,0],              total:1630.33},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"MARIA_RODARTE",         d:[0,0,0,1185.13,303.01,63.51,618.92,3640.03,0,0,0,0],                    total:5810.6},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"MATHEUS_SOUZA",         d:[699.1,84.01,194.98,3571.29,1474.46,4191.3,1413.52,4399.26,0,0,1976.07,0],total:18003.99},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"NAYARA_CRUZ",           d:[0,0,0,164.76,0,0,0,0,0,0,0,0],                                         total:164.76},
+  {equipe:"COFEN BIRIGUI BRUNA",      nome:"RAFAELA_MINHOTO",       d:[0,0,0,322.13,0,0,158.16,0,0,0,0,0],                                    total:480.29},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"BIANCA_V_SILVA",        d:[289.1,0,0,1368.79,0,0,0,0,0,0,0,0],                                    total:1657.89},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"BRENDA_FERREIRA",       d:[0,0,0,0,0,0,1033.23,1311.88,0,0,0,0],                                  total:2345.11},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"CAIO_SHIMITE",          d:[517.58,0,0,4269.38,3030.16,580.66,4253.24,1587.69,216.24,0,2344.2,0],  total:16799.15},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"carulini_santos",       d:[216.9,0,0,0,0,0,0,0,0,0,0,0],                                          total:216.9},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"GIOVANA_SOUZA",         d:[207.99,0,0,2671.73,1203.14,2681.41,1304.55,1816.72,307.5,0,2259.98,142.1],total:12595.12},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"itallo_cardamoni",      d:[0,0,0,838.81,1001.48,230.07,2121.92,2227.03,1112.33,0,8025.68,0],      total:15557.32},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"leticia_romeu",         d:[584.06,1248.64,244.86,3890.39,799.22,1494.13,474.67,6701.42,1857.71,0,2571.65,0],total:19866.75},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"raissa_paloma",         d:[0,0,0,6797.27,2023.27,1314.4,845.91,3112.43,438.98,0,2781.56,0],       total:17313.82},
+  {equipe:"COFEN MARILIA BRENDA",     nome:"silva_beatriz",         d:[0,580.66,0,1009.04,3485.94,3100.65,1815.8,5111.81,697.69,0,3017.86,0], total:18819.45},
+  {equipe:"COFEN DIGITAL",            nome:"CLEBER_JUNIOR",         d:[0,1935.77,0,583.8,859.46,2374.32,199.35,6045.1,280.52,0,152.82,0],     total:12431.14},
+  {equipe:"COFEN DIGITAL",            nome:"JHONATA_NASCIMENTO",    d:[0,0,280.52,0,2446.61,1532.24,2131.01,884.37,0,0,693.5,0],              total:7968.25},
+  {equipe:"COFEN DIGITAL",            nome:"KAROLAINE_SILVA",       d:[0,1510.38,0,7138.44,2188.43,8953.03,333.91,7689.81,1294.97,0,11348.35,0],total:40457.32},
+  {equipe:"COFEN DIGITAL",            nome:"RENATARODRIGUES",       d:[0,597.29,0,93.5,3992.93,1670.09,2560.36,5506.05,371.29,135.09,5005.47,0],total:19932.07},
+  {equipe:"COFEN DIGITAL",            nome:"THAYRA_FERREIRASILVA",  d:[462.24,280.52,0,1500.19,3281.05,4325.96,903.12,1458.64,415.97,0,12154.56,0],total:24782.25},
+  {equipe:"—",                        nome:"pagueplay",             d:[99.46,164.17,91.03,1112.74,983.3,1546.83,1031.89,857.82,592.27,0,1852.57,0],total:8332.08},
+];
+
+// ── Função que gera RDOP_DADOS dinamicamente a partir de D.equipes ──
+function rdopGetDados(){
+  // Se D.equipes não existe ou está vazio, usa fallback estático
+  if(typeof D === 'undefined' || !D || !D.equipes || !D.equipes.length) return RDOP_DADOS_STATIC;
+
+  // Detecta quais dias (1-31) têm dados nos daily dos operadores
+  // Usa os dias do mês de maio 2026 com dados disponíveis
+  const diasAtivos = new Set();
+  const _hoje = new Date().getDate();
+
+  D.equipes.forEach(eq => {
+    (eq.ops||[]).forEach(op => {
+      if(op.rec > 0) {
+        if(op.daily && typeof op.daily === 'object' && Object.keys(op.daily).length > 0) {
+          // Tem breakdown por dia — usa os dias reais
+          Object.keys(op.daily).forEach(d => { if(op.daily[d]>0) diasAtivos.add(parseInt(d)); });
+        } else {
+          // Sem daily: aparece na coluna do dia de hoje
+          diasAtivos.add(_hoje);
+        }
+      }
+    });
+  });
+
+  // Dias ordenados — fallback para dia de hoje se ainda vazio
+  let diasOrdenados = [...diasAtivos].sort((a,b)=>a-b);
+  if(!diasOrdenados.length) diasOrdenados = [_hoje];
+
+  // Atualizar labels dos dias na tabela dinamicamente
+  const thead = document.querySelector('#rdop-table thead tr');
+  if(thead && diasOrdenados.length){
+    // Mantém: # | Operador | Equipe | ...dias... | Total
+    const fixedCols = 3; // #, Operador, Equipe
+    // Recria cabeçalho de dias
+    const allTh = thead.querySelectorAll('th');
+    // Atualiza apenas os dias (índice 3 até penúltimo)
+    diasOrdenados.forEach((dia, i) => {
+      const thIdx = fixedCols + i;
+      if(allTh[thIdx]){
+        const mm = String(dia).padStart(2,'0');
+        allTh[thIdx].textContent = mm+'/05';
+        allTh[thIdx].style.display = '';
+      }
+    });
+    // Esconde colunas extras além do número de dias ativos
+    for(let i = fixedCols + diasOrdenados.length; i < allTh.length - 1; i++){
+      allTh[i].style.display = 'none';
+    }
+  }
+
+  // Monta dados
+  const resultado = [];
+  D.equipes.forEach(eq => {
+    (eq.ops||[]).forEach(op => {
+      if(op.rec <= 0) return; // ignora operadores sem rec
+      const hasDailyKeys = op.daily && typeof op.daily === 'object' && Object.keys(op.daily).length > 0;
+      let dArr;
+      if(hasDailyKeys){
+        // Tem breakdown diário — usa os valores reais por dia
+        dArr = diasOrdenados.map(dia => (op.daily[dia]) ? op.daily[dia] : 0);
+      } else {
+        // Sem breakdown: coloca o total inteiro na coluna de hoje
+        dArr = diasOrdenados.map(dia => dia === _hoje ? (op.rec||0) : 0);
+      }
+      const totalDias = dArr.reduce((s,v)=>s+v,0);
+      resultado.push({
+        equipe: eq.name,
+        nome: op.name,
+        d: dArr,
+        total: op.rec || 0,
+        _hasDailyData: hasDailyKeys,
+      });
+    });
+  });
+
+  // Se não há operadores com rec>0, retorna fallback
+  if(!resultado.length) return RDOP_DADOS_STATIC;
+
+  // Salva dias ativos para uso nos gráficos e rodapé
+  rdopDiasAtivos = diasOrdenados;
+  return resultado;
+}
+
+let rdopDiasAtivos = [1,2,3,4,5,6,7,8,9,10,11,12];
+let rdopFiltroAtual = 'TODAS';
+let rdopSortAtual = 'total';
+let rdopChartDias = null;
+let rdopChartOps = null;
+
+function rdopFiltrar(equipe, btn){
+  rdopFiltroAtual = equipe;
+  document.querySelectorAll('#rdop-fbtns .fbtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  rdopRender();
+}
+
+function rdopSortBy(campo){
+  rdopSortAtual = campo;
+  document.getElementById('rdop-sort-nome').classList.toggle('on', campo==='nome');
+  document.getElementById('rdop-sort-total').classList.toggle('on', campo==='total');
+  rdopRender();
+}
+
+function rdopFmt(v){
+  if(!v || v===0) return '<span style="color:var(--g300)">—</span>';
+  return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function rdopFmtN(v){
+  if(!v || v===0) return '—';
+  return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function rdopGetColor(v, max){
+  if(!v || v===0) return 'transparent';
+  const pct = v/max;
+  if(pct>=0.8) return 'rgba(74,222,128,.18)';
+  if(pct>=0.5) return 'rgba(103,232,249,.13)';
+  if(pct>=0.2) return 'rgba(252,211,77,.12)';
+  return 'rgba(248,113,113,.09)';
+}
+
+function rdopRender(){
+  const search = (document.getElementById('rdop-search')||{}).value || '';
+  const RDOP_DADOS = rdopGetDados();
+
+  let dados = RDOP_DADOS.filter(r => {
+    const nomeOk = r.nome.toLowerCase().includes(search.toLowerCase());
+    const eqOk = rdopFiltroAtual === 'TODAS' || r.equipe === rdopFiltroAtual;
+    return nomeOk && eqOk;
+  });
+
+  if(rdopSortAtual === 'total') dados.sort((a,b) => b.total - a.total);
+  else dados.sort((a,b) => a.nome.localeCompare(b.nome));
+
+  // Dias ativos atuais
+  const nDias = (rdopDiasAtivos||[1,2,3,4,5,6,7,8,9,10,11,12]).length;
+
+  // Max por dia para heatmap
+  const maxDia = Array.from({length:nDias},(_,i) => Math.max(...dados.map(r => r.d[i]||0), 1));
+
+  const tbody = document.getElementById('rdop-tbody');
+  if(!tbody) return;
+
+  // Cores por equipe
+  const EQ_COR = {
+    'COFEN MARILIA BRENDA':    {c:'#00A86B',bg:'#E6F7F1'},
+    'COFEN BIRIGUI BRUNA':     {c:'#4776E6',bg:'#EEF2FF'},
+    'COFEN STEPHANIE 2° TURNO':{c:'#F7971E',bg:'#FFF7ED'},
+    'COFEN DIGITAL':           {c:'#f953c6',bg:'#FDF2FF'},
+    '—':                       {c:'#7A8899',bg:'#F8FAFB'},
+  };
+
+  let html = '';
+  dados.forEach((r,idx) => {
+    const isEven = idx % 2 === 0;
+    const bg = isEven ? 'var(--g50)' : 'var(--w)';
+    const ec = EQ_COR[r.equipe] || {c:'#7A8899',bg:'#F8FAFB'};
+    const eqLabel = r.equipe==='COFEN MARILIA BRENDA'?'Marília Brenda'
+                  : r.equipe==='COFEN BIRIGUI BRUNA'?'Birigui Bruna'
+                  : r.equipe==='COFEN STEPHANIE 2° TURNO'?'Stephanie 2°T'
+                  : r.equipe==='COFEN DIGITAL'?'Digital':'—';
+    html += `<tr style="background:${bg};border-bottom:1px solid var(--g100);transition:background .15s"
+      onmouseover="this.style.background='rgba(0,168,107,.05)'" onmouseout="this.style.background='${bg}'">
+      <td style="padding:8px 14px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--g300);text-align:center;position:sticky;left:0;background:${bg}">${idx+1}</td>
+      <td style="padding:8px 14px;position:sticky;left:28px;background:${bg}">
+        <div style="font-weight:800;font-size:12px;color:var(--g900)">${r.nome}</div>
+      </td>
+      <td style="padding:8px 14px">
+        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;background:${ec.bg};color:${ec.c};border:1px solid ${ec.c}33;white-space:nowrap">${eqLabel}</span>
+      </td>`;
+    r.d.forEach((v,i) => {
+      const cellBg = rdopGetColor(v, maxDia[i]);
+      // Oculta célula se coluna está escondida
+      const showCol = i < nDias;
+      html += `<td style="padding:7px 12px;text-align:right;font-size:11px;font-weight:700;color:var(--g700);background:${cellBg};white-space:nowrap;${showCol?'':'display:none'}">${rdopFmt(v)}</td>`;
+    });
+    html += `<td style="padding:8px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#4ADE80;font-weight:900;white-space:nowrap;background:rgba(74,222,128,.06);border-left:2px solid rgba(74,222,128,.2)">${rdopFmtN(r.total)}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+
+  // Rodapé totais por dia
+  const tfoot = document.getElementById('rdop-tfoot');
+  if(tfoot){
+    const totFilt = Array.from({length:nDias},(_,i) => dados.reduce((s,r) => s+(r.d[i]||0),0));
+    const totGeral = dados.reduce((s,r) => s+r.total, 0);
+    let fHtml = `<tr style="background:var(--ppd);font-weight:800">
+      <td style="padding:9px 14px;position:sticky;left:0;background:var(--ppd)"></td>
+      <td colspan="2" style="padding:9px 14px;font-size:11px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.5px;text-transform:uppercase;position:sticky;left:28px;background:var(--ppd)">TOTAL FILTRADO</td>`;
+    totFilt.forEach((v,i) => {
+      const showCol = i < nDias;
+      fHtml += `<td style="padding:9px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#67E8F9;white-space:nowrap;${showCol?'':'display:none'}">${v>0?'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</td>`;
+    });
+    fHtml += `<td style="padding:9px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#4ADE80;border-left:2px solid rgba(74,222,128,.3)">R$ ${totGeral.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr>`;
+    tfoot.innerHTML = fHtml;
+  }
+
+  // Atualizar contador e indicador de fonte
+  const ct = document.getElementById('rdop-count');
+  if(ct) ct.textContent = dados.length;
+  // Indica se dados vieram do arquivo importado ou do fallback
+  const srcBadge = document.getElementById('rdop-src-badge');
+  const fromD = typeof D !== 'undefined' && D && D.equipes && D.equipes.some(eq => eq.ops && eq.ops.some(op => op.rec > 0));
+  if(srcBadge) {
+    srcBadge.textContent = fromD ? '🟢 Dados do arquivo importado' : '🟡 Dados iniciais (importe o arquivo para atualizar)';
+    srcBadge.style.color = fromD ? 'var(--ok)' : 'var(--warn)';
+  }
+
+  // Charts
+  rdopRenderCharts(dados);
+}
+
+function rdopRenderCharts(dados){
+  const dias = (rdopDiasAtivos||[1,2,3,4,5,6,7,8,9,10,11,12]);
+  const labels = dias.map(d => String(d).padStart(2,'0')+'/05');
+  const totaisDia = dias.map((_,i) => dados.reduce((s,r)=>s+(r.d[i]||0),0));
+  const maxTot = Math.max(...totaisDia, 1);
+
+  // Chart por dia
+  const ctxD = document.getElementById('rdop-chart-dias');
+  if(ctxD){
+    if(rdopChartDias) rdopChartDias.destroy();
+    rdopChartDias = new Chart(ctxD, {
+      type:'bar',
+      data:{
+        labels,
+        datasets:[{
+          label:'Recebimento (R$)',
+          data: totaisDia,
+          backgroundColor: totaisDia.map(v => v===maxTot?'rgba(74,222,128,.85)':'rgba(0,168,107,.5)'),
+          borderRadius:6,borderSkipped:false,
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},
+        scales:{
+          x:{grid:{display:false},ticks:{font:{family:'Nunito',weight:'700',size:10},color:'#7A8899'}},
+          y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{callback:v=>'R$ '+v.toLocaleString('pt-BR',{maximumFractionDigits:0}),font:{family:'Nunito',size:9},color:'#7A8899'}}
+        }
+      }
+    });
+  }
+
+  // Chart top 10 ops
+  const ctxO = document.getElementById('rdop-chart-ops');
+  if(ctxO){
+    if(rdopChartOps) rdopChartOps.destroy();
+    const top10 = [...dados].sort((a,b)=>b.total-a.total).slice(0,10);
+    const colors = ['rgba(74,222,128,.85)','rgba(0,168,107,.75)','rgba(103,232,249,.75)','rgba(59,130,246,.7)','rgba(167,139,250,.7)','rgba(252,211,77,.75)','rgba(251,146,60,.7)','rgba(248,113,113,.7)','rgba(0,184,169,.7)','rgba(156,163,175,.6)'];
+    rdopChartOps = new Chart(ctxO, {
+      type:'bar',
+      data:{
+        labels: top10.map(r=>r.nome.replace('_',' ')),
+        datasets:[{
+          label:'Total (R$)',
+          data: top10.map(r=>r.total),
+          backgroundColor: colors,
+          borderRadius:6,
+          borderSkipped:false,
+        }]
+      },
+      options:{
+        indexAxis:'y',
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.x.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},
+        scales:{
+          x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{callback:v=>'R$ '+v.toLocaleString('pt-BR',{maximumFractionDigits:0}),font:{family:'Nunito',size:9},color:'#7A8899'}},
+          y:{grid:{display:false},ticks:{font:{family:'Nunito',weight:'700',size:10},color:'#3D4B5C'}}
+        }
+      }
+    });
+  }
+}
+
+// Inicializar ao abrir a aba
+document.addEventListener('DOMContentLoaded', ()=>{
+  // Renderizar quando a aba for aberta
+  const tabBtn = document.querySelector('[onclick*="recdia-op"]');
+  if(tabBtn){
+    const orig = tabBtn.getAttribute('onclick');
+    tabBtn.setAttribute('onclick', orig+';rdopRender()');
+  }
+});
+</script>
 
 <script>
 // ══════════════════════════════════════════
