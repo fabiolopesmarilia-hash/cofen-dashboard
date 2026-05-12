@@ -5927,7 +5927,7 @@ function importParse(raw){
   const iCob  = colIdx(['cobradora','operador','cobrador','nome']);
   const iRec  = colIdx(['recebido','rec ','valor rec','total rec','vlr rec']);
   const iHO   = colIdx(['total ho','ho','honorar']);
-  const iDate = colIdx(['data baixa','dt.baixa','dt baixa','data pgto','data pag','data','dt','date']);
+  const iDate = colIdx(['dtlig','dt.lig','dt lig','dtbaixa','dt.baixa','dt baixa','data baixa','data lig','dtpgto','dt.pgto','dt pgto','data pgto','data pag','data','dt','date']);
   const iTipo = colIdx(['forma pgto','forma pag','tipo pgto','tipo pag','forma de pag','tipo de pag','tipo','forma','pagamento']);
 
   if(iCob < 0 || iRec < 0){
@@ -5943,14 +5943,21 @@ function importParse(raw){
 
   // Extrai dia do mês de uma string de data (DD/MM/YYYY ou YYYY-MM-DD)
   function extractDay(str){
-    if(!str) return null;
-    str = str.trim();
-    // formato YYYY-MM-DD
+    if(!str && str !== 0) return null;
+    str = String(str).trim();
+    // formato YYYY-MM-DD (com ou sem hora: 2026-05-12 09:30:00)
     let m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if(m) return parseInt(m[3]);
     // formato DD/MM/YYYY ou DD-MM-YYYY
     m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
     if(m) return parseInt(m[1]);
+    // Número serial do Excel (dias desde 1900-01-01)
+    const num = parseFloat(str);
+    if(!isNaN(num) && num > 40000 && num < 60000){
+      // Converte serial Excel para data JS
+      const d = new Date(Math.round((num - 25569) * 86400 * 1000));
+      return d.getUTCDate();
+    }
     return null;
   }
 
