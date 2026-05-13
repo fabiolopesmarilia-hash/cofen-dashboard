@@ -5950,7 +5950,7 @@ function importParse(raw){
     var m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if(m) return parseInt(m[3]);
     // DD/MM/YYYY ou DD-MM-YYYY ou DD.MM.YYYY
-    m = str.match(/^(\d{1,2})[\/-\.](\d{1,2})[\/-\.]((\d{2}){1,2})/);
+    m = str.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/);
     if(m) return parseInt(m[1]);
     // Serial Excel
     var _n = parseFloat(str.replace(',','.'));
@@ -5959,7 +5959,6 @@ function importParse(raw){
       return _d.getUTCDate();
     }
     return null;
-  }    return null;
   }
 
   // Acumula por operador (nome raw do arquivo)
