@@ -1151,6 +1151,11 @@ select.ev-inp{cursor:pointer}
       border-bottom:2px solid transparent;margin-bottom:-2px">
       🗑️ Remover Operador
     </div>
+    <div class="gtab" onclick="gTab('adicionar',this)"
+      style="padding:11px 18px;font-weight:800;font-size:12px;cursor:pointer;color:var(--g500);
+      border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap">
+      ➕ Adicionar
+    </div>
   </div>
 
   <!-- ── SUB: MOVER OPERADORES ── -->
@@ -1321,6 +1326,201 @@ select.ev-inp{cursor:pointer}
     <div id="fotos-fbtns" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px"></div>
     <div id="fotos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px"></div>
     <input type="file" id="fotos-file-input" accept="image/*" style="display:none" onchange="fotosFileSelected(this)">
+  </div>
+
+  <!-- ── SUB: ADICIONAR (Operador / Equipe / Líder) ── -->
+  <div id="gsub-adicionar" class="gsub" style="display:none;background:var(--w);border:1px solid var(--g200);border-radius:0 0 var(--rl) var(--rl);padding:20px;box-shadow:var(--sh)">
+
+    <!-- Selector de tipo -->
+    <div style="display:flex;gap:8px;margin-bottom:20px" id="add-tipo-btns">
+      <button onclick="addSetTipo('operador',this)"
+        style="display:flex;align-items:center;gap:8px;flex:1;padding:14px 16px;border-radius:var(--rl);
+        border:2px solid var(--pp);background:var(--ppl);cursor:pointer;font-family:Nunito,sans-serif;transition:all .2s"
+        id="add-btn-operador">
+        <span style="font-size:22px">👤</span>
+        <div style="text-align:left">
+          <div style="font-weight:900;font-size:13px;color:var(--ppd)">Operador</div>
+          <div style="font-size:10px;color:var(--g500);font-weight:600">Adicionar novo operador à equipe</div>
+        </div>
+      </button>
+      <button onclick="addSetTipo('equipe',this)"
+        style="display:flex;align-items:center;gap:8px;flex:1;padding:14px 16px;border-radius:var(--rl);
+        border:2px solid var(--g200);background:var(--w);cursor:pointer;font-family:Nunito,sans-serif;transition:all .2s"
+        id="add-btn-equipe">
+        <span style="font-size:22px">🏢</span>
+        <div style="text-align:left">
+          <div style="font-weight:900;font-size:13px;color:var(--g700)">Equipe</div>
+          <div style="font-size:10px;color:var(--g500);font-weight:600">Criar uma nova equipe no sistema</div>
+        </div>
+      </button>
+      <button onclick="addSetTipo('lider',this)"
+        style="display:flex;align-items:center;gap:8px;flex:1;padding:14px 16px;border-radius:var(--rl);
+        border:2px solid var(--g200);background:var(--w);cursor:pointer;font-family:Nunito,sans-serif;transition:all .2s"
+        id="add-btn-lider">
+        <span style="font-size:22px">⭐</span>
+        <div style="text-align:left">
+          <div style="font-weight:900;font-size:13px;color:var(--g700)">Líder</div>
+          <div style="font-size:10px;color:var(--g500);font-weight:600">Definir líder de uma equipe</div>
+        </div>
+      </button>
+    </div>
+
+    <!-- FORM: OPERADOR -->
+    <div id="add-form-operador">
+      <div style="font-size:11px;color:var(--g500);font-weight:600;margin-bottom:16px;background:var(--ppl);border:1px solid rgba(0,168,107,.2);border-radius:var(--rm);padding:9px 14px">
+        👤 Preencha os dados do novo operador. Ele aparecerá no ranking, equipes e recebimento do dia.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
+        <div>
+          <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Nome do Operador *</label>
+          <input id="add-op-nome" type="text" placeholder="Ex: LUCAS_SILVA"
+            style="width:100%;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);
+            padding:10px 13px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);outline:none;transition:all .2s"
+            onfocus="this.style.borderColor='var(--pp)'" onblur="this.style.borderColor='var(--g200)'">
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Equipe *</label>
+          <select id="add-op-eq"
+            style="width:100%;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);
+            padding:10px 13px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);outline:none">
+            <option value="">— Selecione —</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Rec. Acumulado (R$)</label>
+          <input id="add-op-rec" type="number" placeholder="0,00" step="0.01" min="0" value="0"
+            style="width:100%;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);
+            padding:10px 13px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);outline:none;transition:all .2s"
+            onfocus="this.style.borderColor='var(--pp)'" onblur="this.style.borderColor='var(--g200)'">
+        </div>
+      </div>
+      <button onclick="addOperadorApply()"
+        style="padding:12px 32px;border-radius:var(--rm);border:none;cursor:pointer;
+        background:linear-gradient(135deg,var(--pp),var(--pp3));color:#fff;
+        font-family:Nunito,sans-serif;font-weight:800;font-size:14px;transition:all .2s"
+        onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(0,168,107,.35)'"
+        onmouseout="this.style.transform='';this.style.boxShadow=''">
+        ➕ Adicionar Operador
+      </button>
+      <!-- Lista adicionados -->
+      <div style="margin-top:22px" id="add-op-lista-wrap" style="display:none">
+        <div style="font-size:11px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">Operadores Adicionados</div>
+        <div id="add-op-lista"></div>
+      </div>
+    </div>
+
+    <!-- FORM: EQUIPE -->
+    <div id="add-form-equipe" style="display:none">
+      <div style="font-size:11px;color:var(--g500);font-weight:600;margin-bottom:16px;background:#EEF2FF;border:1px solid #C7D2FE;border-radius:var(--rm);padding:9px 14px">
+        🏢 Crie uma nova equipe. Ela ficará disponível para receber operadores e metas.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 80px;gap:14px;margin-bottom:14px;align-items:end">
+        <div>
+          <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Nome Completo da Equipe *</label>
+          <input id="add-eq-nome" type="text" placeholder="Ex: COFEN NOVA EQUIPE"
+            style="width:100%;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);
+            padding:10px 13px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);outline:none;transition:all .2s"
+            onfocus="this.style.borderColor='var(--pp)'" onblur="this.style.borderColor='var(--g200)'">
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Nome Curto (exibição)</label>
+          <input id="add-eq-short" type="text" placeholder="Ex: Nova Equipe"
+            style="width:100%;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);
+            padding:10px 13px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);outline:none;transition:all .2s"
+            onfocus="this.style.borderColor='var(--pp)'" onblur="this.style.borderColor='var(--g200)'">
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Cor da Equipe</label>
+          <input id="add-eq-cor" type="color" value="#6366F1"
+            style="width:100%;height:43px;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);
+            padding:4px 8px;cursor:pointer;outline:none">
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Ícone</label>
+          <input id="add-eq-ico" type="text" placeholder="🏢" maxlength="4" value="🏢"
+            style="width:100%;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);
+            padding:10px 8px;font-size:20px;text-align:center;outline:none">
+        </div>
+      </div>
+      <!-- Preview -->
+      <div style="margin-bottom:16px;padding:12px 16px;border-radius:var(--rm);background:var(--g50);border:1px solid var(--g200)">
+        <div style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">Preview do Badge</div>
+        <span id="add-eq-preview" style="font-size:12px;font-weight:700;padding:4px 12px;border-radius:100px;background:#EEF2FF;color:#6366F1;border:1px solid #C7D2FE">🏢 Nova Equipe</span>
+      </div>
+      <script>
+        function addEqPreview(){
+          const nome = document.getElementById('add-eq-short').value||'Nova Equipe';
+          const cor  = document.getElementById('add-eq-cor').value||'#6366F1';
+          const ico  = document.getElementById('add-eq-ico').value||'🏢';
+          const el   = document.getElementById('add-eq-preview');
+          if(!el) return;
+          el.textContent = ico+' '+nome;
+          el.style.color = cor;
+          el.style.background = cor+'22';
+          el.style.borderColor = cor+'66';
+        }
+        document.getElementById('add-eq-short')?.addEventListener('input', addEqPreview);
+        document.getElementById('add-eq-cor')?.addEventListener('input', addEqPreview);
+        document.getElementById('add-eq-ico')?.addEventListener('input', addEqPreview);
+      </script>
+      <button onclick="addEquipeApply()"
+        style="padding:12px 32px;border-radius:var(--rm);border:none;cursor:pointer;
+        background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;
+        font-family:Nunito,sans-serif;font-weight:800;font-size:14px;transition:all .2s"
+        onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
+        🏢 Criar Equipe
+      </button>
+      <!-- Lista equipes -->
+      <div style="margin-top:22px">
+        <div style="font-size:11px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">Equipes Cadastradas</div>
+        <div id="add-eq-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px"></div>
+      </div>
+    </div>
+
+    <!-- FORM: LÍDER -->
+    <div id="add-form-lider" style="display:none">
+      <div style="font-size:11px;color:var(--g500);font-weight:600;margin-bottom:16px;background:#FFF7ED;border:1px solid #FCD34D;border-radius:var(--rm);padding:9px 14px">
+        ⭐ Defina o líder de cada equipe. O líder aparece destacado no dashboard da equipe.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div>
+          <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Equipe *</label>
+          <select id="add-ld-eq" onchange="addLiderFillOps()"
+            style="width:100%;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);
+            padding:10px 13px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);outline:none">
+            <option value="">— Selecione a equipe —</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Líder *</label>
+          <select id="add-ld-op"
+            style="width:100%;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);
+            padding:10px 13px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);outline:none">
+            <option value="">— Selecione a equipe primeiro —</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Ou digite o nome do Líder</label>
+        <input id="add-ld-nome" type="text" placeholder="Ex: BRENDA_FERREIRA (se não estiver na lista)"
+          style="width:100%;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);
+          padding:10px 13px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);outline:none;transition:all .2s;margin-bottom:14px"
+          onfocus="this.style.borderColor='var(--pp)'" onblur="this.style.borderColor='var(--g200)'">
+      </div>
+      <button onclick="addLiderApply()"
+        style="padding:12px 32px;border-radius:var(--rm);border:none;cursor:pointer;
+        background:linear-gradient(135deg,#F59E0B,#EF4444);color:#fff;
+        font-family:Nunito,sans-serif;font-weight:800;font-size:14px;transition:all .2s"
+        onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
+        ⭐ Definir Líder
+      </button>
+      <!-- Lista líderes definidos -->
+      <div style="margin-top:22px">
+        <div style="font-size:11px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">Líderes Definidos</div>
+        <div id="add-ld-lista" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+    </div>
+
   </div>
 
 </div>
@@ -5502,6 +5702,7 @@ function gTab(id, el){
   if(id==='remover') gestaoRemoverInit();
   if(id==='meta-op') metaOpInit();
   if(id==='fotos') fotosInit();
+  if(id==='adicionar') addInit();
 }
 
 // ── INIT ──
@@ -5512,6 +5713,7 @@ function gestaoInit(){
   fotosInit();
   metaOpInit();
   gestaoRemoverInit();
+  addInit();
 }
 
 // ─────────────────────────────
@@ -12528,6 +12730,240 @@ document.addEventListener('DOMContentLoaded',()=>{
     histRender();
   }
 });
+</script>
+
+
+<script>
+// ══════════════════════════════════════════
+// ADICIONAR: Operador / Equipe / Líder
+// ══════════════════════════════════════════
+
+let _addTipoAtual = 'operador';
+
+function addSetTipo(tipo, btn){
+  _addTipoAtual = tipo;
+  ['operador','equipe','lider'].forEach(t=>{
+    const b = document.getElementById('add-btn-'+t);
+    const f = document.getElementById('add-form-'+t);
+    if(b){ b.style.borderColor='var(--g200)'; b.style.background='var(--w)'; b.querySelector('div div:first-child').style.color='var(--g700)'; }
+    if(f) f.style.display='none';
+  });
+  const colors = {operador:['var(--pp)','var(--ppl)'],equipe:['#6366F1','#EEF2FF'],lider:['#F59E0B','#FFF7ED']};
+  const c = colors[tipo]||colors.operador;
+  btn.style.borderColor = c[0];
+  btn.style.background  = c[1];
+  btn.querySelector('div div:first-child').style.color = c[0];
+  const form = document.getElementById('add-form-'+tipo);
+  if(form) form.style.display='block';
+  if(tipo==='operador') addPopulateEqSel('add-op-eq');
+  if(tipo==='equipe')   addRenderEqLista();
+  if(tipo==='lider'){ addPopulateEqSel('add-ld-eq'); addRenderLdLista(); }
+}
+
+function addInit(){
+  addSetTipo('operador', document.getElementById('add-btn-operador'));
+}
+
+function addPopulateEqSel(selId){
+  const sel = document.getElementById(selId);
+  if(!sel) return;
+  const allEqs = Object.keys(EQ);
+  // Also include custom created equipes
+  const ov = gGetOverrides();
+  const extraEqs = (ov.novasEquipes||[]).map(e=>e.nome);
+  const allNames = [...new Set([...allEqs,...extraEqs])];
+  sel.innerHTML = '<option value="">— Selecione —</option>' +
+    allNames.map(nm=>{
+      const cfg = EQ[nm]||{sh:nm,ico:'🏢'};
+      return `<option value="${nm}">${cfg.ico||''} ${cfg.sh||nm}</option>`;
+    }).join('');
+}
+
+// ── ADICIONAR OPERADOR ──
+function addOperadorApply(){
+  const nome = (document.getElementById('add-op-nome').value||'').trim().replace(/\s+/g,'_').toUpperCase();
+  const eqNm = document.getElementById('add-op-eq').value;
+  const rec  = parseFloat(document.getElementById('add-op-rec').value)||0;
+  if(!nome){ toast('⚠️ Digite o nome do operador!'); return; }
+  if(!eqNm){ toast('⚠️ Selecione a equipe!'); return; }
+  if(ALL.find(o=>o.name===nome)){ toast('⚠️ Operador já existe: '+nome); return; }
+
+  const ho = rec*0.25;
+  const newOp = { name:nome,rec,ho,acordos:0,ligacoes:0,med_atraso:0,med_lig_baixa:0,daily:{},tipos:{},n_ag:0,val_ag:0,eq:eqNm };
+  const eqObj = D.equipes.find(e=>e.name===eqNm);
+  if(!eqObj){
+    // Equipe criada manualmente — adicionar ao D também
+    D.equipes.push({name:eqNm,rec,ho,n_op:1,acordos:0,ops:[newOp]});
+  } else {
+    eqObj.ops.push(newOp);
+    eqObj.ops.sort((a,b)=>b.rec-a.rec);
+    eqObj.rec += rec; eqObj.ho += ho; eqObj.n_op = eqObj.ops.length;
+  }
+  const ov = gGetOverrides();
+  if(!ov.novos) ov.novos=[];
+  ov.novos.push({name:nome,eq:eqNm,rec,ts:Date.now()});
+  gSetOverrides(ov); fbPush('gestao',ov);
+  rebuildAll(); refreshAll();
+  document.getElementById('add-op-nome').value='';
+  document.getElementById('add-op-rec').value='0';
+  addRenderOpLista();
+  const cfg=EQ[eqNm]||{sh:eqNm};
+  toast('✅ '+nome.replace(/_/g,' ')+' adicionado à '+(cfg.sh||eqNm)+'!');
+}
+
+function addRenderOpLista(){
+  const ov = gGetOverrides();
+  const novos = ov.novos||[];
+  const wrap = document.getElementById('add-op-lista-wrap');
+  const list = document.getElementById('add-op-lista');
+  if(!wrap||!list) return;
+  wrap.style.display = novos.length>0?'block':'none';
+  list.innerHTML = novos.map((n,i)=>{
+    const cfg=EQ[n.eq]||{c:'#888',sh:n.eq};
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--g50);border:1px solid var(--g200);border-radius:var(--rm);margin-bottom:6px">
+      <div style="width:28px;height:28px;border-radius:7px;background:${cfg.c||'#888'};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:10px;color:#fff">${ini(n.name)}</div>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:12px;color:var(--g900)">${n.name.replace(/_/g,' ')}</div>
+        <div style="font-size:10px;color:${cfg.c||'#888'};font-weight:700">${cfg.sh||n.eq}</div>
+      </div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--pp)">${fR(n.rec)}</div>
+      <button onclick="addRemoveOp(${i})"
+        style="width:26px;height:26px;border-radius:6px;border:1px solid var(--g200);background:var(--w);color:var(--g500);cursor:pointer;font-size:12px"
+        onmouseover="this.style.background='#FEF2F2';this.style.color='var(--danger)'"
+        onmouseout="this.style.background='var(--w)';this.style.color='var(--g500)'">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function addRemoveOp(idx){
+  const ov=gGetOverrides();
+  if(!ov.novos||!ov.novos[idx]) return;
+  const n=ov.novos[idx];
+  const eqObj=D.equipes.find(e=>e.name===n.eq);
+  if(eqObj){ eqObj.ops=eqObj.ops.filter(o=>o.name!==n.name); eqObj.rec=eqObj.ops.reduce((s,o)=>s+o.rec,0); eqObj.n_op=eqObj.ops.length; }
+  if(!ov.removidos) ov.removidos=[];
+  if(!ov.removidos.includes(n.name)) ov.removidos.push(n.name);
+  ov.novos.splice(idx,1);
+  gSetOverrides(ov); fbPush('gestao',ov);
+  rebuildAll(); refreshAll(); addRenderOpLista();
+  toast('↩ Operador removido!');
+}
+
+// ── ADICIONAR EQUIPE ──
+function addEquipeApply(){
+  const nome  = (document.getElementById('add-eq-nome').value||'').trim().toUpperCase();
+  const short = (document.getElementById('add-eq-short').value||'').trim() || nome;
+  const cor   = document.getElementById('add-eq-cor').value||'#6366F1';
+  const ico   = (document.getElementById('add-eq-ico').value||'🏢').trim();
+  if(!nome){ toast('⚠️ Digite o nome da equipe!'); return; }
+  if(D.equipes.find(e=>e.name===nome)){ toast('⚠️ Equipe já existe!'); return; }
+
+  // Add to EQ config
+  EQ[nome] = {c:cor, bg:cor+'22', ico, sh:short};
+  // Add to D
+  D.equipes.push({name:nome, rec:0, ho:0, n_op:0, acordos:0, ops:[]});
+  // Persist
+  const ov = gGetOverrides();
+  if(!ov.novasEquipes) ov.novasEquipes=[];
+  ov.novasEquipes.push({nome, short, cor, ico, ts:Date.now()});
+  gSetOverrides(ov); fbPush('gestao',ov);
+  rebuildAll(); refreshAll();
+  document.getElementById('add-eq-nome').value='';
+  document.getElementById('add-eq-short').value='';
+  addRenderEqLista();
+  // Atualiza selects de equipe em outros formulários
+  addPopulateEqSel('add-op-eq');
+  addPopulateEqSel('add-ld-eq');
+  const mvEq = document.getElementById('mv-eq'); if(mvEq) gestaoMoverInit();
+  toast('🏢 Equipe "'+short+'" criada!');
+}
+
+function addRenderEqLista(){
+  const el = document.getElementById('add-eq-lista');
+  if(!el) return;
+  const ov = gGetOverrides();
+  const extras = ov.novasEquipes||[];
+  // Show all equipes (base + custom)
+  const allEqs = [...D.equipes];
+  el.innerHTML = allEqs.map(eq=>{
+    const cfg = EQ[eq.name]||{c:'#888',bg:'#eee',ico:'🏢',sh:eq.name};
+    const isCustom = extras.find(e=>e.nome===eq.name);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--g50);border:1.5px solid ${cfg.c}44;border-radius:var(--rm)">
+      <div style="width:36px;height:36px;border-radius:9px;background:${cfg.c};display:flex;align-items:center;justify-content:center;font-size:18px">${cfg.ico||'🏢'}</div>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:12px;color:var(--g900)">${cfg.sh||eq.name}</div>
+        <div style="font-size:10px;color:var(--g500);font-weight:600">${eq.n_op||0} operador(es)</div>
+      </div>
+      ${isCustom?`<span style="font-size:9px;font-weight:800;background:#EEF2FF;color:#6366F1;border-radius:100px;padding:2px 7px;border:1px solid #C7D2FE">NOVO</span>`:''}
+    </div>`;
+  }).join('') || '<div style="font-size:12px;color:var(--g500);padding:10px">Nenhuma equipe.</div>';
+}
+
+// ── ADICIONAR LÍDER ──
+function addLiderFillOps(){
+  const eq = document.getElementById('add-ld-eq').value;
+  const sel = document.getElementById('add-ld-op');
+  if(!eq||!sel){ sel.innerHTML='<option value="">— Selecione a equipe primeiro —</option>'; return; }
+  const eqObj = D.equipes.find(e=>e.name===eq);
+  const ops = eqObj ? eqObj.ops : [];
+  sel.innerHTML='<option value="">— Selecione o líder —</option>'+
+    ops.map(o=>`<option value="${o.name}">${o.name.replace(/_/g,' ')}</option>`).join('');
+}
+
+function addLiderApply(){
+  const eq   = document.getElementById('add-ld-eq').value;
+  const opSel= document.getElementById('add-ld-op').value;
+  const nome = (document.getElementById('add-ld-nome').value||'').trim() || opSel;
+  if(!eq){ toast('⚠️ Selecione a equipe!'); return; }
+  if(!nome){ toast('⚠️ Selecione ou digite o nome do líder!'); return; }
+  const ov = gGetOverrides();
+  if(!ov.lideres) ov.lideres={};
+  ov.lideres[eq] = nome;
+  gSetOverrides(ov); fbPush('gestao',ov);
+  document.getElementById('add-ld-nome').value='';
+  addRenderLdLista();
+  const cfg=EQ[eq]||{sh:eq};
+  toast('⭐ '+nome.replace(/_/g,' ')+' definido como líder de '+(cfg.sh||eq)+'!');
+}
+
+function addRenderLdLista(){
+  const el = document.getElementById('add-ld-lista');
+  if(!el) return;
+  const ov = gGetOverrides();
+  const lideres = ov.lideres||{};
+  const entries = Object.entries(lideres);
+  if(entries.length===0){ el.innerHTML='<div style="font-size:12px;color:var(--g500);padding:10px">Nenhum líder definido ainda.</div>'; return; }
+  el.innerHTML = entries.map(([eq,lider])=>{
+    const cfg=EQ[eq]||{c:'#888',sh:eq,ico:'🏢'};
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--g50);border:1px solid var(--g200);border-radius:var(--rm)">
+      <div style="width:34px;height:34px;border-radius:9px;background:${cfg.c||'#888'};display:flex;align-items:center;justify-content:center;font-size:16px">${cfg.ico||'🏢'}</div>
+      <div style="flex:1">
+        <div style="font-size:10px;font-weight:700;color:var(--g500);letter-spacing:.8px;text-transform:uppercase">${cfg.sh||eq}</div>
+        <div style="font-weight:900;font-size:13px;color:var(--g900)">⭐ ${lider.replace(/_/g,' ')}</div>
+      </div>
+      <button onclick="addRemoveLider('${eq}')"
+        style="padding:6px 12px;border-radius:var(--r);border:1px solid var(--g200);background:var(--w);color:var(--danger);font-family:Nunito,sans-serif;font-size:11px;font-weight:700;cursor:pointer"
+        onmouseover="this.style.background='#FEF2F2'" onmouseout="this.style.background='var(--w)'">Remover</button>
+    </div>`;
+  }).join('');
+}
+
+function addRemoveLider(eq){
+  const ov=gGetOverrides();
+  if(ov.lideres) delete ov.lideres[eq];
+  gSetOverrides(ov); fbPush('gestao',ov);
+  addRenderLdLista();
+  toast('Líder removido.');
+}
+
+// Recarregar equipes personalizadas ao iniciar
+(function loadCustomEquipes(){
+  const ov = gGetOverrides();
+  (ov.novasEquipes||[]).forEach(e=>{
+    if(!EQ[e.nome]) EQ[e.nome]={c:e.cor,bg:e.cor+'22',ico:e.ico,sh:e.short};
+    if(!D.equipes.find(eq=>eq.name===e.nome)) D.equipes.push({name:e.nome,rec:0,ho:0,n_op:0,acordos:0,ops:[]});
+  });
+})();
 </script>
 
 </body>
