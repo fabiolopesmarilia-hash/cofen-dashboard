@@ -9411,18 +9411,10 @@ function cmpFmtK(v){ const a=Math.abs(v); const s=v>=0?'+':'-'; return s+'R$ '+(
 
 // Retorna o total real de Maio do arquivo Visão Geral Financeira (vgDB)
 function cmpGetTotalMaioGeral(){
-  try{
-    const vgRaw = localStorage.getItem('cofen_vg3');
-    if(vgRaw){
-      const vg = JSON.parse(vgRaw);
-      if(vg && vg.mes){
-        const maio = vg.mes['2026-05'];
-        if(maio && maio.vr > 0) return maio.vr;
-      }
-    }
-  }catch(e){}
-  // Fallback: overrideTotalRec (editor manual)
-  return overrideTotalRec > 0 ? overrideTotalRec : 0;
+  // Usa o último DU disponível em CMP_MAIO_CUMUL (dados reais do XLS rec_geral)
+  const dus = Object.keys(CMP_MAIO_CUMUL).map(Number);
+  if(dus.length > 0) return CMP_MAIO_CUMUL[Math.max(...dus)] || 0;
+  return 0;
 }
 
 // ── Mini Comparativo removido ──
@@ -9591,63 +9583,10 @@ function cmpTab(view, el){
 // Reconstrói CMP_MAIO_CUMUL (por DU) usando vgDB.dia (Visão Geral Financeira) como fonte principal
 // Hierarquia: 1) vgDB.dia (rec diário real do arquivo geral) → 2) overrideTotalRec linear → 3) operadores
 function cmpAtualizarCumul(){
-  // Preserva os dados estáticos do XLS como base — só sobrescreve com dados dinâmicos se disponíveis
+  // SEMPRE usa os dados reais do XLS (rec_geral) como fonte de verdade para o comparativo
+  // vgDB e overrideTotalRec contêm totais anuais — não usar aqui
   Object.keys(CMP_MAIO_CUMUL).forEach(k=>delete CMP_MAIO_CUMUL[k]);
-  // Restaura dados do XLS como ponto de partida
-  if(typeof CMP_MAIO_CUMUL_STATIC !== 'undefined'){
-    Object.assign(CMP_MAIO_CUMUL, CMP_MAIO_CUMUL_STATIC);
-  }
-
-  // Tenta carregar vgDB do localStorage (Visão Geral Financeira)
-  let vgDia = {};
-  try{
-    const vgRaw = localStorage.getItem('cofen_vg3');
-    if(vgRaw){ const vg = JSON.parse(vgRaw); if(vg && vg.dia) vgDia = vg.dia; }
-  }catch(e){}
-
-  // Verifica se tem dados de Maio no vgDB.dia (chaves '2026-05-XX')
-  const diasVgMaio = Object.keys(vgDia).filter(k=>k.startsWith('2026-05'));
-
-  if(diasVgMaio.length > 0){
-    // ── MODO 1: Dados reais do arquivo Visão Geral — acumula por DU ──
-    let acum = 0;
-    CMP_MAIO_DU_DIAS.forEach((diaCalendario, idx)=>{
-      const du = idx + 1;
-      const prevDia = idx > 0 ? CMP_MAIO_DU_DIAS[idx-1] : 0;
-      for(let d = prevDia+1; d <= diaCalendario; d++){
-        const key = '2026-05-' + String(d).padStart(2,'0');
-        if(vgDia[key]) acum += vgDia[key].vr || 0;
-      }
-      if(diasVgMaio.some(k=> parseInt(k.slice(8)) <= diaCalendario)){
-        CMP_MAIO_CUMUL[du] = Math.round(acum*100)/100;
-      }
-    });
-  } else if(overrideTotalRec > 0){
-    // ── MODO 2: Só tem total (editor/importar total geral) → linear ──
-    const hoje = new Date().getDate();
-    let duHoje = 0;
-    CMP_MAIO_DU_DIAS.forEach((dia, idx)=>{ if(dia <= hoje) duHoje = idx + 1; });
-    for(let du=1; du<=duHoje; du++){
-      CMP_MAIO_CUMUL[du] = Math.round(overrideTotalRec * (du/duHoje) * 100) / 100;
-    }
-  } else {
-    // ── MODO 3: Sem geral → usa daily dos operadores (empresa/PaguePay) ──
-    const daily = D.global.daily||{};
-    const diasComDado = Object.keys(daily).map(Number).sort((a,b)=>a-b);
-    if(diasComDado.length > 0){
-      let acum = 0;
-      CMP_MAIO_DU_DIAS.forEach((diaCalendario, idx)=>{
-        const du = idx + 1;
-        const prevDia = idx > 0 ? CMP_MAIO_DU_DIAS[idx-1] : 0;
-        for(let d = prevDia+1; d <= diaCalendario; d++){ if(daily[d]) acum += daily[d]; }
-        if(diasComDado.some(d=>d<=diaCalendario)) CMP_MAIO_CUMUL[du] = acum;
-      });
-    }
-  }
-  // ── FALLBACK: se nenhum modo populou, garante que dados do XLS estão presentes ──
-  if(typeof CMP_MAIO_CUMUL_STATIC !== 'undefined' && Object.keys(CMP_MAIO_CUMUL).length === 0){
-    Object.assign(CMP_MAIO_CUMUL, CMP_MAIO_CUMUL_STATIC);
-  }
+  Object.assign(CMP_MAIO_CUMUL, CMP_MAIO_CUMUL_STATIC);
 
   // CMP_MAIO_EQ usa dados reais por DU (não proporcional)
 
@@ -11721,10 +11660,6 @@ function mtsAtualizarMaio(){
     <div style="overflow-x:auto">
       <table id="rdop-table" style="width:100%;border-collapse:collapse;font-size:11px">
         <thead>
-          <tr id="rdop-thead-totdia" style="background:#F0FDF4;border-bottom:2px solid rgba(0,168,107,.2)">
-            <td colspan="3" style="padding:5px 14px;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#166534;position:sticky;left:0;background:#F0FDF4;z-index:2">Total do dia</td>
-            <!-- células preenchidas dinamicamente pelo JS -->
-          </tr>
           <tr style="background:var(--ppd);color:rgba(255,255,255,.85)">
             <th style="padding:10px 14px;text-align:left;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;position:sticky;left:0;background:var(--ppd);z-index:2">#</th>
             <th style="padding:10px 14px;text-align:left;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;position:sticky;left:28px;background:var(--ppd);z-index:2">Operador</th>
@@ -11742,6 +11677,9 @@ function mtsAtualizarMaio(){
             <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">11/05</th>
             <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">12/05</th>
             <th style="padding:10px 14px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;background:rgba(74,222,128,.15);color:#4ADE80">Total</th>
+          </tr>
+          <tr id="rdop-thead-totdia" style="background:#fff;border-top:3px solid var(--ppd);border-bottom:2px solid var(--g200)">
+            <td colspan="3" style="padding:7px 14px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--g500);position:sticky;left:0;background:#fff;z-index:2">💰 Total do Dia</td>
           </tr>
         </thead>
         <tbody id="rdop-tbody"></tbody>
@@ -12118,11 +12056,12 @@ function rdopRender(){
   if(totDiaRow){
     // remove old day cells (keep first td colspan=3)
     while(totDiaRow.children.length > 1) totDiaRow.removeChild(totDiaRow.lastChild);
-    const totsPorDia = Array.from({length:nDias},(_,i) => dados.reduce((s,r)=>s+(r.d[i]||0),0));
-    const totalGeral = dados.reduce((s,r)=>s+r.total,0);
+    const _nCols = nDias; // use only active day columns
+    const totsPorDia = Array.from({length:_nCols},(_,i) => dados.reduce((s,r)=>s+(r.d[i]||0),0));
+    const totalGeral = totsPorDia.reduce((s,v)=>s+v,0);
     totsPorDia.forEach((v,i) => {
       const td = document.createElement('td');
-      td.style.cssText = 'padding:5px 10px;text-align:right;font-family:Bebas Neue,sans-serif;font-size:12px;white-space:nowrap;background:#F0FDF4;';
+      td.style.cssText = 'padding:7px 10px;text-align:right;font-family:Nunito,sans-serif;font-size:12px;white-space:nowrap;background:#fff;letter-spacing:-0.3px;';
       if(v > 0){
         td.textContent = 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
         // color by value
@@ -12130,13 +12069,13 @@ function rdopRender(){
         td.style.fontWeight = '800';
       } else {
         td.textContent = '—';
-        td.style.color = '#9CA3AF';
+        td.style.color = '#D1D5DB';
       }
       totDiaRow.appendChild(td);
     });
     // célula do total geral
     const tdTot = document.createElement('td');
-    tdTot.style.cssText = 'padding:5px 12px;text-align:right;font-family:Bebas Neue,sans-serif;font-size:13px;color:#065F46;font-weight:900;white-space:nowrap;background:rgba(74,222,128,.15);border-left:2px solid rgba(74,222,128,.3)';
+    tdTot.style.cssText = 'padding:7px 14px;text-align:right;font-family:Nunito,sans-serif;font-size:13px;color:#065F46;font-weight:900;white-space:nowrap;background:rgba(74,222,128,.12);border-left:2px solid rgba(74,222,128,.3);letter-spacing:-0.3px;';
     tdTot.textContent = 'R$ '+totalGeral.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
     totDiaRow.appendChild(tdTot);
   }
