@@ -595,10 +595,12 @@ select.ev-inp{cursor:pointer}
               <th id="eq-mt-col-header" style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#FCD34D;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">META DE HOJE — DUs</th>
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#C084FC;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">DEVERIA ESTAR HOJE</th>
               <th id="eq-mt-col-pct-header" style="padding:7px 12px;text-align:center;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">% S/ META HOJE</th>
+              <th id="eq-mt-col-pct-minus1-header" style="padding:7px 12px;text-align:center;font-size:9px;font-weight:800;color:rgba(255,180,0,.7);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">% COM -1 DU</th>
+              <th id="eq-mt-col-pct-minus1-header" style="padding:7px 12px;text-align:center;font-size:9px;font-weight:800;color:rgba(255,180,0,.6);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">% COM -1 DU</th>
             </tr>
           </thead>
           <tbody id="eq-metas-tbody">
-            <tr><td colspan="6" style="padding:14px;text-align:center;color:rgba(255,255,255,.3);font-size:11px">⏳ Carregando...</td></tr>
+            <tr><td colspan="8" style="padding:14px;text-align:center;color:rgba(255,255,255,.3);font-size:11px">⏳ Carregando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -12212,6 +12214,10 @@ function renderEqMetasTable(){
   // Atualizar cabeçalho da coluna %
   const pctHeader = document.getElementById('eq-mt-col-pct-header');
   if(pctHeader) pctHeader.textContent = '% S/ META HOJE (' + duPass + ' DUs)';
+  const pctM1Header = document.getElementById('eq-mt-col-pct-minus1-header');
+  if(pctM1Header) pctM1Header.textContent = '% -1 DU (' + (Math.max(1,duPass-1)) + ' DUs)';
+  const pctMinus1Header = document.getElementById('eq-mt-col-pct-minus1-header');
+  if(pctMinus1Header) pctMinus1Header.textContent = '% COM -1 DU (' + (duPass - 1) + ' DUs)';
 
   const fR = v => 'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const pctColor = p => p>=100?'#4ADE80':p>=70?'#67E8F9':p>=50?'#FCD34D':'#F87171';
@@ -12258,6 +12264,15 @@ function renderEqMetasTable(){
     const pb    = pctBg(pct);
     const barW  = Math.min(100, pct).toFixed(1);
 
+    // % com -1 DU
+    const duPassM1  = Math.max(1, duPass - 1);
+    const metaHojeM1 = duTotal > 0 ? (metaEq / duTotal) * duPassM1 : 0;
+    const pctM1v    = metaHojeM1 > 0 ? (rec / metaHojeM1 * 100) : 0;
+    const pctM1c    = pctColor(pctM1v);
+    const pctM1b    = pctBg(pctM1v);
+    const pctM1diff = pct - pctM1v;
+    const pctM1arrow = pctM1diff > 0.5 ? '▲' : pctM1diff < -0.5 ? '▼' : '●';
+
     // Cor de urgência para a coluna de meta restante
     const urgColor = duRest <= 2 ? '#F87171' : duRest <= 5 ? '#FCD34D' : '#67E8F9';
 
@@ -12287,9 +12302,13 @@ function renderEqMetasTable(){
       <td style="padding:8px 12px;text-align:center">
         <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:${pc};background:${pb};padding:2px 9px;border-radius:6px;display:inline-block">${pct.toFixed(0)}%</span>
       </td>
+      <td style="padding:8px 12px;text-align:center">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:${pctM1c};background:${pctM1b};padding:2px 9px;border-radius:6px;display:inline-block">${pctM1v.toFixed(0)}%</span>
+        <div style="font-size:9px;color:${pctM1arrow==='▲'?'#4ADE80':pctM1arrow==='▼'?'#F87171':'#999'};font-weight:800;margin-top:2px">${pctM1arrow} ${Math.abs(pctM1diff).toFixed(1)}pp</div>
+      </td>
     </tr>`;
   });
-  tbody.innerHTML = rows || '<tr><td colspan="7" style="padding:14px;text-align:center;color:rgba(255,255,255,.3);font-size:11px">Nenhuma equipe encontrada</td></tr>';
+  tbody.innerHTML = rows || '<tr><td colspan="8" style="padding:14px;text-align:center;color:rgba(255,255,255,.3);font-size:11px">Nenhuma equipe encontrada</td></tr>';
 }
 // Chamar na inicialização (após todos os dados estarem prontos)
 renderEqMetasTable();
