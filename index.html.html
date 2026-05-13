@@ -4687,30 +4687,7 @@ function openM(opName){
       <div class="mk-l">Falta/DU</div>
       <div class="mk-v am">${fRK(projModal.needDay)}</div>
       <div style="font-size:9px;color:var(--g500);font-weight:600;margin-top:2px">${DU.restam} D.U. restam</div>
-    </div>`:''}\
-    ${(()=>{
-      if(!metaIndModal || metaIndModal<=0) return '';
-      const duTotal = DU.total||1;
-      const metaHoje   = metaIndModal * (DU.passou / duTotal);
-      const metaAmanha = metaIndModal * (Math.min(DU.passou+1, duTotal) / duTotal);
-      const faltaHoje   = metaHoje   - op.rec;
-      const faltaAmanha = metaAmanha - op.rec;
-      const corHoje   = faltaHoje   <= 0 ? 'var(--ok)'   : 'var(--warn)';
-      const corAmanha = faltaAmanha <= 0 ? 'var(--ok)'   : 'var(--info)';
-      const lblHoje   = faltaHoje   <= 0 ? '✅ Bateu hoje!'   : fRK(faltaHoje);
-      const lblAmanha = faltaAmanha <= 0 ? '✅ Bateu amanhã!' : fRK(faltaAmanha);
-      return `
-        <div class="mk" style="border:1.5px solid ${corHoje}33;background:${corHoje}0d">
-          <div class="mk-l">Falta Hoje</div>
-          <div class="mk-v" style="color:${corHoje};font-size:17px">${lblHoje}</div>
-          <div style="font-size:9px;color:var(--g500);font-weight:600;margin-top:2px">Meta esperada hoje: ${fRK(metaHoje)}</div>
-        </div>
-        <div class="mk" style="border:1.5px solid ${corAmanha}33;background:${corAmanha}0d">
-          <div class="mk-l">Falta Amanhã</div>
-          <div class="mk-v" style="color:${corAmanha};font-size:17px">${lblAmanha}</div>
-          <div style="font-size:9px;color:var(--g500);font-weight:600;margin-top:2px">Meta esperada amanhã: ${fRK(metaAmanha)}</div>
-        </div>`;
-    })()}
+    </div>`:''}
   ` : '');
 
   // ── AG-BOX: foto do operador se disponível, senão agendamentos ──
@@ -5020,6 +4997,7 @@ function loadSavedOverrides(){
           if(savedOpHist[op.name]){
             if(savedOpHist[op.name].daily) op.daily = savedOpHist[op.name].daily;
             if(savedOpHist[op.name].tipos) op.tipos = savedOpHist[op.name].tipos;
+            if(savedOpHist[op.name].acordos) op.acordos = savedOpHist[op.name].acordos;
           } else if(savedDaily[op.name]){
             op.daily = savedDaily[op.name];
           }
@@ -6154,6 +6132,7 @@ function importParse(raw){
   const iRec  = colIdx(['recebido','rec ','valor rec','total rec','vlr rec']);
   const iHO   = colIdx(['total ho','ho','honorar']);
   const iDate = colIdx(['dtpagamento','dt.pagamento','data pagamento','dtpgto','dt.pgto','dt pgto','data pgto','data pag','dtlig','dt.lig','dt lig','dtbaixa','dt.baixa','dt baixa','data baixa','data lig','baixa','pgto','ligacao','dt','date','data']);
+  const iDoc  = colIdx(['nrdocumento','nr documento','nrdoc','documento','doc','numero','número','parcela','titulo','título']);
   const iTipo = colIdx(['forma pgto','forma pag','tipo pgto','tipo pag','forma de pag','tipo de pag','tipo','forma','pagamento']);
 
   if(iCob < 0 || iRec < 0){
@@ -6195,8 +6174,10 @@ function importParse(raw){
     const rawName = row[iCob].trim();
     if(!rawName) continue;
     const recVal = parseFloat(row[iRec].replace(/\./g,'').replace(',','.')) || 0;
-    if(!acc[rawName]) acc[rawName] = {total:0, daily:{}, tipos:{}};
+    if(!acc[rawName]) acc[rawName] = {total:0, daily:{}, tipos:{}, docs: new Set()};
     acc[rawName].total += recVal;
+    // Contar acordos únicos por NrDocumento
+    if(iDoc >= 0 && row[iDoc]) acc[rawName].docs.add(row[iDoc].trim());
     // Parse date para daily breakdown
     if(iDate >= 0 && recVal > 0){
       const day = extractDay(row[iDate]);
@@ -6299,6 +6280,7 @@ function importParse(raw){
         diff:totalReal-matched.rec,
         daily: daily,
         tipos: accData.tipos || {},
+        acordos: accData.docs ? accData.docs.size : 0,
       });
     } else {
       missing.push({rawName, ho:totalReal * 0.25, totalReal});
@@ -6461,6 +6443,8 @@ function importApply(){
       if(Math.abs(r.recImport - opReal.rec) < 0.01 && Object.keys(r.daily||{}).length===0){ unchanged++; return; }
       opReal.rec = r.recImport;
       opReal.ho  = r.recImport * 0.25;
+      // Aplicar acordos (NrDocumento únicos)
+      if(r.acordos > 0) opReal.acordos = r.acordos;
       // Aplicar daily breakdown se existir
       if(r.daily && Object.keys(r.daily).length > 0){
         opReal.daily = r.daily;
@@ -6534,6 +6518,10 @@ function importApply(){
       if(r.tipos && Object.keys(r.tipos).length > 0) tiposData[r.opName] = r.tipos;
     });
     if(Object.keys(tiposData).length > 0) fbPush('op_tipos', tiposData);
+    // Sincronizar acordos via op_acordos
+    const acordosData = {};
+    importParsed.found.forEach(r=>{ if(r.acordos > 0) acordosData[r.opName] = r.acordos; });
+    if(Object.keys(acordosData).length > 0) fbPush('op_acordos', acordosData);
     // Persistir daily e tipos no localStorage para restaurar ao reabrir
     try{
       const savedOpHist = JSON.parse(localStorage.getItem('cofen_op_hist')||'{}');
@@ -6541,6 +6529,7 @@ function importApply(){
         if(!savedOpHist[r.opName]) savedOpHist[r.opName] = {};
         if(r.daily && Object.keys(r.daily).length > 0) savedOpHist[r.opName].daily = r.daily;
         if(r.tipos && Object.keys(r.tipos).length > 0) savedOpHist[r.opName].tipos = r.tipos;
+        if(r.acordos > 0) savedOpHist[r.opName].acordos = r.acordos;
       });
       localStorage.setItem('cofen_op_hist', JSON.stringify(savedOpHist));
       // compatibilidade: manter cofen_daily_hist também
@@ -8005,6 +7994,33 @@ function fbStartListening(){
     if(changed) pulseSyncDot();
   });
   fbListeners.op_tipos = true;
+
+  // ── Acordos por operador (op_acordos) ──
+  if(!fbListeners.op_acordos){
+    fbDb.ref(fbRoom+'/op_acordos').on('value', snap=>{
+      const remote = snap.val();
+      if(!remote) return;
+      let changed = false;
+      Object.entries(remote).forEach(([nm, acordos])=>{
+        if(!acordos) return;
+        D.equipes.forEach(eq=>{
+          const opReal = eq.ops.find(o=>o.name===nm);
+          if(opReal){ opReal.acordos = acordos; changed = true; }
+        });
+      });
+      // Persistir no localStorage
+      try{
+        const savedOpHist = JSON.parse(localStorage.getItem('cofen_op_hist')||'{}');
+        Object.entries(remote).forEach(([nm, acordos])=>{
+          if(!savedOpHist[nm]) savedOpHist[nm] = {};
+          savedOpHist[nm].acordos = acordos;
+        });
+        localStorage.setItem('cofen_op_hist', JSON.stringify(savedOpHist));
+      }catch(e){}
+      if(changed){ rebuildAll(); refreshAll(); pulseSyncDot(); }
+    });
+    fbListeners.op_acordos = true;
+  }
 
   // ── Recebimento do dia (rd) ──
   fbDb.ref(fbRoom+'/rd').on('value', snap=>{
