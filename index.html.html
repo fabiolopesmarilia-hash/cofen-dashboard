@@ -4687,7 +4687,30 @@ function openM(opName){
       <div class="mk-l">Falta/DU</div>
       <div class="mk-v am">${fRK(projModal.needDay)}</div>
       <div style="font-size:9px;color:var(--g500);font-weight:600;margin-top:2px">${DU.restam} D.U. restam</div>
-    </div>`:''}
+    </div>`:''}\
+    ${(()=>{
+      if(!metaIndModal || metaIndModal<=0) return '';
+      const duTotal = DU.total||1;
+      const metaHoje   = metaIndModal * (DU.passou / duTotal);
+      const metaAmanha = metaIndModal * (Math.min(DU.passou+1, duTotal) / duTotal);
+      const faltaHoje   = metaHoje   - op.rec;
+      const faltaAmanha = metaAmanha - op.rec;
+      const corHoje   = faltaHoje   <= 0 ? 'var(--ok)'   : 'var(--warn)';
+      const corAmanha = faltaAmanha <= 0 ? 'var(--ok)'   : 'var(--info)';
+      const lblHoje   = faltaHoje   <= 0 ? '✅ Bateu hoje!'   : fRK(faltaHoje);
+      const lblAmanha = faltaAmanha <= 0 ? '✅ Bateu amanhã!' : fRK(faltaAmanha);
+      return `
+        <div class="mk" style="border:1.5px solid ${corHoje}33;background:${corHoje}0d">
+          <div class="mk-l">Falta Hoje</div>
+          <div class="mk-v" style="color:${corHoje};font-size:17px">${lblHoje}</div>
+          <div style="font-size:9px;color:var(--g500);font-weight:600;margin-top:2px">Meta esperada hoje: ${fRK(metaHoje)}</div>
+        </div>
+        <div class="mk" style="border:1.5px solid ${corAmanha}33;background:${corAmanha}0d">
+          <div class="mk-l">Falta Amanhã</div>
+          <div class="mk-v" style="color:${corAmanha};font-size:17px">${lblAmanha}</div>
+          <div style="font-size:9px;color:var(--g500);font-weight:600;margin-top:2px">Meta esperada amanhã: ${fRK(metaAmanha)}</div>
+        </div>`;
+    })()}
   ` : '');
 
   // ── AG-BOX: foto do operador se disponível, senão agendamentos ──
