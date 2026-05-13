@@ -5927,7 +5927,7 @@ function importParse(raw){
   const iCob  = colIdx(['cobradora','operador','cobrador','nome']);
   const iRec  = colIdx(['recebido','rec ','valor rec','total rec','vlr rec']);
   const iHO   = colIdx(['total ho','ho','honorar']);
-  const iDate = colIdx(['dtlig','dt.lig','dt lig','dtbaixa','dt.baixa','dt baixa','data baixa','data lig','dtpgto','dt.pgto','dt pgto','data pgto','data pag','data','dt','date']);
+  const iDate = colIdx(['dtpagamento','dt.pagamento','data pagamento','dtpgto','dt.pgto','dt pgto','data pgto','data pag','dtlig','dt.lig','dt lig','dtbaixa','dt.baixa','dt baixa','data baixa','data lig','baixa','pgto','ligacao','dt','date','data']);
   const iTipo = colIdx(['forma pgto','forma pag','tipo pgto','tipo pag','forma de pag','tipo de pag','tipo','forma','pagamento']);
 
   if(iCob < 0 || iRec < 0){
@@ -5943,21 +5943,23 @@ function importParse(raw){
 
   // Extrai dia do mês de uma string de data (DD/MM/YYYY ou YYYY-MM-DD)
   function extractDay(str){
-    if(!str && str !== 0) return null;
-    str = String(str).trim();
-    // formato YYYY-MM-DD (com ou sem hora: 2026-05-12 09:30:00)
-    let m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(!str) return null;
+    str = String(str).trim().replace(/^"|"$/g,'');
+    if(!str || str==='nan' || str==='0') return null;
+    // YYYY-MM-DD
+    var m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if(m) return parseInt(m[3]);
-    // formato DD/MM/YYYY ou DD-MM-YYYY
-    m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+    // DD/MM/YYYY ou DD-MM-YYYY ou DD.MM.YYYY
+    m = str.match(/^(\d{1,2})[\/-\.](\d{1,2})[\/-\.]((\d{2}){1,2})/);
     if(m) return parseInt(m[1]);
-    // Número serial do Excel (dias desde 1900-01-01)
-    const _n = parseFloat(str);
-    if(!isNaN(_n) && _n > 40000 && _n < 60000){
-      const _d = new Date(Math.round((_n - 25569) * 86400 * 1000));
+    // Serial Excel
+    var _n = parseFloat(str.replace(',','.'));
+    if(!isNaN(_n) && _n>40000 && _n<60000){
+      var _d = new Date(Math.round((_n-25569)*86400*1000));
       return _d.getUTCDate();
     }
     return null;
+  }    return null;
   }
 
   // Acumula por operador (nome raw do arquivo)
@@ -5986,11 +5988,37 @@ function importParse(raw){
     }
   }
 
-  // Sem coluna de data: atribui total ao dia de hoje
+  // Sem coluna de data: tenta usar rd_hist (histórico do dia), senão usa hoje
   const _todayDay = new Date().getDate();
   Object.values(acc).forEach(a => {
     if(a._semData && a.total > 0 && Object.keys(a.daily).length === 0){
-      a.daily[_todayDay] = a.total;
+      // Tenta pegar histórico diário do rd_hist salvo no localStorage
+      try {
+        const _hist = JSON.parse(localStorage.getItem('cofen_rd_hist') || '{}');
+        let _foundDaily = false;
+        // rd_hist[data][op] = valor — procura pelo operador nos históricos
+        Object.entries(_hist).forEach(([dateKey, opMap]) => {
+          // dateKey = YYYY-MM-DD ou DD_MM_YYYY
+          const _dm = dateKey.match(/(\d{4})[-_](\d{1,2})[-_](\d{1,2})|(\d{1,2})[-_](\d{1,2})[-_](\d{4})/);
+          let _day = null;
+          if(_dm) _day = parseInt(_dm[3] || _dm[4]);
+          if(!_day || _day < 1 || _day > 31) return;
+          // Procura este operador no mapa do dia
+          Object.entries(opMap).forEach(([opKey, v]) => {
+            // compara normalizando nome
+            const _nk = opKey.toLowerCase().replace(/[^a-z]/g,'');
+            Object.keys(acc).forEach(rawN => {
+              if(_nk === rawN.toLowerCase().replace(/[^a-z]/g,'')) {
+                a.daily[_day] = (a.daily[_day] || 0) + (parseFloat(v) || 0);
+                _foundDaily = true;
+              }
+            });
+          });
+        });
+        if(!_foundDaily) a.daily[_todayDay] = a.total;
+      } catch(e) {
+        a.daily[_todayDay] = a.total;
+      }
     }
   });
 
