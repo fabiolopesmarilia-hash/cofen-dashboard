@@ -11548,6 +11548,64 @@ function mtsAtualizarMaio(){
     <div style="height:240px;position:relative"><canvas id="rdop-chart-ops"></canvas></div>
   </div>
 
+  <!-- ══ CARROSSEL HISTÓRICO ══ -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden">
+    <!-- Header do carrossel -->
+    <div style="background:linear-gradient(135deg,var(--ppd),#1B4332);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#fff;letter-spacing:2px">📅 HISTÓRICO — RECEBIMENTO POR DIA / OPERADOR</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.45);font-weight:600;margin-top:2px">Meses anteriores • 2026</div>
+      </div>
+      <!-- Seletor de mês -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="hist-mes-btns">
+        <button class="fbtn on" onclick="histSetMes('Abril',this)" style="font-size:11px;background:rgba(0,168,107,.3);color:#4ADE80;border-color:rgba(74,222,128,.4)">Abril</button>
+        <button class="fbtn" onclick="histSetMes('Março',this)" style="font-size:11px">Março</button>
+        <button class="fbtn" onclick="histSetMes('Fevereiro',this)" style="font-size:11px">Fevereiro</button>
+        <button class="fbtn" onclick="histSetMes('Janeiro',this)" style="font-size:11px">Janeiro</button>
+      </div>
+    </div>
+    <!-- KPIs rápidos -->
+    <div id="hist-kpis" style="display:flex;gap:0;border-bottom:1px solid var(--g100)"></div>
+    <!-- Filtros equipe + busca -->
+    <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--g100)">
+      <div style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:.6px;text-transform:uppercase">Equipe:</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap" id="hist-fbtns">
+        <button class="fbtn on" onclick="histFiltrar('TODAS',this)" style="font-size:10px">Todas</button>
+        <button class="fbtn" onclick="histFiltrar('Birigui Bruna',this)" style="font-size:10px">Birigui Bruna</button>
+        <button class="fbtn" onclick="histFiltrar('Marília Brenda',this)" style="font-size:10px">Marília Brenda</button>
+        <button class="fbtn" onclick="histFiltrar('Stephanie 2°T',this)" style="font-size:10px">Stephanie 2°T</button>
+        <button class="fbtn" onclick="histFiltrar('Digital',this)" style="font-size:10px">Digital</button>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+        <input id="hist-search" type="text" placeholder="🔍 Buscar operador..." oninput="histRender()"
+          style="padding:6px 11px;border-radius:var(--rm);border:1.5px solid var(--g200);font-family:Nunito,sans-serif;font-size:11px;font-weight:700;color:var(--g900);outline:none;width:170px;transition:all .2s"
+          onfocus="this.style.borderColor='var(--pp)'" onblur="this.style.borderColor='var(--g200)'">
+        <button class="fbtn on" onclick="histSortBy('total')" id="hist-sort-total" style="font-size:10px">Maior Total</button>
+        <button class="fbtn" onclick="histSortBy('nome')" id="hist-sort-nome" style="font-size:10px">A–Z</button>
+      </div>
+    </div>
+    <!-- Tabela -->
+    <div style="overflow-x:auto">
+      <table id="hist-table" style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead><tr id="hist-thead-tr" style="background:var(--ppd);color:rgba(255,255,255,.85)"></tr></thead>
+        <tbody id="hist-tbody"></tbody>
+        <tfoot id="hist-tfoot"></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Gráfico histórico por dia -->
+  <div class="card">
+    <div class="sec" id="hist-chart-title">📊 Recebimento Total por Dia — Abril</div>
+    <div style="height:200px;position:relative"><canvas id="hist-chart-dias"></canvas></div>
+  </div>
+
+  <!-- Top 10 histórico -->
+  <div class="card">
+    <div class="sec" id="hist-chart-ops-title">🏆 Top 10 Operadores — Abril</div>
+    <div style="height:240px;position:relative"><canvas id="hist-chart-ops"></canvas></div>
+  </div>
+
 </div>
 <!-- ══════════ FIM PAGE: RECEBIMENTO POR DIA / OPERADOR ══════════ -->
 
@@ -11765,11 +11823,19 @@ function rdopFmtN(v){
 
 function rdopGetColor(v, max){
   if(!v || v===0) return 'transparent';
-  const pct = v/max;
-  if(pct>=0.8) return 'rgba(74,222,128,.18)';
-  if(pct>=0.5) return 'rgba(103,232,249,.13)';
-  if(pct>=0.2) return 'rgba(252,211,77,.12)';
-  return 'rgba(248,113,113,.09)';
+  if(v >= 4000) return 'rgba(74,222,128,.22)';
+  if(v >= 3000) return 'rgba(103,232,249,.20)';
+  if(v >= 2000) return 'rgba(59,130,246,.16)';
+  if(v >= 1000) return 'rgba(252,211,77,.20)';
+  return 'rgba(248,113,113,.22)';
+}
+function rdopGetTextColor(v){
+  if(!v || v===0) return 'var(--g700)';
+  if(v >= 4000) return '#166534';
+  if(v >= 3000) return '#0e7490';
+  if(v >= 2000) return '#1d4ed8';
+  if(v >= 1000) return '#92400e';
+  return '#991b1b';
 }
 
 function rdopRender(){
@@ -11825,7 +11891,8 @@ function rdopRender(){
       const cellBg = rdopGetColor(v, maxDia[i]);
       // Oculta célula se coluna está escondida
       const showCol = i < nDias;
-      html += `<td style="padding:7px 12px;text-align:right;font-size:11px;font-weight:700;color:var(--g700);background:${cellBg};white-space:nowrap;${showCol?'':'display:none'}">${rdopFmt(v)}</td>`;
+      const cellTxt = rdopGetTextColor(v);
+      html += `<td style="padding:7px 12px;text-align:right;font-size:11px;font-weight:700;color:${cellTxt};background:${cellBg};white-space:nowrap;${showCol?'':'display:none'}">${rdopFmt(v)}</td>`;
     });
     html += `<td style="padding:8px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#4ADE80;font-weight:900;white-space:nowrap;background:rgba(74,222,128,.06);border-left:2px solid rgba(74,222,128,.2)">${rdopFmtN(r.total)}</td>
     </tr>`;
@@ -12045,6 +12112,422 @@ function renderEqMetasTable(){
 }
 // Chamar na inicialização (após todos os dados estarem prontos)
 renderEqMetasTable();
+</script>
+
+
+<script>
+// ══════════════════════════════════════════
+// DADOS HISTÓRICOS (Jan–Abr 2026)
+// ══════════════════════════════════════════
+const HIST_DADOS = {
+  "Janeiro": {
+    dias: 31,
+    rows: [
+      {nome:"GIOVANA_SOUZA", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,733.53,276.55,487.48,0,0,531.74,672.04,732.88,3524.26,1879.12,270.82,0,349.26,487.48,2347.0,0,2001.04,1298.91], total:15592.11},
+      {nome:"BIANCA_V_SILVA", d:[0,0,0,0,0,0,0,0,0,0,0,169.82,316.59,276.55,333.88,760.86,0,0,548.28,2254.64,367.7,885.1,1424.49,246.13,0,825.68,0,497.81,678.13,1285.46,270.82], total:11141.94},
+      {nome:"ISABELA_MONTEIRO", d:[0,0,0,0,0,0,0,0,0,0,0,985.29,0,270.82,0,472.41,0,0,128.56,747.47,1541.2,619.79,1270.79,605.29,0,0,346.62,779.34,668.43,1690.34,668.46], total:10794.81},
+      {nome:"JESSICA_O_SILVA", d:[0,0,0,0,0,0,0,0,136.38,0,0,0,0,420.74,0,497.81,0,0,270.82,296.2,371.14,968.69,830.56,1121.51,0,252.56,357.54,395.11,1130.61,2553.44,949.67], total:10552.78},
+      {nome:"BRENDA_FERREIRA", d:[0,0,0,0,0,0,0,0,0,0,0,487.48,0,0,0,0,0,0,0,0,547.37,0,0,0,0,270.82,0,1278.35,302.73,1941.49,0], total:4828.24},
+      {nome:"KELY_SILVA", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,497.81,0,0,1476.02,359.54,1565.59,782.56,103.83], total:4785.35},
+      {nome:"STEPHANIE_BERNARDES", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,487.48,294.67,0,0,0,0,1145.82,93.11,270.82,227.91,2240.59,0], total:4760.4},
+      {nome:"FABIO_AQUINO", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,997.26,0,0,0,0,0,0,0,136.76,818.19,0], total:1952.21},
+    ]
+  },
+  "Fevereiro": {
+    dias: 28,
+    rows: [
+      {nome:"GIOVANA_SOUZA", d:[270.82,2138.58,270.82,547.37,633.08,908.8,0,0,1071.2,276.55,125.58,1790.99,497.47,0,0,174.53,0,105.84,767.05,1342.83,155.76,0,418.71,901.25,1537.17,774.59,2395.63,1246.55], total:18351.17},
+      {nome:"BIANCA_V_SILVA", d:[0,992.41,0,412.71,898.42,270.82,0,0,2057.62,219.4,760.08,1292.66,921.01,0,0,258.99,0,0,549.5,340.38,206.01,141.43,688.81,255.91,2242.49,232.73,2687.79,691.32], total:16120.49},
+      {nome:"KELY_SILVA", d:[0,351.03,136.77,1767.81,305.62,1515.64,547.37,0,1241.48,1128.18,2664.81,550.41,589.99,0,0,0,0,0,273.41,0,271.87,0,489.38,277.63,52.89,0,467.82,0], total:12632.11},
+      {nome:"JESSICA_O_SILVA", d:[215.73,254.88,185.51,1337.06,1280.85,1950.32,270.82,0,587.46,286.52,1335.81,271.87,801.33,0,0,0,0,271.87,253.11,136.75,277.63,0,489.38,604.67,143.98,0,423.69,936.76], total:12316.0},
+      {nome:"ISABELA_MONTEIRO", d:[0,680.54,995.62,487.48,464.01,479.16,0,0,333.5,328.73,1185.12,607.31,1278.2,0,468.52,0,0,0,400.6,339.2,0,0,884.7,268.13,597.46,141.56,2234.81,137.22], total:12311.87},
+      {nome:"STEPHANIE_FAGUNDES", d:[0,0,0,675.96,136.78,855.96,270.82,0,586.65,825.91,717.25,142.16,0,0,162.51,0,0,137.37,784.97,1033.12,0,0,0,137.38,58.85,0,929.7,386.73], total:7842.12},
+      {nome:"BRENDA_FERREIRA", d:[0,57.97,588.83,270.82,276.55,0,0,0,517.07,497.81,1829.19,0,0,0,0,0,0,0,93.61,277.63,0,0,0,989.13,0,173.49,277.63,0], total:5849.73},
+      {nome:"silva_beatriz", d:[0,0,0,0,0,0,0,0,0,0,0,0,409.22,0,277.63,0,0,0,880.15,543.74,0,0,1131.63,75.62,471.7,278.54,489.38,661.08], total:5218.69},
+      {nome:"CAIO_SHIMITE", d:[0,0,0,0,0,0,0,0,0,0,0,0,142.2,72.8,0,0,0,0,55.53,387.24,0,0,137.35,279.65,751.58,0,1105.79,550.41], total:3482.55},
+      {nome:"rodrigo_martins", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1941.08,0,0,1456.08,0,0,0,0,0], total:3397.16},
+      {nome:"STEPHANIE_BERNARDES", d:[0,619.94,985.29,0,0,497.81,0,0,207.42,614.41,0,0,0,0,0,0,0,0,0,91.59,0,0,136.8,0,0,0,0,0], total:3153.26},
+      {nome:"geovanna_almeida", d:[0,0,0,0,0,0,0,0,0,0,0,274.7,271.87,0,0,0,0,515.54,271.87,279.61,0,0,781.01,247.29,0,0,0,0], total:2641.89},
+      {nome:"jussara_pereira", d:[0,0,0,0,0,0,0,0,0,0,0,0,247.24,0,0,0,0,626.23,130.22,0,0,0,0,415.03,271.87,0,0,549.5], total:2240.09},
+      {nome:"thauany_moura", d:[0,0,0,0,0,0,0,0,0,0,0,196.33,0,0,0,0,0,0,247.29,271.87,0,0,0,0,335.62,0,1146.85,0], total:2197.96},
+      {nome:"felipe_arruda", d:[0,0,0,0,0,0,0,0,0,0,0,247.23,164.83,0,0,0,0,0,0,613.51,0,0,0,0,0,0,868.33,0], total:1893.9},
+      {nome:"raissa_paloma", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1507.45,0], total:1507.45},
+      {nome:"HELTON_ROLDON", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,989.13,0], total:989.13},
+      {nome:"aline_pupim", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,989.13,0], total:989.13},
+      {nome:"THAYRA_FERREIRASILVA", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,896.2,0], total:896.2},
+      {nome:"LYVIA_DIAS", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,569.22,0,0], total:569.22},
+      {nome:"leticia_romeu", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,557.31,0,0], total:557.31},
+      {nome:"miguel_rodrigues", d:[0,0,0,0,0,0,0,0,0,0,0,0,488.75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], total:488.75},
+      {nome:"FABIO_AQUINO", d:[0,183.34,0,0,0,276.55,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], total:459.89},
+      {nome:"itallo_cardamoni", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,434.13,0], total:434.13},
+      {nome:"MATHEUS_SOUZA", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,279.69,0], total:279.69},
+      {nome:"thais_mayara", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,259.93,0,0], total:259.93},
+    ]
+  },
+  "Mar\u00e7o": {
+    dias: 31,
+    rows: [
+      {nome:"CAIO_SHIMITE", d:[0,173.26,136.11,855.54,274.91,3162.46,0,0,4458.65,1051.78,499.75,3515.08,2300.57,0,0,1645.16,1237.43,2745.84,3465.72,1146.56,515.15,675.63,2633.3,342.65,3767.84,3616.78,5096.04,0,0,2239.81,7432.63], total:52988.65},
+      {nome:"STEPHANIE_FAGUNDES", d:[0,154.85,5539.13,1584.47,267.21,263.41,0,288.64,729.22,919.97,1396.5,934.17,291.75,0,0,4640.44,0,0,61.04,4538.78,0,0,3723.29,1836.58,2595.85,3353.09,3846.79,0,0,8755.86,2948.53], total:48669.57},
+      {nome:"raissa_paloma", d:[0,0,1435.01,0,2439.65,1135.03,256.94,0,1735.12,3776.04,2447.27,3547.77,0,0,0,1416.16,621.81,337.74,0,131.74,0,0,916.63,545.86,2309.7,2912.46,0,0,0,6816.36,5386.49], total:38167.78},
+      {nome:"LEONARDO_NUNES", d:[0,0,0,0,0,320.75,0,0,192.22,4996.48,0,277.63,4964.2,0,0,68.96,1218.83,0,1391.28,890.84,0,0,1936.18,0,1492.0,4340.93,5840.34,607.74,0,4535.62,3463.11], total:36537.11},
+      {nome:"KAROLAINE_SILVA", d:[0,58.31,0,0,3514.42,0,0,0,2491.1,2551.06,1507.62,626.05,0,0,0,279.06,0,448.88,0,2383.88,0,0,2175.15,895.14,1586.75,2459.43,4998.78,252.98,273.4,1936.88,7183.37], total:35622.26},
+      {nome:"GIOVANA_SOUZA", d:[98.08,779.18,3695.87,55.83,850.44,598.4,0,0,71.71,2874.98,645.06,414.13,2458.56,0,0,1679.07,0,414.24,2480.43,3269.23,307.49,0,0,353.39,714.96,2011.54,2131.6,0,0,5442.68,2739.49], total:34086.36},
+      {nome:"ISABELA_MONTEIRO", d:[553.97,431.56,617.12,0,523.17,137.44,0,0,68.75,187.97,1779.52,1537.47,239.15,75.69,0,0,0,0,0,0,0,0,205.96,2069.88,852.01,2791.69,3295.72,104.35,0,6458.12,9996.09], total:31925.63},
+      {nome:"itallo_cardamoni", d:[0,0,1581.6,0,2334.36,282.78,0,0,873.7,7408.15,772.25,2489.37,0,0,0,589.69,561.16,0,0,2003.37,0,0,0,375.35,578.86,658.75,3877.58,0,0,1717.94,2508.26], total:28613.17},
+      {nome:"BIANCA_V_SILVA", d:[0,734.47,1071.78,110.77,1231.37,1286.91,130.28,0,472.41,0,0,4181.97,217.2,0,0,697.4,124.38,0,395.31,1060.31,0,0,55.96,279.85,4695.9,2959.82,2432.5,330.61,162.91,454.24,5239.58], total:28325.93},
+      {nome:"MATHEUS_SOUZA", d:[0,0,2513.28,0,1839.59,227.91,0,0,1259.73,2508.6,0,516.86,1372.42,0,0,0,0,832.68,559.28,2730.31,0,0,281.73,322.06,0,3890.02,1704.32,0,1042.16,1713.21,4625.65], total:27939.81},
+      {nome:"leticia_romeu", d:[0,822.95,527.39,635.69,3558.98,0,0,0,4048.94,0,0,0,0,0,278.54,0,0,1648.99,4125.91,0,283.91,0,710.61,273.4,1390.01,701.22,0,0,0,1544.67,3871.67], total:24422.88},
+      {nome:"silva_beatriz", d:[0,1504.08,624.69,0,277.63,959.16,0,0,0,197.63,1684.25,1461.81,629.99,0,0,137.36,0,0,1332.5,412.44,0,0,0,108.5,169.63,5270.22,1587.73,0,0,806.56,5711.41], total:22875.59},
+      {nome:"katia_regina", d:[0,0,0,0,0,0,0,0,0,0,490.77,0,0,0,0,983.96,0,141.63,0,651.51,0,0,367.98,82.05,190.33,2323.66,10642.36,150.09,0,5631.73,922.87], total:22578.94},
+      {nome:"JHONATA_NASCIMENTO", d:[0,0,0,1279.54,598.92,2265.86,1382.27,229.9,0,2259.19,0,0,0,230.32,0,527.58,0,3061.7,0,2510.7,0,0,0,0,0,0,462.36,1283.09,1432.44,3847.01,547.45], total:21918.33},
+      {nome:"larissa_santana", d:[0,2133.2,1998.96,1094.82,70.66,882.12,0,0,0,1177.26,1042.26,0,0,0,0,1839.25,4975.62,0,0,0,0,0,189.07,136.43,490.67,498.13,1065.89,0,0,3318.49,632.34], total:21545.17},
+      {nome:"CLEBER_JUNIOR", d:[0,0,1130.35,504.21,978.47,0,0,0,0,0,1358.3,1944.73,1602.34,0,0,0,3006.9,0,3584.62,511.31,300.15,0,1434.3,0,2107.62,0,97.44,0,0,253.57,582.42], total:19396.73},
+      {nome:"geovanna_almeida", d:[0,91.57,0,549.5,0,629.52,1128.39,0,0,1303.89,360.07,0,3270.57,0,0,0,0,0,0,89.13,0,0,151.4,0,1788.71,380.53,1132.06,89.1,0,3152.2,4956.85], total:19073.49},
+      {nome:"MAYSA_OLIVEIRA", d:[0,0,137.44,0,0,489.38,0,0,230.32,1020.99,1053.34,604.48,277.63,0,0,309.91,1222.19,549.5,0,0,0,0,1376.62,0,0,1706.97,0,3060.18,0,534.33,6195.98], total:18769.26},
+      {nome:"RENATARODRIGUES", d:[0,0,173.74,0,0,486.16,0,0,2894.13,1059.59,370.9,0,0,0,0,167.53,273.4,0,1350.68,0,0,0,265.74,324.16,392.67,2008.33,5629.62,0,0,2242.55,606.49], total:18245.69},
+      {nome:"FRANCISCA_BRITO", d:[0,0,0,0,283.11,2616.72,0,0,0,1083.15,0,0,0,0,0,379.46,7090.69,530.83,266.99,0,0,0,0,0,543.12,1190.94,1111.92,58.34,0,1118.48,1235.32], total:17509.07},
+      {nome:"HELTON_ROLDON", d:[0,0,591.31,0,0,1290.1,0,0,271.87,761.47,214.56,229.61,742.38,0,0,1631.82,0,514.95,2612.86,147.33,0,0,1468.31,223.32,644.98,88.41,426.89,474.82,210.4,4575.31,231.34], total:17352.04},
+      {nome:"jussara_pereira", d:[0,0,5934.66,381.09,1156.49,1061.43,0,0,356.75,1547.65,0,0,0,0,0,0,143.16,145.36,0,279.78,0,0,231.93,735.36,0,2051.23,1380.49,840.12,0,672.32,351.34], total:17269.16},
+      {nome:"MARIA_MOREIRASANTOS", d:[0,0,0,0,0,1080.29,0,0,3431.47,0,1885.42,105.65,0,0,0,0,0,507.92,0,0,0,0,2229.05,212.78,757.82,3139.72,1945.01,0,299.56,409.83,1141.22], total:17145.74},
+      {nome:"aline_pupim", d:[0,0,0,0,399.33,271.87,0,0,0,89.05,197.22,264.07,0,0,0,842.2,2285.03,213.94,916.03,1055.0,0,0,0,2478.75,1019.66,807.74,23.97,1106.62,0,53.58,3982.74], total:16006.8},
+      {nome:"thauany_moura", d:[0,0,258.81,78.75,0,948.08,0,0,564.23,1937.5,0,0,1140.68,0,0,0,108.88,765.52,0,0,0,0,796.6,0,93.15,1577.99,2035.57,0,0,4283.64,1190.03], total:15779.43},
+      {nome:"carulini_santos", d:[0,0,0,0,132.68,139.94,132.1,0,164.97,3962.53,286.81,0,3562.23,0,0,0,132.46,0,0,1524.83,0,0,0,0,0,2735.3,0,0,0,1616.68,1283.45], total:15673.98},
+      {nome:"thais_mayara", d:[0,265.21,0,0,0,556.17,0,655.28,1025.48,173.58,91.66,230.32,3225.79,0,0,541.67,369.7,566.49,0,662.28,0,0,0,0,631.67,1679.38,791.04,0,0,437.62,339.44], total:12242.78},
+      {nome:"FABIO_AQUINO", d:[0,0,6675.51,3191.41,0,0,0,0,489.38,271.87,675.93,0,209.13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], total:11513.23},
+      {nome:"THAYRA_FERREIRASILVA", d:[0,0,0,0,0,0,0,0,91.17,0,1385.09,2203.19,0,0,0,315.31,1625.83,0,0,273.4,0,0,3945.1,0,206.77,578.86,187.98,0,0,137.0,165.56], total:11115.26},
+      {nome:"LYVIA_DIAS", d:[0,1113.88,232.34,0,0,278.54,226.2,0,302.32,0,1276.19,0,0,0,0,0,140.39,165.95,184.01,79.39,0,0,273.4,503.73,88.17,458.41,3164.57,0,0,550.74,1476.31], total:10514.54},
+      {nome:"AMABELLY_SANTOS", d:[0,0,0,0,0,0,0,0,0,0,0,500.54,0,0,0,0,83.1,0,0,0,0,0,185.64,1880.66,1103.14,980.94,4188.11,0,0,768.64,0], total:9690.77},
+      {nome:"NAYARA_CRUZ", d:[0,0,0,0,442.7,1019.06,0,0,279.8,0,0,0,0,0,0,0,0,143.16,0,275.72,0,0,0,0,2558.51,278.47,859.63,0,0,0,2667.13], total:8524.18},
+      {nome:"RAFAELA_MINHOTO", d:[0,0,0,0,0,1191.51,0,0,0,0,0,0,0,0,0,231.33,0,976.75,0,0,88.5,0,0,0,0,4112.32,0,0,0,0,1450.82], total:8051.23},
+      {nome:"HELENA_SANTOS", d:[0,0,0,0,0,226.03,0,0,0,0,0,0,0,0,0,4682.62,0,0,0,0,0,0,0,0,0,1412.7,0,0,0,1404.27,0], total:7725.62},
+      {nome:"thalia_thomaz", d:[0,0,2334.81,0,0,256.17,0,0,0,0,0,0,278.54,0,0,0,0,0,0,0,0,0,559.28,712.76,218.56,1946.55,96.54,0,0,969.72,307.28], total:7680.21},
+      {nome:"kauane_azevedo", d:[0,0,0,0,0,0,0,0,0,0,177.23,0,221.07,0,0,0,0,100.7,1009.22,871.3,0,0,0,0,787.75,0,2545.97,0,0,915.61,467.45], total:7096.3},
+      {nome:"KELY_SILVA", d:[0,1363.13,306.81,509.06,0,94.93,0,0,1320.03,420.39,0,701.94,0,0,0,0,0,0,0,0,0,82.9,0,0,0,0,50.7,55.59,190.19,52.92,1213.73], total:6362.32},
+      {nome:"felipe_arruda", d:[0,0,0,1730.72,0,489.38,0,0,104.11,0,271.87,1909.02,489.38,0,0,85.33,0,0,0,223.43,0,0,0,95.53,0,0,0,0,0,0,0], total:5398.77},
+      {nome:"DEBORA_ANDRIELLY", d:[0,0,0,0,0,168.9,0,0,0,0,131.27,0,0,0,0,92.85,0,1068.96,0,0,0,0,899.29,219.84,427.4,520.41,0,0,0,663.76,845.93], total:5038.61},
+      {nome:"EDUARDO_SILVA", d:[0,0,0,0,0,0,0,0,0,109.69,298.16,215.85,0,0,0,0,0,0,273.4,353.54,0,0,0,0,0,1787.46,74.17,0,0,1314.73,176.8], total:4603.8},
+      {nome:"BRENDA_FERREIRA", d:[0,57.96,1536.11,0,0,0,0,0,0,0,0,0,0,0,0,0,173.48,0,0,0,0,0,87.75,0,298.88,0,0,0,0,1628.17,205.04], total:3987.39},
+      {nome:"MARIA_BRAIDOTI", d:[0,0,0,0,0,0,0,0,0,128.18,0,0,0,0,0,0,254.08,0,379.64,0,0,0,0,0,552.58,0,188.71,0,0,595.38,1844.83], total:3943.4},
+      {nome:"ANA_BENTO", d:[0,0,0,0,0,111.21,0,0,0,185.4,486.02,0,1481.38,0,0,527.49,0,0,0,0,0,0,0,0,0,59.83,111.2,0,0,0,959.57], total:3922.1},
+      {nome:"thais_c_ferreira", d:[0,0,0,0,0,489.34,0,0,363.12,0,0,822.95,0,0,0,0,0,0,0,0,0,0,0,0,0,190.33,471.88,0,0,109.83,292.58], total:2740.03},
+      {nome:"JESSICA_O_SILVA", d:[0,818.97,383.74,0,0,215.47,0,0,0,0,113.25,0,0,0,0,0,165.71,0,105.9,0,0,0,0,0,0,0,113.28,150.37,0,329.48,232.69], total:2628.86},
+      {nome:"JOAO_MIRANDA", d:[0,0,0,0,1061.3,0,0,0,295.27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,912.29,0], total:2268.86},
+      {nome:"BRUNO_UEMURA", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,546.88,0,0,0,0,0,562.99,0,0,0,0,0,0,0,0], total:1109.87},
+      {nome:"STEPHANIE_BERNARDES", d:[68.85,0,0,0,0,0,0,0,0,0,0,192.55,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,192.55,91.59,0], total:545.54},
+      {nome:"BRUNA_JUSTIMIANO", d:[0,0,0,0,0,0,0,0,0,0,123.94,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,53.14,0,0,0], total:177.08},
+    ]
+  },
+  "Abril": {
+    dias: 30,
+    rows: [
+      {nome:"KAROLAINE_SILVA", d:[102.62,0,0,0,0,1737.55,202.17,3233.68,7896.54,5856.3,0,0,2922.07,5308.95,2721.77,2384.13,10635.92,335.86,471.18,2225.1,280.67,7035.99,6475.82,12851.77,242.24,0,9040.32,7831.42,7245.51,13456.78], total:110494.36},
+      {nome:"STEPHANIE_FAGUNDES", d:[3537.92,247.02,306.81,0,0,2549.46,8488.56,2615.46,4820.9,3831.64,278.42,0,9058.96,8181.11,4650.96,1455.8,943.37,0,0,2589.41,0,650.43,2035.13,2965.9,1172.18,0,3361.27,2254.84,1843.38,2609.69], total:70448.62},
+      {nome:"katia_regina", d:[279.18,403.96,0,0,0,8904.5,6890.86,2435.68,1030.65,766.97,0,0,4365.14,5366.54,2291.37,1058.37,2659.74,0,0,3135.58,0,4435.72,2803.97,2596.83,0,0,1452.02,10408.1,496.82,4502.35], total:66284.35},
+      {nome:"raissa_paloma", d:[8380.84,374.41,0,0,0,1317.05,1173.06,212.24,5170.67,3415.14,587.91,0,0,7602.81,337.75,3622.68,1266.91,0,899.04,638.95,0,370.41,2205.17,1307.99,676.1,0,4681.74,4923.65,2044.97,13907.46], total:65116.95},
+      {nome:"MATHEUS_SOUZA", d:[1420.6,2213.58,0,0,0,0,7891.94,478.85,5952.06,5571.41,0,0,2234.44,3182.08,307.37,3846.29,1756.38,3207.39,0,703.55,135.03,4499.92,2836.15,2042.57,705.4,0,1124.79,6022.26,3061.46,5153.57], total:64347.09},
+      {nome:"silva_beatriz", d:[899.45,729.6,0,0,0,5499.68,4889.26,2838.93,3436.4,2785.49,0,0,335.38,3873.49,5735.05,1274.95,1378.78,0,0,1368.51,0,3477.59,4490.87,2451.08,296.07,0,3147.9,1949.68,3784.02,7223.99], total:61866.17},
+      {nome:"GIOVANA_SOUZA", d:[391.45,751.58,0,0,0,4095.18,848.96,1330.13,1751.28,208.02,284.63,0,2529.9,4077.52,4329.8,451.44,5073.26,0,0,3899.05,0,203.86,50.31,6860.86,322.42,390.08,1288.44,9934.34,4834.2,7573.8], total:61480.51},
+      {nome:"LEONARDO_NUNES", d:[0,0,0,0,0,381.61,2200.61,578.86,1532.17,0,0,0,4266.58,3982.06,198.49,12308.38,834.99,0,0,9191.33,0,3347.4,1341.19,3183.57,299.07,0,1192.03,9584.83,2086.14,4374.85], total:60884.16},
+      {nome:"leticia_romeu", d:[0,1011.67,0,0,0,2790.24,1370.4,4701.45,4839.56,2622.06,0,0,3968.31,3700.4,2463.81,554.25,4281.87,0,1551.39,3036.3,0,328.37,548.75,6254.4,0,0,3122.42,1414.92,6534.92,4001.81], total:59097.3},
+      {nome:"thauany_moura", d:[1233.23,982.69,0,0,0,2410.26,2393.72,2005.73,6234.17,876.38,2273.46,0,6755.23,1599.68,5317.8,2884.52,5302.84,0,200.38,78.72,0,1672.36,946.24,1518.35,2038.38,0,1040.97,3502.84,504.47,2420.71], total:54193.13},
+      {nome:"RENATARODRIGUES", d:[0,0,0,0,0,4889.3,4711.73,869.14,4725.47,1639.66,0,0,756.28,2356.06,1911.78,425.73,4770.85,0,0,4518.51,0,462.63,903.05,1332.0,230.75,0,1233.82,1803.0,8098.51,8084.55], total:53722.82},
+      {nome:"CAIO_SHIMITE", d:[1750.02,551.42,0,0,0,4330.12,3808.67,2706.02,9437.98,2134.91,213.69,0,816.27,882.51,4629.67,2890.45,2035.69,320.7,0,282.71,0,3133.48,1947.97,750.29,430.87,0,639.74,3776.61,1801.97,4358.5], total:53630.26},
+      {nome:"MARIA_MOREIRASANTOS", d:[131.65,1572.28,0,0,0,252.03,1535.18,1210.65,0,7242.37,0,0,2544.23,392.32,3145.31,3815.21,1428.52,0,0,2551.27,0,2573.33,4402.16,5929.39,534.48,0,5789.71,2440.48,1173.3,2937.1], total:51600.97},
+      {nome:"aline_pupim", d:[3522.02,3500.46,0,0,0,8885.45,2373.18,2535.37,0,1135.69,0,0,1930.73,851.44,1073.47,414.18,134.9,0,0,1953.63,0,281.39,2882.43,1955.13,0,0,6343.74,4328.5,1647.16,4446.29], total:50195.16},
+      {nome:"kauane_azevedo", d:[1549.44,750.31,0,0,0,4831.06,931.23,1588.21,3365.9,3657.43,0,0,1585.02,6213.75,2939.16,3214.76,811.42,0,0,0,0,1304.27,3188.5,1703.64,0,0,598.14,1486.19,4414.53,2841.35], total:46974.31},
+      {nome:"HELTON_ROLDON", d:[5998.37,0,0,0,0,384.62,3312.87,0,2183.96,0,0,0,0,3117.44,2188.25,157.18,842.49,0,0,2916.24,0,3813.74,939.98,3222.85,0,0,1320.73,7158.76,2233.9,7024.88], total:46816.26},
+      {nome:"itallo_cardamoni", d:[4995.29,1211.79,0,0,0,2682.45,1002.9,4952.01,1257.41,3675.97,774.16,0,4341.74,2646.81,1928.46,891.48,4155.7,0,0,301.74,589.7,182.89,2403.44,1154.72,0,0,883.51,841.37,1761.87,3745.47], total:46380.88},
+      {nome:"AMABELLY_SANTOS", d:[961.93,0,0,0,0,742.79,0,4045.7,4927.01,589.16,0,0,198.22,284.85,891.95,2496.75,669.48,0,0,2195.82,0,4031.06,5605.85,2903.56,0,0,1677.71,1768.82,3121.17,8742.89], total:45854.72},
+      {nome:"FRANCISCA_BRITO", d:[0,0,0,0,0,1716.4,3501.93,213.36,508.33,7246.37,980.14,0,267.02,1363.87,0,3277.96,276.1,0,0,0,0,0,1410.51,3460.12,154.81,0,2456.5,4711.77,2873.4,8772.26], total:43190.85},
+      {nome:"jussara_pereira", d:[1161.14,660.31,0,0,0,2410.89,5943.8,2765.19,2335.37,980.27,0,0,1263.98,2404.0,3403.34,2966.63,3531.28,550.27,0,85.93,0,0,503.9,813.25,0,0,287.45,1977.76,1751.93,6042.54], total:41839.23},
+      {nome:"thais_mayara", d:[174.24,0,0,546.88,0,216.72,1998.67,1091.01,3474.3,2380.29,0,0,0,2151.72,341.65,5679.48,6305.76,0,0,2086.44,0,0,1280.65,1100.43,240.07,0,2658.62,2207.23,3611.63,2649.01], total:40194.8},
+      {nome:"geovanna_almeida", d:[61.26,87.15,203.63,0,0,5815.24,225.51,683.95,982.11,4981.59,0,0,4133.52,1068.45,621.2,1559.79,1305.48,0,0,986.52,1448.29,1130.53,2139.56,928.75,0,0,2323.03,2098.87,1326.66,5439.63], total:39550.72},
+      {nome:"BIANCA_V_SILVA", d:[1432.51,578.86,0,0,0,4413.06,4464.52,658.13,1596.02,937.1,381.61,0,56.41,3037.68,1372.62,2932.29,2710.67,0,0,94.28,0,625.34,2276.93,2259.59,0,0,1094.2,581.74,1997.97,3249.44], total:36750.97},
+      {nome:"ISABELA_MONTEIRO", d:[54.37,1903.35,0,0,0,748.45,251.88,1382.09,0,0,0,0,513.69,4227.13,2850.42,2328.95,2002.8,75.69,0,3994.61,0,5013.21,591.62,2039.63,0,0,1437.2,299.07,2451.83,1533.71], total:33699.7},
+      {nome:"CLEBER_JUNIOR", d:[0,307.25,0,0,0,0,0,2007.6,275.28,3226.4,1260.65,3096.5,0,771.8,873.21,200.02,511.31,0,0,4981.2,0,190.38,1066.87,915.0,0,198.56,2148.06,4113.43,1596.52,1123.63], total:28863.67},
+      {nome:"larissa_santana", d:[0,642.78,0,0,0,0,1943.1,429.72,296.37,0,0,0,1000.15,846.76,587.09,1827.57,1266.82,0,0,1045.22,53.53,0,734.31,1905.34,95.53,0,4705.54,1300.15,4028.98,1952.96], total:24661.92},
+      {nome:"carulini_santos", d:[1455.54,216.9,0,0,0,2536.5,2647.19,0,1727.85,59.51,0,0,0,1198.3,2338.73,1988.01,0,0,0,5509.33,0,1173.02,0,0,0,0,580.72,1605.19,750.3,582.1], total:24369.19},
+      {nome:"THAYRA_FERREIRASILVA", d:[0,578.86,0,0,0,0,0,1524.21,444.45,2136.74,0,574.1,180.0,2761.74,0,1190.71,0,370.67,0,0,0,308.2,873.73,103.3,0,0,778.25,2175.81,1743.85,7725.57], total:23470.19},
+      {nome:"RAFAELA_MINHOTO", d:[0,155.01,0,0,0,158.16,2602.8,820.8,0,539.55,1813.94,0,0,0,1574.95,3130.41,3927.2,0,0,1865.78,0,0,385.66,0,88.5,0,2524.9,0,311.57,925.22], total:20824.45},
+      {nome:"LYVIA_DIAS", d:[257.04,1928.51,0,0,0,560.17,273.4,1983.13,1227.49,719.46,0,0,251.26,451.91,0,582.56,348.04,0,94.38,2728.98,0,458.4,430.87,1169.9,720.52,0,1832.2,0,1543.74,2762.14], total:20324.1},
+      {nome:"HELENA_SANTOS", d:[0,0,0,0,0,0,124.43,0,0,0,0,0,127.22,308.7,592.73,0,580.66,826.61,0,290.42,0,0,1633.27,1869.41,0,0,4182.14,2011.7,436.46,4658.08], total:17641.83},
+      {nome:"ANA_BENTO", d:[1265.75,0,0,0,0,767.43,366.85,92.25,1344.51,583.52,578.86,0,3604.89,1933.87,479.56,0,3651.63,0,0,0,0,0,397.15,0,0,0,0,111.2,0,1813.36], total:16990.83},
+      {nome:"MAYSA_OLIVEIRA", d:[3572.69,1382.62,0,0,0,849.72,2070.08,766.14,2575.46,610.05,0,0,594.5,227.96,498.4,825.22,453.65,0,0,0,502.91,207.44,0,244.12,0,0,138.31,0,311.26,1099.7], total:16930.23},
+      {nome:"MARIA_BRAIDOTI", d:[526.62,0,0,0,687.22,80.91,2164.33,0,204.18,533.4,0,0,0,219.88,501.68,0,527.41,200.92,0,232.65,0,0,0,549.25,1686.66,337.55,794.95,4213.22,1036.33,2402.43], total:16899.59},
+      {nome:"EDUARDO_SILVA", d:[933.88,0,0,0,0,0,222.37,131.4,951.03,1753.64,0,0,0,0,378.01,112.77,1751.54,0,0,1640.0,0,0,485.87,1783.27,313.6,0,315.35,3104.24,760.85,1939.93], total:16577.75},
+      {nome:"MARIA_RODARTE", d:[0,0,0,0,0,178.07,0,0,4423.95,0,0,0,0,0,0,3956.33,0,2647.4,0,1977.8,199.04,0,0,0,0,0,683.35,475.84,321.44,756.97], total:15620.19},
+      {nome:"JHONATA_NASCIMENTO", d:[299.25,0,0,0,0,520.88,1422.7,0,2002.86,0,1212.21,0,846.15,1907.49,0,0,0,0,0,653.37,0,0,0,441.9,567.03,0,280.52,151.97,649.4,897.65], total:11853.38},
+      {nome:"JOAO_MIRANDA", d:[82.73,0,0,0,0,0,0,1858.62,273.4,0,0,0,0,552.07,1129.81,152.82,361.21,0,0,423.75,0,0,83.48,1085.13,0,0,766.51,2314.9,93.91,0], total:9178.34},
+      {nome:"BRUNA_JUSTIMIANO", d:[5247.51,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,78.67,0,0,0,0,0,0,0,0,0,0,0,1636.46], total:6962.64},
+      {nome:"BRENDA_FERREIRA", d:[320.65,173.48,0,0,0,90.41,0,0,0,0,0,0,777.76,0,0,0,0,0,0,0,0,1036.89,1110.91,0,0,0,0,2577.77,0,756.05], total:6843.92},
+      {nome:"thalia_thomaz", d:[108.0,204.83,0,0,0,4411.86,0,243.76,0,0,578.86,0,0,0,0,0,0,0,0,0,0,0,0,0,164.84,0,0,0,0,0], total:5712.15},
+      {nome:"thais_c_ferreira", d:[1437.3,0,0,0,0,1106.36,1312.16,0,0,0,0,0,0,0,0,0,128.37,0,0,0,0,0,0,0,18.37,0,0,0,0,0], total:4002.56},
+      {nome:"DEBORA_ANDRIELLY", d:[0,0,0,0,0,0,0,0,280.13,0,168.9,0,0,0,0,206.06,9.63,0,0,0,0,393.44,531.07,0,0,0,206.95,0,655.93,888.47], total:3340.58},
+      {nome:"LUCIANO_COSTA", d:[437.4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,719.67,218.19], total:1375.26},
+      {nome:"JESSICA_O_SILVA", d:[286.53,0,0,0,0,91.21,93.56,0,0,0,0,0,0,0,0,0,0,56.57,0,0,0,0,170.22,113.28,0,0,0,0,0,444.62], total:1255.99},
+      {nome:"NAYARA_CRUZ", d:[164.76,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,878.87], total:1043.63},
+      {nome:"felipe_arruda", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95.53,0,0,0,0,0,0,0,461.06], total:556.59},
+      {nome:"FABIO_AQUINO", d:[0,0,0,0,0,0,0,0,0,537.53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], total:537.53},
+      {nome:"KELY_SILVA", d:[0,0,0,0,0,0,85.76,0,0,0,0,0,50.28,0,0,0,0,0,0,0,0,0,0,82.9,0,0,0,0,55.58,260.6], total:535.12},
+      {nome:"GABRIELY_ALVES", d:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,430.87,0,0,0,0,0,0,0,0,0,0,0,0], total:430.87},
+    ]
+  },
+};
+
+// ── Estado do carrossel histórico ──
+let histMesAtual   = 'Abril';
+let histFiltroEq   = 'TODAS';
+let histSortAtual  = 'total';
+let histChartDias  = null;
+let histChartOps   = null;
+
+// Mapeamento equipe de exibição → fragmento do nome do operador (sem equipe no dado)
+// Como os dados históricos não têm coluna equipe, usamos lookup do RDOP_DADOS do mês atual
+// para correspondência por nome, com fallback '—'
+function histGetEquipe(nome){
+  if(typeof RDOP_DADOS !== 'undefined'){
+    const op = RDOP_DADOS.find(r => r.nome === nome);
+    if(op) return op.equipe || '—';
+  }
+  return '—';
+}
+
+const HIST_EQ_COR = {
+  'COFEN MARILIA BRENDA':    {c:'#00A86B',bg:'#E6F7F1',label:'Marília Brenda'},
+  'COFEN BIRIGUI BRUNA':     {c:'#4776E6',bg:'#EEF2FF',label:'Birigui Bruna'},
+  'COFEN STEPHANIE 2° TURNO':{c:'#F7971E',bg:'#FFF7ED',label:'Stephanie 2°T'},
+  'COFEN DIGITAL':           {c:'#f953c6',bg:'#FDF2FF',label:'Digital'},
+  '—':                       {c:'#7A8899',bg:'#F8FAFB',label:'—'},
+};
+
+function histGetColor(v){
+  if(!v||v===0) return 'transparent';
+  if(v>=4000) return 'rgba(74,222,128,.22)';
+  if(v>=3000) return 'rgba(103,232,249,.20)';
+  if(v>=2000) return 'rgba(59,130,246,.16)';
+  if(v>=1000) return 'rgba(252,211,77,.20)';
+  return 'rgba(248,113,113,.22)';
+}
+function histGetTxt(v){
+  if(!v||v===0) return 'var(--g700)';
+  if(v>=4000) return '#166534';
+  if(v>=3000) return '#0e7490';
+  if(v>=2000) return '#1d4ed8';
+  if(v>=1000) return '#92400e';
+  return '#991b1b';
+}
+function histFmt(v){ return v&&v>0?'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'; }
+function histFmtN(v){ return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+const HIST_MES_NUM = {Janeiro:1,Fevereiro:2,Março:3,Abril:4};
+const HIST_MES_DIAS = {Janeiro:31,Fevereiro:28,Março:31,Abril:30};
+
+function histSetMes(mes, btn){
+  histMesAtual = mes;
+  document.querySelectorAll('#hist-mes-btns .fbtn').forEach(b=>{
+    b.classList.remove('on');
+    b.style.background=''; b.style.color=''; b.style.borderColor='';
+  });
+  btn.classList.add('on');
+  btn.style.background='rgba(0,168,107,.3)';
+  btn.style.color='#4ADE80';
+  btn.style.borderColor='rgba(74,222,128,.4)';
+  histRender();
+}
+
+function histFiltrar(eq, btn){
+  histFiltroEq = eq;
+  document.querySelectorAll('#hist-fbtns .fbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  histRender();
+}
+
+function histSortBy(by){
+  histSortAtual = by;
+  document.getElementById('hist-sort-total').classList.toggle('on', by==='total');
+  document.getElementById('hist-sort-nome').classList.toggle('on', by==='nome');
+  histRender();
+}
+
+// Mapeamento label de filtro → equipe real
+const HIST_LABEL_EQ = {
+  'Birigui Bruna':  'COFEN BIRIGUI BRUNA',
+  'Marília Brenda': 'COFEN MARILIA BRENDA',
+  'Stephanie 2°T':  'COFEN STEPHANIE 2° TURNO',
+  'Digital':        'COFEN DIGITAL',
+};
+
+function histRender(){
+  const mes = histMesAtual;
+  const info = HIST_DADOS[mes];
+  if(!info) return;
+  const nDias = info.dias;
+  const mesNum = HIST_MES_NUM[mes];
+
+  const search = (document.getElementById('hist-search')||{}).value||'';
+
+  let rows = info.rows.filter(r => {
+    if(search && !r.nome.toLowerCase().includes(search.toLowerCase())) return false;
+    if(histFiltroEq !== 'TODAS'){
+      const eq = histGetEquipe(r.nome);
+      const targetEq = HIST_LABEL_EQ[histFiltroEq];
+      if(eq !== targetEq) return false;
+    }
+    return true;
+  });
+
+  if(histSortAtual==='total') rows.sort((a,b)=>b.total-a.total);
+  else rows.sort((a,b)=>a.nome.localeCompare(b.nome));
+
+  // KPIs
+  const totalGeral = rows.reduce((s,r)=>s+r.total,0);
+  const kpisEl = document.getElementById('hist-kpis');
+  if(kpisEl){
+    kpisEl.innerHTML = [
+      {label:'Operadores', val: rows.length, color:'#fff', font:false},
+      {label:'Total Geral', val: histFmtN(totalGeral), color:'#4ADE80', font:true},
+      {label:'Mês', val: mes+' 2026', color:'#67E8F9', font:true},
+      {label:'Dias no Mês', val: nDias, color:'#C084FC', font:false},
+    ].map(k=>`<div style="flex:1;padding:12px 16px;border-right:1px solid var(--g100)">
+      <div style="font-size:9px;font-weight:700;color:var(--g500);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">${k.label}</div>
+      <div style="font-family:${k.font?"'Bebas Neue'":"Nunito"},sans-serif;font-size:${k.font?20:18}px;font-weight:${k.font?400:900};color:${k.color}">${k.val}</div>
+    </div>`).join('');
+  }
+
+  // Cabeçalho da tabela
+  const theadTr = document.getElementById('hist-thead-tr');
+  if(theadTr){
+    const th = (txt,extra='')=>`<th style="padding:9px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap${extra}">${txt}</th>`;
+    let ths = `<th style="padding:9px 12px;text-align:left;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;position:sticky;left:0;background:var(--ppd);z-index:2">#</th>`;
+    ths += `<th style="padding:9px 14px;text-align:left;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;position:sticky;left:28px;background:var(--ppd);z-index:2">Operador</th>`;
+    ths += `<th style="padding:9px 12px;text-align:left;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap">Equipe</th>`;
+    for(let d=1;d<=nDias;d++){
+      const label = String(d).padStart(2,'0')+'/'+String(mesNum).padStart(2,'0');
+      ths += th(label);
+    }
+    ths += `<th style="padding:9px 14px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;background:rgba(74,222,128,.15);color:#4ADE80">Total</th>`;
+    theadTr.innerHTML = ths;
+  }
+
+  // Corpo
+  const tbody = document.getElementById('hist-tbody');
+  if(!tbody) return;
+  let html = '';
+  rows.forEach((r,idx)=>{
+    const bg = idx%2===0?'var(--g50)':'var(--w)';
+    const eq = histGetEquipe(r.nome);
+    const ec = HIST_EQ_COR[eq]||HIST_EQ_COR['—'];
+    html += `<tr style="background:${bg};border-bottom:1px solid var(--g100);transition:background .15s"
+      onmouseover="this.style.background='rgba(0,168,107,.05)'" onmouseout="this.style.background='${bg}'">
+      <td style="padding:7px 12px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--g300);text-align:center;position:sticky;left:0;background:${bg}">${idx+1}</td>
+      <td style="padding:7px 14px;position:sticky;left:28px;background:${bg}">
+        <div style="font-weight:800;font-size:11px;color:var(--g900)">${r.nome}</div>
+      </td>
+      <td style="padding:7px 12px">
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;background:${ec.bg};color:${ec.c};border:1px solid ${ec.c}33;white-space:nowrap">${ec.label}</span>
+      </td>`;
+    r.d.forEach(v=>{
+      const cb=histGetColor(v), ct=histGetTxt(v);
+      html+=`<td style="padding:6px 10px;text-align:right;font-size:11px;font-weight:700;color:${ct};background:${cb};white-space:nowrap">${histFmt(v)}</td>`;
+    });
+    html+=`<td style="padding:7px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#4ADE80;font-weight:900;white-space:nowrap;background:rgba(74,222,128,.06);border-left:2px solid rgba(74,222,128,.2)">${histFmtN(r.total)}</td></tr>`;
+  });
+  tbody.innerHTML = html;
+
+  // Rodapé
+  const tfoot = document.getElementById('hist-tfoot');
+  if(tfoot){
+    const tots = Array.from({length:nDias},(_,i)=>rows.reduce((s,r)=>s+(r.d[i]||0),0));
+    const tg = rows.reduce((s,r)=>s+r.total,0);
+    let fh=`<tr style="background:var(--ppd);font-weight:800">
+      <td style="padding:8px 12px;position:sticky;left:0;background:var(--ppd)"></td>
+      <td colspan="2" style="padding:8px 14px;font-size:10px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.5px;text-transform:uppercase;position:sticky;left:28px;background:var(--ppd)">TOTAL FILTRADO</td>`;
+    tots.forEach(v=>{
+      fh+=`<td style="padding:8px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#67E8F9;white-space:nowrap">${v>0?'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</td>`;
+    });
+    fh+=`<td style="padding:8px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#4ADE80;border-left:2px solid rgba(74,222,128,.3)">${histFmtN(tg)}</td></tr>`;
+    tfoot.innerHTML = fh;
+  }
+
+  // Títulos dos gráficos
+  const ct1 = document.getElementById('hist-chart-title');
+  if(ct1) ct1.textContent = '📊 Recebimento Total por Dia — '+mes;
+  const ct2 = document.getElementById('hist-chart-ops-title');
+  if(ct2) ct2.textContent = '🏆 Top 10 Operadores — '+mes;
+
+  // Charts
+  histRenderCharts(rows, nDias, mesNum);
+}
+
+function histRenderCharts(rows, nDias, mesNum){
+  const mesLabel = (d)=>String(d).padStart(2,'0')+'/'+String(mesNum).padStart(2,'0');
+  const labels = Array.from({length:nDias},(_,i)=>mesLabel(i+1));
+  const totsDia = Array.from({length:nDias},(_,i)=>rows.reduce((s,r)=>s+(r.d[i]||0),0));
+
+  const ctxD = document.getElementById('hist-chart-dias');
+  if(ctxD){
+    if(histChartDias) histChartDias.destroy();
+    histChartDias = new Chart(ctxD,{
+      type:'bar',
+      data:{
+        labels,
+        datasets:[{
+          data:totsDia,
+          backgroundColor:totsDia.map(v=>v>0?'rgba(0,168,107,.75)':'rgba(0,168,107,.1)'),
+          borderRadius:4,borderSkipped:false
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},
+        scales:{
+          x:{grid:{display:false},ticks:{font:{family:'Nunito',size:9},color:'#7A8899'}},
+          y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{callback:v=>'R$ '+v.toLocaleString('pt-BR',{maximumFractionDigits:0}),font:{family:'Nunito',size:9},color:'#7A8899'}}
+        }
+      }
+    });
+  }
+
+  const top10 = [...rows].sort((a,b)=>b.total-a.total).slice(0,10);
+  const ctxO = document.getElementById('hist-chart-ops');
+  if(ctxO){
+    if(histChartOps) histChartOps.destroy();
+    histChartOps = new Chart(ctxO,{
+      type:'bar',
+      data:{
+        labels:top10.map(r=>r.nome),
+        datasets:[{
+          data:top10.map(r=>r.total),
+          backgroundColor:'rgba(0,168,107,.7)',
+          borderRadius:4,borderSkipped:false
+        }]
+      },
+      options:{
+        indexAxis:'y',
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.x.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},
+        scales:{
+          x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{callback:v=>'R$ '+v.toLocaleString('pt-BR',{maximumFractionDigits:0}),font:{family:'Nunito',size:9},color:'#7A8899'}},
+          y:{grid:{display:false},ticks:{font:{family:'Nunito',weight:'700',size:10},color:'#3D4B5C'}}
+        }
+      }
+    });
+  }
+}
+
+// Inicializar quando a aba for aberta (após RDOP_DADOS existir)
+document.addEventListener('DOMContentLoaded',()=>{
+  const tabBtn = document.querySelector('[onclick*="recdia-op"]');
+  if(tabBtn){
+    const orig = tabBtn.getAttribute('onclick');
+    if(!orig.includes('histRender')) tabBtn.setAttribute('onclick', orig+';histRender()');
+  }
+  // Renderizar imediatamente se já estiver na aba
+  if(document.getElementById('pg-recdia-op') && document.getElementById('pg-recdia-op').classList.contains('on')){
+    histRender();
+  }
+});
 </script>
 
 </body>
