@@ -824,24 +824,6 @@ select.ev-inp{cursor:pointer}
           </div>
 
         </div>
-        <!-- Campo manual PaguePay Maio -->
-        <div style="margin-top:10px;padding:12px 14px;background:#0a1628;border:1.5px solid rgba(0,188,212,.4);border-radius:10px">
-          <div style="font-size:10px;font-weight:800;color:rgba(0,220,255,.6);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">✏️ CORRIGIR PAGUE PAY MANUALMENTE</div>
-          <div style="display:flex;gap:10px;align-items:flex-end">
-            <div style="flex:1">
-              <div style="font-size:10px;color:rgba(255,255,255,.4);font-weight:600;margin-bottom:4px">Valor PaguePay Maio (R$)</div>
-              <input type="number" id="inp-arrecadado-manual" step="0.01" min="0"
-                style="width:100%;background:rgba(0,0,0,.3);border:1.5px solid rgba(0,188,212,.5);border-radius:8px;padding:9px 12px;font-family:Nunito,sans-serif;font-size:15px;font-weight:800;color:#00E5FF;outline:none"
-                placeholder="Ex: 182000.00"
-                oninput="ppManualInput(this.value)">
-            </div>
-            <button onclick="ppManualApply()"
-              style="padding:9px 18px;border-radius:8px;border:none;cursor:pointer;background:rgba(0,188,212,.8);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;white-space:nowrap">
-              ✅ Aplicar
-            </button>
-          </div>
-          <div id="pp-manual-preview" style="font-size:11px;color:rgba(0,220,255,.5);margin-top:6px;font-weight:600"></div>
-        </div>
         <!-- IDs ocultos preservados -->
         <input type="hidden" id="inp-arrecadado" value="0">
         <input type="hidden" id="inp-meta-arrecadado" value="2000000">
@@ -2468,8 +2450,6 @@ function rebuildAll(){
   // Recalcula totais das equipes sem remover ops do D
   D.equipes.forEach(eq=>{
     const visibleOps=eq.ops.filter(o=>!_allRemoved.has(o.name));
-    // FIX: garantir que op.ho esteja sempre sincronizado com op.rec
-    visibleOps.forEach(o=>{ o.ho = o.rec * 0.25; });
     eq.rec=visibleOps.reduce((s,o)=>s+o.rec,0);
     eq.ho=visibleOps.reduce((s,o)=>s+o.ho,0);
     eq.n_op=visibleOps.length;
@@ -2861,8 +2841,6 @@ function buildOpEditor(){
   // Preencher Total Arrecadado
   setV('inp-arrecadado',     totalArrecadado);
   setV('inp-meta-arrecadado', metaArrecadado>0&&metaArrecadado!==1000000 ? metaArrecadado : '');
-  // Preencher campo de correção manual do PaguePay com valor já salvo
-  setV('inp-arrecadado-manual', ppEmpresaAbril > 0 ? ppEmpresaAbril : totalArrecadado);
   liveCalc();
   liveCalcCorens();
   liveCalcArrecadado();
@@ -3157,34 +3135,6 @@ function renderPpMetas(){
   if(w2) w2.innerHTML = _buildMetasHtml(val, true) + _buildTeamsHtml(true);
 }
 
-// ── Correção manual do PaguePay Maio ──
-function ppManualInput(val){
-  const v = parseFloat(val)||0;
-  const el = document.getElementById('pp-manual-preview');
-  if(el) el.textContent = v>0 ? 'Será aplicado: ' + v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : '';
-}
-function ppManualApply(){
-  const inp = document.getElementById('inp-arrecadado-manual');
-  const v = parseFloat(inp?.value)||0;
-  if(v<=0){ alert('Digite um valor válido!'); return; }
-  ppEmpresaAbril = v;
-  totalArrecadado = v;
-  localStorage.setItem('cofen_pp_maio', v);
-  localStorage.setItem('cofen_arrecadado', v);
-  // Atualiza campo oculto para manter compatibilidade
-  const inpHid = document.getElementById('inp-arrecadado');
-  if(inpHid) inpHid.value = v.toFixed(2);
-  initHero();
-  if(typeof renderPpMetas==='function') renderPpMetas();
-  if(typeof renderPPProjecao==='function') renderPPProjecao();
-  if(fbDb && fbRoom) fbPush('arrecadado', {v, m:metaArrecadado, ppAbril:v});
-  const el = document.getElementById('pp-manual-preview');
-  if(el) el.textContent = '✅ Aplicado: ' + v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-  const fR = x => x.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-  const toast = msg => { const t=document.getElementById('toast'); if(t){t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3000);} };
-  toast('✅ PaguePay corrigido para ' + fR(v) + '!');
-}
-
 function liveCalcArrecadado(){
   const v = parseFloat(document.getElementById('inp-arrecadado')?.value)||0;
   const m = parseFloat(document.getElementById('inp-meta-arrecadado')?.value)||0;
@@ -3423,7 +3373,7 @@ function _parseMensal(raw){
     for(const c of cands){ const i=headers.findIndex(h=>h.includes(c)); if(i>=0)return i; }
     return -1;
   };
-  const iData   = col(['dtpgto','dt.pgto','dt pgto','data pagamento','dtpagamento','dt.baixa','dt baixa','data','date']);
+  const iData   = col(['data','dt.baixa','dt baixa','date']);
   const iPer    = col(['periodo','period']);  // "Pagamento - 2026/04"
   const iRec    = col(['valor recebido','vlr recebido','recebido','valor rec']);
   const iPP     = col(['pague play','pagueplay','24,96','24.96','pp (']);
@@ -3889,15 +3839,16 @@ function aplicarEmpresa(){
 
   if(ppVal <= 0){ statusEl.textContent='⚠️ Nenhum valor encontrado no arquivo.'; statusEl.style.background='#FFFBEB'; statusEl.style.color='#92400E'; return; }
 
-  // FIX: ppEmpresaAbril = ppVal diretamente (valor total PaguePay importado = Maio)
-  // O _parseMensal calculava valor parcial/errado; usar ppVal diretamente e mais confiavel
-  ppEmpresaAbril = Math.round(ppVal * 100) / 100;
+  // Calcular PaguePay de Abril separadamente — extrair .pp do objeto mensal
+  const mesAtualKey2 = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
+  const mesalEmpTemp = _parseMensal(raw);
+  // _parseMensal retorna {rec, pp, corens} por mês — precisa pegar .pp
+  const _mesAbril = mesalEmpTemp[mesAtualKey2] || mesalEmpTemp['2026-05'] || null;
+  const ppAbrilCalc = _mesAbril
+    ? (typeof _mesAbril === 'object' ? (_mesAbril.pp || _mesAbril.rec || 0) : _mesAbril)
+    : 0;
+  ppEmpresaAbril = Math.round(ppAbrilCalc * 100) / 100;
   localStorage.setItem('cofen_pp_maio', ppEmpresaAbril);
-  // Preencher campo de correção manual com o valor importado
-  const _inpManual = document.getElementById('inp-arrecadado-manual');
-  if(_inpManual) _inpManual.value = ppEmpresaAbril.toFixed(2);
-  const _prevManual = document.getElementById('pp-manual-preview');
-  if(_prevManual) _prevManual.textContent = '';
 
   // Preencher campo Total Arrecadado (oculto)
   const inpArr = document.getElementById('inp-arrecadado');
@@ -4974,7 +4925,7 @@ function refreshAll(){
   if(typeof renderEqMetasTable==='function') renderEqMetasTable();
   // ── Atualiza aba Recebimento por Dia/Operador ──
   if(typeof rdopRender==='function') rdopRender();
-  // ── Atualiza gráfico Recebimento por Equipe ──
+  // ── Atualiza gráfico Recebimento por Equipe (pp-metas-wrap) ──
   if(typeof renderPpMetas==='function') renderPpMetas();
 }
 
@@ -5010,9 +4961,9 @@ function loadSavedOverrides(){
     localStorage.setItem('cofen_op_overrides', JSON.stringify(initOv));
     // Redefinir metas de equipe para os valores corretos de Maio 2026
     const metasCorretas = {
-      'COFEN MARILIA BRENDA':     450000,
-      'COFEN BIRIGUI BRUNA':      450000,
-      'COFEN STEPHANIE 2° TURNO': 450000,
+      'COFEN MARILIA BRENDA':     300000,
+      'COFEN BIRIGUI BRUNA':      200000,
+      'COFEN STEPHANIE 2° TURNO': 200000,
     };
     const metasAtuais = {};
     try{ Object.assign(metasAtuais, JSON.parse(localStorage.getItem('cofen_metas_eq')||'{}')); }catch(e){}
@@ -6514,14 +6465,14 @@ function importApply(){
     eq.ho  = eq.ops.reduce((s,o)=>s+o.ho,  0);
   });
 
-  // FIX: Salvar no localStorage ANTES do rebuildAll para que a restauração já use os valores novos
-  const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
-  importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
-  localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
-
   // Rebuild ALL ordenado → ranking atualizado
   rebuildAll();
   refreshAll();
+
+  // Salvar no localStorage
+  const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+  importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
+  localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
 
   const totalImportado = importParsed.found.reduce((s,r)=>s+r.recImport,0);
   toast(`✅ ${updated} operadores atualizados! Total: ${fRK(totalImportado)} · HO: ${fRK(totalImportado*0.25)}`);
@@ -11858,88 +11809,88 @@ function mtsAtualizarMaio(){
 // DADOS: Recebimento por Dia / Operador
 // ══════════════════════════════════════════
 const RDOP_DADOS = [
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MATHEUS_SOUZA",                   d:[699.1,84.01,194.98,3571.29,1474.46,4191.3,1413.52,4399.26,0,0,1976.07,5895.97,0], total:23899.96},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"LEONARDO_NUNES",                  d:[0,280.96,0,4204.43,330.95,442.25,1132.39,3425.61,595.91,0,521.64,1758.4,0], total:12692.54},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"LYVIA_DIAS",                      d:[0,117.44,0,2023.21,0,1684.86,2383.09,1732.84,0,0,918.9,3136.49,0], total:11996.83},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELTON_ROLDON",                   d:[487.38,0,0,0,2339.09,444.5,1238.88,1628.14,0,0,1341.58,3416.96,0], total:10896.53},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MATHEUS_SOUZA",                   d:[699.1,84.01,194.98,3571.29,1474.46,4191.3,1413.52,4399.26,0,0,2433.97,5895.97,3212.28], total:27570.14},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"LYVIA_DIAS",                      d:[0,117.44,0,2023.21,0,1684.86,2383.09,1732.84,0,0,918.9,3136.49,7686.19], total:19683.02},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"LEONARDO_NUNES",                  d:[0,280.96,0,4204.43,330.95,442.25,1132.39,3425.61,595.91,0,521.64,3067.54,716.02], total:14717.7},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELTON_ROLDON",                   d:[487.38,0,0,0,2339.09,444.5,1238.88,1628.14,0,0,1341.58,4717.94,1226.54], total:13424.05},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"EDUARDO_SILVA",                   d:[0,151.71,0,310.14,1164.45,2569.3,881.96,937.58,155.05,0,4070.48,501.77,0], total:10742.44},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_RODARTE",                   d:[0,0,0,1185.13,303.01,63.51,618.92,3640.03,0,0,0,2221.34,0], total:8031.94},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_RODARTE",                   d:[0,0,0,1185.13,303.01,63.51,618.92,3640.03,0,0,0,2221.34,566.9], total:8598.84},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"FRANCISCA_BRITO",                 d:[0,388.94,0,645.11,1454.68,2787.17,238.38,194.2,0,0,0,299.07,0], total:6007.55},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"JOAO_MIRANDA",                    d:[0,0,0,546.64,650.84,0,285.46,1369.96,0,0,1400.83,649.25,0], total:4902.98},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELENA_SANTOS",                   d:[0,0,0,829.98,575.68,605.72,0,329.85,0,0,124.42,1604.31,0], total:4069.96},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_BRAIDOTI",                  d:[0,0,0,580.94,871.02,99.66,742.48,67.55,0,0,0,0,0], total:2361.65},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_BRAIDOTI",                  d:[0,0,0,580.94,871.02,99.66,742.48,67.55,0,0,0,2771.67,123.72], total:5257.04},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"JOAO_MIRANDA",                    d:[0,0,0,546.64,650.84,0,285.46,1369.96,0,0,1400.83,649.25,143.97], total:5046.95},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELENA_SANTOS",                   d:[0,0,0,829.98,575.68,605.72,0,329.85,0,0,124.42,1604.31,499.09], total:4569.05},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_MOREIRASANTOS",             d:[105.5,79.21,0,352.11,581.61,58.72,199.22,0,0,0,253.96,0,1121.76], total:2752.09},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"RAFAELA_MINHOTO",                 d:[0,0,0,322.13,0,0,158.16,0,0,0,0,1503.22,0], total:1983.51},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_MOREIRASANTOS",             d:[105.5,79.21,0,352.11,581.61,58.72,199.22,0,0,0,253.96,0,0], total:1630.33},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"MAYSA_OLIVEIRA",                  d:[0,0,0,0,0,0,0,0,0,0,0,56.67,0], total:56.67},
-  {equipe:"COFEN DIGITAL", nome:"KAROLAINE_SILVA",                 d:[0,1510.38,0,7138.44,2188.43,8953.03,333.91,7689.81,1294.97,0,11348.35,4323.19,0], total:44780.51},
-  {equipe:"COFEN DIGITAL", nome:"THAYRA_FERREIRASILVA",            d:[462.24,280.52,0,1500.19,3281.05,4325.96,903.12,1458.64,415.97,0,12154.56,1929.78,0], total:26712.03},
-  {equipe:"COFEN DIGITAL", nome:"RENATARODRIGUES",                 d:[0,597.29,0,93.5,3992.93,1670.09,2560.36,5506.05,371.29,135.09,5005.47,871.12,0], total:20803.19},
+  {equipe:"COFEN DIGITAL", nome:"KAROLAINE_SILVA",                 d:[0,1510.38,0,7138.44,2188.43,8953.03,333.91,7689.81,1294.97,0,11448.07,4323.19,5371.33], total:50251.56},
+  {equipe:"COFEN DIGITAL", nome:"THAYRA_FERREIRASILVA",            d:[462.24,280.52,0,1500.19,3281.05,4325.96,903.12,1458.64,415.97,0,12154.56,1929.78,8292.56], total:35004.59},
+  {equipe:"COFEN DIGITAL", nome:"RENATARODRIGUES",                 d:[0,597.29,0,93.5,3992.93,1670.09,2560.36,5506.05,371.29,135.09,5005.47,1287.12,3598.58], total:24817.77},
   {equipe:"COFEN DIGITAL", nome:"CLEBER_JUNIOR",                   d:[0,1935.77,0,583.8,859.46,2374.32,199.35,6045.1,280.52,0,152.82,3292.02,0], total:15723.16},
   {equipe:"COFEN DIGITAL", nome:"JHONATA_NASCIMENTO",              d:[0,0,280.52,0,2446.61,1532.24,2131.01,884.37,0,0,693.5,599.9,0], total:8568.15},
   {equipe:"COFEN DIGITAL", nome:"NAYARA_CRUZ",                     d:[0,0,0,164.76,0,0,0,0,0,0,0,0,0], total:164.76},
-  {equipe:"COFEN MARILIA BRENDA", nome:"silva_beatriz",                   d:[0,580.66,0,1009.04,3485.94,3100.65,1815.8,5111.81,697.69,0,3017.86,6270.05,294.13], total:25383.63},
-  {equipe:"COFEN MARILIA BRENDA", nome:"leticia_romeu",                   d:[584.06,1248.64,244.86,3890.39,799.22,1494.13,474.67,6701.42,1857.71,0,2571.65,5502.82,0], total:25369.57},
-  {equipe:"COFEN MARILIA BRENDA", nome:"GIOVANA_SOUZA",                   d:[207.99,0,0,2671.73,1203.14,2681.41,1304.55,1816.72,307.5,0,2259.98,8178.77,0], total:20631.79},
-  {equipe:"COFEN MARILIA BRENDA", nome:"CAIO_SHIMITE",                    d:[517.58,0,0,4269.38,3030.16,580.66,4253.24,1587.69,216.24,0,2344.2,2053.85,0], total:18853.0},
-  {equipe:"COFEN MARILIA BRENDA", nome:"raissa_paloma",                   d:[0,0,0,6797.27,2023.27,1314.4,845.91,3112.43,438.98,0,2781.56,1427.01,0], total:18740.83},
-  {equipe:"COFEN MARILIA BRENDA", nome:"STEPHANIE_FAGUNDES",              d:[1289.33,0,299.07,2471.59,582.56,1848.77,1887.02,1552.44,200.02,0,1357.45,6540.06,397.27], total:18425.58},
-  {equipe:"COFEN MARILIA BRENDA", nome:"itallo_cardamoni",                d:[0,0,0,838.81,1001.48,230.07,2121.92,2227.03,1112.33,0,8025.68,1291.01,0], total:16848.33},
-  {equipe:"COFEN MARILIA BRENDA", nome:"thauany_moura",                   d:[0,870.87,344.24,4438.52,1998.25,1778.88,1689.71,2085.89,371.95,147.02,1336.03,1075.66,0], total:16137.02},
+  {equipe:"COFEN MARILIA BRENDA", nome:"silva_beatriz",                   d:[0,580.66,0,1009.04,3485.94,3100.65,1815.8,5111.81,697.69,0,3017.86,6137.75,4684.25], total:29641.45},
+  {equipe:"COFEN MARILIA BRENDA", nome:"leticia_romeu",                   d:[584.06,1248.64,244.86,3890.39,799.22,1494.13,474.67,6701.42,1857.71,0,2571.65,5502.82,1801.59], total:27171.16},
+  {equipe:"COFEN MARILIA BRENDA", nome:"GIOVANA_SOUZA",                   d:[207.99,0,0,2671.73,1203.14,2681.41,1304.55,1816.72,307.5,0,2259.98,8178.77,2016.99], total:22648.78},
+  {equipe:"COFEN MARILIA BRENDA", nome:"STEPHANIE_FAGUNDES",              d:[1289.33,0,299.07,2471.59,582.56,1848.77,1887.02,1552.44,200.02,0,1357.45,6540.06,3287.23], total:21315.54},
+  {equipe:"COFEN MARILIA BRENDA", nome:"CAIO_SHIMITE",                    d:[517.58,0,0,4269.38,3030.16,580.66,4253.24,1587.69,216.24,0,2344.2,2053.85,1797.88], total:20650.88},
+  {equipe:"COFEN MARILIA BRENDA", nome:"itallo_cardamoni",                d:[0,0,0,838.81,1001.48,230.07,2121.92,2227.03,1112.33,0,8025.68,1291.01,3556.88], total:20405.21},
+  {equipe:"COFEN MARILIA BRENDA", nome:"raissa_paloma",                   d:[0,0,0,6797.27,2023.27,1314.4,845.91,3112.43,438.98,0,2781.56,1427.01,1098.06], total:19838.89},
+  {equipe:"COFEN MARILIA BRENDA", nome:"thauany_moura",                   d:[0,870.87,344.24,4438.52,1998.25,1778.88,1689.71,2085.89,371.95,147.02,1336.03,1075.66,875.18], total:17012.2},
   {equipe:"COFEN MARILIA BRENDA", nome:"BIANCA_V_SILVA",                  d:[289.1,0,105.17,1368.79,0,0,0,0,0,0,0,0,0], total:1763.06},
   {equipe:"COFEN MARILIA BRENDA", nome:"carulini_santos",                 d:[216.9,0,0,0,0,0,0,0,0,0,0,0,0], total:216.9},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"katia_regina",                    d:[163.55,1029.67,0,444.23,5874.46,2943.2,5774.23,1576.1,299.07,299.07,1508.98,5172.59,463.19], total:25548.34},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"geovanna_almeida",                d:[0,0,0,1743.79,3220.55,4659.73,1209.96,2457.65,0,0,1779.12,3455.63,0], total:18526.43},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"kauane_azevedo",                  d:[575.32,0,0,436.53,1730.98,893.55,6775.91,5838.63,0,0,1614.28,521.66,0], total:18386.86},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"AMABELLY_SANTOS",                 d:[280.52,0,0,2015.66,1785.24,147.49,2125.17,896.36,0,0,720.7,5969.3,485.31], total:14425.75},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"thais_mayara",                    d:[0,268.12,0,3934.83,1164.53,1599.3,1741.82,1865.54,0,0,1039.49,2766.91,0], total:14380.54},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"aline_pupim",                     d:[898.89,0,0,1182.3,1099.63,134.9,2970.42,1920.28,0,0,1079.91,4222.09,0], total:13508.42},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"larissa_santana",                 d:[0,0,0,57.57,4709.36,130.99,0,1695.08,0,0,3598.6,2849.94,0], total:13041.54},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"ISABELA_MONTEIRO",                d:[0,0,0,0,1214.93,1163.42,3477.91,1574.87,222.84,0,1278.34,1377.34,0], total:10309.65},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"jussara_pereira",                 d:[0,0,0,2314.27,146.24,3754.21,1265.99,587.24,0,0,2014.75,0,0], total:10082.7}
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"katia_regina",                    d:[163.55,1029.67,0,444.23,5874.46,2943.2,5774.23,1576.1,299.07,299.07,1508.98,5172.59,5086.98], total:30172.13},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"geovanna_almeida",                d:[0,0,0,1743.79,3220.55,4659.73,1209.96,2457.65,0,0,1779.12,3455.63,2854.41], total:21380.84},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"kauane_azevedo",                  d:[575.32,0,0,436.53,1730.98,893.55,6775.91,5838.63,0,0,1614.28,521.66,751.84], total:19138.7},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"AMABELLY_SANTOS",                 d:[280.52,0,0,2015.66,1785.24,147.49,2125.17,896.36,0,0,720.7,5969.3,3537.95], total:17478.39},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"thais_mayara",                    d:[0,268.12,0,3934.83,1164.53,1599.3,1741.82,1865.54,0,0,1039.49,2766.91,2894.05], total:17274.59},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"larissa_santana",                 d:[0,0,0,57.57,4709.36,130.99,0,1695.08,0,0,3598.6,2849.94,3365.71], total:16407.25},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"aline_pupim",                     d:[898.89,0,0,1182.3,1099.63,134.9,2970.42,1920.28,0,0,1079.91,4222.09,1628.66], total:15137.08},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"ISABELA_MONTEIRO",                d:[0,0,0,0,1214.93,1163.42,3477.91,1574.87,222.84,0,1278.34,1377.34,2128.15], total:12437.8},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"jussara_pereira",                 d:[0,0,0,2314.27,146.24,3754.21,1265.99,587.24,0,0,2014.75,0,1374.73], total:11457.43}
 ];
 
 const RDOP_DIAS_LABELS = ['01/05','02/05','03/05','04/05','05/05','06/05','07/05','08/05','09/05','10/05','11/05','12/05'];
 
 // Fallback estático (quando arquivo ainda não foi importado)
 const RDOP_DADOS_STATIC = [
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MATHEUS_SOUZA",                   d:[699.1,84.01,194.98,3571.29,1474.46,4191.3,1413.52,4399.26,0,0,1976.07,5895.97,0], total:23899.96},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"LEONARDO_NUNES",                  d:[0,280.96,0,4204.43,330.95,442.25,1132.39,3425.61,595.91,0,521.64,1758.4,0], total:12692.54},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"LYVIA_DIAS",                      d:[0,117.44,0,2023.21,0,1684.86,2383.09,1732.84,0,0,918.9,3136.49,0], total:11996.83},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELTON_ROLDON",                   d:[487.38,0,0,0,2339.09,444.5,1238.88,1628.14,0,0,1341.58,3416.96,0], total:10896.53},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MATHEUS_SOUZA",                   d:[699.1,84.01,194.98,3571.29,1474.46,4191.3,1413.52,4399.26,0,0,2433.97,5895.97,3212.28], total:27570.14},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"LYVIA_DIAS",                      d:[0,117.44,0,2023.21,0,1684.86,2383.09,1732.84,0,0,918.9,3136.49,7686.19], total:19683.02},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"LEONARDO_NUNES",                  d:[0,280.96,0,4204.43,330.95,442.25,1132.39,3425.61,595.91,0,521.64,3067.54,716.02], total:14717.7},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELTON_ROLDON",                   d:[487.38,0,0,0,2339.09,444.5,1238.88,1628.14,0,0,1341.58,4717.94,1226.54], total:13424.05},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"EDUARDO_SILVA",                   d:[0,151.71,0,310.14,1164.45,2569.3,881.96,937.58,155.05,0,4070.48,501.77,0], total:10742.44},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_RODARTE",                   d:[0,0,0,1185.13,303.01,63.51,618.92,3640.03,0,0,0,2221.34,0], total:8031.94},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_RODARTE",                   d:[0,0,0,1185.13,303.01,63.51,618.92,3640.03,0,0,0,2221.34,566.9], total:8598.84},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"FRANCISCA_BRITO",                 d:[0,388.94,0,645.11,1454.68,2787.17,238.38,194.2,0,0,0,299.07,0], total:6007.55},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"JOAO_MIRANDA",                    d:[0,0,0,546.64,650.84,0,285.46,1369.96,0,0,1400.83,649.25,0], total:4902.98},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELENA_SANTOS",                   d:[0,0,0,829.98,575.68,605.72,0,329.85,0,0,124.42,1604.31,0], total:4069.96},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_BRAIDOTI",                  d:[0,0,0,580.94,871.02,99.66,742.48,67.55,0,0,0,0,0], total:2361.65},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_BRAIDOTI",                  d:[0,0,0,580.94,871.02,99.66,742.48,67.55,0,0,0,2771.67,123.72], total:5257.04},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"JOAO_MIRANDA",                    d:[0,0,0,546.64,650.84,0,285.46,1369.96,0,0,1400.83,649.25,143.97], total:5046.95},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELENA_SANTOS",                   d:[0,0,0,829.98,575.68,605.72,0,329.85,0,0,124.42,1604.31,499.09], total:4569.05},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_MOREIRASANTOS",             d:[105.5,79.21,0,352.11,581.61,58.72,199.22,0,0,0,253.96,0,1121.76], total:2752.09},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"RAFAELA_MINHOTO",                 d:[0,0,0,322.13,0,0,158.16,0,0,0,0,1503.22,0], total:1983.51},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_MOREIRASANTOS",             d:[105.5,79.21,0,352.11,581.61,58.72,199.22,0,0,0,253.96,0,0], total:1630.33},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"MAYSA_OLIVEIRA",                  d:[0,0,0,0,0,0,0,0,0,0,0,56.67,0], total:56.67},
-  {equipe:"COFEN DIGITAL", nome:"KAROLAINE_SILVA",                 d:[0,1510.38,0,7138.44,2188.43,8953.03,333.91,7689.81,1294.97,0,11348.35,4323.19,0], total:44780.51},
-  {equipe:"COFEN DIGITAL", nome:"THAYRA_FERREIRASILVA",            d:[462.24,280.52,0,1500.19,3281.05,4325.96,903.12,1458.64,415.97,0,12154.56,1929.78,0], total:26712.03},
-  {equipe:"COFEN DIGITAL", nome:"RENATARODRIGUES",                 d:[0,597.29,0,93.5,3992.93,1670.09,2560.36,5506.05,371.29,135.09,5005.47,871.12,0], total:20803.19},
+  {equipe:"COFEN DIGITAL", nome:"KAROLAINE_SILVA",                 d:[0,1510.38,0,7138.44,2188.43,8953.03,333.91,7689.81,1294.97,0,11448.07,4323.19,5371.33], total:50251.56},
+  {equipe:"COFEN DIGITAL", nome:"THAYRA_FERREIRASILVA",            d:[462.24,280.52,0,1500.19,3281.05,4325.96,903.12,1458.64,415.97,0,12154.56,1929.78,8292.56], total:35004.59},
+  {equipe:"COFEN DIGITAL", nome:"RENATARODRIGUES",                 d:[0,597.29,0,93.5,3992.93,1670.09,2560.36,5506.05,371.29,135.09,5005.47,1287.12,3598.58], total:24817.77},
   {equipe:"COFEN DIGITAL", nome:"CLEBER_JUNIOR",                   d:[0,1935.77,0,583.8,859.46,2374.32,199.35,6045.1,280.52,0,152.82,3292.02,0], total:15723.16},
   {equipe:"COFEN DIGITAL", nome:"JHONATA_NASCIMENTO",              d:[0,0,280.52,0,2446.61,1532.24,2131.01,884.37,0,0,693.5,599.9,0], total:8568.15},
   {equipe:"COFEN DIGITAL", nome:"NAYARA_CRUZ",                     d:[0,0,0,164.76,0,0,0,0,0,0,0,0,0], total:164.76},
-  {equipe:"COFEN MARILIA BRENDA", nome:"silva_beatriz",                   d:[0,580.66,0,1009.04,3485.94,3100.65,1815.8,5111.81,697.69,0,3017.86,6270.05,294.13], total:25383.63},
-  {equipe:"COFEN MARILIA BRENDA", nome:"leticia_romeu",                   d:[584.06,1248.64,244.86,3890.39,799.22,1494.13,474.67,6701.42,1857.71,0,2571.65,5502.82,0], total:25369.57},
-  {equipe:"COFEN MARILIA BRENDA", nome:"GIOVANA_SOUZA",                   d:[207.99,0,0,2671.73,1203.14,2681.41,1304.55,1816.72,307.5,0,2259.98,8178.77,0], total:20631.79},
-  {equipe:"COFEN MARILIA BRENDA", nome:"CAIO_SHIMITE",                    d:[517.58,0,0,4269.38,3030.16,580.66,4253.24,1587.69,216.24,0,2344.2,2053.85,0], total:18853.0},
-  {equipe:"COFEN MARILIA BRENDA", nome:"raissa_paloma",                   d:[0,0,0,6797.27,2023.27,1314.4,845.91,3112.43,438.98,0,2781.56,1427.01,0], total:18740.83},
-  {equipe:"COFEN MARILIA BRENDA", nome:"STEPHANIE_FAGUNDES",              d:[1289.33,0,299.07,2471.59,582.56,1848.77,1887.02,1552.44,200.02,0,1357.45,6540.06,397.27], total:18425.58},
-  {equipe:"COFEN MARILIA BRENDA", nome:"itallo_cardamoni",                d:[0,0,0,838.81,1001.48,230.07,2121.92,2227.03,1112.33,0,8025.68,1291.01,0], total:16848.33},
-  {equipe:"COFEN MARILIA BRENDA", nome:"thauany_moura",                   d:[0,870.87,344.24,4438.52,1998.25,1778.88,1689.71,2085.89,371.95,147.02,1336.03,1075.66,0], total:16137.02},
+  {equipe:"COFEN MARILIA BRENDA", nome:"silva_beatriz",                   d:[0,580.66,0,1009.04,3485.94,3100.65,1815.8,5111.81,697.69,0,3017.86,6137.75,4684.25], total:29641.45},
+  {equipe:"COFEN MARILIA BRENDA", nome:"leticia_romeu",                   d:[584.06,1248.64,244.86,3890.39,799.22,1494.13,474.67,6701.42,1857.71,0,2571.65,5502.82,1801.59], total:27171.16},
+  {equipe:"COFEN MARILIA BRENDA", nome:"GIOVANA_SOUZA",                   d:[207.99,0,0,2671.73,1203.14,2681.41,1304.55,1816.72,307.5,0,2259.98,8178.77,2016.99], total:22648.78},
+  {equipe:"COFEN MARILIA BRENDA", nome:"STEPHANIE_FAGUNDES",              d:[1289.33,0,299.07,2471.59,582.56,1848.77,1887.02,1552.44,200.02,0,1357.45,6540.06,3287.23], total:21315.54},
+  {equipe:"COFEN MARILIA BRENDA", nome:"CAIO_SHIMITE",                    d:[517.58,0,0,4269.38,3030.16,580.66,4253.24,1587.69,216.24,0,2344.2,2053.85,1797.88], total:20650.88},
+  {equipe:"COFEN MARILIA BRENDA", nome:"itallo_cardamoni",                d:[0,0,0,838.81,1001.48,230.07,2121.92,2227.03,1112.33,0,8025.68,1291.01,3556.88], total:20405.21},
+  {equipe:"COFEN MARILIA BRENDA", nome:"raissa_paloma",                   d:[0,0,0,6797.27,2023.27,1314.4,845.91,3112.43,438.98,0,2781.56,1427.01,1098.06], total:19838.89},
+  {equipe:"COFEN MARILIA BRENDA", nome:"thauany_moura",                   d:[0,870.87,344.24,4438.52,1998.25,1778.88,1689.71,2085.89,371.95,147.02,1336.03,1075.66,875.18], total:17012.2},
   {equipe:"COFEN MARILIA BRENDA", nome:"BIANCA_V_SILVA",                  d:[289.1,0,105.17,1368.79,0,0,0,0,0,0,0,0,0], total:1763.06},
   {equipe:"COFEN MARILIA BRENDA", nome:"carulini_santos",                 d:[216.9,0,0,0,0,0,0,0,0,0,0,0,0], total:216.9},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"katia_regina",                    d:[163.55,1029.67,0,444.23,5874.46,2943.2,5774.23,1576.1,299.07,299.07,1508.98,5172.59,463.19], total:25548.34},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"geovanna_almeida",                d:[0,0,0,1743.79,3220.55,4659.73,1209.96,2457.65,0,0,1779.12,3455.63,0], total:18526.43},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"kauane_azevedo",                  d:[575.32,0,0,436.53,1730.98,893.55,6775.91,5838.63,0,0,1614.28,521.66,0], total:18386.86},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"AMABELLY_SANTOS",                 d:[280.52,0,0,2015.66,1785.24,147.49,2125.17,896.36,0,0,720.7,5969.3,485.31], total:14425.75},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"thais_mayara",                    d:[0,268.12,0,3934.83,1164.53,1599.3,1741.82,1865.54,0,0,1039.49,2766.91,0], total:14380.54},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"aline_pupim",                     d:[898.89,0,0,1182.3,1099.63,134.9,2970.42,1920.28,0,0,1079.91,4222.09,0], total:13508.42},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"larissa_santana",                 d:[0,0,0,57.57,4709.36,130.99,0,1695.08,0,0,3598.6,2849.94,0], total:13041.54},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"ISABELA_MONTEIRO",                d:[0,0,0,0,1214.93,1163.42,3477.91,1574.87,222.84,0,1278.34,1377.34,0], total:10309.65},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"jussara_pereira",                 d:[0,0,0,2314.27,146.24,3754.21,1265.99,587.24,0,0,2014.75,0,0], total:10082.7}
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"katia_regina",                    d:[163.55,1029.67,0,444.23,5874.46,2943.2,5774.23,1576.1,299.07,299.07,1508.98,5172.59,5086.98], total:30172.13},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"geovanna_almeida",                d:[0,0,0,1743.79,3220.55,4659.73,1209.96,2457.65,0,0,1779.12,3455.63,2854.41], total:21380.84},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"kauane_azevedo",                  d:[575.32,0,0,436.53,1730.98,893.55,6775.91,5838.63,0,0,1614.28,521.66,751.84], total:19138.7},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"AMABELLY_SANTOS",                 d:[280.52,0,0,2015.66,1785.24,147.49,2125.17,896.36,0,0,720.7,5969.3,3537.95], total:17478.39},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"thais_mayara",                    d:[0,268.12,0,3934.83,1164.53,1599.3,1741.82,1865.54,0,0,1039.49,2766.91,2894.05], total:17274.59},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"larissa_santana",                 d:[0,0,0,57.57,4709.36,130.99,0,1695.08,0,0,3598.6,2849.94,3365.71], total:16407.25},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"aline_pupim",                     d:[898.89,0,0,1182.3,1099.63,134.9,2970.42,1920.28,0,0,1079.91,4222.09,1628.66], total:15137.08},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"ISABELA_MONTEIRO",                d:[0,0,0,0,1214.93,1163.42,3477.91,1574.87,222.84,0,1278.34,1377.34,2128.15], total:12437.8},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"jussara_pereira",                 d:[0,0,0,2314.27,146.24,3754.21,1265.99,587.24,0,0,2014.75,0,1374.73], total:11457.43}
 ];
 
 // ── Função que gera RDOP_DADOS dinamicamente a partir de D.equipes ──
