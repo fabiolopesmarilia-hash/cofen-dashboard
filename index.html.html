@@ -4668,6 +4668,14 @@ function openM(opName){
   const metaIndModal = getMetaOp(opName);
   const projModal    = calcProjecao(op.rec, metaIndModal);
 
+  // Cálculo: falta p/ meta de hoje e amanhã
+  const _duTotal    = DU.total  || 1;
+  const _duPassou   = DU.passou || 1;
+  const metaHojeOp   = metaIndModal > 0 ? metaIndModal * (_duPassou / _duTotal) : 0;
+  const metaAmanhOp  = metaIndModal > 0 ? metaIndModal * ((_duPassou + 1) / _duTotal) : 0;
+  const faltaHojeOp  = Math.max(0, metaHojeOp  - op.rec);
+  const faltaAmanhOp = Math.max(0, metaAmanhOp - op.rec);
+
   document.getElementById('m-kpis').innerHTML=[
     {l:'Total Real',v:fR(op.rec),cls:'ok'},
     {l:'HO (25%)',v:fR(op.ho),cls:''},
@@ -4690,6 +4698,24 @@ function openM(opName){
       <div class="mk-v am">${fRK(projModal.needDay)}</div>
       <div style="font-size:9px;color:var(--g500);font-weight:600;margin-top:2px">${DU.restam} D.U. restam</div>
     </div>`:''}
+    <div class="mk" style="border:1.5px solid #3B82F633;background:#3B82F608">
+      <div class="mk-l">🎯 Falta p/ Meta Hoje</div>
+      <div class="mk-v" style="color:${faltaHojeOp>0?'#3B82F6':'var(--ok)'}">
+        ${faltaHojeOp>0 ? fR(faltaHojeOp) : '✅ Na meta!'}
+      </div>
+      <div style="font-size:9px;color:var(--g500);font-weight:600;margin-top:2px">
+        ${faltaHojeOp>0 ? 'Meta esperada hoje: '+fR(metaHojeOp) : 'Projeção atingida'}
+      </div>
+    </div>
+    <div class="mk" style="border:1.5px solid #8B5CF633;background:#8B5CF608">
+      <div class="mk-l">📅 Falta p/ Meta Amanhã</div>
+      <div class="mk-v" style="color:${faltaAmanhOp>0?'#8B5CF6':'var(--ok)'}">
+        ${faltaAmanhOp>0 ? fR(faltaAmanhOp) : '✅ Na meta!'}
+      </div>
+      <div style="font-size:9px;color:var(--g500);font-weight:600;margin-top:2px">
+        ${faltaAmanhOp>0 ? 'Meta esperada amanhã: '+fR(metaAmanhOp) : 'Projeção atingida'}
+      </div>
+    </div>
   ` : '');
 
   // ── AG-BOX: foto do operador se disponível, senão agendamentos ──
