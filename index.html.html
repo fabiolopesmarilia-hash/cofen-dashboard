@@ -3615,7 +3615,9 @@ function aplicarGeral(){
   statusEl.style.color = '#065F46';
 
   // Salvar historico mensal
-  _histMensalGeral = _parseMensal(raw);
+  // MERGE: preserva meses anteriores, atualiza/adiciona meses do arquivo importado
+  const _novosMeses = _parseMensal(raw);
+  Object.assign(_histMensalGeral, _novosMeses);
   localStorage.setItem('cofen_hist_geral', JSON.stringify(_histMensalGeral));
 
   // Salvar breakdown diário de Maio (para comparativo DU a DU)
