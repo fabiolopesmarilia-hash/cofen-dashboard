@@ -8127,20 +8127,23 @@ function fbStartListening(){
     // Limpar campo de controle antes de mesclar
     const remoteClean = {...remote};
     delete remoteClean._date;
-    // Merge com local — remoto complementa local (não sobrescreve)
+    // Merge: remoto vence local, exceto chaves que você zerou intencionalmente
     const local = rdGetSaved();
     const merged = {};
-    // Pega todas as chaves de ambos, prefere o maior valor para cada operador
     const allKeys = new Set([...Object.keys(local), ...Object.keys(remoteClean)]);
-    // Chaves zeradas intencionalmente localmente não devem ser sobrescritas pelo Firebase
     const _zerodList = JSON.parse(localStorage.getItem(rdTodayKey()+'_zeroed')||'[]');
     allKeys.forEach(k=>{
       const vLocal  = parseFloat(local[k]||0);
       const vRemote = parseFloat(remoteClean[k]||0);
       if(_zerodList.includes(k)){
-        merged[k] = 0; // respeita zero intencional local
+        // Você zerou este operador intencionalmente — mantém 0
+        merged[k] = 0;
+      } else if(remoteClean.hasOwnProperty(k)){
+        // Remoto tem valor para esta chave → remoto vence (inclui atualizações de outros supervisores)
+        merged[k] = vRemote;
       } else {
-        merged[k] = Math.max(vLocal, vRemote);
+        // Só existe localmente → mantém local
+        merged[k] = vLocal;
       }
     });
     const localStr = JSON.stringify(local);
