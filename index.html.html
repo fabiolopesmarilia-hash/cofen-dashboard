@@ -5308,6 +5308,10 @@ function rdAddAgora(opName){
   if(!v||v<=0){ toast('⚠️ Digite um valor maior que zero'); return; }
   const map=rdGetSaved();
   map[opName]=(parseFloat(map[opName]||0))+v;
+  // Remove da lista de zeros intencionais ao relançar valor
+  const _zer2 = JSON.parse(localStorage.getItem(rdTodayKey()+'_zeroed')||'[]');
+  const _zer2idx = _zer2.indexOf(opName);
+  if(_zer2idx > -1){ _zer2.splice(_zer2idx,1); localStorage.setItem(rdTodayKey()+'_zeroed', JSON.stringify(_zer2)); }
   rdSetSaved(map);
   // Histórico
   const histKey=rdTodayKey()+'_hist_'+sid;
@@ -5398,11 +5402,19 @@ function rdConfirmarEdicao(opName){
   const antigo = parseFloat(map[opName]||0);
 
   if(novoVal===0){
-    delete map[opName];
+    map[opName] = 0;
+    // Registra como zerado intencionalmente para o Firebase não restaurar
+    const _zer = JSON.parse(localStorage.getItem(rdTodayKey()+'_zeroed')||'[]');
+    if(!_zer.includes(opName)) _zer.push(opName);
+    localStorage.setItem(rdTodayKey()+'_zeroed', JSON.stringify(_zer));
     // limpa histórico
     localStorage.removeItem(rdTodayKey()+'_hist_'+sid);
   } else {
     map[opName] = novoVal;
+    // Remove da lista de zeros intencionais ao editar para valor positivo
+    const _zer3 = JSON.parse(localStorage.getItem(rdTodayKey()+'_zeroed')||'[]');
+    const _zer3idx = _zer3.indexOf(opName);
+    if(_zer3idx > -1){ _zer3.splice(_zer3idx,1); localStorage.setItem(rdTodayKey()+'_zeroed', JSON.stringify(_zer3)); }
     // Registra a correção no histórico
     const histKey = rdTodayKey()+'_hist_'+sid;
     let hist=[]; try{hist=JSON.parse(localStorage.getItem(histKey)||'[]')}catch{}
@@ -5429,7 +5441,7 @@ function rdConfirmarEdicao(opName){
   if(row) row.style.background = vHoje>0?'#FFFDF5':'';
 
   // Re-renderiza para mostrar/ocultar botões
-  rdRenderList();
+  rdRender();
   rdUpdateKPIs();
 
   try{ rdBC&&rdBC.postMessage({type:'rd',key:rdTodayKey(),data:map}); }catch{}
@@ -5449,11 +5461,15 @@ function rdZerarOperador(opName){
 
   if(!confirm('Zerar R$ '+fR(atual)+' de '+opName.replace(/_/g,' ')+'?\nEsta ação pode ser desfeita relançando o valor.')) return;
 
-  delete map[opName];
+  map[opName] = 0;
+  // Registra chaves zeradas intencionalmente para o Firebase não restaurar
+  const zeroed = JSON.parse(localStorage.getItem(rdTodayKey()+'_zeroed')||'[]');
+  if(!zeroed.includes(opName)) zeroed.push(opName);
+  localStorage.setItem(rdTodayKey()+'_zeroed', JSON.stringify(zeroed));
   localStorage.removeItem(rdTodayKey()+'_hist_'+sid);
   rdSetSaved(map);
 
-  rdRenderList();
+  rdRender();
   rdUpdateKPIs();
   try{ rdBC&&rdBC.postMessage({type:'rd',key:rdTodayKey(),data:map}); }catch{}
   if(typeof tvRefresh==='function') tvRefresh();
@@ -5465,7 +5481,10 @@ function rdSave(){toast('💾 Salvo automaticamente!');}
 function rdClearDay(){
   if(!confirm('Zerar todos os valores do dia?\nEsta ação não pode ser desfeita.')) return;
   localStorage.removeItem(rdTodayKey());
-  fbPush('rd', {});
+  localStorage.removeItem(rdTodayKey()+'_zeroed');
+  const _today2 = new Date();
+  const _dk2 = _today2.getFullYear()+'_'+(_today2.getMonth()+1)+'_'+_today2.getDate();
+  fbPush('rd', {_date: _dk2});
   rdRender();
   rdUpdateKPIs();
   toast('🗑 Dia zerado!');
@@ -8113,10 +8132,16 @@ function fbStartListening(){
     const merged = {};
     // Pega todas as chaves de ambos, prefere o maior valor para cada operador
     const allKeys = new Set([...Object.keys(local), ...Object.keys(remoteClean)]);
+    // Chaves zeradas intencionalmente localmente não devem ser sobrescritas pelo Firebase
+    const _zerodList = JSON.parse(localStorage.getItem(rdTodayKey()+'_zeroed')||'[]');
     allKeys.forEach(k=>{
       const vLocal  = parseFloat(local[k]||0);
       const vRemote = parseFloat(remoteClean[k]||0);
-      merged[k] = Math.max(vLocal, vRemote);
+      if(_zerodList.includes(k)){
+        merged[k] = 0; // respeita zero intencional local
+      } else {
+        merged[k] = Math.max(vLocal, vRemote);
+      }
     });
     const localStr = JSON.stringify(local);
     if(JSON.stringify(merged) !== localStr){
@@ -8354,7 +8379,11 @@ function fbUpdateRD(map){
   if(!fbDb||!fbRoom) return;
   const today   = new Date();
   const dateKey = today.getFullYear()+'_'+(today.getMonth()+1)+'_'+today.getDate();
-  const payload = {...map, _date: dateKey};
+  // Inclui zeros explícitos para chaves zeradas intencionalmente
+  const _zer = JSON.parse(localStorage.getItem(rdTodayKey()+'_zeroed')||'[]');
+  const mapWithZeros = {...map};
+  _zer.forEach(k=>{ mapWithZeros[k] = 0; });
+  const payload = {...mapWithZeros, _date: dateKey};
   const rdRef   = fbDb.ref(fbRoom+'/rd');
   rdRef.child('_date').once('value', snap=>{
     const remoteDate = snap.val();
