@@ -12254,26 +12254,28 @@ function rdopRender(){
   // ── Reconstrói thead com os dias ativos ──────────────────
   const _thRow = document.getElementById('rdop-thead-dias');
   if(_thRow){
-    // Remove TH de dias antigos (mantém #, Operador, Equipe, Total)
-    while(_thRow.children.length > 3) _thRow.removeChild(_thRow.children[3]);
-    const _totalTh = _thRow.lastElementChild; // guarda o Total
+    // 1. Salva o TH Total ANTES de remover qualquer coisa
+    const _totalTh = _thRow.lastElementChild;
     _thRow.removeChild(_totalTh);
-    // Insere TH para cada dia ativo (entre Equipe e Total)
+    // 2. Agora remove os TH de dias antigos (sobram apenas #, Operador, Equipe)
+    while(_thRow.children.length > 3) _thRow.removeChild(_thRow.children[3]);
+    // 3. Insere TH para cada dia ativo
     const _mesAtual = new Date().getMonth()+1;
     const _mmStr = String(_mesAtual).padStart(2,'0');
+    const _diaHoje = new Date().getDate();
     (rdopDiasAtivos||[]).forEach(dia => {
       const th = document.createElement('th');
       const dd = String(dia).padStart(2,'0');
       th.textContent = dd+'/'+_mmStr;
-      th.style.cssText = 'padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap';
-      // Destaca dia de hoje
-      if(dia === new Date().getDate()) {
+      th.style.cssText = 'padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap;color:rgba(255,255,255,.85)';
+      if(dia === _diaHoje){
         th.style.background = 'rgba(74,222,128,.25)';
         th.style.color = '#4ADE80';
       }
       _thRow.appendChild(th);
     });
-    _thRow.appendChild(_totalTh); // recoloca Total no fim
+    // 4. Recoloca Total no fim
+    _thRow.appendChild(_totalTh);
   }
 
   let dados = RDOP_DADOS.filter(r => {
