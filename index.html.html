@@ -3168,31 +3168,42 @@ function _buildTeamsHtml(compact){
   </div>`;
 }
 function _updateOntemCard(){
-  // Pega o dia anterior útil
-  const hoje = new Date();
-  const dow   = hoje.getDay(); // 0=dom,6=sáb
-  let ontemDay = hoje.getDate() - 1;
-  if(dow === 1) ontemDay = hoje.getDate() - 3; // seg → sexta
-  if(dow === 0) ontemDay = hoje.getDate() - 2; // dom → sexta
+  const hoje   = new Date();
+  const dow    = hoje.getDay();
+  const diaHj  = hoje.getDate();
+
+  // Último dia útil ANTES de hoje (ignora hoje)
+  let ontemDay;
+  if(dow === 1)      ontemDay = diaHj - 3; // seg → sexta
+  else if(dow === 0) ontemDay = diaHj - 2; // dom → sexta
+  else if(dow === 6) ontemDay = diaHj - 1; // sáb → sexta
+  else               ontemDay = diaHj - 1; // ter-sex → dia anterior
   if(ontemDay < 1) ontemDay = 1;
 
-  // Soma de todos os operadores no dia anterior (daily do D)
-  let totalOntem = 0;
-  (D.equipes||[]).forEach(eq=>{
-    (eq.ops||[]).forEach(op=>{
-      totalOntem += parseFloat((op.daily||{})[ontemDay]||0);
+  // Lê de D.global.daily (total diário já somado)
+  const daily = (D.global && D.global.daily) ? D.global.daily : {};
+  let totalOntem = parseFloat(daily[ontemDay] || 0);
+
+  // Fallback: soma operador a operador
+  if(totalOntem <= 0){
+    (D.equipes||[]).forEach(eq=>{
+      (eq.ops||[]).forEach(op=>{
+        totalOntem += parseFloat((op.daily||{})[ontemDay]||0);
+      });
     });
-  });
+  }
+
   const hoOntem = totalOntem * 0.2496;
+  const mes     = String(hoje.getMonth()+1).padStart(2,'0');
+  const diaStr  = String(ontemDay).padStart(2,'0') + '/' + mes;
 
   const totalEl = document.getElementById('pp-ontem-total');
   const hoEl    = document.getElementById('pp-ontem-ho');
   const lblEl   = document.getElementById('pp-ontem-label');
-  const diaStr  = String(ontemDay).padStart(2,'0') + '/' + String(hoje.getMonth()+1).padStart(2,'0');
 
-  if(totalEl){ totalEl.textContent = totalOntem > 0 ? fR(totalOntem) : '—'; }
-  if(hoEl)   { hoEl.textContent    = totalOntem > 0 ? fR(hoOntem)    : '—'; }
-  if(lblEl)  { lblEl.textContent   = 'Recebimento do dia ' + diaStr; }
+  if(totalEl) totalEl.textContent = totalOntem > 0 ? fR(totalOntem) : '—';
+  if(hoEl)    hoEl.textContent    = totalOntem > 0 ? fR(hoOntem)    : '—';
+  if(lblEl)   lblEl.textContent   = 'Recebimento do dia ' + diaStr;
 }
 
 function renderPpMetas(){
