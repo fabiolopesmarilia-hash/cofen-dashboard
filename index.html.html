@@ -537,15 +537,34 @@ select.ev-inp{cursor:pointer}
       <div style="font-size:11px;font-weight:800;color:rgba(0,220,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Total Arrecadado Maio</div>
       <div id="h-arrecadado-ho" style="font-family:'Bebas Neue',sans-serif;font-size:62px;line-height:1;background:linear-gradient(90deg,#29ABE2,#00E5FF,#4DB848,#00E5FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;letter-spacing:2px">—</div>
       <div style="font-size:12px;color:rgba(255,255,255,.3);font-weight:600;margin-bottom:10px">Soma de Maio · coluna Pague Play</div>
+
       <!-- Projeção inline -->
       <div id="pp-proj-inline"></div>
     </div>
 
-    <!-- Falta para próximo objetivo -->
-    <div id="pp-falta-destaque" style="background:rgba(0,188,212,.1);border:2px solid rgba(0,188,212,.4);border-radius:14px;padding:14px 18px;text-align:center;position:relative">
-      <div style="font-size:10px;font-weight:800;color:rgba(0,220,255,.65);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">🎯 FALTA PARA O PRÓXIMO OBJETIVO</div>
-      <div id="pp-falta-valor-big" style="font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1;color:#00E5FF;letter-spacing:1px;margin-bottom:6px">—</div>
-      <div id="pp-falta-label-big" style="font-size:14px;font-weight:800;color:rgba(255,255,255,.5)">importe o arquivo para calcular</div>
+    <!-- Coluna direita: ontem + falta (empilhados) -->
+    <div style="display:flex;flex-direction:column;gap:12px">
+
+      <!-- Recebimento ontem -->
+      <div id="pp-ontem-card" style="background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div>
+          <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">📅 ONTEM — TOTAL RECEBIDO</div>
+          <div id="pp-ontem-total" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#4ADE80;letter-spacing:1px;line-height:1">—</div>
+          <div id="pp-ontem-label" style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px">importe o arquivo</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">HO (24,96%)</div>
+          <div id="pp-ontem-ho" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#00E5FF;letter-spacing:1px;line-height:1">—</div>
+        </div>
+      </div>
+
+      <!-- Falta para próximo objetivo -->
+      <div id="pp-falta-destaque" style="background:rgba(0,188,212,.1);border:2px solid rgba(0,188,212,.4);border-radius:14px;padding:14px 18px;text-align:center;position:relative;flex:1">
+        <div style="font-size:10px;font-weight:800;color:rgba(0,220,255,.65);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">🎯 FALTA PARA O PRÓXIMO OBJETIVO</div>
+        <div id="pp-falta-valor-big" style="font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1;color:#00E5FF;letter-spacing:1px;margin-bottom:6px">—</div>
+        <div id="pp-falta-label-big" style="font-size:14px;font-weight:800;color:rgba(255,255,255,.5)">importe o arquivo para calcular</div>
+      </div>
+
     </div>
   </div>
 
@@ -3148,6 +3167,34 @@ function _buildTeamsHtml(compact){
     ${items}
   </div>`;
 }
+function _updateOntemCard(){
+  // Pega o dia anterior útil
+  const hoje = new Date();
+  const dow   = hoje.getDay(); // 0=dom,6=sáb
+  let ontemDay = hoje.getDate() - 1;
+  if(dow === 1) ontemDay = hoje.getDate() - 3; // seg → sexta
+  if(dow === 0) ontemDay = hoje.getDate() - 2; // dom → sexta
+  if(ontemDay < 1) ontemDay = 1;
+
+  // Soma de todos os operadores no dia anterior (daily do D)
+  let totalOntem = 0;
+  (D.equipes||[]).forEach(eq=>{
+    (eq.ops||[]).forEach(op=>{
+      totalOntem += parseFloat((op.daily||{})[ontemDay]||0);
+    });
+  });
+  const hoOntem = totalOntem * 0.2496;
+
+  const totalEl = document.getElementById('pp-ontem-total');
+  const hoEl    = document.getElementById('pp-ontem-ho');
+  const lblEl   = document.getElementById('pp-ontem-label');
+  const diaStr  = String(ontemDay).padStart(2,'0') + '/' + String(hoje.getMonth()+1).padStart(2,'0');
+
+  if(totalEl){ totalEl.textContent = totalOntem > 0 ? fR(totalOntem) : '—'; }
+  if(hoEl)   { hoEl.textContent    = totalOntem > 0 ? fR(hoOntem)    : '—'; }
+  if(lblEl)  { lblEl.textContent   = 'Recebimento do dia ' + diaStr; }
+}
+
 function renderPpMetas(){
   const val = ppEmpresaAbril || 0;
   const w1 = document.getElementById('pp-metas-wrap');
@@ -3155,6 +3202,7 @@ function renderPpMetas(){
   if(typeof renderPPProjecao==='function') renderPPProjecao();
   const w2 = document.getElementById('h-pp-metas-wrap');
   if(w2) w2.innerHTML = _buildMetasHtml(val, true) + _buildTeamsHtml(true);
+  _updateOntemCard();
 }
 
 function liveCalcArrecadado(){
