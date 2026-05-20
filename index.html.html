@@ -2445,6 +2445,16 @@ const EQ={
   "COFEN DIGITAL":           {c:"#f953c6",bg:"#FDF2FF",ico:"🖥️",sh:"Digital"}
 };
 
+// ── Acréscimos manuais por equipe (operadores movidos no meio do mês) ──
+// Ex: LYVIA DIAS saiu da Bruna mas rec dela continua contando para Bruna
+let _eqExtras = (()=>{
+  try{ return JSON.parse(localStorage.getItem('cofen_eq_extras')||'{}'); }catch(e){ return {}; }
+})();
+function getEqExtra(eqName){ const e=_eqExtras[eqName]; return (e&&e.rec>0)?e.rec:0; }
+function saveEqExtras(){ localStorage.setItem('cofen_eq_extras', JSON.stringify(_eqExtras)); }
+// getTotalRecComExtras: soma eq.rec + extra para uma equipe
+function getEqRecTotal(eq){ return (eq?eq.rec:0) + getEqExtra(eq?eq.name:''); }
+
 const fR=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const fRK=v=>v>=1000?"R$ "+(v/1000).toFixed(1)+"K":fR(v);
 const ini=n=>{const p=n.replace(/_/g," ").split(" ");return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():n.slice(0,2).toUpperCase()};
@@ -2706,9 +2716,12 @@ function duResetManual(){
 
 // ── TOTAL REC (with override) ──
 function getTotalRec(){
-  return overrideTotalRec > 0
+  const base = overrideTotalRec > 0
     ? overrideTotalRec
     : D.equipes.reduce((s,e)=>s+e.rec,0);
+  // Acréscimos manuais (operadores movidos no meio do mês, ex: LYVIA DIAS)
+  const extras = Object.values(_eqExtras||{}).reduce((s,e)=>s+(e&&e.rec>0?e.rec:0),0);
+  return base + extras;
 }
 
 // ── INIT HERO & GERAL ──
@@ -4232,11 +4245,30 @@ function resetTotal(){
 }
 
 // ── EQUIPES PAGE ──
+function applyEqExtra(eqName){
+  const key = eqName.replace(/ /g,'_');
+  const labelEl = document.getElementById('extra-label-'+key);
+  const recEl   = document.getElementById('extra-rec-'+key);
+  if(!labelEl || !recEl) return;
+  const lbl = labelEl.value.trim();
+  const rec = parseFloat(recEl.value)||0;
+  if(!_eqExtras[eqName]) _eqExtras[eqName] = {label:'', rec:0};
+  _eqExtras[eqName].label = lbl;
+  _eqExtras[eqName].rec   = rec;
+  saveEqExtras();
+  mkEq();
+  if(typeof initHero==='function') initHero();
+  if(typeof renderPpMetas==='function') renderPpMetas();
+  const toast = msg => { const t=document.getElementById('toast'); if(t){t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3000);} };
+  toast('✅ ' + (lbl||'Extra') + ' → ' + (rec>0 ? 'R$ '+(rec/1000).toFixed(1)+'K adicionado' : 'removido') + ' do total da equipe!');
+}
+
 function mkEq(){
   const totalRec=getTotalRec();
   document.getElementById('eq-grid').innerHTML=D.equipes.map(eq=>{
     const cfg=EQ[eq.name]||{c:'#888',bg:'#eee',ico:'📌',sh:eq.name};
-    const pct=(eq.rec/totalRec*100).toFixed(1);
+    const _eqRecWithExtra = getEqRecTotal(eq);
+    const pct=(_eqRecWithExtra/totalRec*100).toFixed(1);
     // Checklist progress for this team
     const chkKey = eqChkKey(eq.name);
     const chkState = JSON.parse(localStorage.getItem(chkKey)||'{}');
@@ -4254,16 +4286,37 @@ function mkEq(){
         <div><div class="eq-nm">${cfg.sh}</div><div class="eq-op">${eq.n_op} operadores · ${eq.acordos} acordos</div></div>
       </div>
       <div class="eq-kpis">
-        <div class="eq-k"><div class="eq-k-l">Total Real</div><div class="eq-k-v" style="color:${cfg.c}">${fRK(eq.rec)}</div></div>
-        <div class="eq-k"><div class="eq-k-l">HO (25%)</div><div class="eq-k-v">${fRK(eq.ho)}</div></div>
-        <div class="eq-k"><div class="eq-k-l">Média/Op</div><div class="eq-k-v" style="color:#3B82F6">${fRK(eq.rec/eq.n_op)}</div></div>
+        <div class="eq-k"><div class="eq-k-l">Total Real</div><div class="eq-k-v" style="color:${cfg.c}">${fRK(getEqRecTotal(eq))}</div></div>
+        <div class="eq-k"><div class="eq-k-l">HO (25%)</div><div class="eq-k-v">${fRK(getEqRecTotal(eq)*0.25)}</div></div>
+        <div class="eq-k"><div class="eq-k-l">Média/Op</div><div class="eq-k-v" style="color:#3B82F6">${fRK(getEqRecTotal(eq)/eq.n_op)}</div></div>
       </div>
+      ${(()=>{
+        // ── Campo de acréscimo manual (ex: operador movido no meio do mês) ──
+        const extra = _eqExtras[eq.name] || {label:'', rec:0};
+        const hasExtra = extra.rec > 0;
+        return \`<div style="margin:8px 0 0;padding:8px 10px;background:rgba(0,0,0,.04);border-radius:8px;border:1px dashed rgba(0,0,0,.12)">
+          <div style="font-size:9px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">➕ Acréscimo fora da equipe</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="text" placeholder="Nome (ex: LYVIA DIAS)"
+              id="extra-label-\${eq.name.replace(/ /g,'_')}"
+              value="\${extra.label||''}"
+              style="flex:1.2;font-size:11px;padding:5px 8px;border-radius:6px;border:1px solid rgba(0,0,0,.15);background:#fff;font-family:Nunito,sans-serif;font-weight:700;color:var(--g800);min-width:0">
+            <input type="number" placeholder="R$ 0" min="0" step="0.01"
+              id="extra-rec-\${eq.name.replace(/ /g,'_')}"
+              value="\${extra.rec||''}"
+              style="flex:1;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid rgba(0,0,0,.15);background:#fff;font-family:'Bebas Neue',sans-serif;color:\${cfg.c};min-width:0">
+            <button onclick="applyEqExtra('\${eq.name}')"
+              style="padding:5px 10px;border-radius:6px;border:none;cursor:pointer;background:\${cfg.c};color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;white-space:nowrap">✓</button>
+          </div>
+          \${hasExtra ? \`<div style="font-size:10px;color:\${cfg.c};font-weight:800;margin-top:5px">✅ \${extra.label||'Extra'}: \${fRK(extra.rec)} incluído no total</div>\` : ''}
+        </div>\`;
+      })()}
       <div class="eq-bar-bg"><div class="eq-bar-f" style="width:${Math.min(100,parseFloat(pct))}%;background:${cfg.c}"></div></div>
-      <div class="eq-hint"><span style="color:${cfg.c}">${pct}% do total</span><span>${fRK(eq.rec)}</span></div>
+      <div class="eq-hint"><span style="color:${cfg.c}">${pct}% do total</span><span>${fRK(getEqRecTotal(eq))}</span></div>
       ${(()=>{
         const metaEq = getMetaEquipe(eq.name);
         if(!metaEq) return '';
-        const projEq = calcProjecao(eq.rec, metaEq);
+        const projEq = calcProjecao(getEqRecTotal(eq), metaEq);
         return '<div style="margin-top:8px;padding:7px 10px;border-radius:var(--r);background:'+projEq.color+'12;border:1px solid '+projEq.color+'30;display:flex;align-items:center;justify-content:space-between">'
           +'<div style="font-size:10px;font-weight:700;color:var(--g700)">Projeção da equipe</div>'
           +'<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:'+projEq.color+'">'+projEq.pct.toFixed(0)+'%</div>'
@@ -5082,6 +5135,22 @@ function loadSavedOverrides(){
   }
 
   const savedOps = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+
+  // ── AUTO-SYNC _eqExtras a partir dos overrides salvos (ao carregar a página) ──
+  if(Object.keys(_eqExtras).length > 0 && Object.keys(savedOps).length > 0){
+    let changed = false;
+    Object.entries(_eqExtras).forEach(([eqName, extra])=>{
+      if(!extra || !extra.label) return;
+      const labelNorm = extra.label.trim().toUpperCase().replace(/\s+/g,'_');
+      // Buscar o rec salvo nos overrides
+      const savedRec = savedOps[labelNorm] || savedOps[extra.label.trim().toUpperCase()] || 0;
+      if(savedRec > 0 && Math.abs(savedRec - extra.rec) >= 0.01){
+        _eqExtras[eqName].rec = savedRec;
+        changed = true;
+      }
+    });
+    if(changed) saveEqExtras();
+  }
   if(Object.keys(savedOps).length>0){
     D.equipes.forEach(eq=>{
       eq.ops.forEach(op=>{
@@ -5253,7 +5322,7 @@ function rdUpdateEqKpis(eqName){
   const hojeEq=eq.ops.reduce((s,o)=>s+(parseFloat(saved[o.name]||0)),0);
   const totalEq=eq.rec+hojeEq;
   const s=(id,v,col)=>{const e=document.getElementById(id);if(e){e.textContent=v;if(col)e.style.color=col;}};
-  s('eq-kpi-base',fR(eq.rec));
+  s('eq-kpi-base',fR(getEqRecTotal(eq)));
   s('eq-kpi-hoje',hojeEq>0?fR(hojeEq):'R$ 0,00',hojeEq>0?cfg.c:'var(--g300)');
   s('eq-kpi-total',fR(totalEq),cfg.c);
   s('eq-kpi-ho',fR(totalEq*0.25));
@@ -5965,7 +6034,7 @@ function renderMvEqList(){
           <div style="font-weight:800;font-size:13px;color:var(--g900)">${cfg.sh}</div>
           <div style="font-size:10px;color:var(--g500);font-weight:600">${eq.n_op} operadores</div>
         </div>
-        <div style="margin-left:auto;font-family:Bebas Neue,sans-serif;font-size:16px;color:${cfg.c}">${fRK(eq.rec)}</div>
+        <div style="margin-left:auto;font-family:Bebas Neue,sans-serif;font-size:16px;color:${cfg.c}">${fRK(getEqRecTotal(eq))}</div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:5px">
         ${eq.ops.map(op=>`
@@ -5999,7 +6068,7 @@ function gestaoMetasInit(){
       <div style="font-size:20px">${cfg.ico}</div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:800;font-size:13px;color:var(--g900);margin-bottom:2px">${cfg.sh}</div>
-        <div style="font-size:11px;color:var(--g500);font-weight:600">Atual: ${fR(eq.rec)} · ${eq.n_op} operadores</div>
+        <div style="font-size:11px;color:var(--g500);font-weight:600">Atual: ${fR(getEqRecTotal(eq))} · ${eq.n_op} operadores</div>
         ${meta>0?`<div style="margin-top:6px"><div style="background:var(--g200);border-radius:100px;height:4px;overflow:hidden">
           <div style="width:${pct}%;height:100%;background:${cfg.c};border-radius:100px;transition:width 1s"></div>
         </div>
@@ -6568,6 +6637,32 @@ function importApply(){
     });
   });
 
+  // ── AUTO-SYNC: atualizar _eqExtras com o rec mais recente de cada operador vinculado ──
+  // Ex: LYVIA_DIAS foi removida da Bruna mas rec dela continua contando via _eqExtras
+  // A cada importação, verificamos se o opName do extra bate com algum importado e atualizamos
+  let extrasAutoUpdated = [];
+  Object.entries(_eqExtras).forEach(([eqName, extra])=>{
+    if(!extra || !extra.label) return;
+    // Normalizar: "LYVIA DIAS" → "LYVIA_DIAS" para comparar com r.opName
+    const labelNorm = extra.label.trim().toUpperCase().replace(/\s+/g,'_');
+    // Buscar no lote importado
+    const match = importParsed.found.find(r =>
+      r.opName.toUpperCase() === labelNorm ||
+      r.opName.toUpperCase().replace(/_/g,' ') === extra.label.trim().toUpperCase()
+    );
+    if(match && Math.abs(match.recImport - extra.rec) >= 0.01){
+      const anterior = extra.rec;
+      _eqExtras[eqName].rec = match.recImport;
+      extrasAutoUpdated.push({eqName, label: extra.label, anterior, novo: match.recImport});
+    }
+  });
+  if(extrasAutoUpdated.length > 0){
+    saveEqExtras();
+    extrasAutoUpdated.forEach(u=>{
+      console.log('[EqExtras] Auto-sync:', u.label, u.anterior, '->', u.novo, 'para', u.eqName);
+    });
+  }
+
   // Recalcular totais de TODAS as equipes
   D.equipes.forEach(eq=>{
     eq.rec = eq.ops.reduce((s,o)=>s+o.rec, 0);
@@ -6584,7 +6679,10 @@ function importApply(){
   refreshAll();
 
   const totalImportado = importParsed.found.reduce((s,r)=>s+r.recImport,0);
-  toast(`✅ ${updated} operadores atualizados! Total: ${fRK(totalImportado)} · HO: ${fRK(totalImportado*0.25)}`);
+  const extrasMsg = extrasAutoUpdated.length > 0
+    ? ' · ' + extrasAutoUpdated.map(u=>`📌 ${u.label}: ${fRK(u.novo)}`).join(', ')
+    : '';
+  toast(`✅ ${updated} operadores atualizados! Total: ${fRK(totalImportado)}${extrasMsg}`);
 
   // Atualizar CMP_OPS_DEDUP.abril com valores importados (mês atual)
   importParsed.found.forEach(r=>{
