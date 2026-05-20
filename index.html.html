@@ -3801,10 +3801,15 @@ function _parseGeralPorEquipe(raw){
   const norm2 = s => s.trim().replace(/^"|"$/g,'').toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   const hdrs = lines[0].split(sep).map(norm2);
-  const ci = cands => { for(const c of cands){ const i=hdrs.findIndex(h=>h.includes(c)); if(i>=0)return i; } return -1; };
+  // ci: tenta match exato primeiro, depois parcial (evita 'baixa' bater em 'id.baixa')
+  const ci = cands => {
+    for(const c of cands){ const i=hdrs.findIndex(h=>h===c); if(i>=0)return i; }
+    for(const c of cands){ const i=hdrs.findIndex(h=>h.includes(c)); if(i>=0)return i; }
+    return -1;
+  };
 
   const iEq  = ci(['equipe','subgrupo','grupo']);
-  const iDt  = ci(['dt.pagamento','data pagamento','dtpgto','dt.pgto','dt pgto','data pgto','data pag','baixa']);
+  const iDt  = ci(['dt.pagamento','data pagamento','dtpgto','dt.pgto','dt pgto','data pgto','data pag']);
   const iRec = ci(['valor recebido','recebido','vlr rec','valor rec']);
 
   if(iDt < 0 || iRec < 0){
@@ -3823,13 +3828,34 @@ function _parseGeralPorEquipe(raw){
 
   function parseDt(v){
     if(!v) return null;
-    const n = parseFloat(String(v).replace(',','.'));
+    const s = String(v).trim();
+    // Serial numérico Excel
+    const n = parseFloat(s.replace(',','.'));
     if(!isNaN(n) && n > 40000 && n < 60000){
       const d = new Date(Math.round((n - 25569)*86400*1000));
       return d.toISOString().slice(0,10);
     }
-    const m = String(v).match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
-    if(m){ const yr=m[3].length===2?'20'+m[3]:m[3]; return `${yr}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`; }
+    // YYYY-MM-DD
+    let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(m) return `${m[1]}-${m[2]}-${m[3]}`;
+    // DD/MM/YYYY ou DD-MM-YYYY (dia ≤ 31, mês ≤ 12 — formato BR)
+    m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+    if(m){
+      const d=parseInt(m[1]), mo=parseInt(m[2]), yr=m[3];
+      // SheetJS gera M/D/YYYY americano — detecta pelo dia > 12
+      if(d > 12 && mo <= 12) // dia > 12 não pode ser mês → formato BR normal
+        return `${yr}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      if(mo > 12 && d <= 12) // segundo número > 12 → é o dia, primeiro é mês (formato americano)
+        return `${yr}-${String(d).padStart(2,'0')}-${String(mo).padStart(2,'0')}`;
+      // Ambos ≤ 12: assume BR (DD/MM)
+      return `${yr}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    }
+    // M/D/YY ou M/D/YYYY americano curto
+    m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})$/);
+    if(m){
+      const mo=parseInt(m[1]), d=parseInt(m[2]), yr='20'+m[3];
+      return `${yr}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    }
     return null;
   }
 
