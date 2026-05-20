@@ -3126,7 +3126,7 @@ function _buildTeamsHtml(compact){
   const rows = MAIN.map(name=>{
     const eq  = D.equipes.find(e=>e.name===name);
     const cfg = EQ[name]||{c:'#888',sh:name};
-    const rec = eq ? eq.rec : 0;
+    const rec = eq ? getEqRecTotal(eq) : 0;
     return {sh: cfg.sh, c: cfg.c, ico: cfg.ico||'', rec};
   }).sort((a,b)=>b.rec-a.rec);
   const total = rows.reduce((s,r)=>s+r.rec,0);
@@ -5244,7 +5244,7 @@ function rdRenderEqHeroCards(){
   el.innerHTML=D.equipes.map(function(eq){
     var cfg=EQ[eq.name]||{c:'#888',sh:eq.name,ico:'\u{1F3E2}'};
     var hoje=eq.ops.reduce(function(s,op){ return s+(parseFloat(saved[op.name])||0); },0);
-    var total=eq.rec+hoje;
+    var total=getEqRecTotal(eq)+hoje;
     var hojeColor=hoje>0?'#4ADE80':'rgba(255,255,255,.3)';
     return '<div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);'
       +'border-radius:12px;padding:12px 14px;border-top:2px solid '+cfg.c+'">'
@@ -5325,7 +5325,7 @@ function rdUpdateEqKpis(eqName){
   const cfg=EQ[eqName]||{c:'#888'};
   const saved=rdGetSaved();
   const hojeEq=eq.ops.reduce((s,o)=>s+(parseFloat(saved[o.name]||0)),0);
-  const totalEq=eq.rec+hojeEq;
+  const totalEq=getEqRecTotal(eq)+hojeEq;
   const s=(id,v,col)=>{const e=document.getElementById(id);if(e){e.textContent=v;if(col)e.style.color=col;}};
   s('eq-kpi-base',fR(getEqRecTotal(eq)));
   s('eq-kpi-hoje',hojeEq>0?fR(hojeEq):'R$ 0,00',hojeEq>0?cfg.c:'var(--g300)');
@@ -5684,7 +5684,7 @@ function rdRenderEqBreakdown(){
       if(v>0){ eqD[diaHoje]=(eqD[diaHoje]||0)+v; hojeEq+=v; }
     });
 
-    var totalEq = eq.rec + hojeEq;
+    var totalEq = getEqRecTotal(eq) + hojeEq;
 
     var row='<div style="display:flex;align-items:center;gap:0;padding:7px 12px;border-bottom:1px solid var(--g100);overflow-x:auto;min-width:0">'
       +'<div style="min-width:110px;flex-shrink:0;display:flex;align-items:center;gap:5px">'
@@ -6066,7 +6066,7 @@ function gestaoMetasInit(){
   document.getElementById('metas-list').innerHTML = D.equipes.map(eq=>{
     const cfg  = EQ[eq.name]||{c:'#888',sh:eq.name,ico:'📌'};
     const meta = saved[eq.name] || 0;
-    const pct  = meta>0 ? Math.min(100,eq.rec/meta*100) : 0;
+    const pct  = meta>0 ? Math.min(100,getEqRecTotal(eq)/meta*100) : 0;
     return `<div style="display:flex;align-items:center;gap:14px;padding:14px 16px;
       background:var(--g50);border:1px solid var(--g200);border-radius:var(--rl);
       border-left:4px solid ${cfg.c}">
@@ -12499,7 +12499,7 @@ function renderEqMetasTable(){
     let metaEq = META_EQ_DEFAULT;
     try { const m = gGetMetas(); if(m && m[eqName]) metaEq = parseFloat(m[eqName]) || META_EQ_DEFAULT; } catch(e){}
 
-    const rec      = eq.rec || 0;
+    const rec      = getEqRecTotal(eq) || 0;
 
     // Quanto falta para bater a meta
     const falta    = Math.max(0, metaEq - rec);
