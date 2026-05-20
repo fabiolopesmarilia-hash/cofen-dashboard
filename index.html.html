@@ -4245,6 +4245,14 @@ function resetTotal(){
 }
 
 // ── EQUIPES PAGE ──
+// Map eqKey (underscored) → eqName (with spaces) for safe onclick use
+const _eqKeyMap = {};
+D && D.equipes && D.equipes.forEach(eq=>{ _eqKeyMap[eq.name.replace(/ /g,'_')] = eq.name; });
+function applyEqExtraByKey(eqKey){
+  // Rebuild map each call in case D changed
+  const name = (D.equipes||[]).find(e=>e.name.replace(/ /g,'_')===eqKey);
+  if(name) applyEqExtra(name.name);
+}
 function applyEqExtra(eqName){
   const key = eqName.replace(/ /g,'_');
   const labelEl = document.getElementById('extra-label-'+key);
@@ -4294,22 +4302,19 @@ function mkEq(){
         // ── Campo de acréscimo manual (ex: operador movido no meio do mês) ──
         const extra = _eqExtras[eq.name] || {label:'', rec:0};
         const hasExtra = extra.rec > 0;
-        return \`<div style="margin:8px 0 0;padding:8px 10px;background:rgba(0,0,0,.04);border-radius:8px;border:1px dashed rgba(0,0,0,.12)">
-          <div style="font-size:9px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">➕ Acréscimo fora da equipe</div>
-          <div style="display:flex;gap:6px;align-items:center">
-            <input type="text" placeholder="Nome (ex: LYVIA DIAS)"
-              id="extra-label-\${eq.name.replace(/ /g,'_')}"
-              value="\${extra.label||''}"
-              style="flex:1.2;font-size:11px;padding:5px 8px;border-radius:6px;border:1px solid rgba(0,0,0,.15);background:#fff;font-family:Nunito,sans-serif;font-weight:700;color:var(--g800);min-width:0">
-            <input type="number" placeholder="R$ 0" min="0" step="0.01"
-              id="extra-rec-\${eq.name.replace(/ /g,'_')}"
-              value="\${extra.rec||''}"
-              style="flex:1;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid rgba(0,0,0,.15);background:#fff;font-family:'Bebas Neue',sans-serif;color:\${cfg.c};min-width:0">
-            <button onclick="applyEqExtra('\${eq.name}')"
-              style="padding:5px 10px;border-radius:6px;border:none;cursor:pointer;background:\${cfg.c};color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;white-space:nowrap">✓</button>
-          </div>
-          \${hasExtra ? \`<div style="font-size:10px;color:\${cfg.c};font-weight:800;margin-top:5px">✅ \${extra.label||'Extra'}: \${fRK(extra.rec)} incluído no total</div>\` : ''}
-        </div>\`;
+        const eqKey = eq.name.replace(/ /g,'_');
+        const confLine = hasExtra
+          ? '<div style="font-size:10px;color:'+cfg.c+';font-weight:800;margin-top:5px">✅ '+(extra.label||'Extra')+': '+fRK(extra.rec)+' incluído no total</div>'
+          : '';
+        return '<div style="margin:8px 0 0;padding:8px 10px;background:rgba(0,0,0,.04);border-radius:8px;border:1px dashed rgba(0,0,0,.12)">'
+          + '<div style="font-size:9px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">➕ Acréscimo fora da equipe</div>'
+          + '<div style="display:flex;gap:6px;align-items:center">'
+          + '<input type="text" placeholder="Nome (ex: LYVIA DIAS)" id="extra-label-'+eqKey+'" value="'+(extra.label||'')+'" style="flex:1.2;font-size:11px;padding:5px 8px;border-radius:6px;border:1px solid rgba(0,0,0,.15);background:#fff;font-family:Nunito,sans-serif;font-weight:700;color:var(--g800);min-width:0">'
+          + '<input type="number" placeholder="R$ 0" min="0" step="0.01" id="extra-rec-'+eqKey+'" value="'+(extra.rec||'')+'" style="flex:1;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid rgba(0,0,0,.15);background:#fff;font-family:Bebas Neue,sans-serif;color:'+cfg.c+';min-width:0">'
+          + '<button onclick="applyEqExtraByKey(&quot;' + eqKey + '&quot;)" style="padding:5px 10px;border-radius:6px;border:none;cursor:pointer;background:' + cfg.c + ';color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;white-space:nowrap">✓</button>'
+          + '</div>'
+          + confLine
+          + '</div>';
       })()}
       <div class="eq-bar-bg"><div class="eq-bar-f" style="width:${Math.min(100,parseFloat(pct))}%;background:${cfg.c}"></div></div>
       <div class="eq-hint"><span style="color:${cfg.c}">${pct}% do total</span><span>${fRK(getEqRecTotal(eq))}</span></div>
