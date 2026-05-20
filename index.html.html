@@ -546,16 +546,21 @@ select.ev-inp{cursor:pointer}
     <div style="display:flex;flex-direction:column;gap:12px">
 
       <!-- Recebimento ontem -->
-      <div id="pp-ontem-card" style="background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px">
-        <div>
-          <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">📅 ONTEM — TOTAL RECEBIDO</div>
-          <div id="pp-ontem-total" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#4ADE80;letter-spacing:1px;line-height:1">—</div>
-          <div id="pp-ontem-label" style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px">importe o arquivo</div>
+      <div id="pp-ontem-card" style="background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 18px;">
+        <!-- Linha principal: total + HO -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
+          <div>
+            <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">📅 ONTEM — TOTAL RECEBIDO</div>
+            <div id="pp-ontem-total" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#4ADE80;letter-spacing:1px;line-height:1">—</div>
+            <div id="pp-ontem-label" style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px">importe o arquivo</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">HO (24,96%)</div>
+            <div id="pp-ontem-ho" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#00E5FF;letter-spacing:1px;line-height:1">—</div>
+          </div>
         </div>
-        <div style="text-align:right">
-          <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">HO (24,96%)</div>
-          <div id="pp-ontem-ho" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#00E5FF;letter-spacing:1px;line-height:1">—</div>
-        </div>
+        <!-- Breakdown por equipe -->
+        <div id="pp-ontem-equipes" style="display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid rgba(255,255,255,.08);padding-top:8px"></div>
       </div>
 
       <!-- Falta para próximo objetivo -->
@@ -3172,19 +3177,16 @@ function _updateOntemCard(){
   const dow    = hoje.getDay();
   const diaHj  = hoje.getDate();
 
-  // Último dia útil ANTES de hoje (ignora hoje)
   let ontemDay;
-  if(dow === 1)      ontemDay = diaHj - 3; // seg → sexta
-  else if(dow === 0) ontemDay = diaHj - 2; // dom → sexta
-  else if(dow === 6) ontemDay = diaHj - 1; // sáb → sexta
-  else               ontemDay = diaHj - 1; // ter-sex → dia anterior
+  if(dow === 1)      ontemDay = diaHj - 3;
+  else if(dow === 0) ontemDay = diaHj - 2;
+  else if(dow === 6) ontemDay = diaHj - 1;
+  else               ontemDay = diaHj - 1;
   if(ontemDay < 1) ontemDay = 1;
 
-  // Lê de D.global.daily (total diário já somado)
+  // Total geral do dia anterior
   const daily = (D.global && D.global.daily) ? D.global.daily : {};
   let totalOntem = parseFloat(daily[ontemDay] || 0);
-
-  // Fallback: soma operador a operador
   if(totalOntem <= 0){
     (D.equipes||[]).forEach(eq=>{
       (eq.ops||[]).forEach(op=>{
@@ -3193,6 +3195,16 @@ function _updateOntemCard(){
     });
   }
 
+  // Breakdown por equipe
+  const byEq = {};
+  (D.equipes||[]).forEach(eq=>{
+    let soma = 0;
+    (eq.ops||[]).forEach(op=>{
+      soma += parseFloat((op.daily||{})[ontemDay]||0);
+    });
+    if(soma > 0) byEq[eq.name] = soma;
+  });
+
   const hoOntem = totalOntem * 0.2496;
   const mes     = String(hoje.getMonth()+1).padStart(2,'0');
   const diaStr  = String(ontemDay).padStart(2,'0') + '/' + mes;
@@ -3200,10 +3212,28 @@ function _updateOntemCard(){
   const totalEl = document.getElementById('pp-ontem-total');
   const hoEl    = document.getElementById('pp-ontem-ho');
   const lblEl   = document.getElementById('pp-ontem-label');
+  const eqEl    = document.getElementById('pp-ontem-equipes');
 
   if(totalEl) totalEl.textContent = totalOntem > 0 ? fR(totalOntem) : '—';
   if(hoEl)    hoEl.textContent    = totalOntem > 0 ? fR(hoOntem)    : '—';
   if(lblEl)   lblEl.textContent   = 'Recebimento do dia ' + diaStr;
+
+  if(eqEl){
+    const entries = Object.entries(byEq);
+    if(entries.length === 0){
+      eqEl.innerHTML = '<span style="font-size:10px;color:rgba(255,255,255,.25)">sem dados por equipe</span>';
+    } else {
+      eqEl.innerHTML = entries.map(([eqName, val])=>{
+        const cfg = EQ[eqName] || {c:'#aaa', sh: eqName, ico:'👥'};
+        const pct  = totalOntem > 0 ? (val/totalOntem*100).toFixed(0) : 0;
+        return `<div style="display:flex;flex-direction:column;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 10px;min-width:90px">
+          <span style="font-size:9px;font-weight:800;color:${cfg.c};letter-spacing:.5px;margin-bottom:2px">${cfg.ico||''} ${cfg.sh||eqName}</span>
+          <span style="font-size:12px;font-weight:900;color:#fff;line-height:1">${fRK(val)}</span>
+          <span style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">${pct}% do total</span>
+        </div>`;
+      }).join('');
+    }
+  }
 }
 
 function renderPpMetas(){
@@ -3392,6 +3422,8 @@ try{
   if(_smEq){ const v=JSON.parse(_smEq); Object.assign(CMP_MAIO_EQ,v); }
   const _smCumul = localStorage.getItem('cofen_maio_cumul');
   if(_smCumul){ const v=JSON.parse(_smCumul); Object.assign(CMP_MAIO_CUMUL,v); }
+  const _smDuDias = localStorage.getItem('cofen_maio_du_dias');
+  if(_smDuDias){ const v=JSON.parse(_smDuDias); CMP_MAIO_DU_DIAS.length=0; v.forEach(d=>CMP_MAIO_DU_DIAS.push(d)); }
   const _saAbril = localStorage.getItem('cofen_abril_du');
   if(_saAbril){ const v=JSON.parse(_saAbril); Object.keys(CMP_ABRIL_DU).forEach(k=>delete CMP_ABRIL_DU[k]); Object.assign(CMP_ABRIL_DU,v); }
 }catch(e){}
@@ -3729,6 +3761,12 @@ function aplicarGeral(){
       Object.keys(CMP_MAIO_CUMUL).forEach(k=>delete CMP_MAIO_CUMUL[k]);
       Object.assign(CMP_MAIO_CUMUL, eqResult.cumulGlobal);
       localStorage.setItem('cofen_maio_cumul', JSON.stringify(eqResult.cumulGlobal));
+      // Atualiza lista de dias calendário por DU
+      if(eqResult.duDias && eqResult.duDias.length > 0){
+        CMP_MAIO_DU_DIAS.length = 0;
+        eqResult.duDias.forEach(d => CMP_MAIO_DU_DIAS.push(d));
+        localStorage.setItem('cofen_maio_du_dias', JSON.stringify(eqResult.duDias));
+      }
       // Atualiza CMP_ABRIL_DU com dados reais de Abril do mesmo arquivo
       if(eqResult.abrilCumul && Object.keys(eqResult.abrilCumul).length > 0){
         Object.keys(CMP_ABRIL_DU).forEach(k=>delete CMP_ABRIL_DU[k]);
@@ -3868,7 +3906,18 @@ function _parseGeralPorEquipe(raw){
     if(EQ_VALIDAS.has(eq)) cumul[eq] = buildCumul(duMap, Math.max(maxDU_M,1));
   });
 
-  return {cumul, cumulGlobal, abrilCumul};
+  // Monta lista de dias calendário por DU (para labels do comparativo)
+  const duDias = [];
+  const dt2duEntries = Object.entries(dt2duMaio).sort((a,b)=>a[0].localeCompare(b[0]));
+  const duToDia = {};
+  dt2duEntries.forEach(([iso, du])=>{
+    const dia = parseInt(iso.split('-')[2]);
+    if(!duToDia[du]) duToDia[du] = dia; // primeiro dia calendário do DU
+  });
+  const maxDu = Math.max(...Object.keys(recGlobDu).map(Number), 1);
+  for(let du=1; du<=maxDu; du++) duDias.push(duToDia[du] || du);
+
+  return {cumul, cumulGlobal, abrilCumul, duDias};
 }
 
 
