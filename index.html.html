@@ -3470,10 +3470,12 @@ function _parseMensal(raw){
     const vPP  = iPP>=0  ? pN(cells[iPP])  : 0;
     if(vRec===0 && vPP===0) continue;
 
-    // Detectar mes
+    // Detectar mes — PRIORIDADE: coluna Período (ex: "Previsão - 2026/05") é o identificador
+    // contábil correto. Dt.Pagamento/Dt.Baixa reflete quando o dinheiro baixou, que pode
+    // ser de outro mês (ex: previsão de Maio paga em Abril).
     let mesKey = null;
-    if(iData>=0)  mesKey = pMes(cells[iData]);
-    if(!mesKey && iPer>=0) mesKey = pMes(cells[iPer]);
+    if(iPer>=0)   mesKey = pMes(cells[iPer]);   // 1º: Período contábil (mais confiável)
+    if(!mesKey && iData>=0) mesKey = pMes(cells[iData]); // 2º: data de pagamento
     if(!mesKey)   mesKey = pMes(cells[0]);
     if(!mesKey) continue;
 
