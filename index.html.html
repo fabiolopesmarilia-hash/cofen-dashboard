@@ -423,27 +423,6 @@ select.ev-inp{cursor:pointer}
 .mts-legend{display:flex;gap:16px;flex-wrap:wrap;padding:12px 0 4px}
 .mts-leg-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--g500)}
 .mts-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-
-/* ══ AGENDA OPERADOR ══ */
-.ag-lbl{display:block;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:.7px;text-transform:uppercase;margin-bottom:4px}
-.ag-inp{width:100%;padding:9px 11px;border:1.5px solid var(--g200);border-radius:9px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);background:var(--g50);box-sizing:border-box;transition:border .2s}
-.ag-inp:focus{outline:none;border-color:var(--pp);background:#fff}
-.ag-card{background:var(--g50);border:1.5px solid var(--g200);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;transition:all .15s}
-.ag-card:hover{border-color:var(--pp);background:#fff}
-.ag-card-status{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.ag-card-body{flex:1;min-width:0}
-.ag-card-codigo{font-size:13px;font-weight:900;color:var(--g900)}
-.ag-card-meta{font-size:11px;color:var(--g500);margin-top:2px;display:flex;flex-wrap:wrap;gap:6px}
-.ag-card-val{font-size:15px;font-weight:900;color:var(--ok);margin-top:4px}
-.ag-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.5px}
-.ag-badge-pix{background:#D1FAE5;color:#065F46}
-.ag-badge-boleto{background:#FEF3C7;color:#92400E}
-.ag-badge-cartao{background:#EDE9FE;color:#4C1D95}
-.ag-badge-pendente{background:#FEF3C7;color:#92400E}
-.ag-badge-pago{background:#D1FAE5;color:#065F46}
-.ag-badge-vencido{background:#FEE2E2;color:#991B1B}
-.ag-badge-campanha{background:#DBEAFE;color:#1E40AF}
-.ag-badge-telefone{background:#F3F4F6;color:#374151}
 </style>
 
 <!-- Firebase SDK -->
@@ -505,7 +484,6 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('comparativo',this)">📊 Comparativo Mês</div>
   <div class="tab"     onclick="go('inadimpl',this)">🚨 Inadimplência</div>
   <div class="tab"     onclick="go('metas',this)">🎯 Metas 2026</div>
-  <div class="tab"     onclick="go('agenda-op',this);agendaInit()">📋 Agenda Op</div>
 </div>
 
 <!-- ══════════ PAGE: GERAL ══════════ -->
@@ -537,39 +515,15 @@ select.ev-inp{cursor:pointer}
       <div style="font-size:11px;font-weight:800;color:rgba(0,220,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Total Arrecadado Maio</div>
       <div id="h-arrecadado-ho" style="font-family:'Bebas Neue',sans-serif;font-size:62px;line-height:1;background:linear-gradient(90deg,#29ABE2,#00E5FF,#4DB848,#00E5FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;letter-spacing:2px">—</div>
       <div style="font-size:12px;color:rgba(255,255,255,.3);font-weight:600;margin-bottom:10px">Soma de Maio · coluna Pague Play</div>
-
       <!-- Projeção inline -->
       <div id="pp-proj-inline"></div>
     </div>
 
-    <!-- Coluna direita: ontem + falta (empilhados) -->
-    <div style="display:flex;flex-direction:column;gap:12px">
-
-      <!-- Recebimento ontem -->
-      <div id="pp-ontem-card" style="background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 18px;">
-        <!-- Linha principal: total + HO -->
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
-          <div>
-            <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">📅 ONTEM — TOTAL RECEBIDO</div>
-            <div id="pp-ontem-total" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#4ADE80;letter-spacing:1px;line-height:1">—</div>
-            <div id="pp-ontem-label" style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px">importe o arquivo</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">HO (24,96%)</div>
-            <div id="pp-ontem-ho" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#00E5FF;letter-spacing:1px;line-height:1">—</div>
-          </div>
-        </div>
-        <!-- Breakdown por equipe -->
-        <div id="pp-ontem-equipes" style="display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid rgba(255,255,255,.08);padding-top:8px"></div>
-      </div>
-
-      <!-- Falta para próximo objetivo -->
-      <div id="pp-falta-destaque" style="background:rgba(0,188,212,.1);border:2px solid rgba(0,188,212,.4);border-radius:14px;padding:14px 18px;text-align:center;position:relative;flex:1">
-        <div style="font-size:10px;font-weight:800;color:rgba(0,220,255,.65);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">🎯 FALTA PARA O PRÓXIMO OBJETIVO</div>
-        <div id="pp-falta-valor-big" style="font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1;color:#00E5FF;letter-spacing:1px;margin-bottom:6px">—</div>
-        <div id="pp-falta-label-big" style="font-size:14px;font-weight:800;color:rgba(255,255,255,.5)">importe o arquivo para calcular</div>
-      </div>
-
+    <!-- Falta para próximo objetivo -->
+    <div id="pp-falta-destaque" style="background:rgba(0,188,212,.1);border:2px solid rgba(0,188,212,.4);border-radius:14px;padding:14px 18px;text-align:center;position:relative">
+      <div style="font-size:10px;font-weight:800;color:rgba(0,220,255,.65);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">🎯 FALTA PARA O PRÓXIMO OBJETIVO</div>
+      <div id="pp-falta-valor-big" style="font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1;color:#00E5FF;letter-spacing:1px;margin-bottom:6px">—</div>
+      <div id="pp-falta-label-big" style="font-size:14px;font-weight:800;color:rgba(255,255,255,.5)">importe o arquivo para calcular</div>
     </div>
   </div>
 
@@ -869,6 +823,24 @@ select.ev-inp{cursor:pointer}
             </div>
           </div>
 
+        </div>
+        <!-- Campo manual PaguePay Maio -->
+        <div style="margin-top:10px;padding:12px 14px;background:#0a1628;border:1.5px solid rgba(0,188,212,.4);border-radius:10px">
+          <div style="font-size:10px;font-weight:800;color:rgba(0,220,255,.6);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">✏️ CORRIGIR PAGUE PAY MANUALMENTE</div>
+          <div style="display:flex;gap:10px;align-items:flex-end">
+            <div style="flex:1">
+              <div style="font-size:10px;color:rgba(255,255,255,.4);font-weight:600;margin-bottom:4px">Valor PaguePay Maio (R$)</div>
+              <input type="number" id="inp-arrecadado-manual" step="0.01" min="0"
+                style="width:100%;background:rgba(0,0,0,.3);border:1.5px solid rgba(0,188,212,.5);border-radius:8px;padding:9px 12px;font-family:Nunito,sans-serif;font-size:15px;font-weight:800;color:#00E5FF;outline:none"
+                placeholder="Ex: 182000.00"
+                oninput="ppManualInput(this.value)">
+            </div>
+            <button onclick="ppManualApply()"
+              style="padding:9px 18px;border-radius:8px;border:none;cursor:pointer;background:rgba(0,188,212,.8);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;white-space:nowrap">
+              ✅ Aplicar
+            </button>
+          </div>
+          <div id="pp-manual-preview" style="font-size:11px;color:rgba(0,220,255,.5);margin-top:6px;font-weight:600"></div>
         </div>
         <!-- IDs ocultos preservados -->
         <input type="hidden" id="inp-arrecadado" value="0">
@@ -2496,6 +2468,8 @@ function rebuildAll(){
   // Recalcula totais das equipes sem remover ops do D
   D.equipes.forEach(eq=>{
     const visibleOps=eq.ops.filter(o=>!_allRemoved.has(o.name));
+    // FIX: garantir que op.ho esteja sempre sincronizado com op.rec
+    visibleOps.forEach(o=>{ o.ho = o.rec * 0.25; });
     eq.rec=visibleOps.reduce((s,o)=>s+o.rec,0);
     eq.ho=visibleOps.reduce((s,o)=>s+o.ho,0);
     eq.n_op=visibleOps.length;
@@ -2887,6 +2861,8 @@ function buildOpEditor(){
   // Preencher Total Arrecadado
   setV('inp-arrecadado',     totalArrecadado);
   setV('inp-meta-arrecadado', metaArrecadado>0&&metaArrecadado!==1000000 ? metaArrecadado : '');
+  // Preencher campo de correção manual do PaguePay com valor já salvo
+  setV('inp-arrecadado-manual', ppEmpresaAbril > 0 ? ppEmpresaAbril : totalArrecadado);
   liveCalc();
   liveCalcCorens();
   liveCalcArrecadado();
@@ -3172,70 +3148,6 @@ function _buildTeamsHtml(compact){
     ${items}
   </div>`;
 }
-function _updateOntemCard(){
-  const hoje   = new Date();
-  const dow    = hoje.getDay();
-  const diaHj  = hoje.getDate();
-
-  let ontemDay;
-  if(dow === 1)      ontemDay = diaHj - 3;
-  else if(dow === 0) ontemDay = diaHj - 2;
-  else if(dow === 6) ontemDay = diaHj - 1;
-  else               ontemDay = diaHj - 1;
-  if(ontemDay < 1) ontemDay = 1;
-
-  // Total geral do dia anterior
-  const daily = (D.global && D.global.daily) ? D.global.daily : {};
-  let totalOntem = parseFloat(daily[ontemDay] || 0);
-  if(totalOntem <= 0){
-    (D.equipes||[]).forEach(eq=>{
-      (eq.ops||[]).forEach(op=>{
-        totalOntem += parseFloat((op.daily||{})[ontemDay]||0);
-      });
-    });
-  }
-
-  // Breakdown por equipe
-  const byEq = {};
-  (D.equipes||[]).forEach(eq=>{
-    let soma = 0;
-    (eq.ops||[]).forEach(op=>{
-      soma += parseFloat((op.daily||{})[ontemDay]||0);
-    });
-    if(soma > 0) byEq[eq.name] = soma;
-  });
-
-  const hoOntem = totalOntem * 0.2496;
-  const mes     = String(hoje.getMonth()+1).padStart(2,'0');
-  const diaStr  = String(ontemDay).padStart(2,'0') + '/' + mes;
-
-  const totalEl = document.getElementById('pp-ontem-total');
-  const hoEl    = document.getElementById('pp-ontem-ho');
-  const lblEl   = document.getElementById('pp-ontem-label');
-  const eqEl    = document.getElementById('pp-ontem-equipes');
-
-  if(totalEl) totalEl.textContent = totalOntem > 0 ? fR(totalOntem) : '—';
-  if(hoEl)    hoEl.textContent    = totalOntem > 0 ? fR(hoOntem)    : '—';
-  if(lblEl)   lblEl.textContent   = 'Recebimento do dia ' + diaStr;
-
-  if(eqEl){
-    const entries = Object.entries(byEq);
-    if(entries.length === 0){
-      eqEl.innerHTML = '<span style="font-size:10px;color:rgba(255,255,255,.25)">sem dados por equipe</span>';
-    } else {
-      eqEl.innerHTML = entries.map(([eqName, val])=>{
-        const cfg = EQ[eqName] || {c:'#aaa', sh: eqName, ico:'👥'};
-        const pct  = totalOntem > 0 ? (val/totalOntem*100).toFixed(0) : 0;
-        return `<div style="display:flex;flex-direction:column;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 10px;min-width:90px">
-          <span style="font-size:9px;font-weight:800;color:${cfg.c};letter-spacing:.5px;margin-bottom:2px">${cfg.ico||''} ${cfg.sh||eqName}</span>
-          <span style="font-size:12px;font-weight:900;color:#fff;line-height:1">${fRK(val)}</span>
-          <span style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">${pct}% do total</span>
-        </div>`;
-      }).join('');
-    }
-  }
-}
-
 function renderPpMetas(){
   const val = ppEmpresaAbril || 0;
   const w1 = document.getElementById('pp-metas-wrap');
@@ -3243,7 +3155,34 @@ function renderPpMetas(){
   if(typeof renderPPProjecao==='function') renderPPProjecao();
   const w2 = document.getElementById('h-pp-metas-wrap');
   if(w2) w2.innerHTML = _buildMetasHtml(val, true) + _buildTeamsHtml(true);
-  _updateOntemCard();
+}
+
+// ── Correção manual do PaguePay Maio ──
+function ppManualInput(val){
+  const v = parseFloat(val)||0;
+  const el = document.getElementById('pp-manual-preview');
+  if(el) el.textContent = v>0 ? 'Será aplicado: ' + v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : '';
+}
+function ppManualApply(){
+  const inp = document.getElementById('inp-arrecadado-manual');
+  const v = parseFloat(inp?.value)||0;
+  if(v<=0){ alert('Digite um valor válido!'); return; }
+  ppEmpresaAbril = v;
+  totalArrecadado = v;
+  localStorage.setItem('cofen_pp_maio', v);
+  localStorage.setItem('cofen_arrecadado', v);
+  // Atualiza campo oculto para manter compatibilidade
+  const inpHid = document.getElementById('inp-arrecadado');
+  if(inpHid) inpHid.value = v.toFixed(2);
+  initHero();
+  if(typeof renderPpMetas==='function') renderPpMetas();
+  if(typeof renderPPProjecao==='function') renderPPProjecao();
+  if(fbDb && fbRoom) fbPush('arrecadado', {v, m:metaArrecadado, ppAbril:v});
+  const el = document.getElementById('pp-manual-preview');
+  if(el) el.textContent = '✅ Aplicado: ' + v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const fR = x => x.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const toast = msg => { const t=document.getElementById('toast'); if(t){t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3000);} };
+  toast('✅ PaguePay corrigido para ' + fR(v) + '!');
 }
 
 function liveCalcArrecadado(){
@@ -3422,8 +3361,6 @@ try{
   if(_smEq){ const v=JSON.parse(_smEq); Object.assign(CMP_MAIO_EQ,v); }
   const _smCumul = localStorage.getItem('cofen_maio_cumul');
   if(_smCumul){ const v=JSON.parse(_smCumul); Object.assign(CMP_MAIO_CUMUL,v); }
-  const _smDuDias = localStorage.getItem('cofen_maio_du_dias');
-  if(_smDuDias){ const v=JSON.parse(_smDuDias); CMP_MAIO_DU_DIAS.length=0; v.forEach(d=>CMP_MAIO_DU_DIAS.push(d)); }
   const _saAbril = localStorage.getItem('cofen_abril_du');
   if(_saAbril){ const v=JSON.parse(_saAbril); Object.keys(CMP_ABRIL_DU).forEach(k=>delete CMP_ABRIL_DU[k]); Object.assign(CMP_ABRIL_DU,v); }
 }catch(e){}
@@ -3486,7 +3423,7 @@ function _parseMensal(raw){
     for(const c of cands){ const i=headers.findIndex(h=>h.includes(c)); if(i>=0)return i; }
     return -1;
   };
-  const iData   = col(['data','dt.baixa','dt baixa','date']);
+  const iData   = col(['dtpgto','dt.pgto','dt pgto','data pagamento','dtpagamento','dt.baixa','dt baixa','data','date']);
   const iPer    = col(['periodo','period']);  // "Pagamento - 2026/04"
   const iRec    = col(['valor recebido','vlr recebido','recebido','valor rec']);
   const iPP     = col(['pague play','pagueplay','24,96','24.96','pp (']);
@@ -3728,9 +3665,7 @@ function aplicarGeral(){
   statusEl.style.color = '#065F46';
 
   // Salvar historico mensal
-  // MERGE: preserva meses anteriores, atualiza/adiciona meses do arquivo importado
-  const _novosMeses = _parseMensal(raw);
-  Object.assign(_histMensalGeral, _novosMeses);
+  _histMensalGeral = _parseMensal(raw);
   localStorage.setItem('cofen_hist_geral', JSON.stringify(_histMensalGeral));
 
   // Salvar breakdown diário de Maio (para comparativo DU a DU)
@@ -3761,11 +3696,16 @@ function aplicarGeral(){
       Object.keys(CMP_MAIO_CUMUL).forEach(k=>delete CMP_MAIO_CUMUL[k]);
       Object.assign(CMP_MAIO_CUMUL, eqResult.cumulGlobal);
       localStorage.setItem('cofen_maio_cumul', JSON.stringify(eqResult.cumulGlobal));
-      // Atualiza lista de dias calendário por DU
-      if(eqResult.duDias && eqResult.duDias.length > 0){
-        CMP_MAIO_DU_DIAS.length = 0;
-        eqResult.duDias.forEach(d => CMP_MAIO_DU_DIAS.push(d));
-        localStorage.setItem('cofen_maio_du_dias', JSON.stringify(eqResult.duDias));
+      // FIX: Salvar mapeamento DU → dia do calendário para CMP_MAIO_DU_DIAS
+      // Reconstruir a partir do dt2duMaio no resultado, se disponível
+      if(eqResult.dt2duMaio){
+        const _duDias = [];
+        Object.entries(eqResult.dt2duMaio).sort((a,b)=>a[1]-b[1]).forEach(([iso,du])=>{
+          const dia = parseInt(iso.split('-')[2]);
+          if(!_duDias[du-1] || dia < _duDias[du-1]) _duDias[du-1] = dia;
+        });
+        CMP_MAIO_DU_DIAS = _duDias.filter(Boolean);
+        localStorage.setItem('cofen_maio_du_dias', JSON.stringify(CMP_MAIO_DU_DIAS));
       }
       // Atualiza CMP_ABRIL_DU com dados reais de Abril do mesmo arquivo
       if(eqResult.abrilCumul && Object.keys(eqResult.abrilCumul).length > 0){
@@ -3801,15 +3741,10 @@ function _parseGeralPorEquipe(raw){
   const norm2 = s => s.trim().replace(/^"|"$/g,'').toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   const hdrs = lines[0].split(sep).map(norm2);
-  // ci: tenta match exato primeiro, depois parcial (evita 'baixa' bater em 'id.baixa')
-  const ci = cands => {
-    for(const c of cands){ const i=hdrs.findIndex(h=>h===c); if(i>=0)return i; }
-    for(const c of cands){ const i=hdrs.findIndex(h=>h.includes(c)); if(i>=0)return i; }
-    return -1;
-  };
+  const ci = cands => { for(const c of cands){ const i=hdrs.findIndex(h=>h.includes(c)); if(i>=0)return i; } return -1; };
 
   const iEq  = ci(['equipe','subgrupo','grupo']);
-  const iDt  = ci(['dt.pagamento','data pagamento','dtpgto','dt.pgto','dt pgto','data pgto','data pag']);
+  const iDt  = ci(['dt.pagamento','data pagamento','dtpgto','dt.pgto','dt pgto','data pgto','data pag','baixa']);
   const iRec = ci(['valor recebido','recebido','vlr rec','valor rec']);
 
   if(iDt < 0 || iRec < 0){
@@ -3828,34 +3763,13 @@ function _parseGeralPorEquipe(raw){
 
   function parseDt(v){
     if(!v) return null;
-    const s = String(v).trim();
-    // Serial numérico Excel
-    const n = parseFloat(s.replace(',','.'));
+    const n = parseFloat(String(v).replace(',','.'));
     if(!isNaN(n) && n > 40000 && n < 60000){
       const d = new Date(Math.round((n - 25569)*86400*1000));
       return d.toISOString().slice(0,10);
     }
-    // YYYY-MM-DD
-    let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if(m) return `${m[1]}-${m[2]}-${m[3]}`;
-    // DD/MM/YYYY ou DD-MM-YYYY (dia ≤ 31, mês ≤ 12 — formato BR)
-    m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-    if(m){
-      const d=parseInt(m[1]), mo=parseInt(m[2]), yr=m[3];
-      // SheetJS gera M/D/YYYY americano — detecta pelo dia > 12
-      if(d > 12 && mo <= 12) // dia > 12 não pode ser mês → formato BR normal
-        return `${yr}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      if(mo > 12 && d <= 12) // segundo número > 12 → é o dia, primeiro é mês (formato americano)
-        return `${yr}-${String(d).padStart(2,'0')}-${String(mo).padStart(2,'0')}`;
-      // Ambos ≤ 12: assume BR (DD/MM)
-      return `${yr}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    }
-    // M/D/YY ou M/D/YYYY americano curto
-    m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})$/);
-    if(m){
-      const mo=parseInt(m[1]), d=parseInt(m[2]), yr='20'+m[3];
-      return `${yr}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    }
+    const m = String(v).match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+    if(m){ const yr=m[3].length===2?'20'+m[3]:m[3]; return `${yr}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`; }
     return null;
   }
 
@@ -3932,18 +3846,7 @@ function _parseGeralPorEquipe(raw){
     if(EQ_VALIDAS.has(eq)) cumul[eq] = buildCumul(duMap, Math.max(maxDU_M,1));
   });
 
-  // Monta lista de dias calendário por DU (para labels do comparativo)
-  const duDias = [];
-  const dt2duEntries = Object.entries(dt2duMaio).sort((a,b)=>a[0].localeCompare(b[0]));
-  const duToDia = {};
-  dt2duEntries.forEach(([iso, du])=>{
-    const dia = parseInt(iso.split('-')[2]);
-    if(!duToDia[du]) duToDia[du] = dia; // primeiro dia calendário do DU
-  });
-  const maxDu = Math.max(...Object.keys(recGlobDu).map(Number), 1);
-  for(let du=1; du<=maxDu; du++) duDias.push(duToDia[du] || du);
-
-  return {cumul, cumulGlobal, abrilCumul, duDias};
+  return {cumul, cumulGlobal, abrilCumul, dt2duMaio};
 }
 
 
@@ -3955,30 +3858,57 @@ function _parseGeralPorEquipe(raw){
 
 function previewEmpresa(raw){
   if(!raw || raw.trim().length < 20) return;
-  const result = _parseImportCSV(raw);
   const prevEl = document.getElementById('preview-empresa');
-  if(!result || result.error){
-    prevEl.innerHTML = '<span style="color:var(--danger)">❌ ' + (result?.error || 'Formato não reconhecido') + '</span>';
+
+  // FIX: filtrar por mês atual usando _parseMensal
+  const mesalEmp = _parseMensal(raw);
+  const hoje = new Date();
+  const mesAtualKey = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
+  const dadosMes = mesalEmp[mesAtualKey] || null;
+  const todasChaves = Object.keys(mesalEmp).sort();
+  const ultimaChave = todasChaves[todasChaves.length - 1] || null;
+  const dadosFinais = dadosMes || (ultimaChave ? mesalEmp[ultimaChave] : null);
+
+  // Fallback para arquivo sem data
+  const resultFallback = _parseImportCSV(raw);
+  _empresaParsed = resultFallback && !resultFallback.error ? resultFallback : null;
+
+  let ppVal = 0;
+  let chaveUsada = mesAtualKey;
+  let temFiltroData = false;
+  if(dadosFinais && (dadosFinais.pp > 0 || dadosFinais.rec > 0)){
+    ppVal = dadosFinais.pp > 0 ? dadosFinais.pp : dadosFinais.rec;
+    chaveUsada = dadosMes ? mesAtualKey : ultimaChave;
+    temFiltroData = true;
+  } else if(resultFallback && !resultFallback.error){
+    ppVal = resultFallback.totPP > 0 ? resultFallback.totPP : resultFallback.totValorRec;
+  }
+
+  if(ppVal <= 0){
+    prevEl.innerHTML = '<span style="color:var(--danger)">❌ Nenhum valor encontrado para ' + mesAtualKey + '</span>';
     prevEl.style.display = 'block';
-    _empresaParsed = null;
     return;
   }
-  _empresaParsed = result;
 
-  const ppVal = result.totPP > 0 ? result.totPP : result.totValorRec;
-  prevEl.innerHTML = `
-    <div style="font-weight:800;color:#D97706;margin-bottom:6px">✅ ${result.linhas} registros · Arquivo Empresa reconhecido</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div style="padding:8px 10px;background:var(--w);border:1px solid #FCD34D;border-radius:var(--rm)">
-        <div style="font-size:10px;color:#92400E;font-weight:700;text-transform:uppercase;margin-bottom:3px">💼 Total Arrecadado (PaguePay)</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#D97706">${fR(ppVal)}</div>
-        <div style="font-size:10px;color:var(--g500);margin-top:2px">${result.hasSplit ? 'Coluna: Pague Play (24,96%)' : 'Coluna: Valor Recebido (sem split)'}</div>
-      </div>
-      <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
-        <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">Bruto Total</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--g500)">${fR(result.totValorRec)}</div>
-      </div>
+  const mesesHtml = Object.entries(mesalEmp).sort().map(([k,v])=>{
+    const isAtual = k === mesAtualKey;
+    const vv = v.pp > 0 ? v.pp : v.rec;
+    return `<div style="display:flex;justify-content:space-between;padding:3px 6px;border-radius:4px;background:${isAtual?'rgba(217,119,6,.15)':'transparent'};font-size:11px">
+      <span style="font-weight:${isAtual?'800':'600'};color:${isAtual?'#D97706':'var(--g500)'}">${k}${isAtual?' ← MÊS ATUAL':''}</span>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:${isAtual?'#D97706':'var(--g500)'}">${fR(vv)}</span>
     </div>`;
+  }).join('');
+
+  prevEl.innerHTML = `
+    <div style="font-weight:800;color:#D97706;margin-bottom:8px">✅ Arquivo Empresa reconhecido · Filtrado por mês</div>
+    <div style="padding:10px 12px;background:#FFFBEB;border:1.5px solid #FCD34D;border-radius:var(--rm);margin-bottom:8px">
+      <div style="font-size:10px;color:#92400E;font-weight:800;text-transform:uppercase;margin-bottom:4px">
+        💼 PaguePay ${chaveUsada} ${temFiltroData ? '(filtrado por data)' : '(arquivo sem data — soma total)'}
+      </div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#D97706;letter-spacing:.5px">${fR(ppVal)}</div>
+    </div>
+    ${todasChaves.length > 1 ? `<div style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;margin-bottom:4px">Todos os meses no arquivo:</div>${mesesHtml}` : ''}
+  `;
   prevEl.style.display = 'block';
 }
 
@@ -3989,45 +3919,66 @@ function aplicarEmpresa(){
 
   if(!raw.trim()){ statusEl.textContent='⚠️ Cole o conteúdo do arquivo primeiro!'; statusEl.style.background='#FFFBEB'; statusEl.style.color='#92400E'; return; }
 
-  const result = _empresaParsed || _parseImportCSV(raw);
-  if(!result || result.error){ statusEl.textContent='❌ ' + (result?.error||'Erro ao processar'); statusEl.style.background='#FEF2F2'; statusEl.style.color='#991B1B'; return; }
+  // ── FIX: Usar _parseMensal para filtrar APENAS o mês atual (Maio 2026) ──
+  // _parseImportCSV somava o ano inteiro; _parseMensal filtra por mês via coluna de data
+  const mesalEmp = _parseMensal(raw);
+  const hoje = new Date();
+  const mesAtualKey = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
+  const dadosMes = mesalEmp[mesAtualKey] || null;
 
-  // Valor a usar: PaguePay se disponível, senão Valor Recebido
-  const ppVal = result.totPP > 0 ? result.totPP : result.totValorRec;
+  // Se não encontrou pelo mês atual, tenta pegar o mês mais recente disponível
+  const todasChaves = Object.keys(mesalEmp).sort();
+  const ultimaChave = todasChaves[todasChaves.length - 1] || null;
+  const dadosFinais = dadosMes || (ultimaChave ? mesalEmp[ultimaChave] : null);
 
-  if(ppVal <= 0){ statusEl.textContent='⚠️ Nenhum valor encontrado no arquivo.'; statusEl.style.background='#FFFBEB'; statusEl.style.color='#92400E'; return; }
+  // Fallback: se não há coluna de data no arquivo, usa _parseImportCSV
+  const resultFallback = (!dadosFinais || (dadosFinais.pp === 0 && dadosFinais.rec === 0))
+    ? (_empresaParsed || _parseImportCSV(raw))
+    : null;
 
-  // Calcular PaguePay de Abril separadamente — extrair .pp do objeto mensal
-  const mesAtualKey2 = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
-  const mesalEmpTemp = _parseMensal(raw);
-  // _parseMensal retorna {rec, pp, corens} por mês — precisa pegar .pp
-  const _mesAbril = mesalEmpTemp[mesAtualKey2] || mesalEmpTemp['2026-05'] || null;
-  const ppAbrilCalc = _mesAbril
-    ? (typeof _mesAbril === 'object' ? (_mesAbril.pp || _mesAbril.rec || 0) : _mesAbril)
-    : 0;
-  ppEmpresaAbril = Math.round(ppAbrilCalc * 100) / 100;
+  let ppVal = 0;
+  let fonteLabel = '';
+  if(dadosFinais && (dadosFinais.pp > 0 || dadosFinais.rec > 0)){
+    ppVal = dadosFinais.pp > 0 ? dadosFinais.pp : dadosFinais.rec;
+    const chaveUsada = dadosMes ? mesAtualKey : ultimaChave;
+    fonteLabel = 'Mês ' + chaveUsada + ' (filtrado por data)';
+  } else if(resultFallback && !resultFallback.error){
+    ppVal = resultFallback.totPP > 0 ? resultFallback.totPP : resultFallback.totValorRec;
+    fonteLabel = 'Arquivo sem coluna de data — soma total';
+  }
+
+  if(ppVal <= 0){ statusEl.textContent='⚠️ Nenhum valor encontrado para ' + mesAtualKey + '. Verifique se o arquivo tem coluna de data.'; statusEl.style.background='#FFFBEB'; statusEl.style.color='#92400E'; return; }
+
+  ppEmpresaAbril = Math.round(ppVal * 100) / 100;
   localStorage.setItem('cofen_pp_maio', ppEmpresaAbril);
+
+  // Preencher campo de correção manual com o valor importado
+  const _inpManual = document.getElementById('inp-arrecadado-manual');
+  if(_inpManual) _inpManual.value = ppEmpresaAbril.toFixed(2);
+  const _prevManual = document.getElementById('pp-manual-preview');
+  if(_prevManual) _prevManual.textContent = '';
 
   // Preencher campo Total Arrecadado (oculto)
   const inpArr = document.getElementById('inp-arrecadado');
   if(inpArr){ inpArr.value = ppVal.toFixed(2); liveCalcArrecadado(); }
 
-  // Salvar via applyArrecadado (sem alterar operadores/equipes/meta)
+  // Salvar
   totalArrecadado = ppVal;
   localStorage.setItem('cofen_arrecadado', ppVal);
   initHero();
+  if(typeof renderPpMetas==='function') renderPpMetas();
+  if(typeof renderPPProjecao==='function') renderPPProjecao();
   if(fbDb && fbRoom) fbPush('arrecadado', {
     v: ppVal, m: metaArrecadado,
     mt: corenMT, pi: corenPI, ma: corenMA, ce: corenCE,
     ppAbril: ppEmpresaAbril
   });
 
-  statusEl.innerHTML = `✅ PaguePay Ano: <strong>${fR(ppVal)}</strong> · Abril: <strong>${fR(ppEmpresaAbril)}</strong>`;
+  statusEl.innerHTML = `✅ <strong>PaguePay ${mesAtualKey}: ${fR(ppVal)}</strong> · Fonte: ${fonteLabel}`;
   statusEl.style.background = '#FFFBEB';
   statusEl.style.color = '#065F46';
 
-  // Salvar historico mensal PP
-  const mesalEmp = _parseMensal(raw);
+  // Salvar histórico mensal PP
   _histMensalEmpresa = {};
   Object.entries(mesalEmp).forEach(([k,v])=>{ _histMensalEmpresa[k] = v.pp>0?v.pp:v.rec; });
   localStorage.setItem('cofen_hist_empresa', JSON.stringify(_histMensalEmpresa));
@@ -4824,14 +4775,6 @@ function openM(opName){
   const metaIndModal = getMetaOp(opName);
   const projModal    = calcProjecao(op.rec, metaIndModal);
 
-  // Cálculo: falta p/ meta de hoje e amanhã
-  const _duTotal    = DU.total  || 1;
-  const _duPassou   = DU.passou || 1;
-  const metaHojeOp   = metaIndModal > 0 ? metaIndModal * (_duPassou / _duTotal) : 0;
-  const metaAmanhOp  = metaIndModal > 0 ? metaIndModal * ((_duPassou + 1) / _duTotal) : 0;
-  const faltaHojeOp  = Math.max(0, metaHojeOp  - op.rec);
-  const faltaAmanhOp = Math.max(0, metaAmanhOp - op.rec);
-
   document.getElementById('m-kpis').innerHTML=[
     {l:'Total Real',v:fR(op.rec),cls:'ok'},
     {l:'HO (25%)',v:fR(op.ho),cls:''},
@@ -4854,24 +4797,6 @@ function openM(opName){
       <div class="mk-v am">${fRK(projModal.needDay)}</div>
       <div style="font-size:9px;color:var(--g500);font-weight:600;margin-top:2px">${DU.restam} D.U. restam</div>
     </div>`:''}
-    <div class="mk" style="border:1.5px solid #3B82F633;background:#3B82F608">
-      <div class="mk-l">🎯 Falta p/ Meta Hoje</div>
-      <div class="mk-v" style="color:${faltaHojeOp>0?'#3B82F6':'var(--ok)'}">
-        ${faltaHojeOp>0 ? fR(faltaHojeOp) : '✅ Na meta!'}
-      </div>
-      <div style="font-size:9px;color:var(--g500);font-weight:600;margin-top:2px">
-        ${faltaHojeOp>0 ? 'Meta esperada hoje: '+fR(metaHojeOp) : 'Projeção atingida'}
-      </div>
-    </div>
-    <div class="mk" style="border:1.5px solid #8B5CF633;background:#8B5CF608">
-      <div class="mk-l">📅 Falta p/ Meta Amanhã</div>
-      <div class="mk-v" style="color:${faltaAmanhOp>0?'#8B5CF6':'var(--ok)'}">
-        ${faltaAmanhOp>0 ? fR(faltaAmanhOp) : '✅ Na meta!'}
-      </div>
-      <div style="font-size:9px;color:var(--g500);font-weight:600;margin-top:2px">
-        ${faltaAmanhOp>0 ? 'Meta esperada amanhã: '+fR(metaAmanhOp) : 'Projeção atingida'}
-      </div>
-    </div>
   ` : '');
 
   // ── AG-BOX: foto do operador se disponível, senão agendamentos ──
@@ -5109,7 +5034,7 @@ function refreshAll(){
   if(typeof renderEqMetasTable==='function') renderEqMetasTable();
   // ── Atualiza aba Recebimento por Dia/Operador ──
   if(typeof rdopRender==='function') rdopRender();
-  // ── Atualiza gráfico Recebimento por Equipe (pp-metas-wrap) ──
+  // ── Atualiza gráfico Recebimento por Equipe ──
   if(typeof renderPpMetas==='function') renderPpMetas();
 }
 
@@ -5145,9 +5070,9 @@ function loadSavedOverrides(){
     localStorage.setItem('cofen_op_overrides', JSON.stringify(initOv));
     // Redefinir metas de equipe para os valores corretos de Maio 2026
     const metasCorretas = {
-      'COFEN MARILIA BRENDA':     300000,
-      'COFEN BIRIGUI BRUNA':      200000,
-      'COFEN STEPHANIE 2° TURNO': 200000,
+      'COFEN MARILIA BRENDA':     450000,
+      'COFEN BIRIGUI BRUNA':      450000,
+      'COFEN STEPHANIE 2° TURNO': 450000,
     };
     const metasAtuais = {};
     try{ Object.assign(metasAtuais, JSON.parse(localStorage.getItem('cofen_metas_eq')||'{}')); }catch(e){}
@@ -5443,17 +5368,7 @@ function rdAddAgora(opName){
   if(!v||v<=0){ toast('⚠️ Digite um valor maior que zero'); return; }
   const map=rdGetSaved();
   map[opName]=(parseFloat(map[opName]||0))+v;
-  // Salva local sem re-push completo
-  _rdSyncingFromFirebase = false;
-  localStorage.setItem(rdTodayKey(), JSON.stringify(map));
-  // Manda só este operador pro Firebase (merge atômico)
-  if(fbDb && fbRoom){
-    const today = new Date();
-    const payload = {};
-    payload[opName] = map[opName];
-    payload['_date'] = today.getFullYear()+'_'+(today.getMonth()+1)+'_'+today.getDate();
-    fbDb.ref(fbRoom+'/rd').update(payload).catch(e=>console.warn('FB rd err:',e));
-  }
+  rdSetSaved(map);
   // Histórico
   const histKey=rdTodayKey()+'_hist_'+sid;
   let hist=[]; try{hist=JSON.parse(localStorage.getItem(histKey)||'[]')}catch{}
@@ -6347,32 +6262,19 @@ function importParse(raw){
     if(!str) return null;
     str = String(str).trim().replace(/^"|"$/g,'');
     if(!str || str==='nan' || str==='0') return null;
-    var day=null, month=null, year=null;
     // YYYY-MM-DD
     var m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if(m){ year=parseInt(m[1]); month=parseInt(m[2]); day=parseInt(m[3]); }
+    if(m) return parseInt(m[3]);
     // DD/MM/YYYY ou DD-MM-YYYY ou DD.MM.YYYY
-    if(!day){ m = str.match(/^(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})/);
-      if(m){ day=parseInt(m[1]); month=parseInt(m[2]); year=parseInt(m[3].length<4?'20'+m[3]:m[3]); }
-    }
+    m = str.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/);
+    if(m) return parseInt(m[1]);
     // Serial Excel
-    if(!day){
-      var _n = parseFloat(str.replace(',','.'));
-      if(!isNaN(_n) && _n>40000 && _n<60000){
-        var _ed = new Date(Math.round((_n-25569)*86400*1000));
-        day=_ed.getUTCDate(); month=_ed.getUTCMonth()+1; year=_ed.getUTCFullYear();
-      }
+    var _n = parseFloat(str.replace(',','.'));
+    if(!isNaN(_n) && _n>40000 && _n<60000){
+      var _d = new Date(Math.round((_n-25569)*86400*1000));
+      return _d.getUTCDate();
     }
-    if(!day) return null;
-    // ── Normaliza sábado e domingo → sexta-feira ──
-    if(month && year){
-      var dt = new Date(year, month-1, day);
-      var dow = dt.getDay(); // 0=dom,6=sáb
-      if(dow === 6) day -= 1; // sáb → sex
-      if(dow === 0) day -= 2; // dom → sex
-      if(day < 1) day = 1;
-    }
-    return day;
+    return null;
   }
 
   // Acumula por operador (nome raw do arquivo)
@@ -6403,30 +6305,24 @@ function importParse(raw){
     }
   }
 
-  // Sem coluna de data: usa o último dia útil (não o dia atual)
-  // Se hoje é segunda, o arquivo é da sexta anterior
-  const _todayDate = new Date();
-  const _todayDay  = _todayDate.getDate();
-  const _todayDow  = _todayDate.getDay(); // 0=dom,1=seg,...,6=sáb
-  // Calcula o último dia útil real (exclui hoje se for segunda sem produção ainda)
-  let _lastUtil = _todayDay;
-  if(_todayDow === 1) _lastUtil = _todayDay - 3; // seg → sexta anterior
-  if(_todayDow === 0) _lastUtil = _todayDay - 2; // dom → sexta
-  if(_todayDow === 6) _lastUtil = _todayDay - 1; // sáb → sexta
-  if(_lastUtil < 1) _lastUtil = 1;
-
+  // Sem coluna de data: tenta usar rd_hist (histórico do dia), senão usa hoje
+  const _todayDay = new Date().getDate();
   Object.values(acc).forEach(a => {
     if(a._semData && a.total > 0 && Object.keys(a.daily).length === 0){
       // Tenta pegar histórico diário do rd_hist salvo no localStorage
       try {
         const _hist = JSON.parse(localStorage.getItem('cofen_rd_hist') || '{}');
         let _foundDaily = false;
+        // rd_hist[data][op] = valor — procura pelo operador nos históricos
         Object.entries(_hist).forEach(([dateKey, opMap]) => {
+          // dateKey = YYYY-MM-DD ou DD_MM_YYYY
           const _dm = dateKey.match(/(\d{4})[-_](\d{1,2})[-_](\d{1,2})|(\d{1,2})[-_](\d{1,2})[-_](\d{4})/);
           let _day = null;
           if(_dm) _day = parseInt(_dm[3] || _dm[4]);
           if(!_day || _day < 1 || _day > 31) return;
+          // Procura este operador no mapa do dia
           Object.entries(opMap).forEach(([opKey, v]) => {
+            // compara normalizando nome
             const _nk = opKey.toLowerCase().replace(/[^a-z]/g,'');
             Object.keys(acc).forEach(rawN => {
               if(_nk === rawN.toLowerCase().replace(/[^a-z]/g,'')) {
@@ -6436,10 +6332,9 @@ function importParse(raw){
             });
           });
         });
-        // Sem histórico: joga no último dia útil (não no dia atual)
-        if(!_foundDaily) a.daily[_lastUtil] = a.total;
+        if(!_foundDaily) a.daily[_todayDay] = a.total;
       } catch(e) {
-        a.daily[_lastUtil] = a.total;
+        a.daily[_todayDay] = a.total;
       }
     }
   });
@@ -6679,14 +6574,14 @@ function importApply(){
     eq.ho  = eq.ops.reduce((s,o)=>s+o.ho,  0);
   });
 
-  // Rebuild ALL ordenado → ranking atualizado
-  rebuildAll();
-  refreshAll();
-
-  // Salvar no localStorage
+  // FIX: Salvar no localStorage ANTES do rebuildAll para que a restauração já use os valores novos
   const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
   importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
   localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
+
+  // Rebuild ALL ordenado → ranking atualizado
+  rebuildAll();
+  refreshAll();
 
   const totalImportado = importParsed.found.reduce((s,r)=>s+r.recImport,0);
   toast(`✅ ${updated} operadores atualizados! Total: ${fRK(totalImportado)} · HO: ${fRK(totalImportado*0.25)}`);
@@ -8242,44 +8137,33 @@ function fbStartListening(){
   fbDb.ref(fbRoom+'/rd').on('value', snap=>{
     const remote = snap.val();
     if(!remote) return;
-
+    // ── Verificar se os dados são do dia de hoje ──
+    const today = new Date();
+    const dateKey = today.getFullYear()+'_'+(today.getMonth()+1)+'_'+today.getDate();
+    if(remote._date && remote._date !== dateKey){
+      // Dados de outro dia — ignorar, não sobrescrever o localStorage de hoje
+      console.log('[RD] Firebase tem dados de '+remote._date+' — ignorando (hoje é '+dateKey+')');
+      return;
+    }
+    // Limpar campo de controle antes de mesclar
     const remoteClean = {...remote};
     delete remoteClean._date;
-    if(!Object.keys(remoteClean).length) return;
-
-    // Firebase é a fonte da verdade — aplica sempre
-    const local  = rdGetSaved();
-    const merged = Object.assign({}, local, remoteClean);
-
-    _rdSyncingFromFirebase = true;
-    localStorage.setItem(rdTodayKey(), JSON.stringify(merged));
-    _rdSyncingFromFirebase = false;
-
-    // Atualiza KPIs do topo sempre
-    rdUpdateKPIs();
-    pulseSyncDot();
-
-    // Atualiza cada linha individualmente (sem precisar recriar a lista inteira)
-    Object.entries(remoteClean).forEach(([opName, v])=>{
-      const sid   = opName.replace(/[^a-zA-Z0-9]/g,'_');
-      const vHoje = parseFloat(v)||0;
-      const op    = ALL.find(o=>o.name===opName);
-      if(!op) return;
-      const cfg   = EQ[op.eq]||{c:'#888'};
-
-      const acumEl  = document.getElementById('rd-hoje-acum-'+sid);
-      const totalEl = document.getElementById('rd-totalhoje-'+sid);
-      const hojehoEl= document.getElementById('rd-hojeho-'+sid);
-      const row     = document.getElementById('rdrow-'+sid);
-
-      if(acumEl)  { acumEl.textContent  = vHoje>0?'+'+fR(vHoje):'—'; acumEl.style.color = vHoje>0?'#F97316':'var(--g400)'; }
-      if(totalEl) { totalEl.textContent = fR((op.rec||0)+vHoje); totalEl.style.color = cfg.c; }
-      if(hojehoEl){ hojehoEl.textContent= 'HO: '+fR(((op.rec||0)+vHoje)*0.25); }
-      if(row)     { row.style.background = vHoje>0?'#FFFDF5':''; }
+    // Merge com local — remoto complementa local (não sobrescreve)
+    const local = rdGetSaved();
+    const merged = {};
+    // Pega todas as chaves de ambos, prefere o maior valor para cada operador
+    const allKeys = new Set([...Object.keys(local), ...Object.keys(remoteClean)]);
+    allKeys.forEach(k=>{
+      const vLocal  = parseFloat(local[k]||0);
+      const vRemote = parseFloat(remoteClean[k]||0);
+      merged[k] = Math.max(vLocal, vRemote);
     });
-
-    // Se a página rd estiver ativa, também reordena a lista
-    if(document.getElementById('pg-recdia')?.classList.contains('on')) rdRender();
+    const localStr = JSON.stringify(local);
+    if(JSON.stringify(merged) !== localStr){
+      localStorage.setItem(rdTodayKey(), JSON.stringify(merged));
+      if(document.getElementById('pg-recdia')?.classList.contains('on')) rdRender();
+      pulseSyncDot();
+    }
   });
   fbListeners.rd = true;
 
@@ -8505,27 +8389,29 @@ function fbPush(path, data){
   if(!fbDb||!fbRoom) return;
   fbDb.ref(fbRoom+'/'+path).set(data).catch(e=>console.warn('FB push err:',e));
 }
-// ── fbUpdateRD: .update() direto — garante tempo real entre usuários ──
+// ── fbUpdateRD: usa .update() para não sobrescrever dados de outros supervisores ──
 function fbUpdateRD(map){
   if(!fbDb||!fbRoom) return;
   const today   = new Date();
   const dateKey = today.getFullYear()+'_'+(today.getMonth()+1)+'_'+today.getDate();
   const payload = {...map, _date: dateKey};
-  // .update() faz merge no nó — não apaga outros operadores editados em paralelo
-  fbDb.ref(fbRoom+'/rd').update(payload)
-    .catch(e=>console.warn('FB update(rd) err:',e));
+  const rdRef   = fbDb.ref(fbRoom+'/rd');
+  rdRef.child('_date').once('value', snap=>{
+    const remoteDate = snap.val();
+    if(remoteDate && remoteDate === dateKey){
+      rdRef.update(payload).catch(e=>console.warn('FB update(rd) err:',e));
+    } else {
+      rdRef.set(payload).catch(e=>console.warn('FB set(rd) err:',e));
+    }
+  });
 }
 // ── PATCH LOCAL FUNCTIONS TO PUSH TO FIREBASE ──
 // Patch rdSetSaved — usa fbUpdateRD para preservar dados de outros supervisores
 const _rdSetSaved_fb = rdSetSaved;
-let _rdSyncingFromFirebase = false; // flag anti-loop
 function rdSetSaved(map){
   localStorage.setItem(rdTodayKey(), JSON.stringify(map));
-  if(!_rdSyncingFromFirebase){
-    // Só manda pro Firebase se foi o usuário quem editou (não o listener)
-    syncBroadcast('rd_update', JSON.stringify(map));
-    fbUpdateRD(map);
-  }
+  syncBroadcast('rd_update', JSON.stringify(map));
+  fbUpdateRD(map);
 }
 
 // applyOps — lê editor, atualiza D.equipes e sincroniza Firebase
@@ -9594,7 +9480,8 @@ const CMP_MAIO_CUMUL = {...CMP_MAIO_CUMUL_STATIC};
 // CMP_MAIO_EQ: acumulado POR EQUIPE por DU (gerado do arquivo rec_58_0905.xls)
 const CMP_MAIO_EQ = {"COFEN BIRIGUI BRUNA": {"1": 15174.49, "2": 25240.82, "3": 38543.48, "4": 49508.91, "5": 67373.7, "6": 80439.59, "7": 108303.76}, "COFEN STEPHANIE 2\u00b0 TURNO": {"1": 19622.32, "2": 43725.16, "3": 64522.56, "4": 94812.57, "5": 117123.72, "6": 134555.99, "7": 168282.18}, "COFEN MARILIA BRENDA": {"1": 25172.89, "2": 37574.38, "3": 48044.73, "4": 61470.63, "5": 84447.98, "6": 105946.52, "7": 130692.3}, "COFEN DIGITAL": {"1": 9315.93, "2": 22414.53, "3": 41557.81, "4": 52237.98, "5": 77331.23, "6": 107302.14, "7": 119268.66}};
 // Dias do calendário de MAIO correspondentes a cada DU (índice 0 = DU1)
-const CMP_MAIO_DU_DIAS = [4,5,6,7,8,11,12];
+// FIX: let ao invés de const para poder ser atualizado após importação
+let CMP_MAIO_DU_DIAS = [4,5,6,7,8,11,12];
 const CMP_ABRIL_CUMUL = CMP_MAIO_CUMUL;
 // CMP_ABRIL_EQ: acumulado por equipe por DU em Abril (proporcional ao marco total)
 // Distribui CMP_ABRIL_DU na mesma proporção que cada equipe representa no total de Abril
@@ -9846,13 +9733,34 @@ function cmpTab(view, el){
   if(view==='operadores') cmpRenderOps();
 }
 
-// Reconstrói CMP_MAIO_CUMUL (por DU) usando vgDB.dia (Visão Geral Financeira) como fonte principal
-// Hierarquia: 1) vgDB.dia (rec diário real do arquivo geral) → 2) overrideTotalRec linear → 3) operadores
+// Reconstrói CMP_MAIO_CUMUL (por DU) priorizando dados importados do localStorage
+// Hierarquia: 1) localStorage cofen_maio_cumul (importado via rec_geral) → 2) static hardcoded (fallback)
 function cmpAtualizarCumul(){
-  // SEMPRE usa os dados reais do XLS (rec_geral) como fonte de verdade para o comparativo
-  // vgDB e overrideTotalRec contêm totais anuais — não usar aqui
+  // FIX: priorizar dados importados (localStorage) sobre o estatico hardcoded
+  // O estatico so vai ate DU 7; dados importados tem todos os DUs do arquivo
+  const _saved = (()=>{ try{ const v=localStorage.getItem('cofen_maio_cumul'); return v?JSON.parse(v):null; }catch(e){return null;} })();
+  const _savedAbril = (()=>{ try{ const v=localStorage.getItem('cofen_abril_du'); return v?JSON.parse(v):null; }catch(e){return null;} })();
+  const _savedEq    = (()=>{ try{ const v=localStorage.getItem('cofen_maio_eq');  return v?JSON.parse(v):null; }catch(e){return null;} })();
+
   Object.keys(CMP_MAIO_CUMUL).forEach(k=>delete CMP_MAIO_CUMUL[k]);
-  Object.assign(CMP_MAIO_CUMUL, CMP_MAIO_CUMUL_STATIC);
+  if(_saved && Object.keys(_saved).length > 0){
+    Object.assign(CMP_MAIO_CUMUL, _saved);
+  } else {
+    Object.assign(CMP_MAIO_CUMUL, CMP_MAIO_CUMUL_STATIC);
+  }
+
+  if(_savedAbril && Object.keys(_savedAbril).length > 0){
+    Object.keys(CMP_ABRIL_DU).forEach(k=>delete CMP_ABRIL_DU[k]);
+    Object.assign(CMP_ABRIL_DU, _savedAbril);
+  }
+
+  if(_savedEq && Object.keys(_savedEq).length > 0){
+    Object.entries(_savedEq).forEach(([eq,duMap])=>{ CMP_MAIO_EQ[eq]=duMap; });
+  }
+
+  // FIX: Restaurar CMP_MAIO_DU_DIAS do localStorage para manter datas corretas dos DUs
+  const _savedDuDias = (()=>{ try{ const v=localStorage.getItem('cofen_maio_du_dias'); return v?JSON.parse(v):null; }catch(e){return null;} })();
+  if(_savedDuDias && _savedDuDias.length > 0) CMP_MAIO_DU_DIAS = _savedDuDias;
 
   // CMP_MAIO_EQ usa dados reais por DU (não proporcional)
 
@@ -11636,208 +11544,6 @@ function mtsAtualizarMaio(){
 </script>
 
 <!-- ══════════ PAGE: METAS 2026 ══════════ -->
-
-<!-- ══════════ PAGE: AGENDA OPERADOR ══════════ -->
-<div class="page" id="pg-agenda-op">
-
-  <!-- LOGIN SCREEN -->
-  <div id="ag-login-screen" style="max-width:400px;margin:60px auto;padding:32px;background:var(--w);border-radius:18px;box-shadow:0 4px 32px #0001;border:1px solid var(--g200)">
-    <div style="text-align:center;margin-bottom:28px">
-      <div style="font-size:36px;margin-bottom:8px">📋</div>
-      <div style="font-size:20px;font-weight:900;color:var(--g900)">Agenda de Acordos</div>
-      <div style="font-size:12px;color:var(--g500);margin-top:6px">Acesso individual por operador</div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <div>
-        <label style="font-size:11px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase">Operador</label>
-        <select id="ag-login-op" style="width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:10px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);background:var(--g50);margin-top:4px">
-          <option value="">— Selecione seu nome —</option>
-        </select>
-      </div>
-      <div>
-        <label style="font-size:11px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase">Senha</label>
-        <input id="ag-login-senha" type="password" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter')agendaDoLogin()"
-          style="width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:10px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);background:var(--g50);margin-top:4px;box-sizing:border-box">
-      </div>
-      <button onclick="agendaDoLogin()"
-        style="padding:13px;background:var(--pp);color:#fff;border:none;border-radius:11px;font-family:Nunito,sans-serif;font-size:14px;font-weight:900;cursor:pointer;letter-spacing:.4px">
-        Entrar →
-      </button>
-      <div id="ag-login-err" style="text-align:center;font-size:12px;color:var(--danger);display:none;font-weight:700"></div>
-    </div>
-
-    <!-- Só gerente vê isso -->
-    <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--g100)">
-      <div style="font-size:10px;font-weight:800;color:var(--g400);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">🔑 Gerente — Definir Senha de Operador</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <select id="ag-adm-op" style="flex:1;min-width:140px;padding:8px 10px;border:1.5px solid var(--g200);border-radius:8px;font-family:Nunito,sans-serif;font-size:12px;font-weight:700;background:var(--g50)">
-          <option value="">— Operador —</option>
-        </select>
-        <input id="ag-adm-senha" type="text" placeholder="Nova senha" style="flex:1;min-width:120px;padding:8px 10px;border:1.5px solid var(--g200);border-radius:8px;font-family:Nunito,sans-serif;font-size:12px;font-weight:700;background:var(--g50)">
-        <button onclick="agendaDefSenha()" style="padding:8px 14px;background:var(--g900);color:#fff;border:none;border-radius:8px;font-family:Nunito,sans-serif;font-size:12px;font-weight:800;cursor:pointer">Salvar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- DASHBOARD DO OPERADOR (após login) -->
-  <div id="ag-op-screen" style="display:none;padding:20px;max-width:960px;margin:0 auto">
-
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
-      <div>
-        <div style="font-size:22px;font-weight:900;color:var(--g900)" id="ag-op-title">📋 Minha Agenda</div>
-        <div style="font-size:12px;color:var(--g500);margin-top:2px" id="ag-op-sub"></div>
-      </div>
-      <button onclick="agendaLogout()" style="padding:8px 18px;background:var(--g100);color:var(--g700);border:none;border-radius:9px;font-family:Nunito,sans-serif;font-size:12px;font-weight:800;cursor:pointer">Sair ↩</button>
-    </div>
-
-    <!-- KPIs rápidos -->
-    <div id="ag-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px"></div>
-
-    <!-- Formulário novo acordo -->
-    <div style="background:var(--w);border-radius:16px;border:1.5px solid var(--g200);padding:24px;margin-bottom:24px">
-      <div style="font-size:14px;font-weight:900;color:var(--g900);margin-bottom:18px">➕ Registrar Novo Acordo</div>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
-
-        <!-- Código -->
-        <div>
-          <label class="ag-lbl">Código do Acordo *</label>
-          <input id="ag-f-codigo" type="text" placeholder="Ex: 202500123" class="ag-inp">
-        </div>
-
-        <!-- COREN -->
-        <div>
-          <label class="ag-lbl">COREN *</label>
-          <select id="ag-f-coren" class="ag-inp">
-            <option value="">— Selecione —</option>
-            <option>COREN-SP</option>
-            <option>COREN-PI</option>
-            <option>COREN-MA</option>
-            <option>COREN-MT</option>
-            <option>COREN-CE</option>
-            <option>COREN-RJ</option>
-            <option>COREN-MG</option>
-            <option>COREN-RS</option>
-            <option>COREN-PR</option>
-            <option>COREN-BA</option>
-            <option>COREN-GO</option>
-            <option>COREN-PE</option>
-            <option>COREN-SC</option>
-            <option>Outro</option>
-          </select>
-        </div>
-
-        <!-- Data do agendamento -->
-        <div>
-          <label class="ag-lbl">Data do Agendamento *</label>
-          <input id="ag-f-data" type="date" class="ag-inp">
-        </div>
-
-        <!-- Data de vencimento -->
-        <div>
-          <label class="ag-lbl">Data de Vencimento *</label>
-          <input id="ag-f-venc" type="date" class="ag-inp">
-        </div>
-
-        <!-- Forma de pagamento -->
-        <div>
-          <label class="ag-lbl">Forma de Pagamento *</label>
-          <select id="ag-f-forma" class="ag-inp" onchange="agendaToggleParcelas()">
-            <option value="">— Selecione —</option>
-            <option value="pix">💸 Pix</option>
-            <option value="boleto">🏦 Boleto</option>
-            <option value="cartao">💳 Cartão</option>
-          </select>
-        </div>
-
-        <!-- Parcelado -->
-        <div>
-          <label class="ag-lbl">Parcelado?</label>
-          <select id="ag-f-parcelado" class="ag-inp" onchange="agendaToggleParcelas()">
-            <option value="nao">Não — À vista</option>
-            <option value="sim">Sim — Parcelado</option>
-          </select>
-        </div>
-
-        <!-- Nº Parcelas (oculto se à vista) -->
-        <div id="ag-f-nparcelas-wrap">
-          <label class="ag-lbl">Nº de Parcelas</label>
-          <input id="ag-f-nparcelas" type="number" min="2" max="60" placeholder="Ex: 6" class="ag-inp">
-        </div>
-
-        <!-- Valor Total -->
-        <div>
-          <label class="ag-lbl">Valor Total (R$) *</label>
-          <input id="ag-f-vtotal" type="number" step="0.01" min="0" placeholder="0,00" class="ag-inp" oninput="agendaCalcParcela()">
-        </div>
-
-        <!-- Valor da Parcela (oculto se à vista) -->
-        <div id="ag-f-vparcela-wrap">
-          <label class="ag-lbl">Valor da Parcela (R$)</label>
-          <input id="ag-f-vparcela" type="number" step="0.01" min="0" placeholder="Auto" class="ag-inp">
-        </div>
-
-        <!-- Canal -->
-        <div>
-          <label class="ag-lbl">Canal de Origem *</label>
-          <select id="ag-f-canal" class="ag-inp">
-            <option value="">— Selecione —</option>
-            <option value="telefone_ativo">📞 Telefone Ativo</option>
-            <option value="campanha">📣 Campanha</option>
-            <option value="whatsapp">💬 WhatsApp</option>
-            <option value="receptivo">📲 Receptivo</option>
-          </select>
-        </div>
-
-        <!-- Campanha (aparece se canal = campanha) -->
-        <div id="ag-f-campanha-wrap" style="display:none">
-          <label class="ag-lbl">Nome da Campanha</label>
-          <input id="ag-f-campanha" type="text" placeholder="Ex: Campanha Maio 2026" class="ag-inp">
-        </div>
-
-        <!-- Observação -->
-        <div style="grid-column:1/-1">
-          <label class="ag-lbl">Observação</label>
-          <input id="ag-f-obs" type="text" placeholder="Anotações adicionais..." class="ag-inp">
-        </div>
-
-      </div>
-
-      <div style="display:flex;gap:10px;margin-top:18px;align-items:center">
-        <button onclick="agendaSalvar()"
-          style="padding:13px 28px;background:var(--ok);color:#fff;border:none;border-radius:11px;font-family:Nunito,sans-serif;font-size:14px;font-weight:900;cursor:pointer">
-          💾 Salvar Acordo
-        </button>
-        <button onclick="agendaLimpar()"
-          style="padding:13px 18px;background:var(--g100);color:var(--g700);border:none;border-radius:11px;font-family:Nunito,sans-serif;font-size:13px;font-weight:800;cursor:pointer">
-          Limpar
-        </button>
-        <div id="ag-save-msg" style="font-size:12px;font-weight:700;color:var(--ok);display:none">✅ Salvo automaticamente!</div>
-      </div>
-    </div>
-
-    <!-- Filtros + lista -->
-    <div style="background:var(--w);border-radius:16px;border:1.5px solid var(--g200);padding:24px">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
-        <div style="font-size:14px;font-weight:900;color:var(--g900)">📜 Meus Acordos Registrados</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <select id="ag-filtro-status" class="ag-inp" style="width:auto" onchange="agendaRenderLista()">
-            <option value="">Todos os status</option>
-            <option value="pendente">⏳ Pendente</option>
-            <option value="pago">✅ Pago</option>
-            <option value="vencido">🔴 Vencido</option>
-          </select>
-          <input id="ag-filtro-busca" type="text" placeholder="🔍 Buscar código..." class="ag-inp" style="width:160px" oninput="agendaRenderLista()">
-        </div>
-      </div>
-      <div id="ag-lista" style="display:flex;flex-direction:column;gap:8px"></div>
-      <div id="ag-lista-empty" style="text-align:center;padding:40px;color:var(--g400);font-weight:700;display:none">Nenhum acordo registrado ainda.</div>
-    </div>
-  </div>
-</div>
-
 <div class="page" id="pg-metas">
 
   <!-- Hero -->
@@ -12127,11 +11833,23 @@ function mtsAtualizarMaio(){
   <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden">
     <div style="overflow-x:auto">
       <table id="rdop-table" style="width:100%;border-collapse:collapse;font-size:11px">
-        <thead id="rdop-thead">
-          <tr id="rdop-thead-dias" style="background:var(--ppd);color:rgba(255,255,255,.85)">
+        <thead>
+          <tr style="background:var(--ppd);color:rgba(255,255,255,.85)">
             <th style="padding:10px 14px;text-align:left;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;position:sticky;left:0;background:var(--ppd);z-index:2">#</th>
             <th style="padding:10px 14px;text-align:left;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;position:sticky;left:28px;background:var(--ppd);z-index:2">Operador</th>
             <th style="padding:10px 14px;text-align:left;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap">Equipe</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">01/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">02/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">03/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">04/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">05/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">06/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">07/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">08/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">09/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">10/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">11/05</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap">12/05</th>
             <th style="padding:10px 14px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;background:rgba(74,222,128,.15);color:#4ADE80">Total</th>
           </tr>
           <tr id="rdop-thead-totdia" style="background:#fff;border-top:3px solid var(--ppd);border-bottom:2px solid var(--g200)">
@@ -12222,88 +11940,88 @@ function mtsAtualizarMaio(){
 // DADOS: Recebimento por Dia / Operador
 // ══════════════════════════════════════════
 const RDOP_DADOS = [
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MATHEUS_SOUZA",                   d:[699.1,84.01,194.98,3571.29,1474.46,4191.3,1413.52,4399.26,0,0,2433.97,5895.97,3212.28], total:27570.14},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"LYVIA_DIAS",                      d:[0,117.44,0,2023.21,0,1684.86,2383.09,1732.84,0,0,918.9,3136.49,7686.19], total:19683.02},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"LEONARDO_NUNES",                  d:[0,280.96,0,4204.43,330.95,442.25,1132.39,3425.61,595.91,0,521.64,3067.54,716.02], total:14717.7},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELTON_ROLDON",                   d:[487.38,0,0,0,2339.09,444.5,1238.88,1628.14,0,0,1341.58,4717.94,1226.54], total:13424.05},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MATHEUS_SOUZA",                   d:[699.1,84.01,194.98,3571.29,1474.46,4191.3,1413.52,4399.26,0,0,1976.07,5895.97,0], total:23899.96},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"LEONARDO_NUNES",                  d:[0,280.96,0,4204.43,330.95,442.25,1132.39,3425.61,595.91,0,521.64,1758.4,0], total:12692.54},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"LYVIA_DIAS",                      d:[0,117.44,0,2023.21,0,1684.86,2383.09,1732.84,0,0,918.9,3136.49,0], total:11996.83},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELTON_ROLDON",                   d:[487.38,0,0,0,2339.09,444.5,1238.88,1628.14,0,0,1341.58,3416.96,0], total:10896.53},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"EDUARDO_SILVA",                   d:[0,151.71,0,310.14,1164.45,2569.3,881.96,937.58,155.05,0,4070.48,501.77,0], total:10742.44},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_RODARTE",                   d:[0,0,0,1185.13,303.01,63.51,618.92,3640.03,0,0,0,2221.34,566.9], total:8598.84},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_RODARTE",                   d:[0,0,0,1185.13,303.01,63.51,618.92,3640.03,0,0,0,2221.34,0], total:8031.94},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"FRANCISCA_BRITO",                 d:[0,388.94,0,645.11,1454.68,2787.17,238.38,194.2,0,0,0,299.07,0], total:6007.55},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_BRAIDOTI",                  d:[0,0,0,580.94,871.02,99.66,742.48,67.55,0,0,0,2771.67,123.72], total:5257.04},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"JOAO_MIRANDA",                    d:[0,0,0,546.64,650.84,0,285.46,1369.96,0,0,1400.83,649.25,143.97], total:5046.95},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELENA_SANTOS",                   d:[0,0,0,829.98,575.68,605.72,0,329.85,0,0,124.42,1604.31,499.09], total:4569.05},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_MOREIRASANTOS",             d:[105.5,79.21,0,352.11,581.61,58.72,199.22,0,0,0,253.96,0,1121.76], total:2752.09},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"JOAO_MIRANDA",                    d:[0,0,0,546.64,650.84,0,285.46,1369.96,0,0,1400.83,649.25,0], total:4902.98},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELENA_SANTOS",                   d:[0,0,0,829.98,575.68,605.72,0,329.85,0,0,124.42,1604.31,0], total:4069.96},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_BRAIDOTI",                  d:[0,0,0,580.94,871.02,99.66,742.48,67.55,0,0,0,0,0], total:2361.65},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"RAFAELA_MINHOTO",                 d:[0,0,0,322.13,0,0,158.16,0,0,0,0,1503.22,0], total:1983.51},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_MOREIRASANTOS",             d:[105.5,79.21,0,352.11,581.61,58.72,199.22,0,0,0,253.96,0,0], total:1630.33},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"MAYSA_OLIVEIRA",                  d:[0,0,0,0,0,0,0,0,0,0,0,56.67,0], total:56.67},
-  {equipe:"COFEN DIGITAL", nome:"KAROLAINE_SILVA",                 d:[0,1510.38,0,7138.44,2188.43,8953.03,333.91,7689.81,1294.97,0,11448.07,4323.19,5371.33], total:50251.56},
-  {equipe:"COFEN DIGITAL", nome:"THAYRA_FERREIRASILVA",            d:[462.24,280.52,0,1500.19,3281.05,4325.96,903.12,1458.64,415.97,0,12154.56,1929.78,8292.56], total:35004.59},
-  {equipe:"COFEN DIGITAL", nome:"RENATARODRIGUES",                 d:[0,597.29,0,93.5,3992.93,1670.09,2560.36,5506.05,371.29,135.09,5005.47,1287.12,3598.58], total:24817.77},
+  {equipe:"COFEN DIGITAL", nome:"KAROLAINE_SILVA",                 d:[0,1510.38,0,7138.44,2188.43,8953.03,333.91,7689.81,1294.97,0,11348.35,4323.19,0], total:44780.51},
+  {equipe:"COFEN DIGITAL", nome:"THAYRA_FERREIRASILVA",            d:[462.24,280.52,0,1500.19,3281.05,4325.96,903.12,1458.64,415.97,0,12154.56,1929.78,0], total:26712.03},
+  {equipe:"COFEN DIGITAL", nome:"RENATARODRIGUES",                 d:[0,597.29,0,93.5,3992.93,1670.09,2560.36,5506.05,371.29,135.09,5005.47,871.12,0], total:20803.19},
   {equipe:"COFEN DIGITAL", nome:"CLEBER_JUNIOR",                   d:[0,1935.77,0,583.8,859.46,2374.32,199.35,6045.1,280.52,0,152.82,3292.02,0], total:15723.16},
   {equipe:"COFEN DIGITAL", nome:"JHONATA_NASCIMENTO",              d:[0,0,280.52,0,2446.61,1532.24,2131.01,884.37,0,0,693.5,599.9,0], total:8568.15},
   {equipe:"COFEN DIGITAL", nome:"NAYARA_CRUZ",                     d:[0,0,0,164.76,0,0,0,0,0,0,0,0,0], total:164.76},
-  {equipe:"COFEN MARILIA BRENDA", nome:"silva_beatriz",                   d:[0,580.66,0,1009.04,3485.94,3100.65,1815.8,5111.81,697.69,0,3017.86,6137.75,4684.25], total:29641.45},
-  {equipe:"COFEN MARILIA BRENDA", nome:"leticia_romeu",                   d:[584.06,1248.64,244.86,3890.39,799.22,1494.13,474.67,6701.42,1857.71,0,2571.65,5502.82,1801.59], total:27171.16},
-  {equipe:"COFEN MARILIA BRENDA", nome:"GIOVANA_SOUZA",                   d:[207.99,0,0,2671.73,1203.14,2681.41,1304.55,1816.72,307.5,0,2259.98,8178.77,2016.99], total:22648.78},
-  {equipe:"COFEN MARILIA BRENDA", nome:"STEPHANIE_FAGUNDES",              d:[1289.33,0,299.07,2471.59,582.56,1848.77,1887.02,1552.44,200.02,0,1357.45,6540.06,3287.23], total:21315.54},
-  {equipe:"COFEN MARILIA BRENDA", nome:"CAIO_SHIMITE",                    d:[517.58,0,0,4269.38,3030.16,580.66,4253.24,1587.69,216.24,0,2344.2,2053.85,1797.88], total:20650.88},
-  {equipe:"COFEN MARILIA BRENDA", nome:"itallo_cardamoni",                d:[0,0,0,838.81,1001.48,230.07,2121.92,2227.03,1112.33,0,8025.68,1291.01,3556.88], total:20405.21},
-  {equipe:"COFEN MARILIA BRENDA", nome:"raissa_paloma",                   d:[0,0,0,6797.27,2023.27,1314.4,845.91,3112.43,438.98,0,2781.56,1427.01,1098.06], total:19838.89},
-  {equipe:"COFEN MARILIA BRENDA", nome:"thauany_moura",                   d:[0,870.87,344.24,4438.52,1998.25,1778.88,1689.71,2085.89,371.95,147.02,1336.03,1075.66,875.18], total:17012.2},
+  {equipe:"COFEN MARILIA BRENDA", nome:"silva_beatriz",                   d:[0,580.66,0,1009.04,3485.94,3100.65,1815.8,5111.81,697.69,0,3017.86,6270.05,294.13], total:25383.63},
+  {equipe:"COFEN MARILIA BRENDA", nome:"leticia_romeu",                   d:[584.06,1248.64,244.86,3890.39,799.22,1494.13,474.67,6701.42,1857.71,0,2571.65,5502.82,0], total:25369.57},
+  {equipe:"COFEN MARILIA BRENDA", nome:"GIOVANA_SOUZA",                   d:[207.99,0,0,2671.73,1203.14,2681.41,1304.55,1816.72,307.5,0,2259.98,8178.77,0], total:20631.79},
+  {equipe:"COFEN MARILIA BRENDA", nome:"CAIO_SHIMITE",                    d:[517.58,0,0,4269.38,3030.16,580.66,4253.24,1587.69,216.24,0,2344.2,2053.85,0], total:18853.0},
+  {equipe:"COFEN MARILIA BRENDA", nome:"raissa_paloma",                   d:[0,0,0,6797.27,2023.27,1314.4,845.91,3112.43,438.98,0,2781.56,1427.01,0], total:18740.83},
+  {equipe:"COFEN MARILIA BRENDA", nome:"STEPHANIE_FAGUNDES",              d:[1289.33,0,299.07,2471.59,582.56,1848.77,1887.02,1552.44,200.02,0,1357.45,6540.06,397.27], total:18425.58},
+  {equipe:"COFEN MARILIA BRENDA", nome:"itallo_cardamoni",                d:[0,0,0,838.81,1001.48,230.07,2121.92,2227.03,1112.33,0,8025.68,1291.01,0], total:16848.33},
+  {equipe:"COFEN MARILIA BRENDA", nome:"thauany_moura",                   d:[0,870.87,344.24,4438.52,1998.25,1778.88,1689.71,2085.89,371.95,147.02,1336.03,1075.66,0], total:16137.02},
   {equipe:"COFEN MARILIA BRENDA", nome:"BIANCA_V_SILVA",                  d:[289.1,0,105.17,1368.79,0,0,0,0,0,0,0,0,0], total:1763.06},
   {equipe:"COFEN MARILIA BRENDA", nome:"carulini_santos",                 d:[216.9,0,0,0,0,0,0,0,0,0,0,0,0], total:216.9},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"katia_regina",                    d:[163.55,1029.67,0,444.23,5874.46,2943.2,5774.23,1576.1,299.07,299.07,1508.98,5172.59,5086.98], total:30172.13},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"geovanna_almeida",                d:[0,0,0,1743.79,3220.55,4659.73,1209.96,2457.65,0,0,1779.12,3455.63,2854.41], total:21380.84},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"kauane_azevedo",                  d:[575.32,0,0,436.53,1730.98,893.55,6775.91,5838.63,0,0,1614.28,521.66,751.84], total:19138.7},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"AMABELLY_SANTOS",                 d:[280.52,0,0,2015.66,1785.24,147.49,2125.17,896.36,0,0,720.7,5969.3,3537.95], total:17478.39},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"thais_mayara",                    d:[0,268.12,0,3934.83,1164.53,1599.3,1741.82,1865.54,0,0,1039.49,2766.91,2894.05], total:17274.59},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"larissa_santana",                 d:[0,0,0,57.57,4709.36,130.99,0,1695.08,0,0,3598.6,2849.94,3365.71], total:16407.25},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"aline_pupim",                     d:[898.89,0,0,1182.3,1099.63,134.9,2970.42,1920.28,0,0,1079.91,4222.09,1628.66], total:15137.08},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"ISABELA_MONTEIRO",                d:[0,0,0,0,1214.93,1163.42,3477.91,1574.87,222.84,0,1278.34,1377.34,2128.15], total:12437.8},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"jussara_pereira",                 d:[0,0,0,2314.27,146.24,3754.21,1265.99,587.24,0,0,2014.75,0,1374.73], total:11457.43}
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"katia_regina",                    d:[163.55,1029.67,0,444.23,5874.46,2943.2,5774.23,1576.1,299.07,299.07,1508.98,5172.59,463.19], total:25548.34},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"geovanna_almeida",                d:[0,0,0,1743.79,3220.55,4659.73,1209.96,2457.65,0,0,1779.12,3455.63,0], total:18526.43},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"kauane_azevedo",                  d:[575.32,0,0,436.53,1730.98,893.55,6775.91,5838.63,0,0,1614.28,521.66,0], total:18386.86},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"AMABELLY_SANTOS",                 d:[280.52,0,0,2015.66,1785.24,147.49,2125.17,896.36,0,0,720.7,5969.3,485.31], total:14425.75},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"thais_mayara",                    d:[0,268.12,0,3934.83,1164.53,1599.3,1741.82,1865.54,0,0,1039.49,2766.91,0], total:14380.54},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"aline_pupim",                     d:[898.89,0,0,1182.3,1099.63,134.9,2970.42,1920.28,0,0,1079.91,4222.09,0], total:13508.42},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"larissa_santana",                 d:[0,0,0,57.57,4709.36,130.99,0,1695.08,0,0,3598.6,2849.94,0], total:13041.54},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"ISABELA_MONTEIRO",                d:[0,0,0,0,1214.93,1163.42,3477.91,1574.87,222.84,0,1278.34,1377.34,0], total:10309.65},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"jussara_pereira",                 d:[0,0,0,2314.27,146.24,3754.21,1265.99,587.24,0,0,2014.75,0,0], total:10082.7}
 ];
 
 const RDOP_DIAS_LABELS = ['01/05','02/05','03/05','04/05','05/05','06/05','07/05','08/05','09/05','10/05','11/05','12/05'];
 
 // Fallback estático (quando arquivo ainda não foi importado)
 const RDOP_DADOS_STATIC = [
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MATHEUS_SOUZA",                   d:[699.1,84.01,194.98,3571.29,1474.46,4191.3,1413.52,4399.26,0,0,2433.97,5895.97,3212.28], total:27570.14},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"LYVIA_DIAS",                      d:[0,117.44,0,2023.21,0,1684.86,2383.09,1732.84,0,0,918.9,3136.49,7686.19], total:19683.02},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"LEONARDO_NUNES",                  d:[0,280.96,0,4204.43,330.95,442.25,1132.39,3425.61,595.91,0,521.64,3067.54,716.02], total:14717.7},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELTON_ROLDON",                   d:[487.38,0,0,0,2339.09,444.5,1238.88,1628.14,0,0,1341.58,4717.94,1226.54], total:13424.05},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MATHEUS_SOUZA",                   d:[699.1,84.01,194.98,3571.29,1474.46,4191.3,1413.52,4399.26,0,0,1976.07,5895.97,0], total:23899.96},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"LEONARDO_NUNES",                  d:[0,280.96,0,4204.43,330.95,442.25,1132.39,3425.61,595.91,0,521.64,1758.4,0], total:12692.54},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"LYVIA_DIAS",                      d:[0,117.44,0,2023.21,0,1684.86,2383.09,1732.84,0,0,918.9,3136.49,0], total:11996.83},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELTON_ROLDON",                   d:[487.38,0,0,0,2339.09,444.5,1238.88,1628.14,0,0,1341.58,3416.96,0], total:10896.53},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"EDUARDO_SILVA",                   d:[0,151.71,0,310.14,1164.45,2569.3,881.96,937.58,155.05,0,4070.48,501.77,0], total:10742.44},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_RODARTE",                   d:[0,0,0,1185.13,303.01,63.51,618.92,3640.03,0,0,0,2221.34,566.9], total:8598.84},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_RODARTE",                   d:[0,0,0,1185.13,303.01,63.51,618.92,3640.03,0,0,0,2221.34,0], total:8031.94},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"FRANCISCA_BRITO",                 d:[0,388.94,0,645.11,1454.68,2787.17,238.38,194.2,0,0,0,299.07,0], total:6007.55},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_BRAIDOTI",                  d:[0,0,0,580.94,871.02,99.66,742.48,67.55,0,0,0,2771.67,123.72], total:5257.04},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"JOAO_MIRANDA",                    d:[0,0,0,546.64,650.84,0,285.46,1369.96,0,0,1400.83,649.25,143.97], total:5046.95},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELENA_SANTOS",                   d:[0,0,0,829.98,575.68,605.72,0,329.85,0,0,124.42,1604.31,499.09], total:4569.05},
-  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_MOREIRASANTOS",             d:[105.5,79.21,0,352.11,581.61,58.72,199.22,0,0,0,253.96,0,1121.76], total:2752.09},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"JOAO_MIRANDA",                    d:[0,0,0,546.64,650.84,0,285.46,1369.96,0,0,1400.83,649.25,0], total:4902.98},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"HELENA_SANTOS",                   d:[0,0,0,829.98,575.68,605.72,0,329.85,0,0,124.42,1604.31,0], total:4069.96},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_BRAIDOTI",                  d:[0,0,0,580.94,871.02,99.66,742.48,67.55,0,0,0,0,0], total:2361.65},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"RAFAELA_MINHOTO",                 d:[0,0,0,322.13,0,0,158.16,0,0,0,0,1503.22,0], total:1983.51},
+  {equipe:"COFEN BIRIGUI BRUNA", nome:"MARIA_MOREIRASANTOS",             d:[105.5,79.21,0,352.11,581.61,58.72,199.22,0,0,0,253.96,0,0], total:1630.33},
   {equipe:"COFEN BIRIGUI BRUNA", nome:"MAYSA_OLIVEIRA",                  d:[0,0,0,0,0,0,0,0,0,0,0,56.67,0], total:56.67},
-  {equipe:"COFEN DIGITAL", nome:"KAROLAINE_SILVA",                 d:[0,1510.38,0,7138.44,2188.43,8953.03,333.91,7689.81,1294.97,0,11448.07,4323.19,5371.33], total:50251.56},
-  {equipe:"COFEN DIGITAL", nome:"THAYRA_FERREIRASILVA",            d:[462.24,280.52,0,1500.19,3281.05,4325.96,903.12,1458.64,415.97,0,12154.56,1929.78,8292.56], total:35004.59},
-  {equipe:"COFEN DIGITAL", nome:"RENATARODRIGUES",                 d:[0,597.29,0,93.5,3992.93,1670.09,2560.36,5506.05,371.29,135.09,5005.47,1287.12,3598.58], total:24817.77},
+  {equipe:"COFEN DIGITAL", nome:"KAROLAINE_SILVA",                 d:[0,1510.38,0,7138.44,2188.43,8953.03,333.91,7689.81,1294.97,0,11348.35,4323.19,0], total:44780.51},
+  {equipe:"COFEN DIGITAL", nome:"THAYRA_FERREIRASILVA",            d:[462.24,280.52,0,1500.19,3281.05,4325.96,903.12,1458.64,415.97,0,12154.56,1929.78,0], total:26712.03},
+  {equipe:"COFEN DIGITAL", nome:"RENATARODRIGUES",                 d:[0,597.29,0,93.5,3992.93,1670.09,2560.36,5506.05,371.29,135.09,5005.47,871.12,0], total:20803.19},
   {equipe:"COFEN DIGITAL", nome:"CLEBER_JUNIOR",                   d:[0,1935.77,0,583.8,859.46,2374.32,199.35,6045.1,280.52,0,152.82,3292.02,0], total:15723.16},
   {equipe:"COFEN DIGITAL", nome:"JHONATA_NASCIMENTO",              d:[0,0,280.52,0,2446.61,1532.24,2131.01,884.37,0,0,693.5,599.9,0], total:8568.15},
   {equipe:"COFEN DIGITAL", nome:"NAYARA_CRUZ",                     d:[0,0,0,164.76,0,0,0,0,0,0,0,0,0], total:164.76},
-  {equipe:"COFEN MARILIA BRENDA", nome:"silva_beatriz",                   d:[0,580.66,0,1009.04,3485.94,3100.65,1815.8,5111.81,697.69,0,3017.86,6137.75,4684.25], total:29641.45},
-  {equipe:"COFEN MARILIA BRENDA", nome:"leticia_romeu",                   d:[584.06,1248.64,244.86,3890.39,799.22,1494.13,474.67,6701.42,1857.71,0,2571.65,5502.82,1801.59], total:27171.16},
-  {equipe:"COFEN MARILIA BRENDA", nome:"GIOVANA_SOUZA",                   d:[207.99,0,0,2671.73,1203.14,2681.41,1304.55,1816.72,307.5,0,2259.98,8178.77,2016.99], total:22648.78},
-  {equipe:"COFEN MARILIA BRENDA", nome:"STEPHANIE_FAGUNDES",              d:[1289.33,0,299.07,2471.59,582.56,1848.77,1887.02,1552.44,200.02,0,1357.45,6540.06,3287.23], total:21315.54},
-  {equipe:"COFEN MARILIA BRENDA", nome:"CAIO_SHIMITE",                    d:[517.58,0,0,4269.38,3030.16,580.66,4253.24,1587.69,216.24,0,2344.2,2053.85,1797.88], total:20650.88},
-  {equipe:"COFEN MARILIA BRENDA", nome:"itallo_cardamoni",                d:[0,0,0,838.81,1001.48,230.07,2121.92,2227.03,1112.33,0,8025.68,1291.01,3556.88], total:20405.21},
-  {equipe:"COFEN MARILIA BRENDA", nome:"raissa_paloma",                   d:[0,0,0,6797.27,2023.27,1314.4,845.91,3112.43,438.98,0,2781.56,1427.01,1098.06], total:19838.89},
-  {equipe:"COFEN MARILIA BRENDA", nome:"thauany_moura",                   d:[0,870.87,344.24,4438.52,1998.25,1778.88,1689.71,2085.89,371.95,147.02,1336.03,1075.66,875.18], total:17012.2},
+  {equipe:"COFEN MARILIA BRENDA", nome:"silva_beatriz",                   d:[0,580.66,0,1009.04,3485.94,3100.65,1815.8,5111.81,697.69,0,3017.86,6270.05,294.13], total:25383.63},
+  {equipe:"COFEN MARILIA BRENDA", nome:"leticia_romeu",                   d:[584.06,1248.64,244.86,3890.39,799.22,1494.13,474.67,6701.42,1857.71,0,2571.65,5502.82,0], total:25369.57},
+  {equipe:"COFEN MARILIA BRENDA", nome:"GIOVANA_SOUZA",                   d:[207.99,0,0,2671.73,1203.14,2681.41,1304.55,1816.72,307.5,0,2259.98,8178.77,0], total:20631.79},
+  {equipe:"COFEN MARILIA BRENDA", nome:"CAIO_SHIMITE",                    d:[517.58,0,0,4269.38,3030.16,580.66,4253.24,1587.69,216.24,0,2344.2,2053.85,0], total:18853.0},
+  {equipe:"COFEN MARILIA BRENDA", nome:"raissa_paloma",                   d:[0,0,0,6797.27,2023.27,1314.4,845.91,3112.43,438.98,0,2781.56,1427.01,0], total:18740.83},
+  {equipe:"COFEN MARILIA BRENDA", nome:"STEPHANIE_FAGUNDES",              d:[1289.33,0,299.07,2471.59,582.56,1848.77,1887.02,1552.44,200.02,0,1357.45,6540.06,397.27], total:18425.58},
+  {equipe:"COFEN MARILIA BRENDA", nome:"itallo_cardamoni",                d:[0,0,0,838.81,1001.48,230.07,2121.92,2227.03,1112.33,0,8025.68,1291.01,0], total:16848.33},
+  {equipe:"COFEN MARILIA BRENDA", nome:"thauany_moura",                   d:[0,870.87,344.24,4438.52,1998.25,1778.88,1689.71,2085.89,371.95,147.02,1336.03,1075.66,0], total:16137.02},
   {equipe:"COFEN MARILIA BRENDA", nome:"BIANCA_V_SILVA",                  d:[289.1,0,105.17,1368.79,0,0,0,0,0,0,0,0,0], total:1763.06},
   {equipe:"COFEN MARILIA BRENDA", nome:"carulini_santos",                 d:[216.9,0,0,0,0,0,0,0,0,0,0,0,0], total:216.9},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"katia_regina",                    d:[163.55,1029.67,0,444.23,5874.46,2943.2,5774.23,1576.1,299.07,299.07,1508.98,5172.59,5086.98], total:30172.13},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"geovanna_almeida",                d:[0,0,0,1743.79,3220.55,4659.73,1209.96,2457.65,0,0,1779.12,3455.63,2854.41], total:21380.84},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"kauane_azevedo",                  d:[575.32,0,0,436.53,1730.98,893.55,6775.91,5838.63,0,0,1614.28,521.66,751.84], total:19138.7},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"AMABELLY_SANTOS",                 d:[280.52,0,0,2015.66,1785.24,147.49,2125.17,896.36,0,0,720.7,5969.3,3537.95], total:17478.39},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"thais_mayara",                    d:[0,268.12,0,3934.83,1164.53,1599.3,1741.82,1865.54,0,0,1039.49,2766.91,2894.05], total:17274.59},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"larissa_santana",                 d:[0,0,0,57.57,4709.36,130.99,0,1695.08,0,0,3598.6,2849.94,3365.71], total:16407.25},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"aline_pupim",                     d:[898.89,0,0,1182.3,1099.63,134.9,2970.42,1920.28,0,0,1079.91,4222.09,1628.66], total:15137.08},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"ISABELA_MONTEIRO",                d:[0,0,0,0,1214.93,1163.42,3477.91,1574.87,222.84,0,1278.34,1377.34,2128.15], total:12437.8},
-  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"jussara_pereira",                 d:[0,0,0,2314.27,146.24,3754.21,1265.99,587.24,0,0,2014.75,0,1374.73], total:11457.43}
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"katia_regina",                    d:[163.55,1029.67,0,444.23,5874.46,2943.2,5774.23,1576.1,299.07,299.07,1508.98,5172.59,463.19], total:25548.34},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"geovanna_almeida",                d:[0,0,0,1743.79,3220.55,4659.73,1209.96,2457.65,0,0,1779.12,3455.63,0], total:18526.43},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"kauane_azevedo",                  d:[575.32,0,0,436.53,1730.98,893.55,6775.91,5838.63,0,0,1614.28,521.66,0], total:18386.86},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"AMABELLY_SANTOS",                 d:[280.52,0,0,2015.66,1785.24,147.49,2125.17,896.36,0,0,720.7,5969.3,485.31], total:14425.75},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"thais_mayara",                    d:[0,268.12,0,3934.83,1164.53,1599.3,1741.82,1865.54,0,0,1039.49,2766.91,0], total:14380.54},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"aline_pupim",                     d:[898.89,0,0,1182.3,1099.63,134.9,2970.42,1920.28,0,0,1079.91,4222.09,0], total:13508.42},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"larissa_santana",                 d:[0,0,0,57.57,4709.36,130.99,0,1695.08,0,0,3598.6,2849.94,0], total:13041.54},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"ISABELA_MONTEIRO",                d:[0,0,0,0,1214.93,1163.42,3477.91,1574.87,222.84,0,1278.34,1377.34,0], total:10309.65},
+  {equipe:"COFEN STEPHANIE 2° TURNO", nome:"jussara_pereira",                 d:[0,0,0,2314.27,146.24,3754.21,1265.99,587.24,0,0,2014.75,0,0], total:10082.7}
 ];
 
 // ── Função que gera RDOP_DADOS dinamicamente a partir de D.equipes ──
@@ -12327,22 +12045,31 @@ function rdopGetDados(){
     });
   });
 
-  // Sempre mostra todos os dias úteis de 1 até hoje
-  // Sexta = engloba sáb/dom (já tratado no extractDay)
-  const _ano  = new Date().getFullYear();
-  const _mes  = new Date().getMonth(); // 0-based
-  for(let d = 1; d <= _hoje; d++){
-    const _dow = new Date(_ano, _mes, d).getDay();
-    // Inclui seg(1) ter(2) qua(3) qui(4) sex(5) — pula sáb(6) e dom(0) pois já foram somados na sexta
-    if(_dow !== 0 && _dow !== 6) diasAtivos.add(d);
-    // Sáb/dom: garante que a sexta correspondente está no set
-    if(_dow === 6) diasAtivos.add(d - 1);
-    if(_dow === 0) diasAtivos.add(d - 2 < 1 ? 1 : d - 2);
-  }
+  // Dias ordenados — fallback para dia de hoje se vazio
   let diasOrdenados = [...diasAtivos].sort((a,b)=>a-b);
   if(!diasOrdenados.length) diasOrdenados = [_hoje];
 
-  // Thead reconstruído dinamicamente em rdopRender()
+  // Atualizar labels dos dias na tabela dinamicamente
+  const thead = document.querySelector('#rdop-table thead tr');
+  if(thead && diasOrdenados.length){
+    // Mantém: # | Operador | Equipe | ...dias... | Total
+    const fixedCols = 3; // #, Operador, Equipe
+    // Recria cabeçalho de dias
+    const allTh = thead.querySelectorAll('th');
+    // Atualiza apenas os dias (índice 3 até penúltimo)
+    diasOrdenados.forEach((dia, i) => {
+      const thIdx = fixedCols + i;
+      if(allTh[thIdx]){
+        const mm = String(dia).padStart(2,'0');
+        allTh[thIdx].textContent = mm+'/05';
+        allTh[thIdx].style.display = '';
+      }
+    });
+    // Esconde colunas extras além do número de dias ativos
+    for(let i = fixedCols + diasOrdenados.length; i < allTh.length - 1; i++){
+      allTh[i].style.display = 'none';
+    }
+  }
 
   // Monta dados
   const resultado = [];
@@ -12424,33 +12151,6 @@ function rdopGetTextColor(v){
 function rdopRender(){
   const search = (document.getElementById('rdop-search')||{}).value || '';
   const RDOP_DADOS = rdopGetDados();
-
-  // ── Reconstrói thead com os dias ativos ──────────────────
-  const _thRow = document.getElementById('rdop-thead-dias');
-  if(_thRow){
-    // 1. Salva o TH Total ANTES de remover qualquer coisa
-    const _totalTh = _thRow.lastElementChild;
-    _thRow.removeChild(_totalTh);
-    // 2. Agora remove os TH de dias antigos (sobram apenas #, Operador, Equipe)
-    while(_thRow.children.length > 3) _thRow.removeChild(_thRow.children[3]);
-    // 3. Insere TH para cada dia ativo
-    const _mesAtual = new Date().getMonth()+1;
-    const _mmStr = String(_mesAtual).padStart(2,'0');
-    const _diaHoje = new Date().getDate();
-    (rdopDiasAtivos||[]).forEach(dia => {
-      const th = document.createElement('th');
-      const dd = String(dia).padStart(2,'0');
-      th.textContent = dd+'/'+_mmStr;
-      th.style.cssText = 'padding:10px 12px;text-align:right;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap;color:rgba(255,255,255,.85)';
-      if(dia === _diaHoje){
-        th.style.background = 'rgba(74,222,128,.25)';
-        th.style.color = '#4ADE80';
-      }
-      _thRow.appendChild(th);
-    });
-    // 4. Recoloca Total no fim
-    _thRow.appendChild(_totalTh);
-  }
 
   let dados = RDOP_DADOS.filter(r => {
     const nomeOk = r.nome.toLowerCase().includes(search.toLowerCase());
@@ -13418,353 +13118,7 @@ function addRemoveLider(eq){
     if(!D.equipes.find(eq=>eq.name===e.nome)) D.equipes.push({name:e.nome,rec:0,ho:0,n_op:0,acordos:0,ops:[]});
   });
 })();
-
-// ════════════════════════════════════════════════════════
-// MÓDULO: AGENDA DE ACORDOS POR OPERADOR
-// ════════════════════════════════════════════════════════
-
-let _agOpLogado  = null;  // nome do operador logado
-let _agAcordos   = {};    // { id: {codigo, coren, data, venc, forma, parcelado, nparcelas, vtotal, vparcela, canal, campanha, obs, status, ts} }
-let _agListener  = null;
-
-// ── Inicializa a aba (popula selects de operadores) ──────
-function agendaInit() {
-  const ops = _getAllOpNames();
-  const selLogin = document.getElementById('ag-login-op');
-  const selAdm   = document.getElementById('ag-adm-op');
-  if (!selLogin) return;
-
-  // Popula selects com operadores cadastrados
-  const optHtml = ops.map(n => `<option value="${n}">${n.replace(/_/g,' ')}</option>`).join('');
-  selLogin.innerHTML = '<option value="">— Selecione seu nome —</option>' + optHtml;
-  selAdm.innerHTML   = '<option value="">— Operador —</option>' + optHtml;
-
-  // Define data de hoje como padrão nos campos de data
-  const hoje = new Date().toISOString().split('T')[0];
-  const fData = document.getElementById('ag-f-data');
-  if (fData && !fData.value) fData.value = hoje;
-
-  // Se já estava logado nesta sessão, restaura
-  if (_agOpLogado) {
-    _agMostrarDashboard(_agOpLogado);
-  }
-
-  agendaToggleParcelas();
-}
-
-// ── Pega todos os nomes de operadores do D ──────────────
-function _getAllOpNames() {
-  const nomes = new Set();
-  (D.equipes || []).forEach(eq => {
-    (eq.ops || []).forEach(op => nomes.add(op.name));
-  });
-  return [...nomes].sort();
-}
-
-// ── Login ────────────────────────────────────────────────
-function agendaDoLogin() {
-  const opName = document.getElementById('ag-login-op').value;
-  const senha  = document.getElementById('ag-login-senha').value.trim();
-  const errEl  = document.getElementById('ag-login-err');
-
-  if (!opName) { _agLoginErr('Selecione seu nome.'); return; }
-  if (!senha)  { _agLoginErr('Digite sua senha.');   return; }
-
-  // Busca senha no Firebase
-  if (!fbDb || !fbRoom) {
-    _agLoginErr('Conecte ao Firebase primeiro (painel de conexão).');
-    return;
-  }
-
-  fbDb.ref(fbRoom + '/agenda_senhas/' + opName).once('value', snap => {
-    const savedSenha = snap.val();
-
-    // Sem senha cadastrada → senha padrão é o primeiro nome do operador
-    const senhaReal = savedSenha || opName.split('_')[0].toLowerCase();
-
-    if (senha.toLowerCase() === senhaReal.toLowerCase()) {
-      errEl.style.display = 'none';
-      document.getElementById('ag-login-senha').value = '';
-      _agMostrarDashboard(opName);
-    } else {
-      _agLoginErr('Senha incorreta. Fale com o gerente.');
-    }
-  });
-}
-
-function _agLoginErr(msg) {
-  const el = document.getElementById('ag-login-err');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-
-// ── Gerente define senha ─────────────────────────────────
-function agendaDefSenha() {
-  const op    = document.getElementById('ag-adm-op').value;
-  const senha = document.getElementById('ag-adm-senha').value.trim();
-  if (!op || !senha) { toast('Selecione o operador e defina a senha.'); return; }
-  if (!fbDb || !fbRoom) { toast('Firebase não conectado.'); return; }
-
-  fbDb.ref(fbRoom + '/agenda_senhas/' + op).set(senha, err => {
-    if (err) { toast('Erro ao salvar senha.'); return; }
-    document.getElementById('ag-adm-senha').value = '';
-    toast('✅ Senha de ' + op.replace(/_/g,' ') + ' atualizada!');
-  });
-}
-
-// ── Mostra dashboard do operador ─────────────────────────
-function _agMostrarDashboard(opName) {
-  _agOpLogado = opName;
-  document.getElementById('ag-login-screen').style.display  = 'none';
-  document.getElementById('ag-op-screen').style.display     = 'block';
-  document.getElementById('ag-op-title').textContent = '📋 ' + opName.replace(/_/g,' ');
-
-  const eq = _getEqDoOp(opName);
-  document.getElementById('ag-op-sub').textContent = eq ? 'Equipe: ' + (EQ[eq]?.sh || eq) : '';
-
-  // Ouve acordos em tempo real
-  if (_agListener) fbDb.ref(fbRoom + '/agenda/' + opName).off('value', _agListener);
-  _agListener = fbDb.ref(fbRoom + '/agenda/' + opName).on('value', snap => {
-    _agAcordos = snap.val() || {};
-    agendaRenderLista();
-    agendaRenderKpis();
-  });
-
-  agendaToggleParcelas();
-}
-
-function _getEqDoOp(opName) {
-  for (const eq of (D.equipes || [])) {
-    if ((eq.ops || []).find(o => o.name === opName)) return eq.name;
-  }
-  return null;
-}
-
-// ── Logout ───────────────────────────────────────────────
-function agendaLogout() {
-  if (_agListener && fbDb && fbRoom && _agOpLogado) {
-    fbDb.ref(fbRoom + '/agenda/' + _agOpLogado).off('value', _agListener);
-  }
-  _agOpLogado = null; _agAcordos = {}; _agListener = null;
-  document.getElementById('ag-login-screen').style.display = 'block';
-  document.getElementById('ag-op-screen').style.display    = 'none';
-  document.getElementById('ag-login-err').style.display    = 'none';
-}
-
-// ── Toggle campos parcela / campanha ─────────────────────
-function agendaToggleParcelas() {
-  const forma     = (document.getElementById('ag-f-forma')?.value     || '');
-  const parcelado = (document.getElementById('ag-f-parcelado')?.value || 'nao');
-  const canal     = (document.getElementById('ag-f-canal')?.value     || '');
-
-  const showParc = parcelado === 'sim';
-  const showCamp = canal === 'campanha';
-
-  _agShow('ag-f-nparcelas-wrap', showParc);
-  _agShow('ag-f-vparcela-wrap',  showParc);
-  _agShow('ag-f-campanha-wrap',  showCamp);
-
-  // Canal select
-  const canalEl = document.getElementById('ag-f-canal');
-  if (canalEl) canalEl.onchange = () => agendaToggleParcelas();
-}
-
-function _agShow(id, show) {
-  const el = document.getElementById(id);
-  if (el) el.style.display = show ? 'block' : 'none';
-}
-
-// ── Calcula valor da parcela automaticamente ─────────────
-function agendaCalcParcela() {
-  const vtotal = parseFloat(document.getElementById('ag-f-vtotal')?.value) || 0;
-  const np     = parseInt(document.getElementById('ag-f-nparcelas')?.value) || 0;
-  const vpEl   = document.getElementById('ag-f-vparcela');
-  if (vpEl && np > 0 && vtotal > 0) {
-    vpEl.value = (vtotal / np).toFixed(2);
-  }
-}
-
-// ── Salvar acordo ────────────────────────────────────────
-function agendaSalvar() {
-  if (!_agOpLogado) { toast('Faça login primeiro.'); return; }
-
-  const codigo   = document.getElementById('ag-f-codigo')?.value.trim();
-  const coren    = document.getElementById('ag-f-coren')?.value;
-  const data     = document.getElementById('ag-f-data')?.value;
-  const venc     = document.getElementById('ag-f-venc')?.value;
-  const forma    = document.getElementById('ag-f-forma')?.value;
-  const parcelado= document.getElementById('ag-f-parcelado')?.value || 'nao';
-  const nparcelas= parseInt(document.getElementById('ag-f-nparcelas')?.value) || 1;
-  const vtotal   = parseFloat(document.getElementById('ag-f-vtotal')?.value) || 0;
-  const vparcela = parseFloat(document.getElementById('ag-f-vparcela')?.value) || vtotal;
-  const canal    = document.getElementById('ag-f-canal')?.value;
-  const campanha = document.getElementById('ag-f-campanha')?.value.trim() || '';
-  const obs      = document.getElementById('ag-f-obs')?.value.trim() || '';
-
-  // Validação
-  if (!codigo) { toast('⚠️ Informe o código do acordo.'); return; }
-  if (!coren)  { toast('⚠️ Selecione o COREN.');         return; }
-  if (!data)   { toast('⚠️ Informe a data.');             return; }
-  if (!venc)   { toast('⚠️ Informe a data de vencimento.');return; }
-  if (!forma)  { toast('⚠️ Selecione a forma de pagamento.');return; }
-  if (!canal)  { toast('⚠️ Selecione o canal de origem.'); return; }
-  if (vtotal <= 0){ toast('⚠️ Informe o valor total.');   return; }
-
-  // Define status baseado na data de vencimento
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const dVenc = new Date(venc + 'T00:00:00');
-  const status = dVenc < hoje ? 'vencido' : 'pendente';
-
-  const id = 'ac_' + Date.now();
-  const acordo = {
-    id, codigo, coren, data, venc, forma,
-    parcelado, nparcelas: parcelado === 'sim' ? nparcelas : 1,
-    vtotal, vparcela: parcelado === 'sim' ? vparcela : vtotal,
-    canal, campanha, obs, status,
-    ts: Date.now(),
-    op: _agOpLogado
-  };
-
-  // Salva no Firebase
-  fbDb.ref(fbRoom + '/agenda/' + _agOpLogado + '/' + id).set(acordo, err => {
-    if (err) { toast('❌ Erro ao salvar. Verifique conexão.'); return; }
-    const msg = document.getElementById('ag-save-msg');
-    msg.style.display = 'inline';
-    setTimeout(() => msg.style.display = 'none', 3000);
-    agendaLimpar();
-  });
-}
-
-// ── Limpa formulário ─────────────────────────────────────
-function agendaLimpar() {
-  ['ag-f-codigo','ag-f-coren','ag-f-forma','ag-f-parcelado',
-   'ag-f-nparcelas','ag-f-vtotal','ag-f-vparcela','ag-f-canal',
-   'ag-f-campanha','ag-f-obs'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (el.tagName === 'SELECT') el.selectedIndex = 0;
-    else el.value = '';
-  });
-  // Mantém data de hoje
-  document.getElementById('ag-f-data').value = new Date().toISOString().split('T')[0];
-  document.getElementById('ag-f-venc').value = '';
-  agendaToggleParcelas();
-}
-
-// ── Atualiza status de um acordo ─────────────────────────
-function agendaSetStatus(id, status) {
-  if (!_agOpLogado || !fbDb || !fbRoom) return;
-  fbDb.ref(fbRoom + '/agenda/' + _agOpLogado + '/' + id + '/status').set(status);
-}
-
-// ── Excluir acordo ───────────────────────────────────────
-function agendaExcluir(id) {
-  if (!confirm('Excluir este acordo?')) return;
-  fbDb.ref(fbRoom + '/agenda/' + _agOpLogado + '/' + id).remove();
-}
-
-// ── KPIs ─────────────────────────────────────────────────
-function agendaRenderKpis() {
-  const lista = Object.values(_agAcordos);
-  const total  = lista.length;
-  const pagos  = lista.filter(a => a.status === 'pago').length;
-  const vencidos = lista.filter(a => a.status === 'vencido').length;
-  const pendentes = lista.filter(a => a.status === 'pendente').length;
-  const vtotalAll = lista.reduce((s,a) => s + (parseFloat(a.vtotal)||0), 0);
-  const vPagos    = lista.filter(a=>a.status==='pago').reduce((s,a)=>s+(parseFloat(a.vtotal)||0),0);
-
-  const kEl = document.getElementById('ag-kpis');
-  if (!kEl) return;
-  kEl.innerHTML = [
-    {ico:'📋', lbl:'Total Acordos',   val: total,           cor:'var(--g900)'},
-    {ico:'⏳', lbl:'Pendentes',        val: pendentes,       cor:'var(--warn)'},
-    {ico:'✅', lbl:'Pagos',            val: pagos,           cor:'var(--ok)'},
-    {ico:'🔴', lbl:'Vencidos',         val: vencidos,        cor:'var(--danger)'},
-    {ico:'💰', lbl:'Total Agendado',   val: fR(vtotalAll),   cor:'var(--pp)'},
-    {ico:'💸', lbl:'Total Recebido',   val: fR(vPagos),      cor:'var(--ok)'},
-  ].map(k => `
-    <div style="background:var(--w);border:1.5px solid var(--g200);border-radius:12px;padding:14px 16px">
-      <div style="font-size:20px;margin-bottom:4px">${k.ico}</div>
-      <div style="font-size:10px;font-weight:800;color:var(--g400);letter-spacing:.7px;text-transform:uppercase">${k.lbl}</div>
-      <div style="font-size:18px;font-weight:900;color:${k.cor};margin-top:4px">${k.val}</div>
-    </div>
-  `).join('');
-}
-
-// ── Render lista de acordos ──────────────────────────────
-function agendaRenderLista() {
-  const listaEl = document.getElementById('ag-lista');
-  const emptyEl = document.getElementById('ag-lista-empty');
-  if (!listaEl) return;
-
-  const filtroStatus = document.getElementById('ag-filtro-status')?.value || '';
-  const filtroBusca  = (document.getElementById('ag-filtro-busca')?.value || '').toLowerCase();
-
-  let lista = Object.values(_agAcordos).sort((a,b) => b.ts - a.ts);
-
-  if (filtroStatus) lista = lista.filter(a => a.status === filtroStatus);
-  if (filtroBusca)  lista = lista.filter(a => (a.codigo||'').toLowerCase().includes(filtroBusca) || (a.coren||'').toLowerCase().includes(filtroBusca));
-
-  if (lista.length === 0) {
-    listaEl.innerHTML = '';
-    emptyEl.style.display = 'block';
-    return;
-  }
-  emptyEl.style.display = 'none';
-
-  const statusIco = { pago:'✅', pendente:'⏳', vencido:'🔴' };
-  const statusBg  = { pago:'#D1FAE5', pendente:'#FEF3C7', vencido:'#FEE2E2' };
-  const formaBadge = { pix:'ag-badge-pix', boleto:'ag-badge-boleto', cartao:'ag-badge-cartao' };
-  const canalLabel = { telefone_ativo:'📞 Tel. Ativo', campanha:'📣 Campanha', whatsapp:'💬 WhatsApp', receptivo:'📲 Receptivo' };
-
-  listaEl.innerHTML = lista.map(a => {
-    const parcInfo = a.parcelado === 'sim'
-      ? `${a.nparcelas}x de ${fR(a.vparcela)}`
-      : 'À vista';
-    return `
-    <div class="ag-card">
-      <div class="ag-card-status" style="background:${statusBg[a.status]||'#F3F4F6'}">
-        ${statusIco[a.status]||'❓'}
-      </div>
-      <div class="ag-card-body">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span class="ag-card-codigo">${a.codigo}</span>
-          <span class="ag-badge ${formaBadge[a.forma]||''}">${(a.forma||'').toUpperCase()}</span>
-          <span class="ag-badge ag-badge-${a.status||'pendente'}">${a.status||'pendente'}</span>
-          <span class="ag-badge ag-badge-${a.canal==='campanha'?'campanha':'telefone'}">${canalLabel[a.canal]||a.canal||''}</span>
-        </div>
-        <div class="ag-card-meta">
-          <span>📅 Agend.: ${a.data||''}</span>
-          <span>⏰ Venc.: ${a.venc||''}</span>
-          <span>🏥 ${a.coren||''}</span>
-          <span>💳 ${parcInfo}</span>
-          ${a.campanha?`<span>📣 ${a.campanha}</span>`:''}
-          ${a.obs?`<span>📝 ${a.obs}</span>`:''}
-        </div>
-        <div class="ag-card-val">${fR(a.vtotal)}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
-        ${a.status !== 'pago' ? `<button onclick="agendaSetStatus('${a.id}','pago')"
-          style="padding:5px 10px;background:#D1FAE5;color:#065F46;border:none;border-radius:7px;font-family:Nunito,sans-serif;font-size:11px;font-weight:800;cursor:pointer">✅ Pago</button>` : ''}
-        ${a.status !== 'pendente' ? `<button onclick="agendaSetStatus('${a.id}','pendente')"
-          style="padding:5px 10px;background:#FEF3C7;color:#92400E;border:none;border-radius:7px;font-family:Nunito,sans-serif;font-size:11px;font-weight:800;cursor:pointer">⏳ Pendente</button>` : ''}
-        <button onclick="agendaExcluir('${a.id}')"
-          style="padding:5px 10px;background:#FEE2E2;color:#991B1B;border:none;border-radius:7px;font-family:Nunito,sans-serif;font-size:11px;font-weight:800;cursor:pointer">🗑 Excluir</button>
-      </div>
-    </div>
-    `;
-  }).join('');
-}
-// ════════════════════════════════════════════════════════
-// FIM MÓDULO AGENDA
-// ════════════════════════════════════════════════════════
-
 </script>
 
 </body>
 </html>
-
-
-
-
-
