@@ -1204,6 +1204,11 @@ select.ev-inp{cursor:pointer}
       border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap">
       ➕ Adicionar
     </div>
+    <div class="gtab" onclick="gTab('extra',this)"
+      style="padding:11px 18px;font-weight:800;font-size:12px;cursor:pointer;color:var(--g500);
+      border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap">
+      💰 Extra Equipe
+    </div>
   </div>
 
   <!-- ── SUB: MOVER OPERADORES ── -->
@@ -1295,6 +1300,30 @@ select.ev-inp{cursor:pointer}
         ⚡ Distribuir meta da equipe
       </button>
     </div>
+  </div>
+
+  <!-- ── SUB: EXTRA POR EQUIPE ── -->
+  <div id="gsub-extra" class="gsub" style="display:none;background:var(--w);border:1px solid var(--g200);border-radius:0 0 var(--rl) var(--rl);padding:20px;box-shadow:var(--sh)">
+    <div style="font-size:12px;color:var(--g500);font-weight:600;margin-bottom:16px;background:#FFFBEB;border:1px solid #FCD34D;border-radius:var(--rm);padding:9px 14px;line-height:1.6">
+      💰 Informe um valor de recebimento <strong>extra por equipe</strong>. Ao salvar, o valor será adicionado ao recebimento de <strong>todos os operadores</strong> da equipe (dividido igualmente) e atualizado em <strong>todas as abas</strong>.
+    </div>
+    <div id="extra-eq-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div style="display:flex;gap:10px;margin-top:18px;align-items:center;flex-wrap:wrap">
+      <button onclick="extraSalvar()"
+        style="padding:10px 28px;border-radius:var(--rm);border:none;cursor:pointer;
+        background:linear-gradient(135deg,#F59E0B,#F97316);color:#fff;
+        font-family:Nunito,sans-serif;font-weight:800;font-size:14px;
+        box-shadow:0 4px 12px rgba(245,158,11,.3)">
+        💾 Salvar Extra e Atualizar Tudo
+      </button>
+      <button onclick="extraZerarTudo()"
+        style="padding:10px 18px;border-radius:var(--rm);border:1.5px solid var(--g200);
+        background:var(--w);color:var(--danger);font-family:Nunito,sans-serif;font-weight:700;font-size:13px;cursor:pointer">
+        🗑️ Zerar todos os extras
+      </button>
+    </div>
+    <!-- Resumo atual -->
+    <div id="extra-resumo" style="margin-top:16px"></div>
   </div>
 
   <!-- ── SUB: NOVO OPERADOR ── -->
@@ -5904,6 +5933,7 @@ function gTab(id, el){
   if(id==='meta-op') metaOpInit();
   if(id==='fotos') fotosInit();
   if(id==='adicionar') addInit();
+  if(id==='extra') extraInit();
 }
 
 // ── INIT ──
@@ -5915,7 +5945,233 @@ function gestaoInit(){
   metaOpInit();
   gestaoRemoverInit();
   addInit();
+  extraInit();
 }
+
+// ══════════════════════════════════════════
+// MÓDULO: EXTRA POR EQUIPE
+// ══════════════════════════════════════════
+// Armazena {eqName: valor_extra_total} no localStorage
+function extraGetAll(){ try{ return JSON.parse(localStorage.getItem('cofen_extra_eq')||'{}'); }catch(e){return {};} }
+function extraSetAll(obj){ localStorage.setItem('cofen_extra_eq', JSON.stringify(obj)); }
+
+// Inicializa o painel de Extra
+function extraInit(){
+  const el = document.getElementById('extra-eq-list');
+  if(!el) return;
+  const saved = extraGetAll();
+
+  el.innerHTML = D.equipes.map(eq=>{
+    const cfg   = EQ[eq.name]||{c:'#888',sh:eq.name,ico:'🏢'};
+    const extra = saved[eq.name]||0;
+    const nOps  = eq.ops.length||1;
+    const porOp = extra>0 ? extra/nOps : 0;
+    const safeId= eq.name.replace(/[^a-zA-Z0-9]/g,'_');
+    return `
+    <div style="background:var(--g50);border:1.5px solid ${extra>0?'#FCD34D':'var(--g200)'};border-radius:var(--rl);padding:14px 16px;
+      border-left:4px solid ${cfg.c}">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <div style="width:34px;height:34px;border-radius:9px;background:${cfg.c};display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">${cfg.ico}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:900;font-size:13px;color:var(--g900)">${cfg.sh}</div>
+          <div style="font-size:10px;color:var(--g500);font-weight:600">${nOps} operador${nOps!==1?'es':''} · ${extra>0?'Extra ativo ✅':'Sem extra'}</div>
+        </div>
+        ${extra>0?`<div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:var(--rm);padding:6px 12px;text-align:center">
+          <div style="font-size:9px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.8px">Por operador</div>
+          <div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:#B45309">${fR(porOp)}</div>
+        </div>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="flex:1">
+          <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:5px">💰 Valor Extra da Equipe (Total)</label>
+          <div style="position:relative">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:var(--g500);pointer-events:none">R$</span>
+            <input type="number" id="extra-inp-${safeId}" value="${extra||''}" placeholder="0,00" step="0.01" min="0"
+              style="width:100%;background:${extra>0?'#FFFBEB':'var(--w)'};border:1.5px solid ${extra>0?'#FCD34D':'var(--g200)'};
+              border-radius:var(--rm);padding:10px 10px 10px 30px;font-family:Nunito,sans-serif;
+              font-size:15px;font-weight:800;color:var(--g900);outline:none;transition:all .2s"
+              oninput="extraPreviewRow('${eq.name.replace(/'/g,"\\'")}',this.value,${nOps})"
+              onfocus="this.style.borderColor='#F59E0B';this.style.boxShadow='0 0 0 3px rgba(245,158,11,.15)'"
+              onblur="this.style.boxShadow=''">
+          </div>
+        </div>
+        <div id="extra-preview-${safeId}" style="min-width:120px;text-align:center">
+          ${extra>0?`<div style="font-size:9px;color:#92400E;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px">Atual</div>
+          <div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:#B45309">${fR(extra)}</div>
+          <div style="font-size:9px;color:var(--g500)">${fR(porOp)}/op</div>`:
+          '<div style="font-size:11px;color:var(--g300)">—</div>'}
+        </div>
+        <button onclick="extraSalvarEquipe('${eq.name.replace(/'/g,"\\'")}')"
+          style="padding:10px 14px;border-radius:var(--rm);border:none;cursor:pointer;
+          background:linear-gradient(135deg,#F59E0B,#F97316);color:#fff;
+          font-family:Nunito,sans-serif;font-weight:800;font-size:12px;white-space:nowrap;flex-shrink:0">
+          ✅ Salvar Esta
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  extraRenderResumo();
+}
+
+// Preview inline ao digitar
+function extraPreviewRow(eqName, val, nOps){
+  const safeId = eqName.replace(/[^a-zA-Z0-9]/g,'_');
+  const el = document.getElementById('extra-preview-'+safeId);
+  if(!el) return;
+  const v = parseFloat(val)||0;
+  const porOp = v>0 ? v/nOps : 0;
+  if(v>0){
+    el.innerHTML = `<div style="font-size:9px;color:#92400E;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px">Novo</div>
+      <div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:#F97316">${fR(v)}</div>
+      <div style="font-size:9px;color:var(--g500)">${fR(porOp)}/op</div>`;
+  } else {
+    el.innerHTML = '<div style="font-size:11px;color:var(--g300)">—</div>';
+  }
+}
+
+// Salvar extra de UMA equipe
+function extraSalvarEquipe(eqName){
+  const safeId = eqName.replace(/[^a-zA-Z0-9]/g,'_');
+  const inp = document.getElementById('extra-inp-'+safeId);
+  if(!inp){ toast('❌ Campo não encontrado!'); return; }
+  const val = parseFloat(inp.value)||0;
+  const saved = extraGetAll();
+  if(val > 0) saved[eqName] = val; else delete saved[eqName];
+  extraSetAll(saved);
+  _extraAplicar(saved);
+  extraInit();
+  toast('✅ Extra da equipe salvo e aplicado em todas as abas!');
+}
+
+// Salvar todos os extras de uma vez
+function extraSalvar(){
+  const saved = {};
+  D.equipes.forEach(eq=>{
+    const safeId = eq.name.replace(/[^a-zA-Z0-9]/g,'_');
+    const inp = document.getElementById('extra-inp-'+safeId);
+    if(!inp) return;
+    const val = parseFloat(inp.value)||0;
+    if(val > 0) saved[eq.name] = val;
+  });
+  extraSetAll(saved);
+  _extraAplicar(saved);
+  extraInit();
+  toast('✅ Extras salvos e aplicados em todas as abas!');
+}
+
+// Zerar todos os extras
+function extraZerarTudo(){
+  if(!confirm('Zerar todos os valores extras de todas as equipes?')) return;
+  extraSetAll({});
+  _extraAplicar({});
+  extraInit();
+  toast('🗑️ Todos os extras foram zerados!');
+}
+
+// Aplicar extras: recalcula op.rec com base no valor original + extra por operador
+function _extraAplicar(extraMap){
+  // Salvar snapshot do rec base (sem extra) na primeira chamada,
+  // ou usar o snapshot já salvo para garantir que não acumule
+  let baseSnap = {};
+  try { baseSnap = JSON.parse(localStorage.getItem('cofen_base_rec')||'{}'); } catch(e){}
+
+  // Se não temos snapshot ainda, cria agora a partir do estado atual de D.equipes
+  // Só cria snapshot se não há extra ativo ainda
+  const extraAtual = extraGetAll();
+  const jaTemExtra = Object.keys(extraAtual).some(k => extraAtual[k] > 0);
+  if(!jaTemExtra || Object.keys(baseSnap).length === 0){
+    // Gravar estado atual como base (sem extras)
+    D.equipes.forEach(eq=>{
+      eq.ops.forEach(op=>{
+        if(!(op.name in baseSnap)){
+          baseSnap[op.name] = op.rec;
+        }
+      });
+    });
+    localStorage.setItem('cofen_base_rec', JSON.stringify(baseSnap));
+  }
+
+  // Para cada equipe, distribui o extra igualmente entre os operadores
+  D.equipes.forEach(eq=>{
+    const extraTotal = parseFloat(extraMap[eq.name]||0);
+    const nOps = eq.ops.filter(o=>o.name).length || 1;
+    const extraPorOp = extraTotal / nOps;
+
+    eq.ops.forEach(op=>{
+      // Recebimento base = snapshot original (sem extra)
+      const baseRec = baseSnap[op.name] !== undefined ? baseSnap[op.name] : op.rec;
+      op.rec = baseRec + extraPorOp;
+      op.ho  = op.rec * 0.25;
+    });
+
+    eq.rec = eq.ops.reduce((s,o)=>s+o.rec, 0);
+    eq.ho  = eq.ops.reduce((s,o)=>s+o.ho,  0);
+  });
+
+  // Rebuild ALL e refresh todas as abas
+  rebuildAll();
+  refreshAll();
+
+  // Sincronizar Firebase
+  if(typeof fbDb !== 'undefined' && fbDb && fbRoom){
+    fbPush('extra_eq', {...extraMap, _ts: Date.now()});
+  }
+}
+
+// Recupera o rec base de um operador (antes do extra)
+// Usa o override salvo, ou o valor em D.equipes sem extra aplicado
+function _extraGetBaseRec(opName){
+  const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+  if(ov[opName] !== undefined) return parseFloat(ov[opName])||0;
+  // Fallback: procura no ALL
+  const op = ALL.find(o=>o.name===opName);
+  return op ? (op._baseRec !== undefined ? op._baseRec : op.rec) : 0;
+}
+
+// Renderiza resumo dos extras ativos
+function extraRenderResumo(){
+  const el = document.getElementById('extra-resumo');
+  if(!el) return;
+  const saved = extraGetAll();
+  const entries = Object.entries(saved).filter(([,v])=>v>0);
+  if(entries.length === 0){ el.innerHTML=''; return; }
+
+  const totalExtra = entries.reduce((s,[,v])=>s+v,0);
+  el.innerHTML = `
+  <div style="background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:1.5px solid #FCD34D;border-radius:var(--rl);padding:14px 16px;margin-top:4px">
+    <div style="font-size:10px;font-weight:800;color:#92400E;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">
+      📊 Extras Ativos — Total: ${fR(totalExtra)}
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      ${entries.map(([eqName, val])=>{
+        const cfg = EQ[eqName]||{sh:eqName,c:'#888',ico:'🏢'};
+        const eq  = D.equipes.find(e=>e.name===eqName);
+        const nOps= eq ? eq.ops.length : 1;
+        return `<div style="background:var(--w);border:1px solid #FDE68A;border-radius:var(--rm);padding:8px 12px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:15px">${cfg.ico}</span>
+          <div>
+            <div style="font-size:11px;font-weight:800;color:var(--g900)">${cfg.sh}</div>
+            <div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:#B45309">${fR(val)}</div>
+            <div style="font-size:9px;color:var(--g500)">${fR(val/nOps)}/op</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+// Restaurar extras do localStorage ao inicializar (chamado no init do sistema)
+function extraRestoreOnLoad(){
+  const saved = extraGetAll();
+  if(Object.keys(saved).length > 0){
+    _extraAplicar(saved);
+  }
+}
+
+// Também restaurar extras do Firebase quando receber dados
+// (integrado via fbStartListening ao ouvir 'extra_eq')
+
 
 // ─────────────────────────────
 // MOVER OPERADORES
@@ -6683,12 +6939,22 @@ function importApply(){
 
   // Rebuild ALL ordenado → ranking atualizado
   rebuildAll();
-  refreshAll();
 
   // Salvar no localStorage
   const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
   importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
   localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
+
+  // Resetar snapshot base (novos valores importados = nova base)
+  localStorage.removeItem('cofen_base_rec');
+
+  // Reaplicar extras se existirem
+  const _extraMapPos = typeof extraGetAll==='function' ? extraGetAll() : {};
+  if(Object.keys(_extraMapPos).length > 0){
+    _extraAplicar(_extraMapPos);
+  } else {
+    refreshAll();
+  }
 
   const totalImportado = importParsed.found.reduce((s,r)=>s+r.recImport,0);
   toast(`✅ ${updated} operadores atualizados! Total: ${fRK(totalImportado)} · HO: ${fRK(totalImportado*0.25)}`);
@@ -8429,6 +8695,23 @@ function fbStartListening(){
   });
   fbListeners.gestao = true;
 
+  // ── Extra por Equipe ──
+  fbDb.ref(fbRoom+'/extra_eq').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    // Remove chave de controle interna _ts
+    const cleanRemote = {...remote};
+    delete cleanRemote._ts;
+    const local = extraGetAll();
+    if(JSON.stringify(cleanRemote)===JSON.stringify(local)) return;
+    extraSetAll(cleanRemote);
+    _extraAplicar(cleanRemote);
+    // Atualiza painel se estiver aberto
+    if(document.getElementById('gsub-extra')?.style.display!=='none') extraInit();
+    pulseSyncDot();
+  });
+  fbListeners.extra_eq = true;
+
   // ── Checklist por equipe ──
   D.equipes.forEach(eq=>{
     const key = 'chk_eq_'+eq.name.replace(/[^a-zA-Z0-9]/g,'_');
@@ -8558,9 +8841,19 @@ function applyOps(){
   const merged = {...existing, ...overrides};
   localStorage.setItem('cofen_op_overrides', JSON.stringify(merged));
 
+  // Resetar snapshot base (para que _extraAplicar use os novos valores como base)
+  localStorage.removeItem('cofen_base_rec');
+
   // Rebuild ALL e atualizar tudo
   rebuildAll();
-  refreshAll();
+
+  // Reaplicar extras se existirem
+  const extraAtual = typeof extraGetAll === 'function' ? extraGetAll() : {};
+  if(Object.keys(extraAtual).length > 0){
+    _extraAplicar(extraAtual);
+  } else {
+    refreshAll();
+  }
 
   // Sincronizar Firebase
   fbPush('overrides', {...merged, _ts: Date.now()});
@@ -8643,6 +8936,9 @@ function fbPushAllLocal(){
   if(Object.keys(rd).length>0){if(typeof fbUpdateRD==='function') fbUpdateRD(rd);}
   const gestao=gGetOverrides();
   if(Object.keys(gestao).length>0) fbPush('gestao',gestao);
+  // Extra por equipe
+  const extraEq=extraGetAll();
+  if(Object.keys(extraEq).length>0) fbPush('extra_eq',{...extraEq,_ts:Date.now()});
 }
 
 async function fbAutoConnect(){
@@ -10178,6 +10474,8 @@ initHero();
 fbAutoConnect();
 mkGD(); mkDist(); mkTop5();
 mkEq();
+// Restaurar extras de equipe do localStorage ao iniciar
+setTimeout(()=>{ if(typeof extraRestoreOnLoad==='function') extraRestoreOnLoad(); }, 500);
 // Inicializa cards de Abril na página Metas 2026
 setTimeout(()=>{ if(typeof mtsAtualizarAbril==='function') mtsAtualizarAbril(); }, 300);
 // ══════════════════════════════════════════════════════════════
