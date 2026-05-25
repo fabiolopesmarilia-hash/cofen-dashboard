@@ -6071,36 +6071,31 @@ function extraZerarTudo(){
 
 // Aplicar extras: recalcula op.rec com base no valor original + extra por operador
 function _extraAplicar(extraMap){
-  // Salvar snapshot do rec base (sem extra) na primeira chamada,
-  // ou usar o snapshot já salvo para garantir que não acumule
+  // Passo 1: garantir snapshot do rec BASE (sem nenhum extra).
+  // Prioridade: overrides importados (cofen_op_overrides) > rec atual de D.equipes
   let baseSnap = {};
   try { baseSnap = JSON.parse(localStorage.getItem('cofen_base_rec')||'{}'); } catch(e){}
 
-  // Se não temos snapshot ainda, cria agora a partir do estado atual de D.equipes
-  // Só cria snapshot se não há extra ativo ainda
-  const extraAtual = extraGetAll();
-  const jaTemExtra = Object.keys(extraAtual).some(k => extraAtual[k] > 0);
-  if(!jaTemExtra || Object.keys(baseSnap).length === 0){
-    // Gravar estado atual como base (sem extras)
+  if(Object.keys(baseSnap).length === 0){
+    const overrides = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
     D.equipes.forEach(eq=>{
       eq.ops.forEach(op=>{
-        if(!(op.name in baseSnap)){
-          baseSnap[op.name] = op.rec;
-        }
+        baseSnap[op.name] = overrides[op.name] !== undefined
+          ? parseFloat(overrides[op.name])||0
+          : op.rec;
       });
     });
     localStorage.setItem('cofen_base_rec', JSON.stringify(baseSnap));
   }
 
-  // Para cada equipe, distribui o extra igualmente entre os operadores
+  // Passo 2: para cada equipe, distribuir extra e somar ao base
   D.equipes.forEach(eq=>{
     const extraTotal = parseFloat(extraMap[eq.name]||0);
-    const nOps = eq.ops.filter(o=>o.name).length || 1;
+    const nOps = eq.ops.length || 1;
     const extraPorOp = extraTotal / nOps;
 
     eq.ops.forEach(op=>{
-      // Recebimento base = snapshot original (sem extra)
-      const baseRec = baseSnap[op.name] !== undefined ? baseSnap[op.name] : op.rec;
+      const baseRec = baseSnap[op.name] !== undefined ? parseFloat(baseSnap[op.name])||0 : 0;
       op.rec = baseRec + extraPorOp;
       op.ho  = op.rec * 0.25;
     });
@@ -6109,11 +6104,11 @@ function _extraAplicar(extraMap){
     eq.ho  = eq.ops.reduce((s,o)=>s+o.ho,  0);
   });
 
-  // Rebuild ALL e refresh todas as abas
+  // Passo 3: rebuild e refresh TODAS as abas
   rebuildAll();
   refreshAll();
 
-  // Sincronizar Firebase
+  // Passo 4: sincronizar Firebase
   if(typeof fbDb !== 'undefined' && fbDb && fbRoom){
     fbPush('extra_eq', {...extraMap, _ts: Date.now()});
   }
@@ -6165,6 +6160,8 @@ function extraRenderResumo(){
 function extraRestoreOnLoad(){
   const saved = extraGetAll();
   if(Object.keys(saved).length > 0){
+    // Zera snapshot para que _extraAplicar reconstrua a partir dos overrides atuais
+    localStorage.removeItem('cofen_base_rec');
     _extraAplicar(saved);
   }
 }
