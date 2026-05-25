@@ -2563,6 +2563,25 @@ function rebuildAll(){
 }
 rebuildAll();
 
+// ── Salvar snapshot do rec original de D.equipes (antes de qualquer extra ou override) ──
+// Isso garante que _extraAplicar sempre tenha a base correta mesmo sem importação
+(function _salvarBaseRecInicial(){
+  // Só salva se não existe snapshot E não há overrides já aplicados
+  const existeSnap = localStorage.getItem('cofen_base_rec');
+  if(existeSnap) return; // já existe, respeitar
+  const overrides = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+  const snap = {};
+  D.equipes.forEach(eq=>{
+    eq.ops.forEach(op=>{
+      // Se tem override importado, usa ele como base; senão, usa rec do D hardcoded
+      snap[op.name] = overrides[op.name] !== undefined
+        ? parseFloat(overrides[op.name])||0
+        : op.rec;
+    });
+  });
+  localStorage.setItem('cofen_base_rec', JSON.stringify(snap));
+})();
+
 // ── METAS DE EQUIPE — Abril e Maio em chaves separadas ──
 (function forcarMetasCorretas(){
   // ABRIL encerrado: Brenda=300k, Bruna=200k, Stephanie=200k
@@ -6039,6 +6058,8 @@ function extraSalvarEquipe(eqName){
   const saved = extraGetAll();
   if(val > 0) saved[eqName] = val; else delete saved[eqName];
   extraSetAll(saved);
+  // Zerar snapshot ANTES de aplicar — garante base limpa dos overrides
+  localStorage.removeItem('cofen_base_rec');
   _extraAplicar(saved);
   extraInit();
   toast('✅ Extra da equipe salvo e aplicado em todas as abas!');
@@ -6055,6 +6076,8 @@ function extraSalvar(){
     if(val > 0) saved[eq.name] = val;
   });
   extraSetAll(saved);
+  // Zerar snapshot ANTES de aplicar — garante base limpa dos overrides
+  localStorage.removeItem('cofen_base_rec');
   _extraAplicar(saved);
   extraInit();
   toast('✅ Extras salvos e aplicados em todas as abas!');
@@ -6064,6 +6087,7 @@ function extraSalvar(){
 function extraZerarTudo(){
   if(!confirm('Zerar todos os valores extras de todas as equipes?')) return;
   extraSetAll({});
+  localStorage.removeItem('cofen_base_rec');
   _extraAplicar({});
   extraInit();
   toast('🗑️ Todos os extras foram zerados!');
@@ -6071,31 +6095,38 @@ function extraZerarTudo(){
 
 // Aplicar extras: recalcula op.rec com base no valor original + extra por operador
 function _extraAplicar(extraMap){
-  // Passo 1: garantir snapshot do rec BASE (sem nenhum extra).
-  // Prioridade: overrides importados (cofen_op_overrides) > rec atual de D.equipes
+  // BASE sempre vem dos overrides importados (cofen_op_overrides).
+  // Se um operador não tem override, usa o valor original de D.equipes salvo em cofen_base_rec.
+  // Isso garante que nunca acumule extra em cima de extra.
+  const overrides = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+
+  // Montar/atualizar snapshot do rec base original (antes de qualquer extra)
   let baseSnap = {};
   try { baseSnap = JSON.parse(localStorage.getItem('cofen_base_rec')||'{}'); } catch(e){}
 
-  if(Object.keys(baseSnap).length === 0){
-    const overrides = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
-    D.equipes.forEach(eq=>{
-      eq.ops.forEach(op=>{
+  // Registrar no snapshot apenas operadores que ainda não estão nele
+  // (novos operadores adicionados depois da primeira importação)
+  D.equipes.forEach(eq=>{
+    eq.ops.forEach(op=>{
+      if(!(op.name in baseSnap)){
         baseSnap[op.name] = overrides[op.name] !== undefined
           ? parseFloat(overrides[op.name])||0
           : op.rec;
-      });
+      }
     });
-    localStorage.setItem('cofen_base_rec', JSON.stringify(baseSnap));
-  }
+  });
+  localStorage.setItem('cofen_base_rec', JSON.stringify(baseSnap));
 
-  // Passo 2: para cada equipe, distribuir extra e somar ao base
+  // Aplicar: base + extra/operador para cada equipe
   D.equipes.forEach(eq=>{
     const extraTotal = parseFloat(extraMap[eq.name]||0);
     const nOps = eq.ops.length || 1;
     const extraPorOp = extraTotal / nOps;
 
     eq.ops.forEach(op=>{
-      const baseRec = baseSnap[op.name] !== undefined ? parseFloat(baseSnap[op.name])||0 : 0;
+      // SEMPRE usar a base salva no snapshot — nunca o op.rec atual (que pode já ter extra)
+      const baseRec = baseSnap[op.name] !== undefined ? parseFloat(baseSnap[op.name])||0
+        : (overrides[op.name] !== undefined ? parseFloat(overrides[op.name])||0 : 0);
       op.rec = baseRec + extraPorOp;
       op.ho  = op.rec * 0.25;
     });
@@ -6104,11 +6135,11 @@ function _extraAplicar(extraMap){
     eq.ho  = eq.ops.reduce((s,o)=>s+o.ho,  0);
   });
 
-  // Passo 3: rebuild e refresh TODAS as abas
+  // Rebuild ALL e refresh TODAS as abas
   rebuildAll();
   refreshAll();
 
-  // Passo 4: sincronizar Firebase
+  // Sincronizar Firebase
   if(typeof fbDb !== 'undefined' && fbDb && fbRoom){
     fbPush('extra_eq', {...extraMap, _ts: Date.now()});
   }
@@ -6160,7 +6191,7 @@ function extraRenderResumo(){
 function extraRestoreOnLoad(){
   const saved = extraGetAll();
   if(Object.keys(saved).length > 0){
-    // Zera snapshot para que _extraAplicar reconstrua a partir dos overrides atuais
+    // Sempre zerar o snapshot ao carregar — garante base limpa dos overrides importados
     localStorage.removeItem('cofen_base_rec');
     _extraAplicar(saved);
   }
@@ -8579,8 +8610,15 @@ function fbStartListening(){
       const cmpOp = CMP_OPS_DEDUP.find(c=>c.nome===op.name);
       if(cmpOp && op.rec > 0) cmpOp.abril = op.rec;
     });
-    refreshAll();
     localStorage.setItem('cofen_op_overrides', JSON.stringify({...local,...remote}));
+    // Overrides atualizados = nova base; zerar snapshot e reaplicar extras se houver
+    localStorage.removeItem('cofen_base_rec');
+    const _extraPosOv = typeof extraGetAll==='function' ? extraGetAll() : {};
+    if(Object.keys(_extraPosOv).length > 0){
+      _extraAplicar(_extraPosOv); // já chama refreshAll internamente
+    } else {
+      refreshAll();
+    }
     pulseSyncDot();
   });
   fbListeners.overrides = true;
