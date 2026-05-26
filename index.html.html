@@ -3969,6 +3969,9 @@ function aplicarGeral(){
   // ── Extrair rec por DU e atualizar CMP_MAIO_CUMUL + CMP_ABRIL_DU ──
   if(typeof _parseGeralPorEquipe === 'function'){
     const eqResult = _parseGeralPorEquipe(raw);
+    if(!eqResult){
+      statusEl.innerHTML += ' · <span style="color:#F59E0B;font-weight:800">⚠️ Comparativo: coluna de data não reconhecida no CSV. Verifique o console (F12) para ver o cabeçalho detectado.</span>';
+    }
     if(eqResult && Object.keys(eqResult.cumulGlobal).length > 0){
       Object.keys(CMP_MAIO_CUMUL).forEach(k=>delete CMP_MAIO_CUMUL[k]);
       Object.assign(CMP_MAIO_CUMUL, eqResult.cumulGlobal);
@@ -4021,11 +4024,15 @@ function _parseGeralPorEquipe(raw){
   };
 
   const iEq  = ci(['equipe','subgrupo','grupo']);
-  const iDt  = ci(['dt.pagamento','data pagamento','dtpgto','dt.pgto','dt pgto','data pgto','data pag']);
-  const iRec = ci(['valor recebido','recebido','vlr rec','valor rec']);
+  const iDt  = ci([
+    'dt.pagamento','data pagamento','dtpgto','dt.pgto','dt pgto','data pgto','data pag',
+    'dt.baixa','dt baixa','data baixa','dt.pag','data','dt pag','dtpag','data_pagamento',
+    'dt_pagamento','dt_baixa','data_baixa','pagamento','baixa','vencimento','dt.venc'
+  ]);
+  const iRec = ci(['valor recebido','recebido','vlr rec','valor rec','vl recebido','vlr recebido','vl_rec']);
 
   if(iDt < 0 || iRec < 0){
-    console.warn('[EqParse] Colunas de data/rec não encontradas', hdrs.slice(0,10));
+    console.warn('[EqParse] Colunas de data/rec nao encontradas. Cabecalho detectado:', hdrs.slice(0,15).join(' | '));
     return null;
   }
 
