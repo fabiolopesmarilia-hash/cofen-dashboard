@@ -2722,7 +2722,7 @@ function buildCal(gridId){
     const isPast = d<today;
 
     if(isWorkday) duTotal++;
-    if(isWorkday && (isPast||isToday)) duPassed++;
+    if(isWorkday && isPast) duPassed++;
 
     let cls='cal-day';
     if(isManualUtil && isPast) cls+=' past'; // manual = verde
