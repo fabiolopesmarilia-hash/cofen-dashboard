@@ -656,6 +656,7 @@ select.ev-inp{cursor:pointer}
               <th id="eq-mt-col-pct-header" style="padding:7px 12px;text-align:center;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">% S/ META HOJE</th>
               <th id="eq-mt-col-pct-minus1-header" style="padding:7px 12px;text-align:center;font-size:9px;font-weight:800;color:rgba(255,180,0,.7);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">% COM -1 DU</th>
               <th id="eq-mt-col-pct-minus1-header" style="padding:7px 12px;text-align:center;font-size:9px;font-weight:800;color:rgba(255,180,0,.6);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">% COM -1 DU</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#F87171;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">⚡ FALTA P/ DIA</th>
             </tr>
           </thead>
           <tbody id="eq-metas-tbody">
@@ -13293,9 +13294,16 @@ function renderEqMetasTable(){
         <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:${pctM1c};background:${pctM1b};padding:2px 9px;border-radius:6px;display:inline-block">${pctM1v.toFixed(0)}%</span>
         <div style="font-size:9px;color:${pctM1arrow==='▲'?'#4ADE80':pctM1arrow==='▼'?'#F87171':'#999'};font-weight:800;margin-top:2px">${pctM1arrow} ${Math.abs(pctM1diff).toFixed(1)}pp</div>
       </td>
+      <td style="padding:8px 12px;text-align:right">
+        ${falta <= 0
+          ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:#4ADE80">✅ META!</div>`
+          : `<div style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:#F87171;font-weight:900">${fR(metaRestante)}</div>
+             <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">por dia · falta ${fR(falta)}</div>`
+        }
+      </td>
     </tr>`;
   });
-  tbody.innerHTML = rows || '<tr><td colspan="8" style="padding:14px;text-align:center;color:rgba(255,255,255,.3);font-size:11px">Nenhuma equipe encontrada</td></tr>';
+  tbody.innerHTML = rows || '<tr><td colspan="9" style="padding:14px;text-align:center;color:rgba(255,255,255,.3);font-size:11px">Nenhuma equipe encontrada</td></tr>';
 }
 // Chamar na inicialização (após todos os dados estarem prontos)
 renderEqMetasTable();
