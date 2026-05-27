@@ -3969,9 +3969,6 @@ function aplicarGeral(){
   // ── Extrair rec por DU e atualizar CMP_MAIO_CUMUL + CMP_ABRIL_DU ──
   if(typeof _parseGeralPorEquipe === 'function'){
     const eqResult = _parseGeralPorEquipe(raw);
-    if(!eqResult){
-      statusEl.innerHTML += ' · <span style="color:#F59E0B;font-weight:800">⚠️ Comparativo: coluna de data não reconhecida no CSV. Verifique o console (F12) para ver o cabeçalho detectado.</span>';
-    }
     if(eqResult && Object.keys(eqResult.cumulGlobal).length > 0){
       Object.keys(CMP_MAIO_CUMUL).forEach(k=>delete CMP_MAIO_CUMUL[k]);
       Object.assign(CMP_MAIO_CUMUL, eqResult.cumulGlobal);
@@ -4024,15 +4021,11 @@ function _parseGeralPorEquipe(raw){
   };
 
   const iEq  = ci(['equipe','subgrupo','grupo']);
-  const iDt  = ci([
-    'dt.pagamento','data pagamento','dtpgto','dt.pgto','dt pgto','data pgto','data pag',
-    'dt.baixa','dt baixa','data baixa','dt.pag','data','dt pag','dtpag','data_pagamento',
-    'dt_pagamento','dt_baixa','data_baixa','pagamento','baixa','vencimento','dt.venc'
-  ]);
-  const iRec = ci(['valor recebido','recebido','vlr rec','valor rec','vl recebido','vlr recebido','vl_rec']);
+  const iDt  = ci(['dt.pagamento','data pagamento','dtpgto','dt.pgto','dt pgto','data pgto','data pag']);
+  const iRec = ci(['valor recebido','recebido','vlr rec','valor rec']);
 
   if(iDt < 0 || iRec < 0){
-    console.warn('[EqParse] Colunas de data/rec nao encontradas. Cabecalho detectado:', hdrs.slice(0,15).join(' | '));
+    console.warn('[EqParse] Colunas de data/rec não encontradas', hdrs.slice(0,10));
     return null;
   }
 
@@ -10123,13 +10116,13 @@ const CMP_MARCO_CUMUL = CMP_ABRIL_CUMUL_CAL;
 const CMP_ABRIL_DU = {1:54433.18,2:77553.86,3:78064.3,4:161420.09,5:247160.43,6:302149.9,7:395635.12,8:457910.45,9:546963.6,10:611569.22,11:688633.35,12:767266.02,13:837448.72,14:889885.94,15:951999.5,16:1033848.97,17:1111982.72,18:1229445.19,19:1315162.7,20:1484439.39};
 // Dados acumulados de MAIO 2026 por Dia Útil (DU→acumulado) — atualizado dinamicamente via importação
 // CMP_MAIO_CUMUL: acumulado global de Maio por DU (gerado do arquivo rec_58_0905.xls)
-const CMP_MAIO_CUMUL_STATIC = {1:69428.01,2:129178.27,3:193265.45,4:258626.96,5:346873.5,6:428894.55,7:527316.35};
+const CMP_MAIO_CUMUL_STATIC = {1:6777.46,2:16201.65,3:17670.49,4:81606.99,5:139191.2,6:199449.59,7:254604.03,8:336520.2,9:345358.24,10:345939.42,11:424788.2,12:521187.84,13:596487.32};
 // Inicia com dados estáticos do XLS — sobrescrito dinamicamente se houver importação mais recente
 const CMP_MAIO_CUMUL = {...CMP_MAIO_CUMUL_STATIC};
 // CMP_MAIO_EQ: acumulado POR EQUIPE por DU (gerado do arquivo rec_58_0905.xls)
 const CMP_MAIO_EQ = {"COFEN BIRIGUI BRUNA": {"1": 15174.49, "2": 25240.82, "3": 38543.48, "4": 49508.91, "5": 67373.7, "6": 80439.59, "7": 108303.76}, "COFEN STEPHANIE 2\u00b0 TURNO": {"1": 19622.32, "2": 43725.16, "3": 64522.56, "4": 94812.57, "5": 117123.72, "6": 134555.99, "7": 168282.18}, "COFEN MARILIA BRENDA": {"1": 25172.89, "2": 37574.38, "3": 48044.73, "4": 61470.63, "5": 84447.98, "6": 105946.52, "7": 130692.3}, "COFEN DIGITAL": {"1": 9315.93, "2": 22414.53, "3": 41557.81, "4": 52237.98, "5": 77331.23, "6": 107302.14, "7": 119268.66}};
 // Dias do calendário de MAIO correspondentes a cada DU (índice 0 = DU1)
-const CMP_MAIO_DU_DIAS = [4,5,6,7,8,11,12];
+const CMP_MAIO_DU_DIAS = [4,5,6,7,8,11,12,13,14,15,18,19,20,21,22,25,26,27];
 const CMP_ABRIL_CUMUL = CMP_MAIO_CUMUL;
 // CMP_ABRIL_EQ: acumulado por equipe por DU em Abril (proporcional ao marco total)
 // Distribui CMP_ABRIL_DU na mesma proporção que cada equipe representa no total de Abril
