@@ -3606,7 +3606,11 @@ try{
   const _smCumul = localStorage.getItem('cofen_maio_cumul');
   if(_smCumul){ const v=JSON.parse(_smCumul); Object.assign(CMP_MAIO_CUMUL,v); }
   const _smDuDias = localStorage.getItem('cofen_maio_du_dias');
-  if(_smDuDias){ const v=JSON.parse(_smDuDias); CMP_MAIO_DU_DIAS.length=0; v.forEach(d=>CMP_MAIO_DU_DIAS.push(d)); }
+  if(_smDuDias){
+    const v=JSON.parse(_smDuDias);
+    // Só usa o localStorage se tiver dados mais completos que o estático (mais DUs)
+    if(v.length > CMP_MAIO_DU_DIAS.length){ CMP_MAIO_DU_DIAS.length=0; v.forEach(d=>CMP_MAIO_DU_DIAS.push(d)); }
+  }
   const _saAbril = localStorage.getItem('cofen_abril_du');
   if(_saAbril){ const v=JSON.parse(_saAbril); Object.keys(CMP_ABRIL_DU).forEach(k=>delete CMP_ABRIL_DU[k]); Object.assign(CMP_ABRIL_DU,v); }
 }catch(e){}
@@ -10203,9 +10207,9 @@ let cmpSortDir = -1;
 function cmpFmt(v){ return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
 function cmpFmtK(v){ const a=Math.abs(v); const s=v>=0?'+':'-'; return s+'R$ '+(a>=1000?(a/1000).toFixed(1).replace('.',',')+'k':Math.round(a).toLocaleString('pt-BR')); }
 
-// Retorna o total real de Maio do arquivo Visão Geral Financeira (vgDB)
+// Retorna o total real de Maio — prioridade: overrideTotalRec > último DU do cumul
 function cmpGetTotalMaioGeral(){
-  // Usa o último DU disponível em CMP_MAIO_CUMUL (dados reais do XLS rec_geral)
+  if(typeof overrideTotalRec !== 'undefined' && overrideTotalRec > 0) return overrideTotalRec;
   const dus = Object.keys(CMP_MAIO_CUMUL).map(Number);
   if(dus.length > 0) return CMP_MAIO_CUMUL[Math.max(...dus)] || 0;
   return 0;
@@ -10377,10 +10381,20 @@ function cmpTab(view, el){
 // Reconstrói CMP_MAIO_CUMUL (por DU) usando vgDB.dia (Visão Geral Financeira) como fonte principal
 // Hierarquia: 1) vgDB.dia (rec diário real do arquivo geral) → 2) overrideTotalRec linear → 3) operadores
 function cmpAtualizarCumul(){
-  // SEMPRE usa os dados reais do XLS (rec_geral) como fonte de verdade para o comparativo
-  // vgDB e overrideTotalRec contêm totais anuais — não usar aqui
   Object.keys(CMP_MAIO_CUMUL).forEach(k=>delete CMP_MAIO_CUMUL[k]);
   Object.assign(CMP_MAIO_CUMUL, CMP_MAIO_CUMUL_STATIC);
+  // Injeta overrideTotalRec no DU atual se for maior que último acumulado
+  if(typeof overrideTotalRec !== 'undefined' && overrideTotalRec > 0){
+    const _dus = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+    const _ultDU = _dus.length ? Math.max(..._dus) : 0;
+    const _ultVal = _ultDU > 0 ? (CMP_MAIO_CUMUL[_ultDU] || 0) : 0;
+    if(overrideTotalRec > _ultVal){
+      const _hoje = new Date().getDate();
+      const _duHoje = CMP_MAIO_DU_DIAS.indexOf(_hoje);
+      const _duAlvo = _duHoje >= 0 ? (_duHoje + 1) : (_ultDU + 1);
+      CMP_MAIO_CUMUL[_duAlvo] = overrideTotalRec;
+    }
+  }
 
   // CMP_MAIO_EQ usa dados reais por DU (não proporcional)
 
