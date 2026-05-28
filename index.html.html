@@ -2128,6 +2128,7 @@ select.ev-inp{cursor:pointer}
               <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#3B82F6;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(59,130,246,.3);border-left:2px solid rgba(59,130,246,.25);background:rgba(59,130,246,.06)">🔵 ABRIL</th>
               <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#00A86B;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(0,168,107,.3);border-left:2px solid rgba(0,168,107,.25);background:rgba(0,168,107,.06)">🟢 MAIO</th>
               <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--g200);border-left:2px solid var(--g200);background:var(--g50)">⚡ DIFERENÇA</th>
+              <th colspan="1" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#7C3AED;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(124,58,237,.3);border-left:2px solid rgba(124,58,237,.25);background:rgba(124,58,237,.06)">📊 VS ABRIL</th>
             </tr>
             <tr style="background:var(--g50)">
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#3B82F6;letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200);border-left:2px solid rgba(59,130,246,.25);background:rgba(59,130,246,.04)">Rec. do Dia</th>
@@ -2136,6 +2137,7 @@ select.ev-inp{cursor:pointer}
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#00A86B;letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200);background:rgba(0,168,107,.04)">Acumulado</th>
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200);border-left:2px solid var(--g200)">No Dia</th>
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200)">No Total</th>
+              <th style="padding:7px 12px;text-align:center;font-size:9px;font-weight:800;color:#7C3AED;letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200);border-left:2px solid rgba(124,58,237,.25);background:rgba(124,58,237,.04)">% Acum.</th>
             </tr>
           </thead>
           <tbody id="cmp-table-geral"></tbody>
@@ -10503,6 +10505,10 @@ function cmpBuildTableGeral(){
     const clsAcum = diffAcum > 0 ? '#065F46' : diffAcum < 0 ? '#991B1B' : '#555';
     const bgDia   = diffDia  > 0 ? '#F0FDF4' : diffDia  < 0 ? '#FEF2F2' : '';
 
+    const pctAcum = (hasM && abrilAcum > 0) ? ((maioAcum - abrilAcum) / abrilAcum * 100) : null;
+    const pctAcumStr = pctAcum !== null ? (pctAcum >= 0 ? '+' : '') + pctAcum.toFixed(1) + '%' : '—';
+    const pctBg = pctAcum === null ? '' : pctAcum >= 0 ? 'rgba(0,168,107,.10)' : 'rgba(220,38,38,.10)';
+    const pctClr = pctAcum === null ? '#999' : pctAcum >= 0 ? '#065F46' : '#991B1B';
     tbody.innerHTML += `<tr style="border-bottom:1px solid var(--g100);background:${bgDia}">
       <td style="padding:8px 12px;font-weight:800;color:var(--g900);white-space:nowrap">DU ${du}<span style="font-size:10px;color:var(--g500);font-weight:600">${hasM?diaCalMaio:''}</span></td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#3B82F6;border-left:2px solid rgba(59,130,246,.15)">${abrilDia>0?cmpFmt(abrilDia):'—'}</td>
@@ -10511,6 +10517,7 @@ function cmpBuildTableGeral(){
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#00A86B;opacity:.75">${hasM?cmpFmt(maioAcum):'—'}</td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;font-weight:800;color:${clsDia};border-left:2px solid var(--g200)">${diffDia!==null?cmpFmtK(diffDia):'—'}</td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;font-weight:800;color:${clsAcum}">${diffAcum!==null?cmpFmtK(diffAcum):'—'}</td>
+      <td style="padding:8px 12px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:14px;font-weight:900;color:${pctClr};background:${pctBg};border-left:2px solid rgba(124,58,237,.15);border-radius:4px">${pctAcumStr}</td>
     </tr>`;
   }
 
@@ -10522,6 +10529,9 @@ function cmpBuildTableGeral(){
     : (dusMaio.length ? CMP_MAIO_CUMUL[Math.max(...dusMaio)] : null);
   const totalDiff  = totalMaio !== null ? totalMaio - totalAbril : null;
   const tcls = totalDiff !== null ? (totalDiff >= 0 ? '#065F46' : '#991B1B') : '#555';
+  const totalPct = (totalMaio !== null && totalAbril > 0) ? ((totalMaio - totalAbril) / totalAbril * 100) : null;
+  const totalPctStr = totalPct !== null ? (totalPct >= 0 ? '+' : '') + totalPct.toFixed(1) + '%' : '—';
+  const totalPctBg = totalPct === null ? '' : totalPct >= 0 ? 'rgba(0,168,107,.12)' : 'rgba(220,38,38,.12)';
   tbody.innerHTML += `<tr style="border-top:2px solid var(--g200);background:var(--g50)">
     <td style="padding:10px 12px;font-weight:900;color:var(--g900);font-size:13px" colspan="1">TOTAL (${dusMaio.length||0} DUs)</td>
     <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#3B82F6;border-left:2px solid rgba(59,130,246,.2)">—</td>
@@ -10530,6 +10540,7 @@ function cmpBuildTableGeral(){
     <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#00A86B">${totalMaio!==null?cmpFmt(totalMaio):'—'}</td>
     <td style="padding:10px 12px;text-align:right;font-size:15px;font-weight:900;color:${tcls};border-left:2px solid var(--g200)">—</td>
     <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;font-weight:900;color:${tcls}">${totalDiff!==null?cmpFmtK(totalDiff):'—'}</td>
+    <td style="padding:10px 12px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:17px;font-weight:900;color:${tcls};background:${totalPctBg};border-left:2px solid rgba(124,58,237,.25);border-radius:4px">${totalPctStr}</td>
   </tr>`;
 }
 
