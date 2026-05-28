@@ -505,7 +505,7 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('comparativo',this)">📊 Comparativo Mês</div>
   <div class="tab"     onclick="go('inadimpl',this)">🚨 Inadimplência</div>
   <div class="tab"     onclick="go('metas',this)">🎯 Metas 2026</div>
-  <div class="tab"     onclick="go('agenda-op',this);agendaInit()">📋 Agenda Op</div>
+
 </div>
 
 <!-- ══════════ PAGE: GERAL ══════════ -->
@@ -530,19 +530,29 @@ select.ev-inp{cursor:pointer}
   </div>
 
   <!-- Main row: valor + falta -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;align-items:center">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;align-items:start">
 
-    <!-- Valor principal + projeção inline -->
+    <!-- Valor principal + falta ao lado + projeção inline -->
     <div>
-      <div style="font-size:11px;font-weight:800;color:rgba(0,220,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Total Arrecadado Maio</div>
-      <div id="h-arrecadado-ho" style="font-family:'Bebas Neue',sans-serif;font-size:62px;line-height:1;background:linear-gradient(90deg,#29ABE2,#00E5FF,#4DB848,#00E5FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;letter-spacing:2px">—</div>
-      <div style="font-size:12px;color:rgba(255,255,255,.3);font-weight:600;margin-bottom:10px">Soma de Maio · coluna Pague Play</div>
+      <div style="display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:4px">
+        <div>
+          <div style="font-size:11px;font-weight:800;color:rgba(0,220,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Total Arrecadado Maio</div>
+          <div id="h-arrecadado-ho" style="font-family:'Bebas Neue',sans-serif;font-size:62px;line-height:1;background:linear-gradient(90deg,#29ABE2,#00E5FF,#4DB848,#00E5FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px">—</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.3);font-weight:600;margin-bottom:6px">Soma de Maio · coluna Pague Play</div>
+        </div>
+        <!-- Falta para próximo objetivo — ao lado do total -->
+        <div id="pp-falta-destaque" style="background:rgba(0,188,212,.1);border:2px solid rgba(0,188,212,.4);border-radius:14px;padding:10px 16px;text-align:center;position:relative;min-width:160px;margin-bottom:6px">
+          <div style="font-size:8px;font-weight:800;color:rgba(0,220,255,.65);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 FALTA P/ OBJETIVO</div>
+          <div id="pp-falta-valor-big" style="font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:#00E5FF;letter-spacing:1px;margin-bottom:4px">—</div>
+          <div id="pp-falta-label-big" style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5)">importe o arquivo</div>
+        </div>
+      </div>
 
       <!-- Projeção inline -->
       <div id="pp-proj-inline"></div>
     </div>
 
-    <!-- Coluna direita: ontem + falta (empilhados) -->
+    <!-- Coluna direita: ontem + hoje (empilhados) -->
     <div style="display:flex;flex-direction:column;gap:12px">
 
       <!-- Recebimento ontem -->
@@ -563,12 +573,22 @@ select.ev-inp{cursor:pointer}
         <div id="pp-ontem-equipes" style="display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid rgba(255,255,255,.08);padding-top:8px"></div>
       </div>
 
-      <!-- Falta para próximo objetivo -->
-      <div id="pp-falta-destaque" style="background:rgba(0,188,212,.1);border:2px solid rgba(0,188,212,.4);border-radius:14px;padding:14px 18px;text-align:center;position:relative;flex:1">
-        <div style="font-size:10px;font-weight:800;color:rgba(0,220,255,.65);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">🎯 FALTA PARA O PRÓXIMO OBJETIVO</div>
-        <div id="pp-falta-valor-big" style="font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1;color:#00E5FF;letter-spacing:1px;margin-bottom:6px">—</div>
-        <div id="pp-falta-label-big" style="font-size:14px;font-weight:800;color:rgba(255,255,255,.5)">importe o arquivo para calcular</div>
+      <!-- Recebimento hoje (tempo real) -->
+      <div id="pp-hoje-card" style="background:rgba(74,222,128,.05);border:1.5px solid rgba(74,222,128,.18);border-radius:14px;padding:12px 18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
+          <div>
+            <div style="font-size:9px;font-weight:800;color:rgba(74,222,128,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">⚡ HOJE — ATÉ O MOMENTO</div>
+            <div id="pp-hoje-total" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#4ADE80;letter-spacing:1px;line-height:1">R$ 0,00</div>
+            <div id="pp-hoje-label" style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px">recebimento do dia em andamento</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">HO (24,96%)</div>
+            <div id="pp-hoje-ho" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#00E5FF;letter-spacing:1px;line-height:1">R$ 0,00</div>
+          </div>
+        </div>
+        <div id="pp-hoje-equipes" style="display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid rgba(74,222,128,.1);padding-top:8px"></div>
       </div>
+
 
     </div>
   </div>
@@ -2128,7 +2148,6 @@ select.ev-inp{cursor:pointer}
               <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#3B82F6;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(59,130,246,.3);border-left:2px solid rgba(59,130,246,.25);background:rgba(59,130,246,.06)">🔵 ABRIL</th>
               <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#00A86B;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(0,168,107,.3);border-left:2px solid rgba(0,168,107,.25);background:rgba(0,168,107,.06)">🟢 MAIO</th>
               <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--g200);border-left:2px solid var(--g200);background:var(--g50)">⚡ DIFERENÇA</th>
-              <th colspan="1" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#7C3AED;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(124,58,237,.3);border-left:2px solid rgba(124,58,237,.25);background:rgba(124,58,237,.06)">📊 VS ABRIL</th>
             </tr>
             <tr style="background:var(--g50)">
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#3B82F6;letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200);border-left:2px solid rgba(59,130,246,.25);background:rgba(59,130,246,.04)">Rec. do Dia</th>
@@ -2137,7 +2156,6 @@ select.ev-inp{cursor:pointer}
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#00A86B;letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200);background:rgba(0,168,107,.04)">Acumulado</th>
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200);border-left:2px solid var(--g200)">No Dia</th>
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200)">No Total</th>
-              <th style="padding:7px 12px;text-align:center;font-size:9px;font-weight:800;color:#7C3AED;letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--g200);border-left:2px solid rgba(124,58,237,.25);background:rgba(124,58,237,.04)">% Acum.</th>
             </tr>
           </thead>
           <tbody id="cmp-table-geral"></tbody>
@@ -3382,6 +3400,76 @@ function _updateOntemCard(){
           <span style="font-size:9px;font-weight:800;color:${cfg.c};letter-spacing:.5px;margin-bottom:2px">${cfg.ico||''} ${cfg.sh||eqName}</span>
           <span style="font-size:12px;font-weight:900;color:#fff;line-height:1">${fRK(val)}</span>
           <span style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">${pct}% do total</span>
+        </div>`;
+      }).join('');
+    }
+  }
+  // Atualiza card de hoje também
+  if(typeof _updateHojeCard === 'function') _updateHojeCard();
+}
+
+function _updateHojeCard(){
+  if(typeof rdGetSaved !== 'function') return;
+  const saved = rdGetSaved();
+
+  // Total de hoje (soma de todos os operadores do dia)
+  let totalHoje = 0;
+  (D.equipes||[]).forEach(eq=>{
+    (eq.ops||[]).forEach(op=>{
+      totalHoje += parseFloat(saved[op.name]||0);
+    });
+  });
+
+  // Breakdown por equipe
+  const byEq = {};
+  (D.equipes||[]).forEach(eq=>{
+    let soma = 0;
+    (eq.ops||[]).forEach(op=>{ soma += parseFloat(saved[op.name]||0); });
+    if(soma > 0) byEq[eq.name] = soma;
+  });
+
+  const hoHoje = totalHoje * 0.2496;
+  const hoje   = new Date();
+  const diaStr = String(hoje.getDate()).padStart(2,'0') + '/' + String(hoje.getMonth()+1).padStart(2,'0');
+
+  const totalEl = document.getElementById('pp-hoje-total');
+  const hoEl    = document.getElementById('pp-hoje-ho');
+  const lblEl   = document.getElementById('pp-hoje-label');
+  const eqEl    = document.getElementById('pp-hoje-equipes');
+
+  if(totalEl) totalEl.textContent = fR(totalHoje);
+  if(hoEl)    hoEl.textContent    = fR(hoHoje);
+  if(lblEl)   lblEl.textContent   = totalHoje > 0
+    ? 'Recebido em ' + diaStr + ' até o momento'
+    : 'nenhum lançamento ainda hoje';
+
+  if(eqEl){
+    const entries = Object.entries(byEq);
+    if(entries.length === 0){
+      eqEl.innerHTML = '<span style="font-size:10px;color:rgba(255,255,255,.25)">sem lançamentos hoje</span>';
+    } else {
+      // Buscar também valor de ontem por equipe para exibir comparativo
+      const dow    = hoje.getDay();
+      const diaHj  = hoje.getDate();
+      let ontemDay = (dow===1) ? diaHj-3 : (dow===0) ? diaHj-2 : diaHj-1;
+      if(ontemDay < 1) ontemDay = 1;
+
+      eqEl.innerHTML = entries.map(([eqName, valHoje])=>{
+        const cfg = EQ[eqName] || {c:'#aaa', sh: eqName, ico:'👥'};
+        const pct = totalHoje > 0 ? (valHoje/totalHoje*100).toFixed(0) : 0;
+        // Ontem desta equipe
+        let valOntem = 0;
+        const eq = (D.equipes||[]).find(e=>e.name===eqName);
+        if(eq) (eq.ops||[]).forEach(op=>{ valOntem += parseFloat((op.daily||{})[ontemDay]||0); });
+        const diff = valHoje - valOntem;
+        const diffColor = diff >= 0 ? '#4ADE80' : '#F87171';
+        const diffSign  = diff >= 0 ? '▲' : '▼';
+        const diffStr   = valOntem > 0 ? `<span style="font-size:9px;color:${diffColor};margin-top:2px">${diffSign} vs ontem: ${fRK(Math.abs(diff))}</span>` : '';
+        return `<div style="display:flex;flex-direction:column;background:rgba(255,255,255,.05);border:1px solid rgba(74,222,128,.12);border-radius:8px;padding:5px 10px;min-width:90px">
+          <span style="font-size:9px;font-weight:800;color:${cfg.c};letter-spacing:.5px;margin-bottom:2px">${cfg.ico||''} ${cfg.sh||eqName}</span>
+          <span style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">Ontem: ${valOntem > 0 ? fRK(valOntem) : '—'}</span>
+          <span style="font-size:12px;font-weight:900;color:#4ADE80;line-height:1;margin-top:2px">Hoje: ${fRK(valHoje)}</span>
+          ${diffStr}
         </div>`;
       }).join('');
     }
@@ -5477,6 +5565,7 @@ function rdUpdateKPIs(){
   s('rd-data-hoje',ds.charAt(0).toUpperCase()+ds.slice(1));
   rdRenderEqBreakdown();
   rdRenderEqHeroCards();
+  if(typeof _updateHojeCard === 'function') _updateHojeCard();
 }
 
 function rdRenderEqHeroCards(){
@@ -10122,7 +10211,7 @@ const CMP_MARCO_CUMUL = CMP_ABRIL_CUMUL_CAL;
 const CMP_ABRIL_DU = {1:54433.18,2:77553.86,3:78064.3,4:161420.09,5:247160.43,6:302149.9,7:395635.12,8:457910.45,9:546963.6,10:611569.22,11:688633.35,12:767266.02,13:837448.72,14:889885.94,15:951999.5,16:1033848.97,17:1111982.72,18:1229445.19,19:1315162.7,20:1484439.39};
 // Dados acumulados de MAIO 2026 por Dia Útil (DU→acumulado) — atualizado dinamicamente via importação
 // CMP_MAIO_CUMUL: acumulado global de Maio por DU (gerado do arquivo rec_58_0905.xls)
-const CMP_MAIO_CUMUL_STATIC = {1:111405.64,2:194789.99,3:287812.07,4:381651.92,5:496643.41,6:603759.06,7:732584.46,8:830838.42,9:917223.19,10:1014279.05,11:1110690.76,12:1223831.95,13:1324385.93,14:1447882.41,15:1550202.04,16:1678400.99,17:1824443.13,18:1968625.01,19:1971902.68};
+const CMP_MAIO_CUMUL_STATIC = {1:146819.64,2:230203.99,3:323226.07,4:417065.92,5:532057.41,6:639173.06,7:767998.46,8:866252.42,9:952637.19,10:1049693.05,11:1146104.76,12:1259245.95,13:1359799.93,14:1483296.41,15:1585616.04,16:1713814.99,17:1859857.13,18:2004039.01,19:2007316.68};
 // Inicia com dados estáticos do XLS — sobrescrito dinamicamente se houver importação mais recente
 const CMP_MAIO_CUMUL = {...CMP_MAIO_CUMUL_STATIC};
 // CMP_MAIO_EQ: acumulado POR EQUIPE por DU (gerado do arquivo rec_58_0905.xls)
@@ -10505,10 +10594,6 @@ function cmpBuildTableGeral(){
     const clsAcum = diffAcum > 0 ? '#065F46' : diffAcum < 0 ? '#991B1B' : '#555';
     const bgDia   = diffDia  > 0 ? '#F0FDF4' : diffDia  < 0 ? '#FEF2F2' : '';
 
-    const pctAcum = (hasM && abrilAcum > 0) ? ((maioAcum - abrilAcum) / abrilAcum * 100) : null;
-    const pctAcumStr = pctAcum !== null ? (pctAcum >= 0 ? '+' : '') + pctAcum.toFixed(1) + '%' : '—';
-    const pctBg = pctAcum === null ? '' : pctAcum >= 0 ? 'rgba(0,168,107,.10)' : 'rgba(220,38,38,.10)';
-    const pctClr = pctAcum === null ? '#999' : pctAcum >= 0 ? '#065F46' : '#991B1B';
     tbody.innerHTML += `<tr style="border-bottom:1px solid var(--g100);background:${bgDia}">
       <td style="padding:8px 12px;font-weight:800;color:var(--g900);white-space:nowrap">DU ${du}<span style="font-size:10px;color:var(--g500);font-weight:600">${hasM?diaCalMaio:''}</span></td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#3B82F6;border-left:2px solid rgba(59,130,246,.15)">${abrilDia>0?cmpFmt(abrilDia):'—'}</td>
@@ -10517,7 +10602,6 @@ function cmpBuildTableGeral(){
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#00A86B;opacity:.75">${hasM?cmpFmt(maioAcum):'—'}</td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;font-weight:800;color:${clsDia};border-left:2px solid var(--g200)">${diffDia!==null?cmpFmtK(diffDia):'—'}</td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;font-weight:800;color:${clsAcum}">${diffAcum!==null?cmpFmtK(diffAcum):'—'}</td>
-      <td style="padding:8px 12px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:14px;font-weight:900;color:${pctClr};background:${pctBg};border-left:2px solid rgba(124,58,237,.15);border-radius:4px">${pctAcumStr}</td>
     </tr>`;
   }
 
@@ -10529,9 +10613,6 @@ function cmpBuildTableGeral(){
     : (dusMaio.length ? CMP_MAIO_CUMUL[Math.max(...dusMaio)] : null);
   const totalDiff  = totalMaio !== null ? totalMaio - totalAbril : null;
   const tcls = totalDiff !== null ? (totalDiff >= 0 ? '#065F46' : '#991B1B') : '#555';
-  const totalPct = (totalMaio !== null && totalAbril > 0) ? ((totalMaio - totalAbril) / totalAbril * 100) : null;
-  const totalPctStr = totalPct !== null ? (totalPct >= 0 ? '+' : '') + totalPct.toFixed(1) + '%' : '—';
-  const totalPctBg = totalPct === null ? '' : totalPct >= 0 ? 'rgba(0,168,107,.12)' : 'rgba(220,38,38,.12)';
   tbody.innerHTML += `<tr style="border-top:2px solid var(--g200);background:var(--g50)">
     <td style="padding:10px 12px;font-weight:900;color:var(--g900);font-size:13px" colspan="1">TOTAL (${dusMaio.length||0} DUs)</td>
     <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#3B82F6;border-left:2px solid rgba(59,130,246,.2)">—</td>
@@ -10540,7 +10621,6 @@ function cmpBuildTableGeral(){
     <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#00A86B">${totalMaio!==null?cmpFmt(totalMaio):'—'}</td>
     <td style="padding:10px 12px;text-align:right;font-size:15px;font-weight:900;color:${tcls};border-left:2px solid var(--g200)">—</td>
     <td style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;font-weight:900;color:${tcls}">${totalDiff!==null?cmpFmtK(totalDiff):'—'}</td>
-    <td style="padding:10px 12px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:17px;font-weight:900;color:${tcls};background:${totalPctBg};border-left:2px solid rgba(124,58,237,.25);border-radius:4px">${totalPctStr}</td>
   </tr>`;
 }
 
@@ -12192,208 +12272,6 @@ function mtsAtualizarMaio(){
 
 <!-- ══════════ PAGE: METAS 2026 ══════════ -->
 
-<!-- ══════════ PAGE: AGENDA OPERADOR ══════════ -->
-<div class="page" id="pg-agenda-op">
-
-  <!-- LOGIN SCREEN -->
-  <div id="ag-login-screen" style="max-width:400px;margin:60px auto;padding:32px;background:var(--w);border-radius:18px;box-shadow:0 4px 32px #0001;border:1px solid var(--g200)">
-    <div style="text-align:center;margin-bottom:28px">
-      <div style="font-size:36px;margin-bottom:8px">📋</div>
-      <div style="font-size:20px;font-weight:900;color:var(--g900)">Agenda de Acordos</div>
-      <div style="font-size:12px;color:var(--g500);margin-top:6px">Acesso individual por operador</div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <div>
-        <label style="font-size:11px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase">Operador</label>
-        <select id="ag-login-op" style="width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:10px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);background:var(--g50);margin-top:4px">
-          <option value="">— Selecione seu nome —</option>
-        </select>
-      </div>
-      <div>
-        <label style="font-size:11px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase">Senha</label>
-        <input id="ag-login-senha" type="password" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter')agendaDoLogin()"
-          style="width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:10px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);background:var(--g50);margin-top:4px;box-sizing:border-box">
-      </div>
-      <button onclick="agendaDoLogin()"
-        style="padding:13px;background:var(--pp);color:#fff;border:none;border-radius:11px;font-family:Nunito,sans-serif;font-size:14px;font-weight:900;cursor:pointer;letter-spacing:.4px">
-        Entrar →
-      </button>
-      <div id="ag-login-err" style="text-align:center;font-size:12px;color:var(--danger);display:none;font-weight:700"></div>
-    </div>
-
-    <!-- Só gerente vê isso -->
-    <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--g100)">
-      <div style="font-size:10px;font-weight:800;color:var(--g400);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">🔑 Gerente — Definir Senha de Operador</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <select id="ag-adm-op" style="flex:1;min-width:140px;padding:8px 10px;border:1.5px solid var(--g200);border-radius:8px;font-family:Nunito,sans-serif;font-size:12px;font-weight:700;background:var(--g50)">
-          <option value="">— Operador —</option>
-        </select>
-        <input id="ag-adm-senha" type="text" placeholder="Nova senha" style="flex:1;min-width:120px;padding:8px 10px;border:1.5px solid var(--g200);border-radius:8px;font-family:Nunito,sans-serif;font-size:12px;font-weight:700;background:var(--g50)">
-        <button onclick="agendaDefSenha()" style="padding:8px 14px;background:var(--g900);color:#fff;border:none;border-radius:8px;font-family:Nunito,sans-serif;font-size:12px;font-weight:800;cursor:pointer">Salvar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- DASHBOARD DO OPERADOR (após login) -->
-  <div id="ag-op-screen" style="display:none;padding:20px;max-width:960px;margin:0 auto">
-
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
-      <div>
-        <div style="font-size:22px;font-weight:900;color:var(--g900)" id="ag-op-title">📋 Minha Agenda</div>
-        <div style="font-size:12px;color:var(--g500);margin-top:2px" id="ag-op-sub"></div>
-      </div>
-      <button onclick="agendaLogout()" style="padding:8px 18px;background:var(--g100);color:var(--g700);border:none;border-radius:9px;font-family:Nunito,sans-serif;font-size:12px;font-weight:800;cursor:pointer">Sair ↩</button>
-    </div>
-
-    <!-- KPIs rápidos -->
-    <div id="ag-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px"></div>
-
-    <!-- Formulário novo acordo -->
-    <div style="background:var(--w);border-radius:16px;border:1.5px solid var(--g200);padding:24px;margin-bottom:24px">
-      <div style="font-size:14px;font-weight:900;color:var(--g900);margin-bottom:18px">➕ Registrar Novo Acordo</div>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
-
-        <!-- Código -->
-        <div>
-          <label class="ag-lbl">Código do Acordo *</label>
-          <input id="ag-f-codigo" type="text" placeholder="Ex: 202500123" class="ag-inp">
-        </div>
-
-        <!-- COREN -->
-        <div>
-          <label class="ag-lbl">COREN *</label>
-          <select id="ag-f-coren" class="ag-inp">
-            <option value="">— Selecione —</option>
-            <option>COREN-SP</option>
-            <option>COREN-PI</option>
-            <option>COREN-MA</option>
-            <option>COREN-MT</option>
-            <option>COREN-CE</option>
-            <option>COREN-RJ</option>
-            <option>COREN-MG</option>
-            <option>COREN-RS</option>
-            <option>COREN-PR</option>
-            <option>COREN-BA</option>
-            <option>COREN-GO</option>
-            <option>COREN-PE</option>
-            <option>COREN-SC</option>
-            <option>COREN-AM</option>
-            <option>COREN-PB</option>
-            <option>Outro</option>
-          </select>
-        </div>
-
-        <!-- Data do agendamento -->
-        <div>
-          <label class="ag-lbl">Data do Agendamento *</label>
-          <input id="ag-f-data" type="date" class="ag-inp">
-        </div>
-
-        <!-- Data de vencimento -->
-        <div>
-          <label class="ag-lbl">Data de Vencimento *</label>
-          <input id="ag-f-venc" type="date" class="ag-inp">
-        </div>
-
-        <!-- Forma de pagamento -->
-        <div>
-          <label class="ag-lbl">Forma de Pagamento *</label>
-          <select id="ag-f-forma" class="ag-inp" onchange="agendaToggleParcelas()">
-            <option value="">— Selecione —</option>
-            <option value="pix">💸 Pix</option>
-            <option value="boleto">🏦 Boleto</option>
-            <option value="cartao">💳 Cartão</option>
-          </select>
-        </div>
-
-        <!-- Parcelado -->
-        <div>
-          <label class="ag-lbl">Parcelado?</label>
-          <select id="ag-f-parcelado" class="ag-inp" onchange="agendaToggleParcelas()">
-            <option value="nao">Não — À vista</option>
-            <option value="sim">Sim — Parcelado</option>
-          </select>
-        </div>
-
-        <!-- Nº Parcelas (oculto se à vista) -->
-        <div id="ag-f-nparcelas-wrap">
-          <label class="ag-lbl">Nº de Parcelas</label>
-          <input id="ag-f-nparcelas" type="number" min="2" max="60" placeholder="Ex: 6" class="ag-inp">
-        </div>
-
-        <!-- Valor Total -->
-        <div>
-          <label class="ag-lbl">Valor Total (R$) *</label>
-          <input id="ag-f-vtotal" type="number" step="0.01" min="0" placeholder="0,00" class="ag-inp" oninput="agendaCalcParcela()">
-        </div>
-
-        <!-- Valor da Parcela (oculto se à vista) -->
-        <div id="ag-f-vparcela-wrap">
-          <label class="ag-lbl">Valor da Parcela (R$)</label>
-          <input id="ag-f-vparcela" type="number" step="0.01" min="0" placeholder="Auto" class="ag-inp">
-        </div>
-
-        <!-- Canal -->
-        <div>
-          <label class="ag-lbl">Canal de Origem *</label>
-          <select id="ag-f-canal" class="ag-inp">
-            <option value="">— Selecione —</option>
-            <option value="telefone_ativo">📞 Telefone Ativo</option>
-            <option value="campanha">📣 Campanha</option>
-            <option value="whatsapp">💬 WhatsApp</option>
-            <option value="receptivo">📲 Receptivo</option>
-          </select>
-        </div>
-
-        <!-- Campanha (aparece se canal = campanha) -->
-        <div id="ag-f-campanha-wrap" style="display:none">
-          <label class="ag-lbl">Nome da Campanha</label>
-          <input id="ag-f-campanha" type="text" placeholder="Ex: Campanha Maio 2026" class="ag-inp">
-        </div>
-
-        <!-- Observação -->
-        <div style="grid-column:1/-1">
-          <label class="ag-lbl">Observação</label>
-          <input id="ag-f-obs" type="text" placeholder="Anotações adicionais..." class="ag-inp">
-        </div>
-
-      </div>
-
-      <div style="display:flex;gap:10px;margin-top:18px;align-items:center">
-        <button onclick="agendaSalvar()"
-          style="padding:13px 28px;background:var(--ok);color:#fff;border:none;border-radius:11px;font-family:Nunito,sans-serif;font-size:14px;font-weight:900;cursor:pointer">
-          💾 Salvar Acordo
-        </button>
-        <button onclick="agendaLimpar()"
-          style="padding:13px 18px;background:var(--g100);color:var(--g700);border:none;border-radius:11px;font-family:Nunito,sans-serif;font-size:13px;font-weight:800;cursor:pointer">
-          Limpar
-        </button>
-        <div id="ag-save-msg" style="font-size:12px;font-weight:700;color:var(--ok);display:none">✅ Salvo automaticamente!</div>
-      </div>
-    </div>
-
-    <!-- Filtros + lista -->
-    <div style="background:var(--w);border-radius:16px;border:1.5px solid var(--g200);padding:24px">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
-        <div style="font-size:14px;font-weight:900;color:var(--g900)">📜 Meus Acordos Registrados</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <select id="ag-filtro-status" class="ag-inp" style="width:auto" onchange="agendaRenderLista()">
-            <option value="">Todos os status</option>
-            <option value="pendente">⏳ Pendente</option>
-            <option value="pago">✅ Pago</option>
-            <option value="vencido">🔴 Vencido</option>
-          </select>
-          <input id="ag-filtro-busca" type="text" placeholder="🔍 Buscar código..." class="ag-inp" style="width:160px" oninput="agendaRenderLista()">
-        </div>
-      </div>
-      <div id="ag-lista" style="display:flex;flex-direction:column;gap:8px"></div>
-      <div id="ag-lista-empty" style="text-align:center;padding:40px;color:var(--g400);font-weight:700;display:none">Nenhum acordo registrado ainda.</div>
-    </div>
-  </div>
-</div>
 
 <div class="page" id="pg-metas">
 
@@ -13983,352 +13861,6 @@ function addRemoveLider(eq){
   });
 })();
 
-// ════════════════════════════════════════════════════════
-// MÓDULO: AGENDA DE ACORDOS POR OPERADOR
-// ════════════════════════════════════════════════════════
 
-let _agOpLogado  = null;  // nome do operador logado
-let _agAcordos   = {};    // { id: {codigo, coren, data, venc, forma, parcelado, nparcelas, vtotal, vparcela, canal, campanha, obs, status, ts} }
-let _agListener  = null;
-
-// ── Inicializa a aba (popula selects de operadores) ──────
-function agendaInit() {
-  const ops = _getAllOpNames();
-  const selLogin = document.getElementById('ag-login-op');
-  const selAdm   = document.getElementById('ag-adm-op');
-  if (!selLogin) return;
-
-  // Popula selects com operadores cadastrados
-  const optHtml = ops.map(n => `<option value="${n}">${n.replace(/_/g,' ')}</option>`).join('');
-  selLogin.innerHTML = '<option value="">— Selecione seu nome —</option>' + optHtml;
-  selAdm.innerHTML   = '<option value="">— Operador —</option>' + optHtml;
-
-  // Define data de hoje como padrão nos campos de data
-  const hoje = new Date().toISOString().split('T')[0];
-  const fData = document.getElementById('ag-f-data');
-  if (fData && !fData.value) fData.value = hoje;
-
-  // Se já estava logado nesta sessão, restaura
-  if (_agOpLogado) {
-    _agMostrarDashboard(_agOpLogado);
-  }
-
-  agendaToggleParcelas();
-}
-
-// ── Pega todos os nomes de operadores do D ──────────────
-function _getAllOpNames() {
-  const nomes = new Set();
-  (D.equipes || []).forEach(eq => {
-    (eq.ops || []).forEach(op => nomes.add(op.name));
-  });
-  return [...nomes].sort();
-}
-
-// ── Login ────────────────────────────────────────────────
-function agendaDoLogin() {
-  const opName = document.getElementById('ag-login-op').value;
-  const senha  = document.getElementById('ag-login-senha').value.trim();
-  const errEl  = document.getElementById('ag-login-err');
-
-  if (!opName) { _agLoginErr('Selecione seu nome.'); return; }
-  if (!senha)  { _agLoginErr('Digite sua senha.');   return; }
-
-  // Busca senha no Firebase
-  if (!fbDb || !fbRoom) {
-    _agLoginErr('Conecte ao Firebase primeiro (painel de conexão).');
-    return;
-  }
-
-  fbDb.ref(fbRoom + '/agenda_senhas/' + opName).once('value', snap => {
-    const savedSenha = snap.val();
-
-    // Sem senha cadastrada → senha padrão é o primeiro nome do operador
-    const senhaReal = savedSenha || opName.split('_')[0].toLowerCase();
-
-    if (senha.toLowerCase() === senhaReal.toLowerCase()) {
-      errEl.style.display = 'none';
-      document.getElementById('ag-login-senha').value = '';
-      _agMostrarDashboard(opName);
-    } else {
-      _agLoginErr('Senha incorreta. Fale com o gerente.');
-    }
-  });
-}
-
-function _agLoginErr(msg) {
-  const el = document.getElementById('ag-login-err');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-
-// ── Gerente define senha ─────────────────────────────────
-function agendaDefSenha() {
-  const op    = document.getElementById('ag-adm-op').value;
-  const senha = document.getElementById('ag-adm-senha').value.trim();
-  if (!op || !senha) { toast('Selecione o operador e defina a senha.'); return; }
-  if (!fbDb || !fbRoom) { toast('Firebase não conectado.'); return; }
-
-  fbDb.ref(fbRoom + '/agenda_senhas/' + op).set(senha, err => {
-    if (err) { toast('Erro ao salvar senha.'); return; }
-    document.getElementById('ag-adm-senha').value = '';
-    toast('✅ Senha de ' + op.replace(/_/g,' ') + ' atualizada!');
-  });
-}
-
-// ── Mostra dashboard do operador ─────────────────────────
-function _agMostrarDashboard(opName) {
-  _agOpLogado = opName;
-  document.getElementById('ag-login-screen').style.display  = 'none';
-  document.getElementById('ag-op-screen').style.display     = 'block';
-  document.getElementById('ag-op-title').textContent = '📋 ' + opName.replace(/_/g,' ');
-
-  const eq = _getEqDoOp(opName);
-  document.getElementById('ag-op-sub').textContent = eq ? 'Equipe: ' + (EQ[eq]?.sh || eq) : '';
-
-  // Ouve acordos em tempo real
-  if (_agListener) fbDb.ref(fbRoom + '/agenda/' + opName).off('value', _agListener);
-  _agListener = fbDb.ref(fbRoom + '/agenda/' + opName).on('value', snap => {
-    _agAcordos = snap.val() || {};
-    agendaRenderLista();
-    agendaRenderKpis();
-  });
-
-  agendaToggleParcelas();
-}
-
-function _getEqDoOp(opName) {
-  for (const eq of (D.equipes || [])) {
-    if ((eq.ops || []).find(o => o.name === opName)) return eq.name;
-  }
-  return null;
-}
-
-// ── Logout ───────────────────────────────────────────────
-function agendaLogout() {
-  if (_agListener && fbDb && fbRoom && _agOpLogado) {
-    fbDb.ref(fbRoom + '/agenda/' + _agOpLogado).off('value', _agListener);
-  }
-  _agOpLogado = null; _agAcordos = {}; _agListener = null;
-  document.getElementById('ag-login-screen').style.display = 'block';
-  document.getElementById('ag-op-screen').style.display    = 'none';
-  document.getElementById('ag-login-err').style.display    = 'none';
-}
-
-// ── Toggle campos parcela / campanha ─────────────────────
-function agendaToggleParcelas() {
-  const forma     = (document.getElementById('ag-f-forma')?.value     || '');
-  const parcelado = (document.getElementById('ag-f-parcelado')?.value || 'nao');
-  const canal     = (document.getElementById('ag-f-canal')?.value     || '');
-
-  const showParc = parcelado === 'sim';
-  const showCamp = canal === 'campanha';
-
-  _agShow('ag-f-nparcelas-wrap', showParc);
-  _agShow('ag-f-vparcela-wrap',  showParc);
-  _agShow('ag-f-campanha-wrap',  showCamp);
-
-  // Canal select
-  const canalEl = document.getElementById('ag-f-canal');
-  if (canalEl) canalEl.onchange = () => agendaToggleParcelas();
-}
-
-function _agShow(id, show) {
-  const el = document.getElementById(id);
-  if (el) el.style.display = show ? 'block' : 'none';
-}
-
-// ── Calcula valor da parcela automaticamente ─────────────
-function agendaCalcParcela() {
-  const vtotal = parseFloat(document.getElementById('ag-f-vtotal')?.value) || 0;
-  const np     = parseInt(document.getElementById('ag-f-nparcelas')?.value) || 0;
-  const vpEl   = document.getElementById('ag-f-vparcela');
-  if (vpEl && np > 0 && vtotal > 0) {
-    vpEl.value = (vtotal / np).toFixed(2);
-  }
-}
-
-// ── Salvar acordo ────────────────────────────────────────
-function agendaSalvar() {
-  if (!_agOpLogado) { toast('Faça login primeiro.'); return; }
-
-  const codigo   = document.getElementById('ag-f-codigo')?.value.trim();
-  const coren    = document.getElementById('ag-f-coren')?.value;
-  const data     = document.getElementById('ag-f-data')?.value;
-  const venc     = document.getElementById('ag-f-venc')?.value;
-  const forma    = document.getElementById('ag-f-forma')?.value;
-  const parcelado= document.getElementById('ag-f-parcelado')?.value || 'nao';
-  const nparcelas= parseInt(document.getElementById('ag-f-nparcelas')?.value) || 1;
-  const vtotal   = parseFloat(document.getElementById('ag-f-vtotal')?.value) || 0;
-  const vparcela = parseFloat(document.getElementById('ag-f-vparcela')?.value) || vtotal;
-  const canal    = document.getElementById('ag-f-canal')?.value;
-  const campanha = document.getElementById('ag-f-campanha')?.value.trim() || '';
-  const obs      = document.getElementById('ag-f-obs')?.value.trim() || '';
-
-  // Validação
-  if (!codigo) { toast('⚠️ Informe o código do acordo.'); return; }
-  if (!coren)  { toast('⚠️ Selecione o COREN.');         return; }
-  if (!data)   { toast('⚠️ Informe a data.');             return; }
-  if (!venc)   { toast('⚠️ Informe a data de vencimento.');return; }
-  if (!forma)  { toast('⚠️ Selecione a forma de pagamento.');return; }
-  if (!canal)  { toast('⚠️ Selecione o canal de origem.'); return; }
-  if (vtotal <= 0){ toast('⚠️ Informe o valor total.');   return; }
-
-  // Define status baseado na data de vencimento
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const dVenc = new Date(venc + 'T00:00:00');
-  const status = dVenc < hoje ? 'vencido' : 'pendente';
-
-  const id = 'ac_' + Date.now();
-  const acordo = {
-    id, codigo, coren, data, venc, forma,
-    parcelado, nparcelas: parcelado === 'sim' ? nparcelas : 1,
-    vtotal, vparcela: parcelado === 'sim' ? vparcela : vtotal,
-    canal, campanha, obs, status,
-    ts: Date.now(),
-    op: _agOpLogado
-  };
-
-  // Salva no Firebase
-  fbDb.ref(fbRoom + '/agenda/' + _agOpLogado + '/' + id).set(acordo, err => {
-    if (err) { toast('❌ Erro ao salvar. Verifique conexão.'); return; }
-    const msg = document.getElementById('ag-save-msg');
-    msg.style.display = 'inline';
-    setTimeout(() => msg.style.display = 'none', 3000);
-    agendaLimpar();
-  });
-}
-
-// ── Limpa formulário ─────────────────────────────────────
-function agendaLimpar() {
-  ['ag-f-codigo','ag-f-coren','ag-f-forma','ag-f-parcelado',
-   'ag-f-nparcelas','ag-f-vtotal','ag-f-vparcela','ag-f-canal',
-   'ag-f-campanha','ag-f-obs'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (el.tagName === 'SELECT') el.selectedIndex = 0;
-    else el.value = '';
-  });
-  // Mantém data de hoje
-  document.getElementById('ag-f-data').value = new Date().toISOString().split('T')[0];
-  document.getElementById('ag-f-venc').value = '';
-  agendaToggleParcelas();
-}
-
-// ── Atualiza status de um acordo ─────────────────────────
-function agendaSetStatus(id, status) {
-  if (!_agOpLogado || !fbDb || !fbRoom) return;
-  fbDb.ref(fbRoom + '/agenda/' + _agOpLogado + '/' + id + '/status').set(status);
-}
-
-// ── Excluir acordo ───────────────────────────────────────
-function agendaExcluir(id) {
-  if (!confirm('Excluir este acordo?')) return;
-  fbDb.ref(fbRoom + '/agenda/' + _agOpLogado + '/' + id).remove();
-}
-
-// ── KPIs ─────────────────────────────────────────────────
-function agendaRenderKpis() {
-  const lista = Object.values(_agAcordos);
-  const total  = lista.length;
-  const pagos  = lista.filter(a => a.status === 'pago').length;
-  const vencidos = lista.filter(a => a.status === 'vencido').length;
-  const pendentes = lista.filter(a => a.status === 'pendente').length;
-  const vtotalAll = lista.reduce((s,a) => s + (parseFloat(a.vtotal)||0), 0);
-  const vPagos    = lista.filter(a=>a.status==='pago').reduce((s,a)=>s+(parseFloat(a.vtotal)||0),0);
-
-  const kEl = document.getElementById('ag-kpis');
-  if (!kEl) return;
-  kEl.innerHTML = [
-    {ico:'📋', lbl:'Total Acordos',   val: total,           cor:'var(--g900)'},
-    {ico:'⏳', lbl:'Pendentes',        val: pendentes,       cor:'var(--warn)'},
-    {ico:'✅', lbl:'Pagos',            val: pagos,           cor:'var(--ok)'},
-    {ico:'🔴', lbl:'Vencidos',         val: vencidos,        cor:'var(--danger)'},
-    {ico:'💰', lbl:'Total Agendado',   val: fR(vtotalAll),   cor:'var(--pp)'},
-    {ico:'💸', lbl:'Total Recebido',   val: fR(vPagos),      cor:'var(--ok)'},
-  ].map(k => `
-    <div style="background:var(--w);border:1.5px solid var(--g200);border-radius:12px;padding:14px 16px">
-      <div style="font-size:20px;margin-bottom:4px">${k.ico}</div>
-      <div style="font-size:10px;font-weight:800;color:var(--g400);letter-spacing:.7px;text-transform:uppercase">${k.lbl}</div>
-      <div style="font-size:18px;font-weight:900;color:${k.cor};margin-top:4px">${k.val}</div>
-    </div>
-  `).join('');
-}
-
-// ── Render lista de acordos ──────────────────────────────
-function agendaRenderLista() {
-  const listaEl = document.getElementById('ag-lista');
-  const emptyEl = document.getElementById('ag-lista-empty');
-  if (!listaEl) return;
-
-  const filtroStatus = document.getElementById('ag-filtro-status')?.value || '';
-  const filtroBusca  = (document.getElementById('ag-filtro-busca')?.value || '').toLowerCase();
-
-  let lista = Object.values(_agAcordos).sort((a,b) => b.ts - a.ts);
-
-  if (filtroStatus) lista = lista.filter(a => a.status === filtroStatus);
-  if (filtroBusca)  lista = lista.filter(a => (a.codigo||'').toLowerCase().includes(filtroBusca) || (a.coren||'').toLowerCase().includes(filtroBusca));
-
-  if (lista.length === 0) {
-    listaEl.innerHTML = '';
-    emptyEl.style.display = 'block';
-    return;
-  }
-  emptyEl.style.display = 'none';
-
-  const statusIco = { pago:'✅', pendente:'⏳', vencido:'🔴' };
-  const statusBg  = { pago:'#D1FAE5', pendente:'#FEF3C7', vencido:'#FEE2E2' };
-  const formaBadge = { pix:'ag-badge-pix', boleto:'ag-badge-boleto', cartao:'ag-badge-cartao' };
-  const canalLabel = { telefone_ativo:'📞 Tel. Ativo', campanha:'📣 Campanha', whatsapp:'💬 WhatsApp', receptivo:'📲 Receptivo' };
-
-  listaEl.innerHTML = lista.map(a => {
-    const parcInfo = a.parcelado === 'sim'
-      ? `${a.nparcelas}x de ${fR(a.vparcela)}`
-      : 'À vista';
-    return `
-    <div class="ag-card">
-      <div class="ag-card-status" style="background:${statusBg[a.status]||'#F3F4F6'}">
-        ${statusIco[a.status]||'❓'}
-      </div>
-      <div class="ag-card-body">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span class="ag-card-codigo">${a.codigo}</span>
-          <span class="ag-badge ${formaBadge[a.forma]||''}">${(a.forma||'').toUpperCase()}</span>
-          <span class="ag-badge ag-badge-${a.status||'pendente'}">${a.status||'pendente'}</span>
-          <span class="ag-badge ag-badge-${a.canal==='campanha'?'campanha':'telefone'}">${canalLabel[a.canal]||a.canal||''}</span>
-        </div>
-        <div class="ag-card-meta">
-          <span>📅 Agend.: ${a.data||''}</span>
-          <span>⏰ Venc.: ${a.venc||''}</span>
-          <span>🏥 ${a.coren||''}</span>
-          <span>💳 ${parcInfo}</span>
-          ${a.campanha?`<span>📣 ${a.campanha}</span>`:''}
-          ${a.obs?`<span>📝 ${a.obs}</span>`:''}
-        </div>
-        <div class="ag-card-val">${fR(a.vtotal)}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
-        ${a.status !== 'pago' ? `<button onclick="agendaSetStatus('${a.id}','pago')"
-          style="padding:5px 10px;background:#D1FAE5;color:#065F46;border:none;border-radius:7px;font-family:Nunito,sans-serif;font-size:11px;font-weight:800;cursor:pointer">✅ Pago</button>` : ''}
-        ${a.status !== 'pendente' ? `<button onclick="agendaSetStatus('${a.id}','pendente')"
-          style="padding:5px 10px;background:#FEF3C7;color:#92400E;border:none;border-radius:7px;font-family:Nunito,sans-serif;font-size:11px;font-weight:800;cursor:pointer">⏳ Pendente</button>` : ''}
-        <button onclick="agendaExcluir('${a.id}')"
-          style="padding:5px 10px;background:#FEE2E2;color:#991B1B;border:none;border-radius:7px;font-family:Nunito,sans-serif;font-size:11px;font-weight:800;cursor:pointer">🗑 Excluir</button>
-      </div>
-    </div>
-    `;
-  }).join('');
-}
-// ════════════════════════════════════════════════════════
-// FIM MÓDULO AGENDA
-// ════════════════════════════════════════════════════════
 
 </script>
-
-</body>
-</html>
-
-
-
-
-
