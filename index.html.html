@@ -12556,7 +12556,7 @@ function mtsAtualizarMaio(){
 
   // Resultado final de Maio por equipe — DU19 (mês encerrado em 30/05/2026)
   // Fonte: CMP_MAIO_EQ até último DU disponível; fallback = proporcional ao total de Abril
-  const totalMaioGlobal = 2007316.68; // Total real importado (DU19)
+  const totalMaioGlobal = 2007316.68; // Total real confirmado (DU19)
   const totalAbril = 1601416.79;
   const recAbrilPorEq = {
     'COFEN MARILIA BRENDA':     391979.58,
@@ -12564,19 +12564,32 @@ function mtsAtualizarMaio(){
     'COFEN STEPHANIE 2° TURNO': 485724.16,
     'COFEN DIGITAL':            206704.90,
   };
+  // Mapeamento supervisor → equipe (para somar rec dos supervisores no total de Maio)
+  const _supEqMapM = {
+    'BRENDA_FERREIRA':    'COFEN MARILIA BRENDA',
+    'BRUNA_JUSTIMIANO':   'COFEN BIRIGUI BRUNA',
+    'STEPHANIE_BERNARDES':'COFEN STEPHANIE 2° TURNO',
+  };
   // Para cada equipe: pega o último DU do CMP_MAIO_EQ se disponível,
-  // senão estima proporcionalmente pelo peso de Abril
+  // senão estima proporcionalmente pelo peso de Abril.
+  // FIX: inclui rec dos supervisores bloqueados no total da equipe
   const REC_MAIO_FINAL = {};
   SUPERVISORES_MAIO.forEach(sup => {
     const duData = CMP_MAIO_EQ[sup.eq] || {};
     const keys = Object.keys(duData).map(Number).sort((a,b)=>a-b);
+    let baseRec = 0;
     if(keys.length > 0){
-      REC_MAIO_FINAL[sup.eq] = duData[keys[keys.length-1]];
+      baseRec = duData[keys[keys.length-1]];
     } else {
-      // Estimativa proporcional ao peso de Abril
       const pct = (recAbrilPorEq[sup.eq] || 0) / totalAbril;
-      REC_MAIO_FINAL[sup.eq] = Math.round(totalMaioGlobal * pct * 100) / 100;
+      baseRec = Math.round(totalMaioGlobal * pct * 100) / 100;
     }
+    // Somar rec dos supervisores desta equipe (dados em D.equipes)
+    const supRec = (D.equipes || [])
+      .flatMap(eq => eq.ops || [])
+      .filter(o => _supEqMapM[o.name] === sup.eq)
+      .reduce((s, o) => s + (o.rec || 0), 0);
+    REC_MAIO_FINAL[sup.eq] = baseRec + supRec;
   });
 
   const totalMaio = SUPERVISORES_MAIO.reduce((s, sup) => s + (REC_MAIO_FINAL[sup.eq] || 0), 0);
@@ -12633,7 +12646,19 @@ function mtsAtualizarJunho(){
   ];
 
   const recPorEq = {};
-  (D.equipes || []).forEach(eq => { recPorEq[eq.name] = eq.rec || 0; });
+  const _supEqMapJ = {
+    'BRENDA_FERREIRA':    'COFEN MARILIA BRENDA',
+    'BRUNA_JUSTIMIANO':   'COFEN BIRIGUI BRUNA',
+    'STEPHANIE_BERNARDES':'COFEN STEPHANIE 2° TURNO',
+  };
+  // FIX: incluir rec dos supervisores bloqueados no total de cada equipe
+  (D.equipes || []).forEach(eq => {
+    const baseRec = eq.rec || 0;
+    const supRec = eq.ops
+      .filter(o => _supEqMapJ[o.name] === eq.name)
+      .reduce((s, o) => s + (o.rec || 0), 0);
+    recPorEq[eq.name] = baseRec + supRec;
+  });
 
   const totalJunho = SUPERVISORES_JUN.reduce((s, sup) => s + (recPorEq[sup.eq] || 0), 0);
   if(totalEl) totalEl.textContent = totalJunho > 0 ? fBR(totalJunho) : '—';
