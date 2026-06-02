@@ -2894,24 +2894,19 @@ rebuildAll();
     'COFEN BIRIGUI BRUNA':      450000,
     'COFEN STEPHANIE 2° TURNO': 450000,
   };
-  // JUNHO ativo: todas as equipes = 450k
+  // JUNHO ativo
   const metasJunho = {
-    'COFEN MARILIA BRENDA':     500000,
-    'COFEN BIRIGUI BRUNA':      1000000,
-    'COFEN STEPHANIE 2° TURNO': 500000,
+    'COFEN MARILIA BRENDA':     450000,
+    'COFEN BIRIGUI BRUNA':      450000,
+    'COFEN STEPHANIE 2° TURNO': 450000,
     'COFEN DIGITAL':            300000,
   };
-  function forcar(key, corretas){
-    const atuais = {};
-    try { Object.assign(atuais, JSON.parse(localStorage.getItem(key)||'{}')); } catch(e){}
-    const precisa = Object.entries(corretas).some(([k,v]) => atuais[k] !== v);
-    if(precisa) localStorage.setItem(key, JSON.stringify({...atuais, ...corretas}));
-  }
-  forcar('cofen_metas_eq_abril', metasAbril);
-  forcar('cofen_metas_eq_maio',  metasMaio);
-  forcar('cofen_metas_eq_junho', metasJunho);
+  // FIX: sempre sobrescrever — não misturar com localStorage antigo que pode ter lixo
+  localStorage.setItem('cofen_metas_eq_abril', JSON.stringify(metasAbril));
+  localStorage.setItem('cofen_metas_eq_maio',  JSON.stringify(metasMaio));
+  localStorage.setItem('cofen_metas_eq_junho', JSON.stringify(metasJunho));
   // Mantém cofen_metas_eq com Junho (compatibilidade com resto do sistema)
-  forcar('cofen_metas_eq', metasJunho);
+  localStorage.setItem('cofen_metas_eq', JSON.stringify(metasJunho));
 })();
 
 // ── CALENDAR & DU ──
@@ -5704,14 +5699,13 @@ function loadSavedOverrides(){
     localStorage.setItem('cofen_op_overrides', JSON.stringify(initOv));
     // Redefinir metas de equipe para os valores corretos de Junho 2026
     const metasCorretas = {
-      'COFEN MARILIA BRENDA':     500000,
-      'COFEN BIRIGUI BRUNA':      1000000,
-      'COFEN STEPHANIE 2° TURNO': 500000,
+      'COFEN MARILIA BRENDA':     450000,
+      'COFEN BIRIGUI BRUNA':      450000,
+      'COFEN STEPHANIE 2° TURNO': 450000,
       'COFEN DIGITAL':            300000,
     };
-    const metasAtuais = {};
-    try{ Object.assign(metasAtuais, JSON.parse(localStorage.getItem('cofen_metas_eq')||'{}')); }catch(e){}
-    localStorage.setItem('cofen_metas_eq', JSON.stringify({...metasAtuais, ...metasCorretas}));
+    // FIX: sempre sobrescrever metas corretas
+    localStorage.setItem('cofen_metas_eq', JSON.stringify(metasCorretas));
     rebuildAll();
     return;
   }
@@ -9295,16 +9289,15 @@ function fbStartListening(){
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
     // Metas Junho — Firebase não sobrescreve valores corretos
     const corretasMaio = {
-      'COFEN MARILIA BRENDA':     500000,
-      'COFEN BIRIGUI BRUNA':      1000000,
-      'COFEN STEPHANIE 2° TURNO': 500000,
+      'COFEN MARILIA BRENDA':     450000,
+      'COFEN BIRIGUI BRUNA':      450000,
+      'COFEN STEPHANIE 2° TURNO': 450000,
       'COFEN DIGITAL':            300000,
     };
     const merged = {...local, ...remote, ...corretasMaio};
     gSetMetas(merged);
-    // Também atualiza localStorage separado de Maio
-    const _mmAtual = {}; try{Object.assign(_mmAtual,JSON.parse(localStorage.getItem('cofen_metas_eq_maio')||'{}'));}catch(e){}
-    localStorage.setItem('cofen_metas_eq_maio', JSON.stringify({..._mmAtual,...corretasMaio}));
+    // Também atualiza localStorage separado de Junho
+    localStorage.setItem('cofen_metas_eq_junho', JSON.stringify(corretasMaio));
     // Se o Firebase não tem os valores corretos, corrige lá também
     const fbTemErro = Object.entries(corretasMaio).some(([k,v])=>(remote[k]||0)!==v);
     if(fbTemErro && typeof fbPush==='function') fbPush('metas_eq', merged);
@@ -12556,7 +12549,23 @@ function mtsAtualizarMaio(){
 
   // Resultado final de Maio por equipe — DU19 (mês encerrado em 30/05/2026)
   // Fonte: CMP_MAIO_EQ até último DU disponível; fallback = proporcional ao total de Abril
-  const totalMaioGlobal = 2007316.68; // Total real confirmado (DU19)
+  // Valores reais confirmados de Maio 2026 por equipe (mês encerrado 30/05/2026)
+  const REC_MAIO_HARDCODED = {
+    'COFEN MARILIA BRENDA':     495110.00,
+    'COFEN BIRIGUI BRUNA':      515233.00,
+    'COFEN STEPHANIE 2° TURNO': 375163.25,
+    'COFEN DIGITAL':            285365.00,
+  };
+  const totalMaioGlobal = 1670871.25; // Total real confirmado
+
+  // Mapeamento supervisor → equipe
+  const _supEqMapM = {
+    'BRENDA_FERREIRA':    'COFEN MARILIA BRENDA',
+    'BRUNA_JUSTIMIANO':   'COFEN BIRIGUI BRUNA',
+    'STEPHANIE_BERNARDES':'COFEN STEPHANIE 2° TURNO',
+  };
+
+  // Prioridade: 1) CMP_MAIO_EQ (importado), 2) hardcoded, 3) proporcional Abril
   const totalAbril = 1601416.79;
   const recAbrilPorEq = {
     'COFEN MARILIA BRENDA':     391979.58,
@@ -12564,27 +12573,23 @@ function mtsAtualizarMaio(){
     'COFEN STEPHANIE 2° TURNO': 485724.16,
     'COFEN DIGITAL':            206704.90,
   };
-  // Mapeamento supervisor → equipe (para somar rec dos supervisores no total de Maio)
-  const _supEqMapM = {
-    'BRENDA_FERREIRA':    'COFEN MARILIA BRENDA',
-    'BRUNA_JUSTIMIANO':   'COFEN BIRIGUI BRUNA',
-    'STEPHANIE_BERNARDES':'COFEN STEPHANIE 2° TURNO',
-  };
-  // Para cada equipe: pega o último DU do CMP_MAIO_EQ se disponível,
-  // senão estima proporcionalmente pelo peso de Abril.
-  // FIX: inclui rec dos supervisores bloqueados no total da equipe
   const REC_MAIO_FINAL = {};
   SUPERVISORES_MAIO.forEach(sup => {
     const duData = CMP_MAIO_EQ[sup.eq] || {};
     const keys = Object.keys(duData).map(Number).sort((a,b)=>a-b);
     let baseRec = 0;
     if(keys.length > 0){
+      // Dados importados disponíveis — usar
       baseRec = duData[keys[keys.length-1]];
+    } else if(REC_MAIO_HARDCODED[sup.eq] > 0){
+      // Valores hardcoded confirmados
+      baseRec = REC_MAIO_HARDCODED[sup.eq];
     } else {
+      // Fallback proporcional a Abril
       const pct = (recAbrilPorEq[sup.eq] || 0) / totalAbril;
       baseRec = Math.round(totalMaioGlobal * pct * 100) / 100;
     }
-    // Somar rec dos supervisores desta equipe (dados em D.equipes)
+    // Somar rec dos supervisores desta equipe
     const supRec = (D.equipes || [])
       .flatMap(eq => eq.ops || [])
       .filter(o => _supEqMapM[o.name] === sup.eq)
@@ -12639,10 +12644,10 @@ function mtsAtualizarJunho(){
 
   const _mj = {}; try{ Object.assign(_mj, JSON.parse(localStorage.getItem('cofen_metas_eq_junho')||'{}')); }catch(e){}
   const SUPERVISORES_JUN = [
-    { eq: 'COFEN MARILIA BRENDA',     meta: _mj['COFEN MARILIA BRENDA']     || 500000,  av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
-    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mj['COFEN BIRIGUI BRUNA']      || 1000000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
-    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mj['COFEN STEPHANIE 2° TURNO'] || 500000,  av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
-    { eq: 'COFEN DIGITAL',            meta: _mj['COFEN DIGITAL']            || 300000,  av: 'DG',  avClass: 'mts-av-bb', nome: 'Digital'           },
+    { eq: 'COFEN MARILIA BRENDA',     meta: _mj['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mj['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mj['COFEN STEPHANIE 2° TURNO'] || 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
+    { eq: 'COFEN DIGITAL',            meta: _mj['COFEN DIGITAL']            || 300000, av: 'DG',  avClass: 'mts-av-bb', nome: 'Digital'           },
   ];
 
   const recPorEq = {};
@@ -13559,7 +13564,7 @@ function renderEqMetasTable(){
   const tbody = document.getElementById('eq-metas-tbody');
   if(!tbody) return;
 
-  const META_EQ_DEFAULT = 500000;
+  const META_EQ_DEFAULT = 450000;
 
   // ── Dias úteis reais do objeto DU (atualizado pelo dashboard a cada dia) ──
   const duPass  = (typeof DU !== 'undefined' && DU && DU.passou  > 0) ? DU.passou  : 1;
