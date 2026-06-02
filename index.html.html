@@ -300,32 +300,102 @@ select.ev-inp{cursor:pointer}
 .photo-upload-btn{padding:5px 12px;border-radius:var(--rm);border:1.5px dashed var(--g300);background:var(--g50);color:var(--g500);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap}
 .photo-upload-btn:hover{border-color:var(--pp);color:var(--pp);background:var(--ppl)}
 
-/* ─ TV MODE ─ */
-#tv-overlay{position:fixed;inset:0;z-index:9000;background:#0A1628;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif,sans-serif;overflow:hidden}
+/* ─ TV MODE — TEMA COPA DO BRASIL ─ */
+:root{
+  --br-verde:#009B3A;     /* Verde bandeira */
+  --br-amarelo:#FEDF00;   /* Amarelo bandeira */
+  --br-azul:#002776;      /* Azul esfera */
+  --br-verde-esc:#006428; /* Verde escuro */
+  --br-ouro:#FFD700;      /* Ouro medalha */
+}
+#tv-overlay{
+  position:fixed;inset:0;z-index:9000;
+  background:radial-gradient(ellipse at 20% 50%, #003d1a 0%, #001408 40%, #000e05 100%);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  font-family:Nunito,sans-serif;overflow:hidden;
+}
+/* Listras diagonais estilo copa */
+#tv-overlay::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(
+    -60deg,
+    transparent, transparent 80px,
+    rgba(0,155,58,.04) 80px, rgba(0,155,58,.04) 82px
+  );
+  z-index:0;
+}
+/* Borda dourada animada no topo */
+#tv-overlay::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--br-verde),var(--br-amarelo),var(--br-verde),var(--br-amarelo),var(--br-verde));
+  background-size:400% 100%;
+  animation:tv-flag-wave 3s linear infinite;
+  z-index:10;
+}
+@keyframes tv-flag-wave{0%{background-position:0% 0%}100%{background-position:100% 0%}}
 #tv-overlay.on{display:flex}
-.tv-header{position:absolute;top:0;left:0;right:0;padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
-.tv-brand{font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:3px;color:rgba(255,255,255,.25)}
-.tv-clock{font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:2px;color:rgba(255,255,255,.4)}
-.tv-close{position:absolute;top:16px;right:20px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.tv-close:hover{background:rgba(255,60,60,.3);color:#fff;border-color:rgba(255,60,60,.5)}
-.tv-card{width:100%;height:100%;padding:0;animation:tvIn .6s cubic-bezier(.34,1.4,.64,1)}
-@keyframes tvIn{from{opacity:0;transform:scale(.92) translateY(24px)}to{opacity:1;transform:none}}
-.tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;border:4px solid rgba(255,255,255,.15);flex-shrink:0}
-.tv-photo-placeholder{width:140px;height:140px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:50px;color:#fff;flex-shrink:0;border:4px solid rgba(255,255,255,.1)}
-.tv-name{font-family:Bebas Neue,sans-serif;font-size:46px;letter-spacing:2px;color:#fff;line-height:1}
+.tv-header{
+  position:absolute;top:0;left:0;right:0;
+  padding:12px 32px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(180deg,rgba(0,0,0,.7) 0%,transparent 100%);
+  z-index:5;
+}
+.tv-brand{
+  font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;
+  color:var(--br-amarelo);
+  text-shadow:0 0 20px rgba(254,223,0,.4);
+  display:flex;align-items:center;gap:10px;
+}
+.tv-brand::before{content:'🇧🇷';font-size:20px;filter:drop-shadow(0 0 8px rgba(0,155,58,.8))}
+.tv-clock{
+  font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;
+  color:var(--br-amarelo);
+  text-shadow:0 0 15px rgba(254,223,0,.5);
+}
+.tv-close{
+  position:absolute;top:14px;right:20px;width:36px;height:36px;border-radius:50%;
+  border:1px solid rgba(254,223,0,.3);background:rgba(0,0,0,.3);
+  color:rgba(254,223,0,.6);cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:10;
+}
+.tv-close:hover{background:rgba(255,40,40,.4);color:#fff;border-color:rgba(255,80,80,.6)}
+.tv-card{width:100%;height:100%;padding:0;animation:tvIn .5s cubic-bezier(.34,1.3,.64,1);z-index:1;position:relative}
+@keyframes tvIn{from{opacity:0;transform:scale(.94) translateY(18px)}to{opacity:1;transform:none}}
+.tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;
+  border:3px solid var(--br-amarelo);flex-shrink:0;
+  box-shadow:0 0 30px rgba(254,223,0,.25);}
+.tv-photo-placeholder{width:140px;height:140px;border-radius:20px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:50px;color:#fff;flex-shrink:0;
+  border:3px solid rgba(254,223,0,.3);}
+.tv-name{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:2px;color:#fff;line-height:1}
 .tv-eq{font-size:14px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
-.tv-kpi{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px 20px;text-align:center}
+.tv-kpi{background:rgba(0,155,58,.1);border:1px solid rgba(0,155,58,.25);border-radius:14px;padding:16px 20px;text-align:center}
 .tv-kpi-l{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
-.tv-kpi-v{font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:.5px;line-height:1}
-.tv-progress{width:100%;height:8px;background:rgba(255,255,255,.1);border-radius:100px;overflow:hidden;margin-top:16px}
-.tv-progress-fill{height:100%;border-radius:100px;transition:width 5s linear}
-.tv-nav{display:flex;align-items:center;gap:12px;margin-top:16px;justify-content:center}
-.tv-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);transition:all .3s;cursor:pointer}
-.tv-dot.on{background:#fff;transform:scale(1.4)}
-.tv-ag-row{display:flex;justify-content:space-between;font-size:13px;font-weight:700;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.tv-kpi-v{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.5px;line-height:1}
+.tv-progress{
+  width:100%;height:5px;
+  background:rgba(0,155,58,.15);
+  overflow:hidden;margin-top:0;position:relative;z-index:5;
+}
+.tv-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--br-verde),var(--br-amarelo),var(--br-verde));
+  background-size:200% 100%;
+  animation:tv-bar-shine 2s linear infinite;
+  transition:width linear;
+}
+@keyframes tv-bar-shine{0%{background-position:100% 0%}100%{background-position:-100% 0%}}
+.tv-nav{display:flex;align-items:center;gap:10px;margin-top:14px;justify-content:center}
+.tv-dot{width:7px;height:7px;border-radius:50%;background:rgba(254,223,0,.2);transition:all .3s;cursor:pointer}
+.tv-dot.on{background:var(--br-amarelo);transform:scale(1.5);box-shadow:0 0 8px var(--br-amarelo)}
+.tv-ag-row{display:flex;justify-content:space-between;font-size:13px;font-weight:700;padding:4px 0;border-bottom:1px solid rgba(0,155,58,.15)}
 .tv-fb-badge{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
-.tv-fb-done{background:rgba(74,222,128,.15);border:1.5px solid rgba(74,222,128,.5);color:#4ADE80}
-.tv-fb-pending{background:rgba(252,211,77,.12);border:1.5px dashed rgba(252,211,77,.45);color:#FCD34D}
+.tv-fb-done{background:rgba(0,155,58,.2);border:1.5px solid rgba(0,155,58,.6);color:#4ADE80}
+.tv-fb-pending{background:rgba(254,223,0,.1);border:1.5px dashed rgba(254,223,0,.45);color:var(--br-amarelo)}
+/* Partículas de estrelas animadas Copa */
+@keyframes tv-star-float{0%{transform:translateY(0) rotate(0deg);opacity:.7}100%{transform:translateY(-100vh) rotate(360deg);opacity:0}}
 
 
 /* ─ SYNC PANEL ─ */
@@ -953,6 +1023,103 @@ select.ev-inp{cursor:pointer}
           </div>
 
         </div>
+
+        <!-- ══ CARD: HISTÓRICO HO PAGUEPAY POR MÊS ══ -->
+        <div id="pp-hist-ho-card" style="background:linear-gradient(135deg,#0D1117 0%,#0F2027 50%,#0A1628 100%);border:1px solid rgba(0,229,255,.15);border-radius:16px;padding:20px 22px;margin-bottom:10px;box-shadow:0 8px 32px rgba(0,0,0,.4)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+            <div>
+              <div style="font-size:10px;font-weight:800;color:rgba(0,229,255,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">📊 HISTÓRICO HO PAGUEPAY — 2026</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.3);font-weight:600">Honorários recebidos pela empresa mês a mês (24,96%)</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">TOTAL ANO</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#00E5FF;letter-spacing:1px">R$ 2.194.882,86</div>
+            </div>
+          </div>
+
+          <!-- Maior valor para calcular % das barras: 498.979,12 (Mai) = 100% -->
+          <div style="display:flex;flex-direction:column;gap:9px">
+
+            <!-- JAN -->
+            <div style="display:grid;grid-template-columns:46px 1fr 130px;align-items:center;gap:10px">
+              <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:.8px">JAN</div>
+              <div style="background:rgba(255,255,255,.07);border-radius:100px;height:7px;overflow:hidden">
+                <div style="height:100%;width:4.08%;border-radius:100px;background:linear-gradient(90deg,#3B82F6,#60A5FA)"></div>
+              </div>
+              <div style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#60A5FA;letter-spacing:.3px">R$ 20.352,13</div>
+            </div>
+
+            <!-- FEV -->
+            <div style="display:grid;grid-template-columns:46px 1fr 130px;align-items:center;gap:10px">
+              <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:.8px">FEV</div>
+              <div style="background:rgba(255,255,255,.07);border-radius:100px;height:7px;overflow:hidden">
+                <div style="height:100%;width:6.10%;border-radius:100px;background:linear-gradient(90deg,#3B82F6,#60A5FA)"></div>
+              </div>
+              <div style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#60A5FA;letter-spacing:.3px">R$ 30.447,39</div>
+            </div>
+
+            <!-- MAR -->
+            <div style="display:grid;grid-template-columns:46px 1fr 130px;align-items:center;gap:10px">
+              <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:.8px">MAR</div>
+              <div style="background:rgba(255,255,255,.07);border-radius:100px;height:7px;overflow:hidden">
+                <div style="height:100%;width:28.26%;border-radius:100px;background:linear-gradient(90deg,#8B5CF6,#A78BFA)"></div>
+              </div>
+              <div style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#A78BFA;letter-spacing:.3px">R$ 141.025,45</div>
+            </div>
+
+            <!-- ABR -->
+            <div style="display:grid;grid-template-columns:46px 1fr 130px;align-items:center;gap:10px">
+              <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:.8px">ABR</div>
+              <div style="background:rgba(255,255,255,.07);border-radius:100px;height:7px;overflow:hidden">
+                <div style="height:100%;width:74.88%;border-radius:100px;background:linear-gradient(90deg,#F59E0B,#FCD34D)"></div>
+              </div>
+              <div style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#FCD34D;letter-spacing:.3px">R$ 373.649,46</div>
+            </div>
+
+            <!-- MAI — 100% (maior mês) -->
+            <div style="display:grid;grid-template-columns:46px 1fr 130px;align-items:center;gap:10px">
+              <div style="font-size:10px;font-weight:800;color:rgba(74,222,128,.9);letter-spacing:.8px">MAI</div>
+              <div style="background:rgba(255,255,255,.07);border-radius:100px;height:10px;overflow:hidden">
+                <div style="height:100%;width:100%;border-radius:100px;background:linear-gradient(90deg,#4ADE80,#00C97F);box-shadow:0 0 10px rgba(74,222,128,.35)"></div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:#4ADE80;letter-spacing:.3px">R$ 498.979,12</div>
+                <div style="font-size:8px;color:rgba(74,222,128,.55);font-weight:800;text-transform:uppercase;letter-spacing:.5px">🏆 maior mês</div>
+              </div>
+            </div>
+
+            <!-- JUN — mês atual em andamento -->
+            <div style="display:grid;grid-template-columns:46px 1fr 130px;align-items:center;gap:10px">
+              <div style="font-size:10px;font-weight:800;color:rgba(0,229,255,.9);letter-spacing:.8px">JUN</div>
+              <div style="background:rgba(255,255,255,.07);border-radius:100px;height:10px;overflow:hidden;position:relative">
+                <div id="pp-hist-jun-bar" style="height:100%;width:6.58%;border-radius:100px;background:linear-gradient(90deg,#00E5FF,#29ABE2);box-shadow:0 0 10px rgba(0,229,255,.4);transition:width 1s ease"></div>
+              </div>
+              <div style="text-align:right">
+                <div id="pp-hist-jun-val" style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:#00E5FF;letter-spacing:.3px">R$ 32.849,76</div>
+                <div style="font-size:8px;color:rgba(0,229,255,.55);font-weight:800;text-transform:uppercase;letter-spacing:.5px">⚡ em andamento</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Rodapé com totais -->
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;flex-wrap:wrap">
+            <div>
+              <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Jan–Mai (encerrados)</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:rgba(255,255,255,.55);letter-spacing:.3px">R$ 1.064.453,55</div>
+            </div>
+            <div>
+              <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Média mensal (Jan–Mai)</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:rgba(255,255,255,.55);letter-spacing:.3px">R$ 212.890,71</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:9px;font-weight:800;color:rgba(0,229,255,.5);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Total Jan→Jun</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#00E5FF;letter-spacing:.5px">R$ 1.097.303,31</div>
+            </div>
+          </div>
+        </div>
+        <!-- FIM HISTÓRICO HO ══ -->
+
         <!-- IDs ocultos preservados -->
         <input type="hidden" id="inp-arrecadado" value="0">
         <input type="hidden" id="inp-meta-arrecadado" value="2000000">
@@ -5440,7 +5607,7 @@ function go(id,el){
   if(id==='check') checkInit();
   if(id==='comparativo') cmpInit();
   if(id==='inadimpl') inadimplInit();
-  if(id==='metas'){ mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); }
+  if(id==='metas'){ mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho(); }
   if(id==='recdia-op') rdopRender();
 }
 
@@ -5449,6 +5616,7 @@ function refreshAll(){
   rebuildAll();
   initHero();
   if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio();
+  if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho();
   // Sempre atualiza todos os componentes — independente de qual aba está visível
   mkGD(); mkDist(); mkTop5();
   mkEq();
@@ -5471,6 +5639,8 @@ function refreshAll(){
   if(typeof renderResumoEditor==='function') renderResumoEditor();
   // ── Atualiza Metas Abril em tempo real ──
   if(typeof mtsAtualizarAbril==='function') mtsAtualizarAbril();
+  if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio();
+  if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho();
   // ── Atualiza dados do Comparativo Abril vs Maio ──
   if(typeof cmpAtualizarCumul==='function'){
     cmpAtualizarCumul();
@@ -6733,6 +6903,7 @@ function metasSave(){
   gestaoMetasInit();
   if(typeof mtsAtualizarAbril === 'function') mtsAtualizarAbril();
   if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio();
+  if(typeof mtsAtualizarJunho === 'function') mtsAtualizarJunho();
   toast('✅ Metas salvas e sincronizadas para todos!');
 }
 
@@ -8087,9 +8258,9 @@ function tvSetMode(mode, btnEl){
   // Atualiza visual dos botões
   document.querySelectorAll('[id^="tv-btn-"]').forEach(b=>{
     b.style.background='transparent';
-    b.style.color='rgba(255,255,255,.5)';
+    b.style.color='rgba(255,255,255,.4)';
   });
-  if(btnEl){ btnEl.style.background='rgba(255,255,255,.18)'; btnEl.style.color='#fff'; }
+  if(btnEl){ btnEl.style.background='rgba(0,155,58,.5)'; btnEl.style.color='var(--br-amarelo)'; }
   // Atualiza label
   const lbl = document.getElementById('tv-mode-label');
   if(lbl) lbl.textContent = mode==='geral' ? 'RANKING GERAL' : (EQ[mode]?.sh||mode).toUpperCase();
@@ -8148,7 +8319,7 @@ function tvStart(){
   document.querySelectorAll('[id^="tv-btn-"]').forEach(b=>{
     b.style.background='transparent'; b.style.color='rgba(255,255,255,.5)';
   });
-  if(geralBtn){ geralBtn.style.background='rgba(255,255,255,.18)'; geralBtn.style.color='#fff'; }
+  if(geralBtn){ geralBtn.style.background='rgba(0,155,58,.5)'; geralBtn.style.color='var(--br-amarelo)'; }
   const lbl=document.getElementById('tv-mode-label');
   if(lbl) lbl.textContent='RANKING GERAL';
   tvBuildDots();
@@ -8341,33 +8512,51 @@ function tvShow(idx){
       <!-- FOTO ESQUERDA -->
       <div style="width:44%;flex-shrink:0;position:relative;overflow:hidden">
         ${photoHtml}
-        <div style="position:absolute;inset:0;background:linear-gradient(to right,transparent 55%,#0A1628 100%);pointer-events:none"></div>
+        <!-- Gradiente Copa: verde → fundo -->
+        <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,20,8,.2) 0%,transparent 40%,#001408 100%);pointer-events:none"></div>
+        <!-- Faixa verde diagonal no canto inferior esquerdo -->
+        <div style="position:absolute;bottom:0;left:0;right:0;height:120px;
+          background:linear-gradient(to top,rgba(0,60,20,.7),transparent);pointer-events:none"></div>
 
-        <!-- Posição grande -->
+        <!-- Posição grande — cor ouro no top 3 -->
         <div style="position:absolute;bottom:88px;left:26px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:90px;color:${posColor};
-            line-height:1;text-shadow:${posGlow},0 4px 20px rgba(0,0,0,.9);letter-spacing:4px">${posLabel}</div>
-          <div style="font-size:13px;font-weight:700;color:${tierColor};letter-spacing:3px;
-            text-transform:uppercase;text-shadow:0 2px 8px rgba(0,0,0,.8)">${tier}</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:90px;
+            color:${posExib<=3?'var(--br-ouro)':posColor};
+            line-height:1;
+            text-shadow:${posExib<=3?'0 0 60px rgba(255,215,0,.7),0 4px 20px rgba(0,0,0,.9)':posGlow+',0 4px 20px rgba(0,0,0,.9)'};
+            letter-spacing:4px">${posLabel}</div>
+          <div style="font-size:13px;font-weight:700;
+            color:${_tvRec>=20000?'#4ADE80':_tvRec>=10000?'#FEDF00':_tvRec>=5000?'#FCD34D':'#FCA5A5'};
+            letter-spacing:3px;text-transform:uppercase;
+            text-shadow:0 2px 8px rgba(0,0,0,.8)">${tier}</div>
         </div>
 
-        <!-- Badge equipe -->
-        <div style="position:absolute;top:74px;left:26px;background:${cfg.c}30;border:1px solid ${cfg.c}60;
-          border-radius:100px;padding:5px 14px;font-size:11px;font-weight:700;color:${cfg.c};
-          letter-spacing:1.5px;text-transform:uppercase;backdrop-filter:blur(8px)">
+        <!-- Badge equipe — estilo plaquinha copa -->
+        <div style="position:absolute;top:74px;left:26px;
+          background:rgba(0,0,0,.5);
+          border:1px solid rgba(254,223,0,.4);
+          border-radius:100px;padding:5px 14px;font-size:11px;font-weight:700;
+          color:var(--br-amarelo);
+          letter-spacing:1.5px;text-transform:uppercase;backdrop-filter:blur(8px);
+          text-shadow:0 0 10px rgba(254,223,0,.5)">
           ${cfg.ico} ${cfg.sh}
         </div>
 
-        <!-- Contador operadores no modo -->
+        <!-- Contador operadores -->
         <div style="position:absolute;bottom:60px;left:26px;font-size:10px;font-weight:700;
-          color:rgba(255,255,255,.35);letter-spacing:1px">
+          color:rgba(254,223,0,.4);letter-spacing:1px">
           ${idx+1} / ${tvList.length} ${bbMode?'Bruna+Brenda':isEqMode?'na equipe':'no ranking'}
         </div>
+
+        <!-- Mini bandeira do Brasil decorativa -->
+        <div style="position:absolute;top:16px;right:16px;font-size:28px;opacity:.15;
+          filter:drop-shadow(0 0 8px rgba(0,155,58,.5))">🇧🇷</div>
       </div>
 
-      <!-- INFORMAÇÕES DIREITA -->
+      <!-- INFORMAÇÕES DIREITA — fundo copa escuro -->
       <div style="flex:1;display:flex;flex-direction:column;padding:72px 32px 60px 24px;
-          gap:10px;overflow-y:auto;min-width:0">
+          gap:10px;overflow-y:auto;min-width:0;
+          background:linear-gradient(135deg,rgba(0,20,8,.95) 0%,rgba(0,10,4,1) 100%)">
 
         <!-- NOME + badges -->
         <div>
@@ -8395,33 +8584,33 @@ function tvShow(idx){
           </div>
         </div>
 
-        <!-- 4 KPIs -->
+        <!-- 4 KPIs — tema copa -->
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-          <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);
+          <div style="background:rgba(0,155,58,.12);border:1px solid rgba(0,155,58,.3);
               border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">💰 Total Real</div>
+            <div style="font-size:8px;font-weight:700;color:rgba(254,223,0,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">💰 Total Real</div>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;line-height:1">${fR(tvGetRec(op))}</div>
-            ${(()=>{ try{ const _s=rdGetSaved(); const _h=parseFloat(_s[op.name]||0); if(_h>0) return '<div style="font-size:9px;color:#FCD34D;font-weight:800;margin-top:3px">+'+fR(_h)+' hoje</div>'; }catch(e){} return ''; })()}
+            ${(()=>{ try{ const _s=rdGetSaved(); const _h=parseFloat(_s[op.name]||0); if(_h>0) return '<div style="font-size:9px;color:var(--br-amarelo);font-weight:800;margin-top:3px">+'+fR(_h)+' hoje</div>'; }catch(e){} return ''; })()}
           </div>
-          <div style="background:rgba(103,232,249,.1);border:1px solid rgba(103,232,249,.25);
+          <div style="background:rgba(254,223,0,.08);border:1px solid rgba(254,223,0,.2);
               border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 HO (25%)</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#67E8F9;line-height:1">${fR(op.ho)}</div>
+            <div style="font-size:8px;font-weight:700;color:rgba(254,223,0,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 HO (25%)</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--br-amarelo);line-height:1">${fR(op.ho)}</div>
           </div>
-          <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+          <div style="background:rgba(0,39,118,.15);border:1px solid rgba(0,39,118,.35);
               border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">📋 Acordos</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;line-height:1">${op.acordos||0}</div>
+            <div style="font-size:8px;font-weight:700;color:rgba(254,223,0,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">📋 Acordos</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#93C5FD;line-height:1">${op.acordos||0}</div>
           </div>
           ${temEfic
-            ? `<div style="background:${efC}18;border:1px solid ${efC}33;border-radius:12px;padding:12px;text-align:center">
-                <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚡ Efic. Pgto</div>
+            ? `<div style="background:${efC}15;border:1px solid ${efC}30;border-radius:12px;padding:12px;text-align:center">
+                <div style="font-size:8px;font-weight:700;color:rgba(254,223,0,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚡ Efic. Pgto</div>
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${efC};line-height:1">${efPct}%</div>
                 <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px">${pagos}/${gerados} venc.</div>
                </div>`
-            : `<div style="background:rgba(252,211,77,.08);border:1px solid rgba(252,211,77,.2);border-radius:12px;padding:12px;text-align:center">
-                <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎫 Ticket Médio</div>
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FCD34D;line-height:1">${(op.acordos||0)>0?fRK(tvGetRec(op)/(op.acordos||1)):'—'}</div>
+            : `<div style="background:rgba(254,223,0,.07);border:1px solid rgba(254,223,0,.18);border-radius:12px;padding:12px;text-align:center">
+                <div style="font-size:8px;font-weight:700;color:rgba(254,223,0,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎫 Ticket Médio</div>
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--br-amarelo);line-height:1">${(op.acordos||0)>0?fRK(tvGetRec(op)/(op.acordos||1)):'—'}</div>
                </div>`
           }
         </div>
@@ -8526,7 +8715,7 @@ function tvShow(idx){
           <!-- Ranking (vizinhos no modo atual) -->
           <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
               border-radius:12px;padding:11px 13px">
-            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);
+            <div style="font-size:9px;font-weight:700;color:rgba(254,223,0,.5);
               letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">
               🏆 ${bbMode?'Bruna + Brenda':isEqMode?'Ranking da Equipe':'Ranking Geral'}
             </div>
@@ -8621,7 +8810,8 @@ function tvShow(idx){
   tvUpdateDots();
   const bar=document.getElementById('tv-bar');
   if(bar){
-    bar.style.transition='none'; bar.style.width='0%'; bar.style.background=cfg.c||'var(--pp)';
+    bar.style.transition='none'; bar.style.width='0%';
+    bar.style.background='linear-gradient(90deg,var(--br-verde),var(--br-amarelo),var(--br-verde))';
     setTimeout(()=>{ bar.style.transition=`width ${TV_INTERVAL}ms linear`; bar.style.width='100%'; },50);
   }
 }
@@ -10862,7 +11052,7 @@ mkEq();
 // Restaurar extras de equipe do localStorage ao iniciar
 setTimeout(()=>{ if(typeof extraRestoreOnLoad==='function') extraRestoreOnLoad(); }, 500);
 // Inicializa cards de Abril na página Metas 2026
-setTimeout(()=>{ if(typeof mtsAtualizarAbril==='function') mtsAtualizarAbril(); }, 300);
+setTimeout(()=>{ if(typeof mtsAtualizarAbril==='function') mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho(); }, 300);
 // ══════════════════════════════════════════════════════════════
 // SISTEMA DE EVENTOS DO CALENDÁRIO
 // ══════════════════════════════════════════════════════════════
@@ -11053,11 +11243,29 @@ setInterval(()=>{
 
 <!-- TV MODE OVERLAY -->
 <div id="tv-overlay">
+
+  <!-- Estrelas/partículas decorativas Copa -->
+  <div id="tv-particles" style="position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden">
+    <div style="position:absolute;font-size:18px;opacity:.12;top:8%;left:5%;animation:tv-star-float 12s linear infinite">⭐</div>
+    <div style="position:absolute;font-size:12px;opacity:.10;top:20%;left:92%;animation:tv-star-float 9s linear 2s infinite">★</div>
+    <div style="position:absolute;font-size:22px;opacity:.08;top:65%;left:3%;animation:tv-star-float 15s linear 1s infinite">⭐</div>
+    <div style="position:absolute;font-size:10px;opacity:.15;top:80%;left:88%;animation:tv-star-float 11s linear 3s infinite">★</div>
+    <div style="position:absolute;font-size:16px;opacity:.07;top:40%;left:96%;animation:tv-star-float 14s linear 4s infinite">⭐</div>
+    <!-- Círculo verde decorativo estilo esfera da bandeira -->
+    <div style="position:absolute;width:600px;height:600px;border-radius:50%;
+      border:1px solid rgba(0,155,58,.06);top:50%;left:50%;
+      transform:translate(-50%,-50%);pointer-events:none"></div>
+    <div style="position:absolute;width:900px;height:900px;border-radius:50%;
+      border:1px solid rgba(254,223,0,.04);top:50%;left:50%;
+      transform:translate(-50%,-50%);pointer-events:none"></div>
+  </div>
+
   <div class="tv-header">
-    <div class="tv-brand">COB COFEN · DASHBOARD</div>
+    <div class="tv-brand">COB COFEN · JUNHO 2026</div>
     <div style="display:flex;align-items:center;gap:16px">
-      <div id="tv-mode-label" style="font-family:'Bebas Neue',sans-serif;font-size:16px;
-        color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase"></div>
+      <div id="tv-mode-label" style="font-family:'Bebas Neue',sans-serif;font-size:15px;
+        color:var(--br-amarelo);letter-spacing:3px;text-transform:uppercase;
+        text-shadow:0 0 12px rgba(254,223,0,.5)"></div>
       <div id="tv-clock-display" class="tv-clock"></div>
     </div>
   </div>
@@ -11069,54 +11277,57 @@ setInterval(()=>{
   <div class="tv-progress"><div id="tv-bar" class="tv-progress-fill"></div></div>
   <div class="tv-nav" id="tv-dots"></div>
 
-  <!-- Controles -->
-  <div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center">
-    <!-- Seletor de modo -->
-    <div style="display:flex;gap:4px;background:rgba(255,255,255,.08);border-radius:var(--rm);padding:3px">
+  <!-- Controles Copa -->
+  <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;z-index:10">
+    <!-- Seletor de modo — estilo placa copa -->
+    <div style="display:flex;gap:3px;background:rgba(0,0,0,.5);border:1px solid rgba(0,155,58,.3);border-radius:12px;padding:4px;backdrop-filter:blur(8px)">
       <button id="tv-btn-geral" onclick="tvSetMode('geral',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:rgba(255,255,255,.15);color:#fff;letter-spacing:.5px;transition:all .2s">
+        font-weight:800;font-size:11px;background:rgba(0,155,58,.5);color:var(--br-amarelo);
+        letter-spacing:.5px;transition:all .2s;text-shadow:0 0 8px rgba(254,223,0,.4)">
         🏆 Geral
       </button>
       <button id="tv-btn-COFEN_MARILIA_BRENDA" onclick="tvSetMode('COFEN MARILIA BRENDA',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
+        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.45);letter-spacing:.5px;transition:all .2s">
         🏙 Brenda
       </button>
       <button id="tv-btn-COFEN_BIRIGUI_BRUNA" onclick="tvSetMode('COFEN BIRIGUI BRUNA',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
+        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.45);letter-spacing:.5px;transition:all .2s">
         💙 Bruna
       </button>
       <button id="tv-btn-COFEN_STEPHANIE_2_TURNO" onclick="tvSetMode('COFEN STEPHANIE 2° TURNO',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
+        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.45);letter-spacing:.5px;transition:all .2s">
         ⭐ Stephanie
       </button>
       <button id="tv-btn-COFEN_DIGITAL" onclick="tvSetMode('COFEN DIGITAL',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:#f953c6;border:1px solid rgba(249,83,198,.3);letter-spacing:.5px;transition:all .2s">
+        font-weight:800;font-size:11px;background:transparent;color:rgba(255,200,80,.6);
+        letter-spacing:.5px;transition:all .2s">
         🖥️ Digital
       </button>
       <button id="tv-btn-bb" onclick="tvSetMode('bb',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:#7CB9E8;border:1px solid rgba(71,118,230,.3);letter-spacing:.5px;transition:all .2s">
-        💙🏙️ Bruna+Brenda
+        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.45);
+        letter-spacing:.5px;transition:all .2s">
+        💙🏙 Bruna+Brenda
       </button>
     </div>
     <!-- Nav -->
     <button onclick="tvPrev()"
-      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.2);
-      background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);font-family:Nunito,sans-serif;
-      font-weight:700;font-size:12px;cursor:pointer">◀</button>
+      style="padding:7px 16px;border-radius:10px;border:1px solid rgba(0,155,58,.4);
+      background:rgba(0,0,0,.4);color:rgba(254,223,0,.7);font-family:Nunito,sans-serif;
+      font-weight:700;font-size:12px;cursor:pointer;backdrop-filter:blur(4px)">◀</button>
     <button id="tv-pause-btn" onclick="tvTogglePause()"
-      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.2);
-      background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);font-family:Nunito,sans-serif;
-      font-weight:700;font-size:12px;cursor:pointer">⏸ Pausar</button>
+      style="padding:7px 16px;border-radius:10px;border:1px solid rgba(0,155,58,.4);
+      background:rgba(0,0,0,.4);color:rgba(254,223,0,.7);font-family:Nunito,sans-serif;
+      font-weight:700;font-size:12px;cursor:pointer;backdrop-filter:blur(4px)">⏸ Pausar</button>
     <button onclick="tvNext()"
-      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.2);
-      background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);font-family:Nunito,sans-serif;
-      font-weight:700;font-size:12px;cursor:pointer">▶</button>
+      style="padding:7px 16px;border-radius:10px;border:1px solid rgba(0,155,58,.4);
+      background:rgba(0,0,0,.4);color:rgba(254,223,0,.7);font-family:Nunito,sans-serif;
+      font-weight:700;font-size:12px;cursor:pointer;backdrop-filter:blur(4px)">▶</button>
   </div>
 </div>
 
@@ -12229,74 +12440,140 @@ function mtsAtualizarAbril(){
   cardsEl.innerHTML = html;
 }
 
+// ── HELPERS compartilhados pelas funções de metas ──
+function _mtsQuartilInfo(pct){
+  if(pct >= 100) return { cardClass:'c-meta', rvClass:'meta', pctClass:'meta', badgeClass:'mts-qb-meta', label:'Meta batida',  barClass:'meta', barW: Math.min(pct,150) };
+  if(pct >= 80)  return { cardClass:'c-q1',   rvClass:'q1',   pctClass:'q1',   badgeClass:'mts-qb-1',    label:'2° Quartil',  barClass:'q1',   barW: pct };
+  if(pct >= 50)  return { cardClass:'c-q2',   rvClass:'q2',   pctClass:'q2',   badgeClass:'mts-qb-2',    label:'3° Quartil',  barClass:'q2',   barW: pct };
+  return              { cardClass:'c-q3',   rvClass:'q3',   pctClass:'q3',   badgeClass:'mts-qb-3',    label:'4° Quartil',  barClass:'q3',   barW: pct };
+}
+
+// ══ MAIO — mostra resultado FINAL salvo no localStorage ══
 function mtsAtualizarMaio(){
-  const cardsEl  = document.getElementById('mts-maio-cards');
-  const totalEl  = document.getElementById('mts-maio-total');
+  const cardsEl = document.getElementById('mts-maio-cards');
+  const totalEl = document.getElementById('mts-maio-total');
   if(!cardsEl) return;
 
-  // Metas ATIVAS de Maio — chave separada cofen_metas_eq_maio, default 450k por equipe
+  const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+
+  // 1. Tentar ler snapshot final de Maio (salvo quando o mês estava ativo)
+  let maiofinal = null;
+  try { maiofinal = JSON.parse(localStorage.getItem('cofen_maio_resultado_final') || 'null'); } catch(e){}
+
+  // 2. Se não tem snapshot, usa D.equipes atual como fallback (pode ser dados de Junho)
+  //    — mas só usa se o mês no arquivo ainda for Maio (getMonth===4)
+  const hoje = new Date();
+  const recPorEqAtual = {};
+  (D.equipes || []).forEach(eq => { recPorEqAtual[eq.name] = eq.rec || 0; });
+
   const _mm = {}; try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_metas_eq_maio')||'{}')); }catch(e){}
-  // Lê os valores AO VIVO de D.equipes — atualiza sozinho a cada import
-  const SUPERVISORES = [
+  const SUPERVISORES_MAIO = [
     { eq: 'COFEN MARILIA BRENDA',     meta: _mm['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
     { eq: 'COFEN BIRIGUI BRUNA',      meta: _mm['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
     { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mm['COFEN STEPHANIE 2° TURNO'] || 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
   ];
 
-  const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+  // Usar snapshot se disponível, senão D.equipes
+  const recFinal = maiofinal ? maiofinal.recPorEq : recPorEqAtual;
+  const totalMaio = SUPERVISORES_MAIO.reduce((s, sup) => s + (recFinal[sup.eq] || 0), 0);
 
-  // Busca rec de cada equipe diretamente de D.equipes (fonte viva)
-  const recPorEq = {};
-  (D.equipes || []).forEach(eq => { recPorEq[eq.name] = eq.rec || 0; });
+  // Salvar snapshot automaticamente se estamos em Junho e ainda não foi salvo
+  if(!maiofinal && hoje.getMonth() === 5 && totalMaio > 0){
+    const snap = { recPorEq: recFinal, total: totalMaio, salvoEm: new Date().toISOString() };
+    try { localStorage.setItem('cofen_maio_resultado_final', JSON.stringify(snap)); } catch(e){}
+  }
 
-  // Total acumulado Maio = soma das 3 equipes principais
-  const totalMaio = SUPERVISORES.reduce((s, sup) => s + (recPorEq[sup.eq] || 0), 0);
-
-  // Atualiza total no header
   if(totalEl) totalEl.textContent = totalMaio > 0 ? fBR(totalMaio) : '—';
 
-  // Se não tem dado ainda, mostra mensagem
   if(totalMaio === 0){
-    cardsEl.innerHTML = '<div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">⏳ Importe o relatório de Maio para carregar os dados das equipes...</div>';
+    cardsEl.innerHTML = '<div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">📂 Resultado final de Maio não encontrado. Importe o último relatório de Maio para salvar.</div>';
     return;
   }
 
-  function quartilInfo(pct){
-    if(pct >= 100) return { cardClass:'c-meta', rvClass:'meta', pctClass:'meta', badgeClass:'mts-qb-meta', label:'Meta batida',  barClass:'meta', barW: Math.min(pct,150) };
-    if(pct >= 80)  return { cardClass:'c-q1',   rvClass:'q1',   pctClass:'q1',   badgeClass:'mts-qb-1',    label:'2° Quartil',  barClass:'q1',   barW: pct };
-    if(pct >= 50)  return { cardClass:'c-q2',   rvClass:'q2',   pctClass:'q2',   badgeClass:'mts-qb-2',    label:'3° Quartil',  barClass:'q2',   barW: pct };
-    return             { cardClass:'c-q3',   rvClass:'q3',   pctClass:'q3',   badgeClass:'mts-qb-3',    label:'4° Quartil',  barClass:'q3',   barW: pct };
-  }
-
   let html = '';
-  SUPERVISORES.forEach(sup => {
-    const rec  = recPorEq[sup.eq] || 0;
+  SUPERVISORES_MAIO.forEach(sup => {
+    const rec  = recFinal[sup.eq] || 0;
     const pct  = sup.meta > 0 ? (rec / sup.meta * 100) : 0;
-    const q    = quartilInfo(pct);
+    const q    = _mtsQuartilInfo(pct);
     const barW = Math.min(q.barW, 100).toFixed(1);
 
-    // Dias úteis de Maio (estimado) para projeção
-    const totalDU = 21; // dias úteis em Maio 2026
-    const daysElapsed = (() => {
-      const today = new Date();
-      if(today.getMonth() !== 4) return totalDU; // não é Maio
-      const FERIADOS_MAIO = ['2026-05-01'];
-      let count = 0;
-      for(let d = 1; d <= today.getDate(); d++){
-        const dt = new Date(2026, 4, d);
-        const key = dt.toISOString().slice(0,10);
-        if(dt.getDay() !== 0 && dt.getDay() !== 6 && !FERIADOS_MAIO.includes(key)) count++;
-      }
-      return count;
-    })();
-    const projecao = daysElapsed > 0 && daysElapsed < totalDU ? (rec / daysElapsed * totalDU) : 0;
+    html += `
+    <div class="mts-card ${q.cardClass}">
+      <div class="mts-av ${sup.avClass}">${sup.av}</div>
+      <div class="mts-name">${sup.nome}</div>
+      <div class="mts-sub">Maio · resultado final</div>
+      <div class="mts-fl">Meta</div>
+      <div class="mts-fv">${fBR(sup.meta)}</div>
+      <div class="mts-divider"></div>
+      <div class="mts-fl">Total recebido</div>
+      <div class="mts-rv ${q.rvClass}">${fBR(rec)}</div>
+      <div class="mts-pct-row">
+        <span class="mts-pct-num ${q.pctClass}">${pct.toFixed(1)}%</span>
+        <span class="mts-pct-lbl">da meta</span>
+      </div>
+      <span class="mts-qbadge ${q.badgeClass}">${q.label}</span>
+      <div class="mts-bar-bg"><div class="mts-bar-f ${q.barClass}" style="width:${barW}%;transition:width .8s ease"></div></div>
+      ${maiofinal ? `<div style="margin-top:8px;font-size:9px;color:rgba(255,255,255,.3);text-align:right">✔ Salvo em ${new Date(maiofinal.salvoEm).toLocaleDateString('pt-BR')}</div>` : ''}
+    </div>`;
+  });
+
+  cardsEl.innerHTML = html;
+}
+
+// ══ JUNHO — mês ATIVO, lê D.equipes ao vivo ══
+function mtsAtualizarJunho(){
+  const cardsEl = document.getElementById('mts-junho-cards');
+  const totalEl = document.getElementById('mts-junho-total');
+  if(!cardsEl) return;
+
+  const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+
+  const _mj = {}; try{ Object.assign(_mj, JSON.parse(localStorage.getItem('cofen_metas_eq_junho')||'{}')); }catch(e){}
+  const SUPERVISORES_JUN = [
+    { eq: 'COFEN MARILIA BRENDA',     meta: _mj['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mj['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mj['COFEN STEPHANIE 2° TURNO'] || 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
+  ];
+
+  const recPorEq = {};
+  (D.equipes || []).forEach(eq => { recPorEq[eq.name] = eq.rec || 0; });
+
+  const totalJunho = SUPERVISORES_JUN.reduce((s, sup) => s + (recPorEq[sup.eq] || 0), 0);
+  if(totalEl) totalEl.textContent = totalJunho > 0 ? fBR(totalJunho) : '—';
+
+  if(totalJunho === 0){
+    cardsEl.innerHTML = '<div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">⏳ Importe o relatório de Junho para carregar os dados das equipes...</div>';
+    return;
+  }
+
+  // DUs de Junho passados até hoje
+  const totalDU_JUN = 20;
+  const hoje = new Date();
+  let daysElapsed = 0;
+  if(hoje.getMonth() === 5 && hoje.getFullYear() === 2026){
+    const FERIADOS_JUN = ['2026-06-19'];
+    for(let d = 1; d <= hoje.getDate(); d++){
+      const dt = new Date(2026, 5, d);
+      const key = dt.toISOString().slice(0,10);
+      if(dt.getDay() !== 0 && dt.getDay() !== 6 && !FERIADOS_JUN.includes(key)) daysElapsed++;
+    }
+  } else { daysElapsed = totalDU_JUN; }
+
+  let html = '';
+  SUPERVISORES_JUN.forEach(sup => {
+    const rec  = recPorEq[sup.eq] || 0;
+    const pct  = sup.meta > 0 ? (rec / sup.meta * 100) : 0;
+    const q    = _mtsQuartilInfo(pct);
+    const barW = Math.min(q.barW, 100).toFixed(1);
+
+    const projecao = daysElapsed > 0 && daysElapsed < totalDU_JUN ? (rec / daysElapsed * totalDU_JUN) : 0;
     const projPct  = sup.meta > 0 && projecao > 0 ? (projecao / sup.meta * 100) : 0;
 
     html += `
     <div class="mts-card ${q.cardClass}">
       <div class="mts-av ${sup.avClass}">${sup.av}</div>
       <div class="mts-name">${sup.nome}</div>
-      <div class="mts-sub">Maio · em andamento</div>
+      <div class="mts-sub">Junho · em andamento</div>
       <div class="mts-fl">Meta</div>
       <div class="mts-fv">${fBR(sup.meta)}</div>
       <div class="mts-divider"></div>
@@ -12329,7 +12606,7 @@ function mtsAtualizarMaio(){
   <div class="mts-hero">
     <div class="mts-hero-title">Recebimento Geral · Equipe Comercial</div>
     <div class="mts-hero-h">🎯 METAS & RESULTADOS — 2026</div>
-    <div class="mts-hero-sub">Janeiro · Fevereiro · Março · Abril · Maio</div>
+    <div class="mts-hero-sub">Janeiro · Fevereiro · Março · Abril · Maio · Junho</div>
   </div>
 
   <!-- Quartil Reference -->
@@ -12554,23 +12831,44 @@ function mtsAtualizarMaio(){
     </div>
   </div>
 
-  <!-- MAIO — em andamento -->
+  <!-- MAIO — ENCERRADO (resultado final salvo) -->
   <div class="mts-month-block">
     <div class="mts-month-hdr">
       <span class="mts-month-name">MAIO</span>
       <div class="mts-month-rule"></div>
+      <span class="mts-badge mts-badge-done">✔ Encerrado</span>
+    </div>
+    <div class="mts-total-bar" id="mts-maio-total-bar">
+      <div>
+        <span class="mts-total-label">Total recebido no mês</span>
+        <div style="font-size:10px;color:var(--g500);margin-top:2px;font-weight:600">Resultado final — mês encerrado em 30/05/2026</div>
+      </div>
+      <span class="mts-total-value" id="mts-maio-total" style="color:var(--ok)">—</span>
+    </div>
+    <div class="mts-cards" id="mts-maio-cards">
+      <div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">
+        ⏳ Carregando resultado final de Maio...
+      </div>
+    </div>
+  </div>
+
+  <!-- JUNHO — em andamento -->
+  <div class="mts-month-block">
+    <div class="mts-month-hdr">
+      <span class="mts-month-name">JUNHO</span>
+      <div class="mts-month-rule"></div>
       <span class="mts-badge mts-badge-active">⚡ Em andamento</span>
     </div>
-    <div class="mts-total-bar blue" id="mts-maio-total-bar">
+    <div class="mts-total-bar blue" id="mts-junho-total-bar">
       <div>
         <span class="mts-total-label">Total parcial acumulado</span>
         <div style="font-size:10px;color:var(--g500);margin-top:2px;font-weight:600">Atualiza automaticamente a cada importação</div>
       </div>
-      <span class="mts-total-value" id="mts-maio-total">—</span>
+      <span class="mts-total-value" id="mts-junho-total">—</span>
     </div>
-    <div class="mts-cards" id="mts-maio-cards">
+    <div class="mts-cards" id="mts-junho-cards">
       <div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">
-        ⏳ Importe o relatório de Maio para carregar os dados das equipes...
+        ⏳ Importe o relatório de Junho para carregar os dados das equipes...
       </div>
     </div>
   </div>
@@ -12651,7 +12949,8 @@ function mtsAtualizarMaio(){
       </div>
       <!-- Seletor de mês -->
       <div style="display:flex;gap:6px;flex-wrap:wrap" id="hist-mes-btns">
-        <button class="fbtn on" onclick="histSetMes('Abril',this)" style="font-size:11px;background:rgba(0,168,107,.3);color:#4ADE80;border-color:rgba(74,222,128,.4)">Abril</button>
+        <button class="fbtn on" onclick="histSetMes('Maio',this)" style="font-size:11px;background:rgba(0,168,107,.3);color:#4ADE80;border-color:rgba(74,222,128,.4)">Maio</button>
+        <button class="fbtn" onclick="histSetMes('Abril',this)" style="font-size:11px">Abril</button>
         <button class="fbtn" onclick="histSetMes('Março',this)" style="font-size:11px">Março</button>
         <button class="fbtn" onclick="histSetMes('Fevereiro',this)" style="font-size:11px">Fevereiro</button>
         <button class="fbtn" onclick="histSetMes('Janeiro',this)" style="font-size:11px">Janeiro</button>
