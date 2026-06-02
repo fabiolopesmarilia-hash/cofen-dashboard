@@ -640,10 +640,7 @@ select.ev-inp{cursor:pointer}
             <div id="pp-ontem-total" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#4ADE80;letter-spacing:1px;line-height:1">—</div>
             <div id="pp-ontem-label" style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px">importe o arquivo</div>
           </div>
-          <div style="text-align:right">
-            <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">HO (24,96%)</div>
-            <div id="pp-ontem-ho" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#00E5FF;letter-spacing:1px;line-height:1">—</div>
-          </div>
+        
         </div>
         <!-- Breakdown por equipe -->
         <div id="pp-ontem-equipes" style="display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid rgba(255,255,255,.08);padding-top:8px"></div>
@@ -657,15 +654,7 @@ select.ev-inp{cursor:pointer}
             <div id="pp-hoje-total" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#4ADE80;letter-spacing:1px;line-height:1">R$ 0,00</div>
             <div id="pp-hoje-label" style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px">recebimento do dia em andamento</div>
           </div>
-          <div style="text-align:right">
-            <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">HO (24,96%)</div>
-            <div id="pp-hoje-ho" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#00E5FF;letter-spacing:1px;line-height:1">R$ 0,00</div>
-          </div>
-          <div style="text-align:right;margin-left:16px">
-            <div style="font-size:9px;font-weight:800;color:rgba(74,222,128,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">🏆 HO TOTAL MÊS</div>
-            <div id="pp-ho-total-mes" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;letter-spacing:1px;line-height:1">—</div>
-            <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px">acumulado Junho</div>
-          </div>
+          <div id="pp-ho-total-mes" style="display:none"></div>
         </div>
         <div id="pp-hoje-equipes" style="display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid rgba(74,222,128,.1);padding-top:8px"></div>
       </div>
@@ -692,8 +681,8 @@ select.ev-inp{cursor:pointer}
     <div class="hmonth">JUNHO 2026 — COB COFEN</div>
     <div class="hkpis">
       <div class="hkpi"><div class="hkpi-l">Total Real Recebido</div><div class="hkpi-v ok" id="h-total">—</div><div class="hkpi-s">Cobrança Jurídica</div></div>
-      <div class="hkpi"><div class="hkpi-l">HO (25%)</div><div class="hkpi-v tl" id="h-ho">—</div><div class="hkpi-s">Honorários PaguePlay</div></div>
-      <div class="hkpi"><div class="hkpi-l">Falta p/ Meta 1</div><div class="hkpi-v am" id="h-falta">—</div><div class="hkpi-s" id="h-meta-s">Meta: R$ 800K</div></div>
+      <div class="hkpi" style="display:none"><div class="hkpi-l">HO (25%)</div><div class="hkpi-v tl" id="h-ho">—</div><div class="hkpi-s">Honorários PaguePlay</div></div>
+      <div class="hkpi"><div class="hkpi-l">Falta p/ Meta 1</div><div class="hkpi-v am" id="h-falta">—</div><div class="hkpi-s" id="h-meta-s">Meta: R$ 1M</div></div>
       <div class="hkpi"><div class="hkpi-l">Média Real/DU</div><div class="hkpi-v" id="h-media">—</div><div class="hkpi-s" id="h-du-s">13 D.U. passados</div></div>
       <div class="hkpi"><div class="hkpi-l">Precisa/DU</div><div class="hkpi-v am" id="h-need">—</div><div class="hkpi-s" id="h-restam-s">7 D.U. restantes</div></div>
       <div class="hkpi"><div class="hkpi-l">Acordos</div><div class="hkpi-v ok" id="h-ac">—</div><div class="hkpi-s">Total baixas</div></div>
@@ -2893,9 +2882,10 @@ rebuildAll();
   };
   // JUNHO ativo: todas as equipes = 450k
   const metasJunho = {
-    'COFEN MARILIA BRENDA':     450000,
-    'COFEN BIRIGUI BRUNA':      450000,
-    'COFEN STEPHANIE 2° TURNO': 450000,
+    'COFEN MARILIA BRENDA':     500000,
+    'COFEN BIRIGUI BRUNA':      1000000,
+    'COFEN STEPHANIE 2° TURNO': 500000,
+    'COFEN DIGITAL':            300000,
   };
   function forcar(key, corretas){
     const atuais = {};
@@ -3381,7 +3371,7 @@ function renderPPProjecao(){
   const el = document.getElementById('pp-proj-inline');
   if(!el) return;
 
-  const META_EMPRESA = 600000;
+  const META_EMPRESA = 1000000;
   // ── FONTE CORRETA: ppEmpresaAbril = soma da coluna PaguePay do arquivo empresa ──
   const atual = (typeof ppEmpresaAbril !== 'undefined' && ppEmpresaAbril > 0)
                 ? ppEmpresaAbril : 0;
@@ -3466,13 +3456,13 @@ function renderPPProjecao(){
 
     <!-- Linha 3: Falta sutil -->
     <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,.3)">
-      Falta <span style="color:rgba(255,255,255,.6);font-weight:800">${fR(falta)}</span> para R$600K · ${duRest} DUs restantes
+      Falta <span style="color:rgba(255,255,255,.6);font-weight:800">${fR(falta)}</span> para R$1M · ${duRest} DUs restantes
     </div>
   </div>`;
 }
 
 function _buildMetasHtml(val, compact){
-  const META_STEP = 50000;
+  const META_STEP = 100000;
   const metas   = Math.floor(val / META_STEP);
   const prog    = val % META_STEP;
   const pct     = (prog / META_STEP * 100);
@@ -3492,7 +3482,7 @@ function _buildMetasHtml(val, compact){
       background:${bat?c+'22':'rgba(255,255,255,.04)'};opacity:${bat?1:0.4}">
       <span style="font-size:${fs}">${bat?'🏆':'🔒'}</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:${bat?c:'rgba(255,255,255,.3)'};letter-spacing:.5px">
-        META ${i} · R$${(i*50).toFixed(0)}K</span>
+        META ${i} · R$${(i*100).toFixed(0)}K</span>
     </div>`;
   }
   if(val < proxima){
@@ -3500,7 +3490,7 @@ function _buildMetasHtml(val, compact){
       border-radius:100px;border:1.5px dashed rgba(255,255,255,.25);background:rgba(255,255,255,.04)">
       <span style="font-size:${fs}">🎯</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:rgba(255,255,255,.4);letter-spacing:.5px">
-        META ${metas+1} · R$${((metas+1)*50).toFixed(0)}K</span>
+        META ${metas+1} · R$${((metas+1)*100).toFixed(0)}K</span>
     </div>`;
   }
   // Atualiza o destaque de "falta" no topo (se existir)
@@ -3509,7 +3499,7 @@ function _buildMetasHtml(val, compact){
   if(faltaEl && val>0){
     faltaEl.textContent = fR(falta);
     faltaEl.style.color='#00E5FF';
-    if(faltaLbl) faltaLbl.textContent = 'para o objetivo de R$'+((metas+1)*50)+'K';
+    if(faltaLbl) faltaLbl.textContent = 'para o objetivo de R$'+((metas+1)*100)+'K';
   }
   return `
     <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:7px">${badgesHtml}</div>
@@ -5698,11 +5688,12 @@ function loadSavedOverrides(){
     const initOv = {};
     D.equipes.forEach(eq=>{ eq.ops.forEach(op=>{ if(op.rec>0) initOv[op.name]=op.rec; }); });
     localStorage.setItem('cofen_op_overrides', JSON.stringify(initOv));
-    // Redefinir metas de equipe para os valores corretos de Maio 2026
+    // Redefinir metas de equipe para os valores corretos de Junho 2026
     const metasCorretas = {
-      'COFEN MARILIA BRENDA':     300000,
-      'COFEN BIRIGUI BRUNA':      200000,
-      'COFEN STEPHANIE 2° TURNO': 200000,
+      'COFEN MARILIA BRENDA':     500000,
+      'COFEN BIRIGUI BRUNA':      1000000,
+      'COFEN STEPHANIE 2° TURNO': 500000,
+      'COFEN DIGITAL':            300000,
     };
     const metasAtuais = {};
     try{ Object.assign(metasAtuais, JSON.parse(localStorage.getItem('cofen_metas_eq')||'{}')); }catch(e){}
@@ -9288,11 +9279,12 @@ function fbStartListening(){
     if(!remote) return;
     const local = gGetMetas();
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
-    // Metas Maio = 450k por equipe — Firebase não sobrescreve valores corretos
+    // Metas Junho — Firebase não sobrescreve valores corretos
     const corretasMaio = {
-      'COFEN MARILIA BRENDA':     450000,
-      'COFEN BIRIGUI BRUNA':      450000,
-      'COFEN STEPHANIE 2° TURNO': 450000,
+      'COFEN MARILIA BRENDA':     500000,
+      'COFEN BIRIGUI BRUNA':      1000000,
+      'COFEN STEPHANIE 2° TURNO': 500000,
+      'COFEN DIGITAL':            300000,
     };
     const merged = {...local, ...remote, ...corretasMaio};
     gSetMetas(merged);
@@ -12539,43 +12531,34 @@ function mtsAtualizarMaio(){
 
   const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
 
-  // 1. Tentar ler snapshot final de Maio (salvo quando o mês estava ativo)
-  let maiofinal = null;
-  try { maiofinal = JSON.parse(localStorage.getItem('cofen_maio_resultado_final') || 'null'); } catch(e){}
-
-  // 2. Se não tem snapshot, usa D.equipes atual como fallback (pode ser dados de Junho)
-  //    — mas só usa se o mês no arquivo ainda for Maio (getMonth===4)
-  const hoje = new Date();
-  const recPorEqAtual = {};
-  (D.equipes || []).forEach(eq => { recPorEqAtual[eq.name] = eq.rec || 0; });
+  // Resultado FIXO de Maio — último DU disponível do CMP_MAIO_EQ (dados reais importados)
+  // Total Maio encerrado: R$ 2.007.316,68
+  const REC_MAIO_FINAL = {
+    'COFEN MARILIA BRENDA':     (() => { const d=CMP_MAIO_EQ['COFEN MARILIA BRENDA']||{}; const keys=Object.keys(d).map(Number).sort((a,b)=>a-b); return keys.length ? d[keys[keys.length-1]] : 130692.30; })(),
+    'COFEN BIRIGUI BRUNA':      (() => { const d=CMP_MAIO_EQ['COFEN BIRIGUI BRUNA']||{};  const keys=Object.keys(d).map(Number).sort((a,b)=>a-b); return keys.length ? d[keys[keys.length-1]] : 108303.76; })(),
+    'COFEN STEPHANIE 2° TURNO': (() => { const d=CMP_MAIO_EQ['COFEN STEPHANIE 2° TURNO']||{}; const keys=Object.keys(d).map(Number).sort((a,b)=>a-b); return keys.length ? d[keys[keys.length-1]] : 168282.18; })(),
+    'COFEN DIGITAL':            (() => { const d=CMP_MAIO_EQ['COFEN DIGITAL']||{}; const keys=Object.keys(d).map(Number).sort((a,b)=>a-b); return keys.length ? d[keys[keys.length-1]] : 119268.66; })(),
+  };
 
   const _mm = {}; try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_metas_eq_maio')||'{}')); }catch(e){}
   const SUPERVISORES_MAIO = [
     { eq: 'COFEN MARILIA BRENDA',     meta: _mm['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
     { eq: 'COFEN BIRIGUI BRUNA',      meta: _mm['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
     { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mm['COFEN STEPHANIE 2° TURNO'] || 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
+    { eq: 'COFEN DIGITAL',            meta: _mm['COFEN DIGITAL']            || 300000, av: 'DG',  avClass: 'mts-av-bb', nome: 'Digital'           },
   ];
 
-  // Usar snapshot se disponível, senão D.equipes
-  const recFinal = maiofinal ? maiofinal.recPorEq : recPorEqAtual;
-  const totalMaio = SUPERVISORES_MAIO.reduce((s, sup) => s + (recFinal[sup.eq] || 0), 0);
-
-  // Salvar snapshot automaticamente se estamos em Junho e ainda não foi salvo
-  if(!maiofinal && hoje.getMonth() === 5 && totalMaio > 0){
-    const snap = { recPorEq: recFinal, total: totalMaio, salvoEm: new Date().toISOString() };
-    try { localStorage.setItem('cofen_maio_resultado_final', JSON.stringify(snap)); } catch(e){}
-  }
-
-  if(totalEl) totalEl.textContent = totalMaio > 0 ? fBR(totalMaio) : '—';
+  const totalMaio = SUPERVISORES_MAIO.reduce((s, sup) => s + (REC_MAIO_FINAL[sup.eq] || 0), 0);
+  if(totalEl) totalEl.textContent = totalMaio > 0 ? fBR(totalMaio) : 'R$ 2.007.316,68';
 
   if(totalMaio === 0){
-    cardsEl.innerHTML = '<div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">📂 Resultado final de Maio não encontrado. Importe o último relatório de Maio para salvar.</div>';
+    cardsEl.innerHTML = '<div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">📂 Dados de Maio não disponíveis.</div>';
     return;
   }
 
   let html = '';
   SUPERVISORES_MAIO.forEach(sup => {
-    const rec  = recFinal[sup.eq] || 0;
+    const rec  = REC_MAIO_FINAL[sup.eq] || 0;
     const pct  = sup.meta > 0 ? (rec / sup.meta * 100) : 0;
     const q    = _mtsQuartilInfo(pct);
     const barW = Math.min(q.barW, 100).toFixed(1);
@@ -12589,14 +12572,13 @@ function mtsAtualizarMaio(){
       <div class="mts-fv">${fBR(sup.meta)}</div>
       <div class="mts-divider"></div>
       <div class="mts-fl">Total recebido</div>
-      <div class="mts-rv ${q.rvClass}">${fBR(rec)}</div>
+      <div class="mts-rv ${q.rvClass}">${rec > 0 ? fBR(rec) : '—'}</div>
       <div class="mts-pct-row">
-        <span class="mts-pct-num ${q.pctClass}">${pct.toFixed(1)}%</span>
+        <span class="mts-pct-num ${q.pctClass}">${rec > 0 ? pct.toFixed(1)+'%' : '—'}</span>
         <span class="mts-pct-lbl">da meta</span>
       </div>
       <span class="mts-qbadge ${q.badgeClass}">${q.label}</span>
       <div class="mts-bar-bg"><div class="mts-bar-f ${q.barClass}" style="width:${barW}%;transition:width .8s ease"></div></div>
-      ${maiofinal ? `<div style="margin-top:8px;font-size:9px;color:rgba(255,255,255,.3);text-align:right">✔ Salvo em ${new Date(maiofinal.salvoEm).toLocaleDateString('pt-BR')}</div>` : ''}
     </div>`;
   });
 
@@ -12613,9 +12595,10 @@ function mtsAtualizarJunho(){
 
   const _mj = {}; try{ Object.assign(_mj, JSON.parse(localStorage.getItem('cofen_metas_eq_junho')||'{}')); }catch(e){}
   const SUPERVISORES_JUN = [
-    { eq: 'COFEN MARILIA BRENDA',     meta: _mj['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
-    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mj['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
-    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mj['COFEN STEPHANIE 2° TURNO'] || 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
+    { eq: 'COFEN MARILIA BRENDA',     meta: _mj['COFEN MARILIA BRENDA']     || 500000,  av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mj['COFEN BIRIGUI BRUNA']      || 1000000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mj['COFEN STEPHANIE 2° TURNO'] || 500000,  av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
+    { eq: 'COFEN DIGITAL',            meta: _mj['COFEN DIGITAL']            || 300000,  av: 'DG',  avClass: 'mts-av-bb', nome: 'Digital'           },
   ];
 
   const recPorEq = {};
@@ -13520,7 +13503,7 @@ function renderEqMetasTable(){
   const tbody = document.getElementById('eq-metas-tbody');
   if(!tbody) return;
 
-  const META_EQ_DEFAULT = 450000;
+  const META_EQ_DEFAULT = 500000;
 
   // ── Dias úteis reais do objeto DU (atualizado pelo dashboard a cada dia) ──
   const duPass  = (typeof DU !== 'undefined' && DU && DU.passou  > 0) ? DU.passou  : 1;
