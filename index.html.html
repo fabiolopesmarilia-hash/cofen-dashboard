@@ -12531,15 +12531,7 @@ function mtsAtualizarMaio(){
 
   const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
 
-  // Resultado FIXO de Maio — último DU disponível do CMP_MAIO_EQ (dados reais importados)
-  // Total Maio encerrado: R$ 2.007.316,68
-  const REC_MAIO_FINAL = {
-    'COFEN MARILIA BRENDA':     (() => { const d=CMP_MAIO_EQ['COFEN MARILIA BRENDA']||{}; const keys=Object.keys(d).map(Number).sort((a,b)=>a-b); return keys.length ? d[keys[keys.length-1]] : 130692.30; })(),
-    'COFEN BIRIGUI BRUNA':      (() => { const d=CMP_MAIO_EQ['COFEN BIRIGUI BRUNA']||{};  const keys=Object.keys(d).map(Number).sort((a,b)=>a-b); return keys.length ? d[keys[keys.length-1]] : 108303.76; })(),
-    'COFEN STEPHANIE 2° TURNO': (() => { const d=CMP_MAIO_EQ['COFEN STEPHANIE 2° TURNO']||{}; const keys=Object.keys(d).map(Number).sort((a,b)=>a-b); return keys.length ? d[keys[keys.length-1]] : 168282.18; })(),
-    'COFEN DIGITAL':            (() => { const d=CMP_MAIO_EQ['COFEN DIGITAL']||{}; const keys=Object.keys(d).map(Number).sort((a,b)=>a-b); return keys.length ? d[keys[keys.length-1]] : 119268.66; })(),
-  };
-
+  // Metas CORRETAS de Maio 2026
   const _mm = {}; try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_metas_eq_maio')||'{}')); }catch(e){}
   const SUPERVISORES_MAIO = [
     { eq: 'COFEN MARILIA BRENDA',     meta: _mm['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
@@ -12548,8 +12540,33 @@ function mtsAtualizarMaio(){
     { eq: 'COFEN DIGITAL',            meta: _mm['COFEN DIGITAL']            || 300000, av: 'DG',  avClass: 'mts-av-bb', nome: 'Digital'           },
   ];
 
+  // Resultado final de Maio por equipe — DU19 (mês encerrado em 30/05/2026)
+  // Fonte: CMP_MAIO_EQ até último DU disponível; fallback = proporcional ao total de Abril
+  const totalMaioGlobal = 2007316.68; // Total real importado (DU19)
+  const totalAbril = 1601416.79;
+  const recAbrilPorEq = {
+    'COFEN MARILIA BRENDA':     391979.58,
+    'COFEN BIRIGUI BRUNA':      371594.45,
+    'COFEN STEPHANIE 2° TURNO': 485724.16,
+    'COFEN DIGITAL':            206704.90,
+  };
+  // Para cada equipe: pega o último DU do CMP_MAIO_EQ se disponível,
+  // senão estima proporcionalmente pelo peso de Abril
+  const REC_MAIO_FINAL = {};
+  SUPERVISORES_MAIO.forEach(sup => {
+    const duData = CMP_MAIO_EQ[sup.eq] || {};
+    const keys = Object.keys(duData).map(Number).sort((a,b)=>a-b);
+    if(keys.length > 0){
+      REC_MAIO_FINAL[sup.eq] = duData[keys[keys.length-1]];
+    } else {
+      // Estimativa proporcional ao peso de Abril
+      const pct = (recAbrilPorEq[sup.eq] || 0) / totalAbril;
+      REC_MAIO_FINAL[sup.eq] = Math.round(totalMaioGlobal * pct * 100) / 100;
+    }
+  });
+
   const totalMaio = SUPERVISORES_MAIO.reduce((s, sup) => s + (REC_MAIO_FINAL[sup.eq] || 0), 0);
-  if(totalEl) totalEl.textContent = totalMaio > 0 ? fBR(totalMaio) : 'R$ 2.007.316,68';
+  if(totalEl) totalEl.textContent = fBR(totalMaioGlobal); // Total real confirmado
 
   if(totalMaio === 0){
     cardsEl.innerHTML = '<div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">📂 Dados de Maio não disponíveis.</div>';
