@@ -2779,12 +2779,26 @@ function rebuildAll(){
     )
     .sort((a,b)=>b.rec-a.rec);
   // Recalcula totais das equipes sem remover ops do D
+  // FIX: supervisores bloqueados (BRENDA, BRUNA, STEPHANIE) têm rec somado ao total da equipe
+  // mesmo não aparecendo no ranking individual
+  const _SUP_EQ = {
+    'BRENDA_FERREIRA':    'COFEN MARILIA BRENDA',
+    'BRUNA_JUSTIMIANO':   'COFEN BIRIGUI BRUNA',
+    'STEPHANIE_BERNARDES':'COFEN STEPHANIE 2° TURNO',
+  };
   D.equipes.forEach(eq=>{
     const visibleOps=eq.ops.filter(o=>!_allRemoved.has(o.name));
+    // FIX: garantir op.ho sincronizado
+    visibleOps.forEach(o=>{ o.ho = o.rec * 0.25; });
     eq.rec=visibleOps.reduce((s,o)=>s+o.rec,0);
     eq.ho=visibleOps.reduce((s,o)=>s+o.ho,0);
     eq.n_op=visibleOps.length;
     eq.acordos=visibleOps.reduce((s,o)=>s+(o.acordos||0),0);
+    // Somar rec dos supervisores bloqueados desta equipe
+    const supRec = eq.ops
+      .filter(o=>_BLOCKED.includes(o.name) && (_SUP_EQ[o.name]===eq.name || o.eq===eq.name))
+      .reduce((s,o)=>s+o.rec,0);
+    if(supRec>0){ eq.rec+=supRec; eq.ho+=supRec*0.25; }
   });
   // Restaurar acordos do localStorage (persistência offline)
   try {
