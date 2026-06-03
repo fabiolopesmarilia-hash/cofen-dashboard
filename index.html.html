@@ -6705,6 +6705,7 @@ function metasSave(){
   });
   gSetMetas(metas); // salva em cofen_metas_eq (chave ativa)
   localStorage.setItem('cofen_metas_eq_junho', JSON.stringify(metas)); // espelho junho
+  localStorage.setItem('cofen_metas_eq_saved_at', Date.now().toString()); // timestamp anti-overwrite
   fbPush('metas_eq', metas);
   gestaoMetasInit();
   // Atualiza tabela de projecoes da Visao Geral
@@ -8983,15 +8984,15 @@ function fbStartListening(){
   fbDb.ref(fbRoom+'/metas_eq').on('value', snap=>{
     const remote = snap.val();
     if(!remote) return;
+    // Se o usuario salvou localmente nos ultimos 5s, ignorar o Firebase
+    // (evita que o valor antigo do Firebase sobrescreva o que acabou de ser salvo)
+    const lastSave = parseInt(localStorage.getItem('cofen_metas_eq_saved_at')||'0');
+    if(Date.now() - lastSave < 5000) return;
     const local = gGetMetas();
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
-    // Junho 2026: respeitar o que vier do Firebase (salvo pelo usuário)
-    // Apenas faz merge local + remoto, sem forçar valores hardcoded
-    const merged = {...local, ...remote};
-    gSetMetas(merged);
-    // Também atualiza localStorage separado de Junho
-    const _jjAtual = {}; try{Object.assign(_jjAtual,JSON.parse(localStorage.getItem('cofen_metas_eq_junho')||'{}'));}catch(e){}
-    localStorage.setItem('cofen_metas_eq_junho', JSON.stringify({..._jjAtual,...remote}));
+    // Remoto prevalece apenas se nao houve salvamento recente
+    gSetMetas(remote);
+    localStorage.setItem('cofen_metas_eq_junho', JSON.stringify(remote));
     pulseSyncDot();
     if(typeof renderEqMetasTable === 'function') renderEqMetasTable();
     if(typeof mtsAtualizarAbril === 'function') mtsAtualizarAbril();
