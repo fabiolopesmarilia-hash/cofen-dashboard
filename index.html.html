@@ -8078,7 +8078,7 @@ function tvSetMode(mode, btnEl){
   if(btnEl){ btnEl.style.background='rgba(255,255,255,.18)'; btnEl.style.color='#fff'; }
   // Atualiza label
   const lbl = document.getElementById('tv-mode-label');
-  if(lbl) lbl.textContent = mode==='geral' ? 'RANKING GERAL' : (EQ[mode]?.sh||mode).toUpperCase();
+  if(lbl) lbl.textContent = mode==='geral' ? 'RANKING GERAL' : mode==='bb' ? 'BRUNA + BRENDA' : mode==='bs' ? 'BRENDA + STEPHANIE' : (EQ[mode]?.sh||mode).toUpperCase();
 
   // Reconstrói lista e reinicia
   tvBuildList();
@@ -8104,6 +8104,8 @@ function tvBuildList(){
     tvList = base.sort((a,b)=>tvGetRec(b)-tvGetRec(a));
   } else if(tvMode==='bb'){
     tvList = base.filter(o=>['COFEN BIRIGUI BRUNA','COFEN MARILIA BRENDA'].includes(o.eq)).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
+  } else if(tvMode==='bs'){
+    tvList = base.filter(o=>['COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO'].includes(o.eq)).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
   } else {
     tvList = base.filter(o=>o.eq===tvMode).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
   }
@@ -8241,7 +8243,7 @@ function tvShow(idx){
   const cfg     = EQ[op.eq]||{c:'#888',bg:'#1a2330',ico:'⭐',sh:op.eq};
   const photo   = photoGet(op.name);
   const isEqMode= tvMode !== 'geral';
-  const bbMode  = tvMode === 'bb';
+  const bbMode  = tvMode === 'bb' || tvMode === 'bs';
 
   // Relógio
   const now=new Date();
@@ -8514,7 +8516,7 @@ function tvShow(idx){
               border-radius:12px;padding:11px 13px">
             <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);
               letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">
-              🏆 ${bbMode?'Bruna + Brenda':isEqMode?'Ranking da Equipe':'Ranking Geral'}
+              🏆 ${tvMode==='bb'?'Bruna + Brenda':tvMode==='bs'?'Brenda + Stephanie':isEqMode?'Ranking da Equipe':'Ranking Geral'}
             </div>
             ${prev?`<div style="display:flex;justify-content:space-between;padding:4px 7px;
                 border-radius:6px;background:rgba(255,255,255,.04);margin-bottom:4px">
@@ -8626,6 +8628,7 @@ document.addEventListener('keydown', e=>{
   if(e.key==='3'){ document.getElementById('tv-btn-COFEN_STEPHANIE_2_TURNO')?.click(); }
   if(e.key==='4'){ document.getElementById('tv-btn-COFEN_DIGITAL')?.click(); }
   if(e.key==='5'){ document.getElementById('tv-btn-bb')?.click(); }
+  if(e.key==='6'){ document.getElementById('tv-btn-bs')?.click(); }
   
 });
 
@@ -11097,6 +11100,11 @@ setInterval(()=>{
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
         font-weight:800;font-size:11px;background:transparent;color:#7CB9E8;border:1px solid rgba(71,118,230,.3);letter-spacing:.5px;transition:all .2s">
         💙🏙️ Bruna+Brenda
+      </button>
+      <button id="tv-btn-bs" onclick="tvSetMode('bs',this)"
+        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
+        font-weight:800;font-size:11px;background:transparent;color:#F7971E;border:1px solid rgba(247,151,30,.35);letter-spacing:.5px;transition:all .2s">
+        🏙️⭐ Brenda+Steph
       </button>
     </div>
     <!-- Nav -->
