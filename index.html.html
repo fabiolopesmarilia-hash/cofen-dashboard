@@ -2714,9 +2714,9 @@ rebuildAll();
   };
   // MAIO encerrado: todas as equipes = 450k
   const metasMaio = {
-    'COFEN MARILIA BRENDA':     495265.96,
-    'COFEN BIRIGUI BRUNA':      515233.20,
-    'COFEN STEPHANIE 2° TURNO': 375956.23,
+    'COFEN MARILIA BRENDA':     450000,
+    'COFEN BIRIGUI BRUNA':      450000,
+    'COFEN STEPHANIE 2° TURNO': 450000,
   };
   // JUNHO ativo — defaults iniciais (só aplica se nunca foram salvas)
   const metasJunhoDefault = {
@@ -10570,10 +10570,16 @@ function cmpAtualizarCumul(){
 
   // CMP_MAIO_EQ usa dados reais por DU (não proporcional)
 
-  // Atualiza totais de equipes em CMP_TEAMS (rec por equipe, da importação de operadores)
+  // CMP_TEAMS.abril = fechamento real de Maio (NÃO atualizar com dados de Junho)
+  // Os valores abaixo são fixos do cociliação_geral.xls
+  const _maioFechamento = {
+    'COFEN MARILIA BRENDA':      581044.27,
+    'COFEN BIRIGUI BRUNA':       581639.16,
+    'COFEN STEPHANIE 2° TURNO':  412010.35,
+    'COFEN DIGITAL':             365572.54,
+  };
   CMP_TEAMS.forEach(t=>{
-    const eq = D.equipes.find(e=>e.name===t.nome);
-    if(eq) t.abril = eq.rec;
+    if(_maioFechamento[t.nome] !== undefined) t.abril = _maioFechamento[t.nome];
   });
   // Atualiza operadores
   CMP_OPS.forEach(op=>{
@@ -12278,25 +12284,21 @@ function mtsAtualizarMaio(){
   const cardsEl = document.getElementById('mts-maio-cards');
   if(!cardsEl) return;
 
-  // Valores FIXOS de Maio encerrado — extraídos do rec_geral_2805.xls por operador/equipe
+  // Valores FIXOS de Maio encerrado — calculados do cociliação_geral.xls (Valor Recebido por operador/equipe)
   const recMaioPorEq = {
-    'COFEN MARILIA BRENDA':      467049.33,
-    'COFEN BIRIGUI BRUNA':       434209.67,
-    'COFEN STEPHANIE 2° TURNO':  332097.68,
+    'COFEN MARILIA BRENDA':      581044.27,
+    'COFEN BIRIGUI BRUNA':       581639.16,
+    'COFEN STEPHANIE 2° TURNO':  412010.35,
+    'COFEN DIGITAL':             365572.54,
   };
-  // Tenta pegar valores mais precisos via CMP_TEAMS se disponível
-  if(typeof CMP_TEAMS !== 'undefined'){
-    CMP_TEAMS.forEach(t => {
-      if(t.abril > 0) recMaioPorEq[t.nome] = t.abril;
-    });
-  }
+  // NÃO sobrescrever com CMP_TEAMS — esses valores são o fechamento real de Maio
 
   // Metas FIXAS de Maio — chave separada cofen_metas_eq_maio
   const _mm = {}; try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_metas_eq_maio')||'{}')); }catch(e){}
   const SUPERVISORES = [
-    { eq: 'COFEN MARILIA BRENDA',     meta: _mm['COFEN MARILIA BRENDA']     || 495265.96, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
-    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mm['COFEN BIRIGUI BRUNA']      || 515233.20, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
-    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mm['COFEN STEPHANIE 2° TURNO'] || 375956.23, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
+    { eq: 'COFEN MARILIA BRENDA',     meta: _mm['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mm['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mm['COFEN STEPHANIE 2° TURNO'] || 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
   ];
 
   const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
