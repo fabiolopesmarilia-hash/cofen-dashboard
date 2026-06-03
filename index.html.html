@@ -12238,11 +12238,11 @@ function mtsAtualizarMaio(){
   const cardsEl = document.getElementById('mts-maio-cards');
   if(!cardsEl) return;
 
-  // Valores FIXOS de Maio encerrado — vindos de CMP_TEAMS (campo abril = valor real de Maio)
+  // Valores FIXOS de Maio encerrado — extraídos do rec_geral_2805.xls por operador/equipe
   const recMaioPorEq = {
-    'COFEN MARILIA BRENDA':      31479.56,  // substituir pelos valores reais de maio se necessário
-    'COFEN BIRIGUI BRUNA':       16264.00,
-    'COFEN STEPHANIE 2° TURNO':  16261.11,
+    'COFEN MARILIA BRENDA':      467049.33,
+    'COFEN BIRIGUI BRUNA':       434209.67,
+    'COFEN STEPHANIE 2° TURNO':  332097.68,
   };
   // Tenta pegar valores mais precisos via CMP_TEAMS se disponível
   if(typeof CMP_TEAMS !== 'undefined'){
