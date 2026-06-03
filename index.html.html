@@ -2714,9 +2714,9 @@ rebuildAll();
   };
   // MAIO encerrado: todas as equipes = 450k
   const metasMaio = {
-    'COFEN MARILIA BRENDA':     450000,
-    'COFEN BIRIGUI BRUNA':      450000,
-    'COFEN STEPHANIE 2° TURNO': 450000,
+    'COFEN MARILIA BRENDA':     495265.96,
+    'COFEN BIRIGUI BRUNA':      515233.20,
+    'COFEN STEPHANIE 2° TURNO': 375956.23,
   };
   // JUNHO ativo — defaults iniciais (só aplica se nunca foram salvas)
   const metasJunhoDefault = {
@@ -12294,9 +12294,9 @@ function mtsAtualizarMaio(){
   // Metas FIXAS de Maio — chave separada cofen_metas_eq_maio
   const _mm = {}; try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_metas_eq_maio')||'{}')); }catch(e){}
   const SUPERVISORES = [
-    { eq: 'COFEN MARILIA BRENDA',     meta: _mm['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
-    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mm['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
-    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mm['COFEN STEPHANIE 2° TURNO'] || 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
+    { eq: 'COFEN MARILIA BRENDA',     meta: _mm['COFEN MARILIA BRENDA']     || 495265.96, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mm['COFEN BIRIGUI BRUNA']      || 515233.20, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mm['COFEN STEPHANIE 2° TURNO'] || 375956.23, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
   ];
 
   const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
