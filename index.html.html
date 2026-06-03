@@ -5422,7 +5422,7 @@ function go(id,el){
   if(id==='check') checkInit();
   if(id==='comparativo') cmpInit();
   if(id==='inadimpl') inadimplInit();
-  if(id==='metas'){ mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); }
+  if(id==='metas'){ mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho(); }
   if(id==='recdia-op') rdopRender();
 }
 
@@ -5430,7 +5430,7 @@ function go(id,el){
 function refreshAll(){
   rebuildAll();
   initHero();
-  if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio();
+  if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho();
   // Sempre atualiza todos os componentes — independente de qual aba está visível
   mkGD(); mkDist(); mkTop5();
   mkEq();
@@ -6708,7 +6708,7 @@ function metasSave(){
   fbPush('metas_eq', metas);
   gestaoMetasInit();
   if(typeof mtsAtualizarAbril === 'function') mtsAtualizarAbril();
-  if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio();
+  if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho === 'function') mtsAtualizarJunho();
   toast('✅ Metas de Junho salvas e sincronizadas para todos!');
 }
 
@@ -8987,7 +8987,7 @@ function fbStartListening(){
     localStorage.setItem('cofen_metas_eq_junho', JSON.stringify({..._jjAtual,...remote}));
     pulseSyncDot();
     if(typeof mtsAtualizarAbril === 'function') mtsAtualizarAbril();
-    if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio();
+    if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho === 'function') mtsAtualizarJunho();
   });
   fbListeners.metas_eq = true;
 
@@ -10831,7 +10831,7 @@ mkEq();
 // Restaurar extras de equipe do localStorage ao iniciar
 setTimeout(()=>{ if(typeof extraRestoreOnLoad==='function') extraRestoreOnLoad(); }, 500);
 // Inicializa cards de Abril na página Metas 2026
-setTimeout(()=>{ if(typeof mtsAtualizarAbril==='function') mtsAtualizarAbril(); }, 300);
+setTimeout(()=>{ if(typeof mtsAtualizarAbril==='function') mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho(); }, 300);
 // ══════════════════════════════════════════════════════════════
 // SISTEMA DE EVENTOS DO CALENDÁRIO
 // ══════════════════════════════════════════════════════════════
@@ -12199,15 +12199,78 @@ function mtsAtualizarAbril(){
 }
 
 function mtsAtualizarMaio(){
-  const cardsEl  = document.getElementById('mts-maio-cards');
-  const totalEl  = document.getElementById('mts-maio-total');
+  const cardsEl = document.getElementById('mts-maio-cards');
+  if(!cardsEl) return;
+
+  // Valores FIXOS de Maio encerrado — vindos de CMP_TEAMS (campo abril = valor real de Maio)
+  const recMaioPorEq = {
+    'COFEN MARILIA BRENDA':      31479.56,  // substituir pelos valores reais de maio se necessário
+    'COFEN BIRIGUI BRUNA':       16264.00,
+    'COFEN STEPHANIE 2° TURNO':  16261.11,
+  };
+  // Tenta pegar valores mais precisos via CMP_TEAMS se disponível
+  if(typeof CMP_TEAMS !== 'undefined'){
+    CMP_TEAMS.forEach(t => {
+      if(t.abril > 0) recMaioPorEq[t.nome] = t.abril;
+    });
+  }
+
+  // Metas FIXAS de Maio — chave separada cofen_metas_eq_maio
+  const _mm = {}; try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_metas_eq_maio')||'{}')); }catch(e){}
+  const SUPERVISORES = [
+    { eq: 'COFEN MARILIA BRENDA',     meta: _mm['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mm['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mm['COFEN STEPHANIE 2° TURNO'] || 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
+  ];
+
+  const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+
+  function quartilInfo(pct){
+    if(pct >= 100) return { cardClass:'c-meta', rvClass:'meta', pctClass:'meta', badgeClass:'mts-qb-meta', label:'Meta batida', barClass:'meta', barW: Math.min(pct,150) };
+    if(pct >= 80)  return { cardClass:'c-q1',   rvClass:'q1',   pctClass:'q1',   badgeClass:'mts-qb-1',    label:'2° Quartil',  barClass:'q1',   barW: pct };
+    if(pct >= 50)  return { cardClass:'c-q2',   rvClass:'q2',   pctClass:'q2',   badgeClass:'mts-qb-2',    label:'3° Quartil',  barClass:'q2',   barW: pct };
+    return             { cardClass:'c-q3',   rvClass:'q3',   pctClass:'q3',   badgeClass:'mts-qb-3',    label:'4° Quartil',  barClass:'q3',   barW: pct };
+  }
+
+  let html = '';
+  SUPERVISORES.forEach(sup => {
+    const rec  = recMaioPorEq[sup.eq] || 0;
+    const pct  = sup.meta > 0 ? (rec / sup.meta * 100) : 0;
+    const q    = quartilInfo(pct);
+    const barW = Math.min(q.barW, 100).toFixed(1);
+
+    html += `
+    <div class="mts-card ${q.cardClass}">
+      <div class="mts-av ${sup.avClass}">${sup.av}</div>
+      <div class="mts-name">${sup.nome}</div>
+      <div class="mts-sub">Maio encerrado</div>
+      <div class="mts-fl">Meta</div>
+      <div class="mts-fv">${fBR(sup.meta)}</div>
+      <div class="mts-divider"></div>
+      <div class="mts-fl">Recebido</div>
+      <div class="mts-rv ${q.rvClass}">${fBR(rec)}</div>
+      <div class="mts-pct-row">
+        <span class="mts-pct-num ${q.pctClass}">${pct.toFixed(1)}%</span>
+        <span class="mts-pct-lbl">da meta</span>
+      </div>
+      <span class="mts-qbadge ${q.badgeClass}">${q.label}</span>
+      <div class="mts-bar-bg"><div class="mts-bar-f ${q.barClass}" style="width:${barW}%;transition:width .8s ease"></div></div>
+    </div>`;
+  });
+
+  cardsEl.innerHTML = html;
+}
+
+function mtsAtualizarJunho(){
+  const cardsEl = document.getElementById('mts-junho-cards');
+  const totalEl = document.getElementById('mts-junho-total');
   if(!cardsEl) return;
 
   // Metas ATIVAS de Junho — lê de cofen_metas_eq (chave ativa), fallback cofen_metas_eq_junho
-  const _mm = {}; 
+  const _mm = {};
   try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_metas_eq_junho')||'{}')); }catch(e){}
   try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_metas_eq')||'{}')); }catch(e){}
-  // Lê os valores AO VIVO de D.equipes — atualiza sozinho a cada import
+
   const SUPERVISORES = [
     { eq: 'COFEN MARILIA BRENDA',     meta: _mm['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
     { eq: 'COFEN BIRIGUI BRUNA',      meta: _mm['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
@@ -12220,15 +12283,13 @@ function mtsAtualizarMaio(){
   const recPorEq = {};
   (D.equipes || []).forEach(eq => { recPorEq[eq.name] = eq.rec || 0; });
 
-  // Total acumulado Maio = soma das 3 equipes principais
-  const totalMaio = SUPERVISORES.reduce((s, sup) => s + (recPorEq[sup.eq] || 0), 0);
+  // Total acumulado Junho = soma das 3 equipes principais
+  const totalJunho = SUPERVISORES.reduce((s, sup) => s + (recPorEq[sup.eq] || 0), 0);
 
-  // Atualiza total no header
-  if(totalEl) totalEl.textContent = totalMaio > 0 ? fBR(totalMaio) : '—';
+  if(totalEl) totalEl.textContent = totalJunho > 0 ? fBR(totalJunho) : '—';
 
-  // Se não tem dado ainda, mostra mensagem
-  if(totalMaio === 0){
-    cardsEl.innerHTML = '<div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">⏳ Importe o relatório de Maio para carregar os dados das equipes...</div>';
+  if(totalJunho === 0){
+    cardsEl.innerHTML = '<div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">⏳ Importe o relatório de Junho para carregar os dados das equipes...</div>';
     return;
   }
 
@@ -12246,22 +12307,11 @@ function mtsAtualizarMaio(){
     const q    = quartilInfo(pct);
     const barW = Math.min(q.barW, 100).toFixed(1);
 
-    // Dias úteis de Junho — usa o objeto DU global (atualizado pelo calendário)
-    const totalDU = (typeof DU !== 'undefined' && DU.total > 0) ? DU.total : 19;
-    const daysElapsed = (typeof DU !== 'undefined' && DU.passou > 0) ? DU.passou : (() => {
-      const today = new Date();
-      if(today.getMonth() !== 5) return totalDU; // não é Junho
-      const FERIADOS_JUNHO = ['2026-06-04'];
-      let count = 0;
-      for(let d = 1; d < today.getDate(); d++){
-        const dt = new Date(2026, 5, d);
-        const key = dt.toISOString().slice(0,10);
-        if(dt.getDay() !== 0 && dt.getDay() !== 6 && !FERIADOS_JUNHO.includes(key)) count++;
-      }
-      return count;
-    })();
-    const projecao = daysElapsed > 0 && daysElapsed < totalDU ? (rec / daysElapsed * totalDU) : 0;
-    const projPct  = sup.meta > 0 && projecao > 0 ? (projecao / sup.meta * 100) : 0;
+    // Projeção fim do mês usando DU global
+    const totalDU    = (typeof DU !== 'undefined' && DU.total > 0) ? DU.total : 19;
+    const daysElapsed= (typeof DU !== 'undefined' && DU.passou > 0) ? DU.passou : 2;
+    const projecao   = daysElapsed > 0 && daysElapsed < totalDU ? (rec / daysElapsed * totalDU) : 0;
+    const projPct    = sup.meta > 0 && projecao > 0 ? (projecao / sup.meta * 100) : 0;
 
     html += `
     <div class="mts-card ${q.cardClass}">
@@ -12289,7 +12339,7 @@ function mtsAtualizarMaio(){
   cardsEl.innerHTML = html;
 }
 
-</script>
+
 
 <!-- ══════════ PAGE: METAS 2026 ══════════ -->
 
@@ -12300,7 +12350,7 @@ function mtsAtualizarMaio(){
   <div class="mts-hero">
     <div class="mts-hero-title">Recebimento Geral · Equipe Comercial</div>
     <div class="mts-hero-h">🎯 METAS & RESULTADOS — 2026</div>
-    <div class="mts-hero-sub">Janeiro · Fevereiro · Março · Abril · Maio</div>
+    <div class="mts-hero-sub">Janeiro · Fevereiro · Março · Abril · Maio · Junho · Julho</div>
   </div>
 
   <!-- Quartil Reference -->
@@ -12525,23 +12575,61 @@ function mtsAtualizarMaio(){
     </div>
   </div>
 
-  <!-- MAIO — em andamento -->
+  <!-- MAIO — encerrado -->
   <div class="mts-month-block">
     <div class="mts-month-hdr">
       <span class="mts-month-name">MAIO</span>
       <div class="mts-month-rule"></div>
+      <span class="mts-badge" style="background:#EFF2F5;color:#3D4B5C;border:1px solid #C5CDD8">✅ Encerrado</span>
+    </div>
+    <div class="mts-total-bar">
+      <div>
+        <span class="mts-total-label">Total recebido no mês</span>
+      </div>
+    </div>
+    <div class="mts-cards" id="mts-maio-cards">
+      <div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">
+        ⏳ Carregando dados de Maio...
+      </div>
+    </div>
+  </div>
+
+  <!-- JUNHO — em andamento -->
+  <div class="mts-month-block">
+    <div class="mts-month-hdr">
+      <span class="mts-month-name">JUNHO</span>
+      <div class="mts-month-rule"></div>
       <span class="mts-badge mts-badge-active">⚡ Em andamento</span>
     </div>
-    <div class="mts-total-bar blue" id="mts-maio-total-bar">
+    <div class="mts-total-bar blue" id="mts-junho-total-bar">
       <div>
         <span class="mts-total-label">Total parcial acumulado</span>
         <div style="font-size:10px;color:var(--g500);margin-top:2px;font-weight:600">Atualiza automaticamente a cada importação</div>
       </div>
-      <span class="mts-total-value" id="mts-maio-total">—</span>
+      <span class="mts-total-value" id="mts-junho-total">—</span>
     </div>
-    <div class="mts-cards" id="mts-maio-cards">
+    <div class="mts-cards" id="mts-junho-cards">
       <div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">
-        ⏳ Importe o relatório de Maio para carregar os dados das equipes...
+        ⏳ Importe o relatório de Junho para carregar os dados das equipes...
+      </div>
+    </div>
+  </div>
+
+  <!-- JULHO — planejado -->
+  <div class="mts-month-block">
+    <div class="mts-month-hdr">
+      <span class="mts-month-name">JULHO</span>
+      <div class="mts-month-rule"></div>
+      <span class="mts-badge" style="background:#EFF2F5;color:#7A8899;border:1px solid #DDE2E8">🔒 Planejado</span>
+    </div>
+    <div class="mts-total-bar" style="background:rgba(122,136,153,.06);border-color:rgba(122,136,153,.2)">
+      <div>
+        <span class="mts-total-label" style="color:var(--g500)">Aguardando início do mês</span>
+      </div>
+    </div>
+    <div class="mts-cards">
+      <div style="padding:24px;text-align:center;font-size:12px;color:var(--g400);grid-column:1/-1">
+        📅 Julho ainda não começou. As metas serão configuradas quando o mês iniciar.
       </div>
     </div>
   </div>
