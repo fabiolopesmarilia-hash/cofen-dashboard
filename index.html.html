@@ -6707,9 +6707,16 @@ function metasSave(){
   localStorage.setItem('cofen_metas_eq_junho', JSON.stringify(metas)); // espelho junho
   fbPush('metas_eq', metas);
   gestaoMetasInit();
+  // Atualiza tabela de projecoes da Visao Geral
+  if(typeof renderEqMetasTable === 'function') renderEqMetasTable();
+  // Atualiza aba Metas 2026
   if(typeof mtsAtualizarAbril === 'function') mtsAtualizarAbril();
-  if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho === 'function') mtsAtualizarJunho();
-  toast('✅ Metas de Junho salvas e sincronizadas para todos!');
+  if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio();
+  if(typeof mtsAtualizarJunho === 'function') mtsAtualizarJunho();
+  // Atualiza hero e indicadores gerais
+  if(typeof initHero === 'function') initHero();
+  if(typeof renderPpMetas === 'function') renderPpMetas();
+  toast('Metas de Junho salvas e sincronizadas para todos!');
 }
 
 // expose metas to other parts
@@ -8986,8 +8993,13 @@ function fbStartListening(){
     const _jjAtual = {}; try{Object.assign(_jjAtual,JSON.parse(localStorage.getItem('cofen_metas_eq_junho')||'{}'));}catch(e){}
     localStorage.setItem('cofen_metas_eq_junho', JSON.stringify({..._jjAtual,...remote}));
     pulseSyncDot();
+    if(typeof renderEqMetasTable === 'function') renderEqMetasTable();
     if(typeof mtsAtualizarAbril === 'function') mtsAtualizarAbril();
-    if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho === 'function') mtsAtualizarJunho();
+    if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio();
+    if(typeof mtsAtualizarJunho === 'function') mtsAtualizarJunho();
+    if(typeof initHero === 'function') initHero();
+    if(typeof renderPpMetas === 'function') renderPpMetas();
+    if(typeof gestaoMetasInit === 'function' && document.getElementById('pg-gestao')?.classList.contains('on')) gestaoMetasInit();
   });
   fbListeners.metas_eq = true;
 
@@ -12141,6 +12153,8 @@ function indRenderRanking(){
 // ══════════════════════════════════════════
 // METAS ABRIL — Atualização Dinâmica
 // ══════════════════════════════════════════
+</script>
+<script>
 function mtsAtualizarAbril(){
   const cardsEl = document.getElementById('mts-abril-cards');
   if(!cardsEl) return;
@@ -12338,7 +12352,7 @@ function mtsAtualizarJunho(){
 
   cardsEl.innerHTML = html;
 }
-
+</script>
 
 
 <!-- ══════════ PAGE: METAS 2026 ══════════ -->
