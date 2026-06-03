@@ -8984,10 +8984,10 @@ function fbStartListening(){
   fbDb.ref(fbRoom+'/metas_eq').on('value', snap=>{
     const remote = snap.val();
     if(!remote) return;
-    // Se o usuario salvou localmente nos ultimos 5s, ignorar o Firebase
+    // Se o usuario salvou localmente nos ultimos 30s, ignorar o Firebase
     // (evita que o valor antigo do Firebase sobrescreva o que acabou de ser salvo)
     const lastSave = parseInt(localStorage.getItem('cofen_metas_eq_saved_at')||'0');
-    if(Date.now() - lastSave < 5000) return;
+    if(Date.now() - lastSave < 30000) return;
     const local = gGetMetas();
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
     // Remoto prevalece apenas se nao houve salvamento recente
@@ -9000,7 +9000,10 @@ function fbStartListening(){
     if(typeof mtsAtualizarJunho === 'function') mtsAtualizarJunho();
     if(typeof initHero === 'function') initHero();
     if(typeof renderPpMetas === 'function') renderPpMetas();
-    if(typeof gestaoMetasInit === 'function' && document.getElementById('pg-gestao')?.classList.contains('on')) gestaoMetasInit();
+    // Só re-renderiza se o usuário NÃO estiver editando um campo de meta
+    const _focusedEl = document.activeElement;
+    const _isEditingMeta = _focusedEl && _focusedEl.id && _focusedEl.id.startsWith('meta-eq-');
+    if(!_isEditingMeta && typeof gestaoMetasInit === 'function' && document.getElementById('pg-gestao')?.classList.contains('on')) gestaoMetasInit();
   });
   fbListeners.metas_eq = true;
 
