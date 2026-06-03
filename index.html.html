@@ -2880,33 +2880,30 @@ rebuildAll();
   localStorage.setItem('cofen_base_rec', JSON.stringify(snap));
 })();
 
-// ── METAS DE EQUIPE — Abril e Maio em chaves separadas ──
+// ── METAS DE EQUIPE — forçar valores corretos sempre ──
 (function forcarMetasCorretas(){
-  // ABRIL encerrado: Brenda=300k, Bruna=200k, Stephanie=200k
   const metasAbril = {
     'COFEN MARILIA BRENDA':     300000,
     'COFEN BIRIGUI BRUNA':      200000,
     'COFEN STEPHANIE 2° TURNO': 200000,
   };
-  // MAIO encerrado: todas as equipes = 450k
   const metasMaio = {
     'COFEN MARILIA BRENDA':     450000,
     'COFEN BIRIGUI BRUNA':      450000,
     'COFEN STEPHANIE 2° TURNO': 450000,
+    'COFEN DIGITAL':            300000,
   };
-  // JUNHO ativo
   const metasJunho = {
     'COFEN MARILIA BRENDA':     450000,
     'COFEN BIRIGUI BRUNA':      450000,
     'COFEN STEPHANIE 2° TURNO': 450000,
     'COFEN DIGITAL':            300000,
   };
-  // FIX: sempre sobrescrever — não misturar com localStorage antigo que pode ter lixo
-  localStorage.setItem('cofen_metas_eq_abril', JSON.stringify(metasAbril));
-  localStorage.setItem('cofen_metas_eq_maio',  JSON.stringify(metasMaio));
-  localStorage.setItem('cofen_metas_eq_junho', JSON.stringify(metasJunho));
-  // Mantém cofen_metas_eq com Junho (compatibilidade com resto do sistema)
-  localStorage.setItem('cofen_metas_eq', JSON.stringify(metasJunho));
+  // SEMPRE sobrescrever — apaga qualquer lixo do localStorage
+  localStorage.setItem('cofen_metas_eq_abril',  JSON.stringify(metasAbril));
+  localStorage.setItem('cofen_metas_eq_maio',   JSON.stringify(metasMaio));
+  localStorage.setItem('cofen_metas_eq_junho',  JSON.stringify(metasJunho));
+  localStorage.setItem('cofen_metas_eq',        JSON.stringify(metasJunho));
 })();
 
 // ── CALENDAR & DU ──
@@ -12538,13 +12535,12 @@ function mtsAtualizarMaio(){
 
   const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
 
-  // Metas CORRETAS de Maio 2026
-  const _mm = {}; try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_metas_eq_maio')||'{}')); }catch(e){}
+  // Metas CORRETAS de Maio 2026 — valores fixos, não dependem do localStorage
   const SUPERVISORES_MAIO = [
-    { eq: 'COFEN MARILIA BRENDA',     meta: _mm['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
-    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mm['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
-    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mm['COFEN STEPHANIE 2° TURNO'] || 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
-    { eq: 'COFEN DIGITAL',            meta: _mm['COFEN DIGITAL']            || 300000, av: 'DG',  avClass: 'mts-av-bb', nome: 'Digital'           },
+    { eq: 'COFEN MARILIA BRENDA',     meta: 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília' },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'  },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'  },
+    { eq: 'COFEN DIGITAL',            meta: 300000, av: 'DG',  avClass: 'mts-av-bb', nome: 'Digital'          },
   ];
 
   // Resultado final de Maio por equipe — DU19 (mês encerrado em 30/05/2026)
@@ -12578,12 +12574,12 @@ function mtsAtualizarMaio(){
     const duData = CMP_MAIO_EQ[sup.eq] || {};
     const keys = Object.keys(duData).map(Number).sort((a,b)=>a-b);
     let baseRec = 0;
-    if(keys.length > 0){
-      // Dados importados disponíveis — usar
-      baseRec = duData[keys[keys.length-1]];
-    } else if(REC_MAIO_HARDCODED[sup.eq] > 0){
-      // Valores hardcoded confirmados
+    if(REC_MAIO_HARDCODED[sup.eq] > 0){
+      // Valores finais confirmados — sempre priorizar
       baseRec = REC_MAIO_HARDCODED[sup.eq];
+    } else if(keys.length > 0){
+      // Dados importados disponíveis
+      baseRec = duData[keys[keys.length-1]];
     } else {
       // Fallback proporcional a Abril
       const pct = (recAbrilPorEq[sup.eq] || 0) / totalAbril;
@@ -12642,12 +12638,11 @@ function mtsAtualizarJunho(){
 
   const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
 
-  const _mj = {}; try{ Object.assign(_mj, JSON.parse(localStorage.getItem('cofen_metas_eq_junho')||'{}')); }catch(e){}
   const SUPERVISORES_JUN = [
-    { eq: 'COFEN MARILIA BRENDA',     meta: _mj['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
-    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mj['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
-    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mj['COFEN STEPHANIE 2° TURNO'] || 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'   },
-    { eq: 'COFEN DIGITAL',            meta: _mj['COFEN DIGITAL']            || 300000, av: 'DG',  avClass: 'mts-av-bb', nome: 'Digital'           },
+    { eq: 'COFEN MARILIA BRENDA',     meta: 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília' },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'  },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Stephanie · 2°T'  },
+    { eq: 'COFEN DIGITAL',            meta: 300000, av: 'DG',  avClass: 'mts-av-bb', nome: 'Digital'          },
   ];
 
   const recPorEq = {};
