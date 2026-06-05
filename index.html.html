@@ -8373,7 +8373,7 @@ function tvSetMode(mode, btnEl){
   if(btnEl){ btnEl.style.background='rgba(255,255,255,.18)'; btnEl.style.color='#fff'; }
   // Atualiza label
   const lbl = document.getElementById('tv-mode-label');
-  if(lbl) lbl.textContent = mode==='geral' ? 'RANKING GERAL' : mode==='bb' ? 'BRUNA + BRENDA' : mode==='bs' ? 'BRENDA + STEPHANIE' : (EQ[mode]?.sh||mode).toUpperCase();
+  if(lbl) lbl.textContent = mode==='geral' ? 'RANKING GERAL' : mode==='bb' ? 'BRUNA + BRENDA' : mode==='bs' ? 'BRENDA + STEPHANIE' : mode==='COFEN BIRIGUI BRUNA' ? 'BRUNA + DIGITAL + ELITE' : (EQ[mode]?.sh||mode).toUpperCase();
 
   // Reconstrói lista e reinicia
   tvBuildList();
@@ -8420,20 +8420,20 @@ function tvRefresh(){
 }
 
 function tvStart(){
-  tvMode = 'geral';
+  tvMode = 'bs';
   tvBuildList();
   if(tvList.length===0){ toast('⚠️ Nenhum operador para exibir!'); return; }
   tvIdx=0; tvPaused=false;
   document.getElementById('tv-overlay').classList.add('on');
   document.getElementById('tv-pause-btn').textContent='⏸ Pausar';
-  // Marca botão geral como ativo
-  const geralBtn = document.getElementById('tv-btn-geral');
+  // Marca botão bs como ativo
+  const bsBtn = document.getElementById('tv-btn-bs');
   document.querySelectorAll('[id^="tv-btn-"]').forEach(b=>{
     b.style.background='transparent'; b.style.color='rgba(255,255,255,.5)';
   });
-  if(geralBtn){ geralBtn.style.background='rgba(255,255,255,.18)'; geralBtn.style.color='#fff'; }
+  if(bsBtn){ bsBtn.style.background='rgba(255,255,255,.18)'; bsBtn.style.color='#fff'; }
   const lbl=document.getElementById('tv-mode-label');
-  if(lbl) lbl.textContent='RANKING GERAL';
+  if(lbl) lbl.textContent='BRENDA + STEPHANIE';
   tvBuildDots();
   tvShowCurrent();
   tvSchedule();
@@ -8678,10 +8678,10 @@ function tvShow(idx){
               const _nivelOp = _hoOp >= 1000000 ? 'n4' : _hoOp >= 700000 ? 'n3' : _hoOp >= 600000 ? 'n2' : null;
               if(!_nivelOp) return ''; // abaixo de 600k HO: não exibe nada
               const _tabelaOp = PREM_NIVEIS[_nivelOp];
-              const _entryOp  = _tabelaOp.valores.find(v=>v.pos===Number(posGlobal));
+              const _entryOp  = _tabelaOp.valores.find(v=>v.pos===Number(pos));
               if(!_entryOp) return '';
-              const prem = { pos: Number(posGlobal), valor: _entryOp.valor, label: _tabelaOp.label };
-              const _pi = posGlobal - 1;
+              const prem = { pos: Number(pos), valor: _entryOp.valor, label: _tabelaOp.label };
+              const _pi = pos - 1;
               const premCores = ['#FFD700','#D0D0D0','#CD8C55'];
               const premGlows = ['rgba(255,215,0,.7)','rgba(192,192,192,.5)','rgba(205,127,50,.6)'];
               const premBgs   = ['rgba(255,215,0,.13)','rgba(192,192,192,.1)','rgba(205,127,50,.12)'];
@@ -8853,7 +8853,7 @@ function tvShow(idx){
               border-radius:12px;padding:11px 13px">
             <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);
               letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">
-              🏆 ${tvMode==='bb'?'Bruna + Brenda':tvMode==='bs'?'Brenda + Stephanie':isEqMode?'Ranking da Equipe':'Ranking Geral'}
+              🏆 ${tvMode==='bb'?'Bruna + Brenda':tvMode==='bs'?'Brenda + Stephanie':tvMode==='COFEN BIRIGUI BRUNA'?'Bruna + Digital + Elite':isEqMode?'Ranking da Equipe':'Ranking Geral'}
             </div>
             ${prev?`<div style="display:flex;justify-content:space-between;padding:4px 7px;
                 border-radius:6px;background:rgba(255,255,255,.04);margin-bottom:4px">
@@ -8871,9 +8871,9 @@ function tvShow(idx){
                   const _nivelOp2 = _hoOp2 >= 1000000 ? 'n4' : _hoOp2 >= 700000 ? 'n3' : _hoOp2 >= 600000 ? 'n2' : null;
                   if(!_nivelOp2) return '';
                   const _tabOp2  = PREM_NIVEIS[_nivelOp2];
-                  const _entOp2  = _tabOp2.valores.find(v=>v.pos===Number(posGlobal));
+                  const _entOp2  = _tabOp2.valores.find(v=>v.pos===Number(pos));
                   if(!_entOp2) return '';
-                  const prem2 = { pos: Number(posGlobal), valor: _entOp2.valor, label: _tabOp2.label };
+                  const prem2 = { pos: Number(pos), valor: _entOp2.valor, label: _tabOp2.label };
                   if(!prem2) return '';
                   const _pi2=posGlobal-1;
                   const pc2=_pi2===0?'#FFD700':_pi2===1?'#C0C0C0':_pi2===2?'#CD7F32':'#FCD34D';
@@ -8977,13 +8977,8 @@ document.addEventListener('keydown', e=>{
   if(e.key==='ArrowLeft'||e.key==='ArrowUp') tvPrev();
   if(e.key===' '){ e.preventDefault(); tvTogglePause(); }
   // Teclas 0-4 para trocar modo
-  if(e.key==='0'){ document.getElementById('tv-btn-geral')?.click(); }
-  if(e.key==='1'){ document.getElementById('tv-btn-COFEN_MARILIA_BRENDA')?.click(); }
+  if(e.key==='1'){ document.getElementById('tv-btn-bs')?.click(); }
   if(e.key==='2'){ document.getElementById('tv-btn-COFEN_BIRIGUI_BRUNA')?.click(); }
-  if(e.key==='3'){ document.getElementById('tv-btn-COFEN_STEPHANIE_2_TURNO')?.click(); }
-  if(e.key==='4'){ document.getElementById('tv-btn-COFEN_DIGITAL')?.click(); }
-  if(e.key==='5'){ document.getElementById('tv-btn-bb')?.click(); }
-  if(e.key==='6'){ document.getElementById('tv-btn-bs')?.click(); }
   
 });
 
@@ -11442,40 +11437,15 @@ setInterval(()=>{
   <div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center">
     <!-- Seletor de modo -->
     <div style="display:flex;gap:4px;background:rgba(255,255,255,.08);border-radius:var(--rm);padding:3px">
-      <button id="tv-btn-geral" onclick="tvSetMode('geral',this)"
+      <button id="tv-btn-bs" onclick="tvSetMode('bs',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:rgba(255,255,255,.15);color:#fff;letter-spacing:.5px;transition:all .2s">
-        🏆 Geral
-      </button>
-      <button id="tv-btn-COFEN_MARILIA_BRENDA" onclick="tvSetMode('COFEN MARILIA BRENDA',this)"
-        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
-        🏙 Brenda
+        font-weight:800;font-size:11px;background:rgba(255,255,255,.18);color:#fff;letter-spacing:.5px;transition:all .2s">
+        🏙️⭐ Brenda + Stephanie
       </button>
       <button id="tv-btn-COFEN_BIRIGUI_BRUNA" onclick="tvSetMode('COFEN BIRIGUI BRUNA',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
         font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
-        💙 Bruna
-      </button>
-      <button id="tv-btn-COFEN_STEPHANIE_2_TURNO" onclick="tvSetMode('COFEN STEPHANIE 2° TURNO',this)"
-        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
-        ⭐ Stephanie
-      </button>
-      <button id="tv-btn-COFEN_DIGITAL" onclick="tvSetMode('COFEN DIGITAL',this)"
-        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:#f953c6;border:1px solid rgba(249,83,198,.3);letter-spacing:.5px;transition:all .2s">
-        🖥️ Digital
-      </button>
-      <button id="tv-btn-bb" onclick="tvSetMode('bb',this)"
-        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:#7CB9E8;border:1px solid rgba(71,118,230,.3);letter-spacing:.5px;transition:all .2s">
-        💙🏙️ Bruna+Brenda
-      </button>
-      <button id="tv-btn-bs" onclick="tvSetMode('bs',this)"
-        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:#F7971E;border:1px solid rgba(247,151,30,.35);letter-spacing:.5px;transition:all .2s">
-        🏙️⭐ Brenda+Steph
+        💙 Bruna + Digital + Elite
       </button>
     </div>
     <!-- Nav -->
