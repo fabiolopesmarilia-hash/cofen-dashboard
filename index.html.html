@@ -8673,8 +8673,14 @@ function tvShow(idx){
               })()}
             </div>
             ${(()=>{
-              const _opRec=tvGetRec(op); const _opDu=(()=>{let d=0;for(let i=1;i<=31;i++){if(op.daily&&op.daily[i]>0)d++;}return d;})(); const prem = premGetForPos(posGlobal, _opRec, _opDu);
-              if(!prem) return '';
+              // Nível da operação baseado no HO total acumulado (só exibe a partir de N2 = 600k HO)
+              const _hoOp = getTotalRec() * 0.25;
+              const _nivelOp = _hoOp >= 1000000 ? 'n4' : _hoOp >= 700000 ? 'n3' : _hoOp >= 600000 ? 'n2' : null;
+              if(!_nivelOp) return ''; // abaixo de 600k HO: não exibe nada
+              const _tabelaOp = PREM_NIVEIS[_nivelOp];
+              const _entryOp  = _tabelaOp.valores.find(v=>v.pos===Number(posGlobal));
+              if(!_entryOp) return '';
+              const prem = { pos: Number(posGlobal), valor: _entryOp.valor, label: _tabelaOp.label };
               const _pi = posGlobal - 1;
               const premCores = ['#FFD700','#D0D0D0','#CD8C55'];
               const premGlows = ['rgba(255,215,0,.7)','rgba(192,192,192,.5)','rgba(205,127,50,.6)'];
@@ -8699,7 +8705,9 @@ function tvShow(idx){
                   text-shadow:0 0 30px ${premGlow}, 0 2px 10px rgba(0,0,0,.8)">
                   ${fR(prem.valor)}
                 </div>
-                ${prem.label ? `<div style="font-size:11px;font-weight:700;color:${premCor};opacity:.65;margin-top:3px;letter-spacing:.5px">${prem.label}</div>` : ''}
+                <div style="font-size:10px;font-weight:800;color:${premCor};opacity:.6;margin-top:4px;letter-spacing:.5px">
+                  ${_nivelOp === 'n4' ? '🚀 NÍVEL 4 · HO +R$1M' : _nivelOp === 'n3' ? '🔥 NÍVEL 3 · HO +R$700k' : '⭐ NÍVEL 2 · HO +R$600k'}
+                </div>
               </div>`;
             })()}
           </div>
@@ -8858,7 +8866,14 @@ function tvShow(idx){
               <div style="display:flex;align-items:center;gap:8px">
                 <span style="font-size:13px;color:#4ADE80;font-weight:900">${fRK(op.rec)}</span>
                 ${(()=>{
-                  const _opRec2=tvGetRec(op); const _opDu2=(()=>{let d=0;for(let i=1;i<=31;i++){if(op.daily&&op.daily[i]>0)d++;}return d;})(); const prem2=premGetForPos(posGlobal, _opRec2, _opDu2);
+                  // Nível da operação pelo HO total (só exibe a partir de 600k HO)
+                  const _hoOp2 = getTotalRec() * 0.25;
+                  const _nivelOp2 = _hoOp2 >= 1000000 ? 'n4' : _hoOp2 >= 700000 ? 'n3' : _hoOp2 >= 600000 ? 'n2' : null;
+                  if(!_nivelOp2) return '';
+                  const _tabOp2  = PREM_NIVEIS[_nivelOp2];
+                  const _entOp2  = _tabOp2.valores.find(v=>v.pos===Number(posGlobal));
+                  if(!_entOp2) return '';
+                  const prem2 = { pos: Number(posGlobal), valor: _entOp2.valor, label: _tabOp2.label };
                   if(!prem2) return '';
                   const _pi2=posGlobal-1;
                   const pc2=_pi2===0?'#FFD700':_pi2===1?'#C0C0C0':_pi2===2?'#CD7F32':'#FCD34D';
