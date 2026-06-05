@@ -1329,6 +1329,11 @@ select.ev-inp{cursor:pointer}
       border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap">
       💰 Extra Equipe
     </div>
+    <div class="gtab" onclick="gTab('premiacoes',this)"
+      style="padding:11px 18px;font-weight:800;font-size:12px;cursor:pointer;color:var(--g500);
+      border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap">
+      🏆 Premiações TV
+    </div>
   </div>
 
   <!-- ── SUB: MOVER OPERADORES ── -->
@@ -1444,6 +1449,55 @@ select.ev-inp{cursor:pointer}
     </div>
     <!-- Resumo atual -->
     <div id="extra-resumo" style="margin-top:16px"></div>
+  </div>
+
+  <!-- ── SUB: PREMIAÇÕES TV ── -->
+  <div id="gsub-premiacoes" class="gsub" style="display:none;background:var(--w);border:1px solid var(--g200);border-radius:0 0 var(--rl) var(--rl);padding:20px;box-shadow:var(--sh)">
+    <div style="font-size:12px;color:var(--g500);font-weight:600;margin-bottom:16px;background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,165,0,.05));border:1px solid rgba(255,215,0,.35);border-radius:var(--rm);padding:10px 14px;line-height:1.6">
+      🏆 Configure os <strong>valores de premiação por colocação</strong>. Os valores aparecerão em destaque no <strong>Modo TV</strong> para cada operador, com base na posição atual no ranking.
+    </div>
+    <!-- Número de posições premiadas -->
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap">
+      <div>
+        <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Quantas posições premiar?</label>
+        <input type="number" id="prem-qtd" min="1" max="20" value="5"
+          style="width:90px;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);padding:10px 13px;font-family:Nunito,sans-serif;font-size:15px;font-weight:800;color:var(--g900);outline:none"
+          oninput="premRenderFields()"
+          onfocus="this.style.borderColor='var(--pp)'" onblur="this.style.borderColor='var(--g200)'">
+      </div>
+      <div>
+        <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Exibir no Modo TV?</label>
+        <div style="display:flex;gap:8px">
+          <button id="prem-on-btn" onclick="premToggleAtivo(true)"
+            style="padding:8px 18px;border-radius:var(--rm);border:2px solid var(--pp);background:var(--ppl);color:var(--pp);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer">
+            ✅ Ativado
+          </button>
+          <button id="prem-off-btn" onclick="premToggleAtivo(false)"
+            style="padding:8px 18px;border-radius:var(--rm);border:2px solid var(--g200);background:var(--w);color:var(--g500);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer">
+            ❌ Desativado
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Campos dinâmicos de posição + valor -->
+    <div id="prem-fields" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px"></div>
+    <!-- Botões -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button onclick="premSave()"
+        style="padding:10px 28px;border-radius:var(--rm);border:none;cursor:pointer;
+        background:linear-gradient(135deg,#F59E0B,#F97316);color:#fff;
+        font-family:Nunito,sans-serif;font-weight:800;font-size:14px;
+        box-shadow:0 4px 12px rgba(245,158,11,.3)">
+        💾 Salvar Premiações
+      </button>
+      <button onclick="premResetAll()"
+        style="padding:10px 18px;border-radius:var(--rm);border:1.5px solid var(--g200);
+        background:var(--w);color:var(--danger);font-family:Nunito,sans-serif;font-weight:700;font-size:13px;cursor:pointer">
+        🗑️ Limpar tudo
+      </button>
+    </div>
+    <!-- Preview -->
+    <div id="prem-preview" style="margin-top:20px"></div>
   </div>
 
   <!-- ── SUB: NOVO OPERADOR ── -->
@@ -6300,6 +6354,7 @@ function gTab(id, el){
   if(id==='fotos') fotosInit();
   if(id==='adicionar') addInit();
   if(id==='extra') extraInit();
+  if(id==='premiacoes') premInit();
 }
 
 // ── INIT ──
@@ -6312,6 +6367,7 @@ function gestaoInit(){
   gestaoRemoverInit();
   addInit();
   extraInit();
+  premInit();
 }
 
 // ══════════════════════════════════════════
@@ -6547,6 +6603,203 @@ function extraRestoreOnLoad(){
 // Também restaurar extras do Firebase quando receber dados
 // (integrado via fbStartListening ao ouvir 'extra_eq')
 
+
+// ─────────────────────────────
+// PREMIAÇÕES TV
+// ─────────────────────────────
+const PREM_KEY = 'cofen_premiacoes_tv';
+
+// Tabela oficial de premiação — 4 níveis por meta atingida
+// Nível: meta diária média atingida pelo operador
+const PREM_NIVEIS = {
+  n1: { meta: 10000, label:'Nível 1 (R$10K)', valores: [
+    {pos:1,valor:1170},{pos:2,valor:620},{pos:3,valor:490},{pos:4,valor:370},
+    {pos:5,valor:310},{pos:6,valor:260},{pos:7,valor:220},{pos:8,valor:180},
+    {pos:9,valor:150},{pos:10,valor:120},{pos:11,valor:100},{pos:12,valor:80}
+  ]},
+  n2: { meta: 12000, label:'Nível 2 (R$12K)', valores: [
+    {pos:1,valor:1500},{pos:2,valor:720},{pos:3,valor:580},{pos:4,valor:430},
+    {pos:5,valor:360},{pos:6,valor:300},{pos:7,valor:260},{pos:8,valor:220},
+    {pos:9,valor:190},{pos:10,valor:160},{pos:11,valor:130},{pos:12,valor:110}
+  ]},
+  n3: { meta: 15000, label:'Nível 3 (R$15K)', valores: [
+    {pos:1,valor:2000},{pos:2,valor:870},{pos:3,valor:700},{pos:4,valor:520},
+    {pos:5,valor:440},{pos:6,valor:370},{pos:7,valor:310},{pos:8,valor:260},
+    {pos:9,valor:220},{pos:10,valor:190},{pos:11,valor:160},{pos:12,valor:130}
+  ]},
+  n4: { meta: 18000, label:'Nível 4 (R$18K)', valores: [
+    {pos:1,valor:2100},{pos:2,valor:1110},{pos:3,valor:880},{pos:4,valor:660},
+    {pos:5,valor:550},{pos:6,valor:460},{pos:7,valor:400},{pos:8,valor:330},
+    {pos:9,valor:280},{pos:10,valor:240},{pos:11,valor:200},{pos:12,valor:160}
+  ]}
+};
+
+// Detecta qual nível de premiação um operador atingiu baseado no total recebido
+// rec = total recebido no mês, du = dias úteis trabalhados
+function premDetectNivel(rec, du){
+  if(!rec || !du || du<=0) return null;
+  const media = rec / du;
+  if(media >= PREM_NIVEIS.n4.meta) return 'n4';
+  if(media >= PREM_NIVEIS.n3.meta) return 'n3';
+  if(media >= PREM_NIVEIS.n2.meta) return 'n2';
+  if(media >= PREM_NIVEIS.n1.meta) return 'n1';
+  return null; // não atingiu nenhum nível
+}
+
+const PREM_DEFAULT = {
+  ativo: true,
+  modo: 'tabela', // 'tabela' = usa PREM_NIVEIS automaticamente | 'manual' = valores fixos
+  valores: [] // usado apenas no modo manual
+};
+
+function premGetAll(){
+  try{
+    const raw = localStorage.getItem(PREM_KEY);
+    if(!raw) return JSON.parse(JSON.stringify(PREM_DEFAULT));
+    const parsed = JSON.parse(raw);
+    return parsed;
+  }catch(e){ return JSON.parse(JSON.stringify(PREM_DEFAULT)); }
+}
+function premSetAll(obj){ localStorage.setItem(PREM_KEY, JSON.stringify(obj)); }
+
+function premInit(){
+  const data = premGetAll();
+  const qtd  = data.valores.length || 5;
+  const inp  = document.getElementById('prem-qtd');
+  if(inp) inp.value = qtd;
+  premUpdateAtivoUI(data.ativo !== false);
+  premRenderFields(data.valores);
+  premRenderPreview(data);
+}
+
+function premUpdateAtivoUI(ativo){
+  const on  = document.getElementById('prem-on-btn');
+  const off = document.getElementById('prem-off-btn');
+  if(!on||!off) return;
+  if(ativo){
+    on.style.borderColor='var(--pp)'; on.style.background='var(--ppl)'; on.style.color='var(--pp)';
+    off.style.borderColor='var(--g200)'; off.style.background='var(--w)'; off.style.color='var(--g500)';
+  } else {
+    off.style.borderColor='var(--danger)'; off.style.background='#FEF2F2'; off.style.color='var(--danger)';
+    on.style.borderColor='var(--g200)'; on.style.background='var(--w)'; on.style.color='var(--g500)';
+  }
+}
+
+function premToggleAtivo(val){
+  const data = premGetAll();
+  data.ativo = val;
+  premSetAll(data);
+  premUpdateAtivoUI(val);
+  toast(val ? '✅ Premiações ativadas no Modo TV!' : '❌ Premiações desativadas no Modo TV!');
+}
+
+function premRenderFields(valoresExist){
+  const container = document.getElementById('prem-fields');
+  if(!container) return;
+  const qtd = parseInt(document.getElementById('prem-qtd')?.value||5);
+  const data = premGetAll();
+  const vals = valoresExist || data.valores || [];
+  const medals = ['🥇','🥈','🥉'];
+  const cores   = ['#FFD700','#C0C0C0','#CD7F32'];
+  let html = '';
+  for(let i=0;i<qtd;i++){
+    const medal = medals[i] || `${i+1}°`;
+    const cor   = cores[i] || 'rgba(255,255,255,.6)';
+    const val   = vals[i]?.valor || '';
+    const label = vals[i]?.label || '';
+    html += `<div style="display:grid;grid-template-columns:60px 1fr 200px;gap:10px;align-items:center;
+      padding:10px 14px;border-radius:var(--rm);background:var(--g50);border:1px solid var(--g200)">
+      <div style="font-size:22px;text-align:center">${medal}</div>
+      <div>
+        <label style="font-size:9px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase;display:block;margin-bottom:4px">${i+1}° LUGAR — Descrição (opcional)</label>
+        <input type="text" id="prem-label-${i}" value="${label}" placeholder="Ex: Vale-presente, Viagem..."
+          style="width:100%;background:var(--w);border:1px solid var(--g200);border-radius:var(--r);padding:8px 10px;font-family:Nunito,sans-serif;font-size:12px;font-weight:700;color:var(--g900);outline:none"
+          onfocus="this.style.borderColor='var(--pp)'" onblur="this.style.borderColor='var(--g200)'">
+      </div>
+      <div>
+        <label style="font-size:9px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase;display:block;margin-bottom:4px">💰 VALOR (R$)</label>
+        <div style="position:relative">
+          <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:var(--g500)">R$</span>
+          <input type="number" id="prem-val-${i}" value="${val}" placeholder="0,00" step="0.01" min="0"
+            style="width:100%;background:var(--w);border:1.5px solid ${cor}66;border-radius:var(--r);padding:8px 10px 8px 32px;font-family:Nunito,sans-serif;font-size:15px;font-weight:900;color:var(--g900);outline:none"
+            onfocus="this.style.borderColor='${cor}'" onblur="this.style.borderColor='${cor}66'">
+        </div>
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+}
+
+function premSave(){
+  const qtd = parseInt(document.getElementById('prem-qtd')?.value||5);
+  const data = premGetAll();
+  const valores = [];
+  for(let i=0;i<qtd;i++){
+    const val   = parseFloat(document.getElementById('prem-val-'+i)?.value||0)||0;
+    const label = (document.getElementById('prem-label-'+i)?.value||'').trim();
+    valores.push({pos:i+1, valor:val, label});
+  }
+  data.valores = valores;
+  premSetAll(data);
+  premRenderPreview(data);
+  toast('✅ Premiações salvas! Aparecerão em destaque no Modo TV.');
+}
+
+function premResetAll(){
+  if(!confirm('Limpar todas as premiações?')) return;
+  premSetAll({ativo:true,valores:[]});
+  premInit();
+  toast('🗑️ Premiações zeradas!');
+}
+
+function premRenderPreview(data){
+  const el = document.getElementById('prem-preview');
+  if(!el) return;
+  const vals = (data.valores||[]).filter(v=>v.valor>0);
+  if(vals.length===0){ el.innerHTML=''; return; }
+  const medals=['🥇','🥈','🥉'];
+  el.innerHTML=`
+  <div style="background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,165,0,.04));border:1.5px solid rgba(255,215,0,.35);border-radius:var(--rl);padding:14px 16px">
+    <div style="font-size:10px;font-weight:800;color:#92400E;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">
+      🏆 Preview — como aparece no Modo TV
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      ${vals.map((v,i)=>{
+        const medal = medals[i]||v.pos+'°';
+        return `<div style="background:var(--w);border:1px solid rgba(255,215,0,.4);border-radius:var(--rm);padding:10px 14px;display:flex;align-items:center;gap:10px;min-width:180px">
+          <span style="font-size:24px">${medal}</span>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--g500)">${v.pos}° lugar${v.label?' — '+v.label:''}</div>
+            <div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#F59E0B;letter-spacing:.5px">${fR(v.valor)}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+// Retorna o prêmio para uma posição (null se não houver)
+// pos = posição global (1-12), rec = total recebido do operador, du = dias úteis
+function premGetForPos(pos, rec, du){
+  const data = premGetAll();
+  if(!data.ativo) return null;
+  const p = Number(pos);
+  if(p < 1 || p > 12) return null;
+
+  // Modo tabela automático (padrão)
+  if(data.modo !== 'manual'){
+    const nivel = premDetectNivel(rec, du);
+    if(!nivel) return null; // operador não atingiu nenhum nível
+    const tabela = PREM_NIVEIS[nivel];
+    const entry = tabela.valores.find(v=>v.pos===p);
+    if(!entry) return null;
+    return { pos: p, valor: entry.valor, label: tabela.label };
+  }
+
+  // Modo manual (valores configurados na aba Gestão)
+  const item = (data.valores||[]).find(v=>Number(v.pos)===p && Number(v.valor)>0);
+  return item || null;
+}
 
 // ─────────────────────────────
 // MOVER OPERADORES
@@ -8403,19 +8656,51 @@ function tvShow(idx){
 
         <!-- NOME + badges -->
         <div>
-          <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:nowrap;overflow:hidden">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:2px;
-              color:#fff;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">
-              ${op.name.replace(/_/g,' ').toUpperCase()}
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:nowrap;overflow:hidden">
+            <div style="display:flex;align-items:baseline;gap:16px;flex:1;min-width:0;overflow:hidden">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:2px;
+                color:#fff;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">
+                ${op.name.replace(/_/g,' ').toUpperCase()}
+              </div>
+              ${(()=>{
+                const metaInd = getMetaOp(op.name);
+                if(!metaInd||metaInd<=0) return '';
+                const proj = calcProjecao(tvGetRec(op), metaInd);
+                const pCor = proj.status==='ok'?'#4ADE80':proj.status==='info'?'#67E8F9':proj.status==='warn'?'#FCD34D':'#FCA5A5';
+                return `<div style="font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:2px;
+                  color:${pCor};line-height:1;white-space:nowrap;flex-shrink:0;
+                  text-shadow:0 0 24px ${pCor}66">${proj.pct.toFixed(0)}%</div>`;
+              })()}
             </div>
             ${(()=>{
-              const metaInd = getMetaOp(op.name);
-              if(!metaInd||metaInd<=0) return '';
-              const proj = calcProjecao(tvGetRec(op), metaInd);
-              const pCor = proj.status==='ok'?'#4ADE80':proj.status==='info'?'#67E8F9':proj.status==='warn'?'#FCD34D':'#FCA5A5';
-              return `<div style="font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:2px;
-                color:${pCor};line-height:1;white-space:nowrap;flex-shrink:0;
-                text-shadow:0 0 24px ${pCor}66">${proj.pct.toFixed(0)}%</div>`;
+              const _opRec=tvGetRec(op); const _opDu=(()=>{let d=0;for(let i=1;i<=31;i++){if(op.daily&&op.daily[i]>0)d++;}return d;})(); const prem = premGetForPos(posGlobal, _opRec, _opDu);
+              if(!prem) return '';
+              const _pi = posGlobal - 1;
+              const premCores = ['#FFD700','#D0D0D0','#CD8C55'];
+              const premGlows = ['rgba(255,215,0,.7)','rgba(192,192,192,.5)','rgba(205,127,50,.6)'];
+              const premBgs   = ['rgba(255,215,0,.13)','rgba(192,192,192,.1)','rgba(205,127,50,.12)'];
+              const premBds   = ['rgba(255,215,0,.6)','rgba(192,192,192,.45)','rgba(205,127,50,.5)'];
+              const premCor  = premCores[_pi] || '#FCD34D';
+              const premGlow = premGlows[_pi] || 'rgba(252,211,77,.5)';
+              const premBg   = premBgs[_pi]   || 'rgba(252,211,77,.1)';
+              const premBd   = premBds[_pi]   || 'rgba(252,211,77,.4)';
+              const medals   = ['🥇','🥈','🥉'];
+              const medal    = medals[_pi] || '🏆';
+              return `<div style="flex-shrink:0;background:${premBg};border:2px solid ${premBd};
+                border-radius:18px;padding:12px 22px;text-align:center;
+                box-shadow:0 0 40px ${premGlow}, inset 0 0 20px ${premBg};
+                backdrop-filter:blur(12px);animation:tvIn .5s cubic-bezier(.22,1,.36,1)">
+                <div style="font-size:9px;font-weight:900;color:${premCor};letter-spacing:2.5px;
+                  text-transform:uppercase;opacity:.75;margin-bottom:2px">
+                  ${medal} SE TERMINAR AQUI
+                </div>
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:54px;color:${premCor};
+                  letter-spacing:2px;line-height:1;
+                  text-shadow:0 0 30px ${premGlow}, 0 2px 10px rgba(0,0,0,.8)">
+                  ${fR(prem.valor)}
+                </div>
+                ${prem.label ? `<div style="font-size:11px;font-weight:700;color:${premCor};opacity:.65;margin-top:3px;letter-spacing:.5px">${prem.label}</div>` : ''}
+              </div>`;
             })()}
           </div>
           <div style="display:flex;gap:8px;align-items:center;margin-top:5px;flex-wrap:wrap">
@@ -8570,7 +8855,18 @@ function tvShow(idx){
             <div style="display:flex;justify-content:space-between;align-items:center;
                 padding:6px 9px;border-radius:8px;background:${cfg.c}22;border:1px solid ${cfg.c}55;margin-bottom:4px">
               <span style="font-size:12px;color:${cfg.c};font-weight:800">${posLabel} VOCÊ</span>
-              <span style="font-size:13px;color:#4ADE80;font-weight:900">${fRK(op.rec)}</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:13px;color:#4ADE80;font-weight:900">${fRK(op.rec)}</span>
+                ${(()=>{
+                  const _opRec2=tvGetRec(op); const _opDu2=(()=>{let d=0;for(let i=1;i<=31;i++){if(op.daily&&op.daily[i]>0)d++;}return d;})(); const prem2=premGetForPos(posGlobal, _opRec2, _opDu2);
+                  if(!prem2) return '';
+                  const _pi2=posGlobal-1;
+                  const pc2=_pi2===0?'#FFD700':_pi2===1?'#C0C0C0':_pi2===2?'#CD7F32':'#FCD34D';
+                  return `<span style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:${pc2};
+                    background:${pc2}22;border:1px solid ${pc2}55;border-radius:6px;padding:2px 7px;
+                    letter-spacing:.5px;white-space:nowrap">🏆 ${fRK(prem2.valor)}</span>`;
+                })()}
+              </div>
             </div>
             ${next?`<div style="display:flex;justify-content:space-between;padding:4px 7px;
                 border-radius:6px;background:rgba(255,255,255,.04)">
