@@ -609,6 +609,75 @@ select.ev-inp{cursor:pointer}
 
 </div>
 
+  <!-- ══ BLOCO HO GERAL ══ -->
+  <div id="ho-geral-block" style="background:linear-gradient(135deg,#0a1628,#0d2040 55%,#081420);border-radius:var(--rxl);padding:18px 24px;border:2px solid rgba(74,222,128,.3);box-shadow:0 8px 40px rgba(74,222,128,.12),inset 0 1px 0 rgba(255,255,255,.04);margin-bottom:4px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-50px;right:-50px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(74,222,128,.07),transparent 70%);pointer-events:none"></div>
+    <div style="position:absolute;bottom:-30px;left:-20px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(0,168,107,.06),transparent 70%);pointer-events:none"></div>
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#00A86B,#00C97F);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 14px rgba(0,168,107,.4)">💰</div>
+        <div>
+          <div style="font-size:9px;font-weight:800;color:rgba(74,222,128,.5);letter-spacing:3px;text-transform:uppercase;margin-bottom:2px">RECEBIMENTO GERAL · JUNHO 2026</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:rgba(255,255,255,.9);letter-spacing:2px;line-height:1">HO GERAL · META R$ 800K</div>
+        </div>
+      </div>
+      <div id="ho-geral-pct-badge" style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;padding:6px 16px;border-radius:100px;background:rgba(74,222,128,.12);border:1.5px solid rgba(74,222,128,.3);color:#4ADE80">—%</div>
+    </div>
+
+    <!-- Grid principal -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;align-items:start">
+
+      <!-- Coluna esquerda: Total Rec + HO -->
+      <div>
+        <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Total Real Recebido Junho</div>
+        <div id="ho-geral-total-rec" style="font-family:'Bebas Neue',sans-serif;font-size:44px;line-height:1;color:#4ADE80;letter-spacing:2px;margin-bottom:2px">—</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.3);font-weight:600;margin-bottom:12px">Soma geral · operadores COB COFEN</div>
+
+        <div style="font-size:10px;font-weight:800;color:rgba(0,220,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">⚡ HO (25%) — Honorários</div>
+        <div id="ho-geral-ho-val" style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;color:#00E5FF;letter-spacing:1px">—</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.3);font-weight:600;margin-top:2px">25% sobre o Total Real</div>
+      </div>
+
+      <!-- Coluna direita: Falta + Projeção -->
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <!-- Falta para meta HO -->
+        <div id="ho-geral-falta-card" style="background:rgba(74,222,128,.08);border:2px solid rgba(74,222,128,.25);border-radius:14px;padding:14px 18px;text-align:center">
+          <div style="font-size:8px;font-weight:800;color:rgba(74,222,128,.65);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 FALTA P/ META HO</div>
+          <div id="ho-geral-falta-val" style="font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:1;color:#4ADE80;letter-spacing:1px;margin-bottom:4px">—</div>
+          <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.45)">para a meta de R$ 800K HO</div>
+        </div>
+
+        <!-- KPIs: Esperado hoje / VS Projeção / Média/DU -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <div style="background:rgba(0,100,60,.35);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:9px 10px;text-align:center">
+            <div style="font-size:8px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">▶ Esperado Hoje</div>
+            <div id="ho-geral-esperado" style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:#4ADE80;letter-spacing:.5px;line-height:1">—</div>
+          </div>
+          <div id="ho-geral-proj-card" style="background:rgba(100,0,0,.35);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:9px 10px;text-align:center">
+            <div style="font-size:8px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">● VS Projeção</div>
+            <div id="ho-geral-proj-pct" style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:#F87171;letter-spacing:.5px;line-height:1">—%</div>
+          </div>
+          <div style="background:rgba(80,60,0,.35);border:1px solid rgba(252,211,77,.2);border-radius:10px;padding:9px 10px;text-align:center">
+            <div style="font-size:8px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">⚡ Média/DU</div>
+            <div id="ho-geral-media" style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:#FCD34D;letter-spacing:.5px;line-height:1">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de progresso -->
+    <div style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase">🏆 META HO R$800K</span>
+      <span id="ho-geral-bar-lbl" style="font-size:13px;font-weight:900;color:#4ADE80">—</span>
+    </div>
+    <div style="height:10px;border-radius:100px;background:rgba(255,255,255,.1);overflow:hidden;margin-bottom:6px">
+      <div id="ho-geral-bar" style="height:100%;width:0%;border-radius:100px;background:linear-gradient(90deg,#00A86B,#4ADE80);transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,.3);font-weight:600" id="ho-geral-bar-sub">Falta — · — DUs restantes</div>
+  </div>
+
   <!-- HERO ORIGINAL MANTIDO -->
   <div class="hero">
     <div class="htitle">Recebimento Global · Junho 2026</div>
@@ -3173,6 +3242,7 @@ function liveCalc(){
   s('res-meta-lbl', 'Meta 1: '+fRK(m));
   s('res-du-lbl',   DU.passou+' D.U. passados');
   s('res-rest-lbl', DU.restam+' D.U. restam');
+  if(typeof renderHoGeral==='function') renderHoGeral();
 }
 
 // Atualiza soma dos CORENs em tempo real no editor
@@ -5487,7 +5557,80 @@ function refreshAll(){
   // ── Atualiza gráfico Recebimento por Equipe (pp-metas-wrap) ──
   if(typeof renderPpMetas==='function') renderPpMetas();
   if(typeof _updateOntemCard==='function') _updateOntemCard();
+  if(typeof renderHoGeral==='function') renderHoGeral();
 }
+
+// ── BLOCO HO GERAL ──────────────────────────────────────────────
+function renderHoGeral(){
+  const META_HO = 800000;
+  const totalRec = getTotalRec();
+  const ho = totalRec * 0.25;
+  const duPass = DU.passou || 0;
+  const duRest = DU.restam || 0;
+  const duTot  = DU.total  || 1;
+
+  const falta    = Math.max(0, META_HO - ho);
+  const pctHO    = META_HO > 0 ? Math.min(100, ho / META_HO * 100) : 0;
+  const mediaDia = duPass > 0 ? ho / duPass : 0;
+  // Projeção: quanto o HO vai chegar no final do mês no ritmo atual
+  const projecaoHO = duTot > 0 ? ho / Math.max(duPass,1) * duTot : 0;
+  const pctProj    = META_HO > 0 ? Math.round(projecaoHO / META_HO * 100) : 0;
+  // Esperado hoje = meta / total DUs (ritmo linear)
+  const esperado   = META_HO / duTot;
+  // Média por DU restante para bater a meta
+  const mediaRest  = duRest > 0 ? falta / duRest : 0;
+
+  const fR = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fRK = v => v>=1000000?'R$ '+(v/1000000).toFixed(2).replace('.',',')+' M':v>=1000?'R$ '+(v/1000).toFixed(1).replace('.',',')+' K':fR(v);
+
+  const s = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+
+  s('ho-geral-total-rec', fRK(totalRec));
+  s('ho-geral-ho-val',    fRK(ho));
+  s('ho-geral-falta-val', fRK(falta));
+  s('ho-geral-esperado',  fRK(esperado));
+  s('ho-geral-proj-pct',  pctProj+'%');
+  s('ho-geral-media',     fRK(mediaDia));
+  s('ho-geral-pct-badge', pctHO.toFixed(1)+'%');
+  s('ho-geral-bar-lbl',   pctHO.toFixed(1)+'% · faltam '+fRK(falta));
+  s('ho-geral-bar-sub',   'Falta '+fRK(falta)+' · '+duRest+' DUs restantes');
+
+  // Barra
+  const bar = document.getElementById('ho-geral-bar');
+  if(bar) bar.style.width = Math.min(pctHO,100)+'%';
+
+  // Cor do card VS projeção
+  const projCard = document.getElementById('ho-geral-proj-card');
+  const projPct  = document.getElementById('ho-geral-proj-pct');
+  if(projCard && projPct){
+    if(pctProj >= 100){
+      projCard.style.background='rgba(0,100,60,.35)'; projCard.style.borderColor='rgba(74,222,128,.3)';
+      projPct.style.color='#4ADE80';
+    } else if(pctProj >= 75){
+      projCard.style.background='rgba(80,60,0,.35)'; projCard.style.borderColor='rgba(252,211,77,.3)';
+      projPct.style.color='#FCD34D';
+    } else {
+      projCard.style.background='rgba(100,0,0,.35)'; projCard.style.borderColor='rgba(239,68,68,.3)';
+      projPct.style.color='#F87171';
+    }
+  }
+
+  // Cor do badge %
+  const badge = document.getElementById('ho-geral-pct-badge');
+  if(badge){
+    if(pctHO >= 100){ badge.style.color='#4ADE80'; badge.style.borderColor='rgba(74,222,128,.5)'; badge.style.background='rgba(74,222,128,.15)'; }
+    else if(pctHO >= 60){ badge.style.color='#FCD34D'; badge.style.borderColor='rgba(252,211,77,.4)'; badge.style.background='rgba(252,211,77,.1)'; }
+    else { badge.style.color='#F87171'; badge.style.borderColor='rgba(239,68,68,.3)'; badge.style.background='rgba(239,68,68,.1)'; }
+  }
+
+  // Cor da barra
+  if(bar){
+    if(pctHO >= 100) bar.style.background='linear-gradient(90deg,#00A86B,#4ADE80)';
+    else if(pctHO >= 60) bar.style.background='linear-gradient(90deg,#D97706,#FCD34D)';
+    else bar.style.background='linear-gradient(90deg,#DC2626,#F87171)';
+  }
+}
+
 
 // ── TOAST ──
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3000);}
