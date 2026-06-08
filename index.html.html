@@ -3285,20 +3285,20 @@ function renderPPProjecao(){
   const el = document.getElementById('pp-proj-inline');
   if(!el) return;
 
-  const META_EMPRESA = 1000000;
+  // ── META HO (25% do recebimento) = R$ 800K ──
+  const META_EMPRESA = 800000;
   // ── FONTE CORRETA: ppEmpresaAbril = soma da coluna PaguePay do arquivo empresa ──
   const atual = (typeof ppEmpresaAbril !== 'undefined' && ppEmpresaAbril > 0)
                 ? ppEmpresaAbril : 0;
 
-  // ── DU de JUNHO 2026: conta dias que JÁ TERMINARAM (d < hoje, não inclui hoje) ──
-  // Junho 2026: 19 dias úteis (Corpus Christi = 04/jun é feriado — ponto facultativo federal)
-  // Dias úteis: 1,2,3,5,8,9,10,11,12,15,16,17,18,19,22,23,24,25,26
-  const _duJunho = [1,2,3,5,8,9,10,11,12,15,16,17,18,19,22,23,24,25,26];
+  // ── DU de JUNHO 2026: 21 dias úteis (inclui 04/jun Corpus Christi como DU interno) ──
+  // Dias úteis: 2,3,4,5,6,9,10,11,12,13,16,17,18,19,20,23,24,25,26,27,30
+  const _duJunho = [2,3,4,5,6,9,10,11,12,13,16,17,18,19,20,23,24,25,26,27,30];
   const _hoje    = new Date();
   const _diaHoje = (_hoje.getMonth() === 5) ? _hoje.getDate() : 0; // mês 5 = junho (0-indexed)
   let duPass = 0;
-  _duJunho.forEach(d => { if(d < _diaHoje) duPass++; }); // estrito: não conta o dia atual
-  const duTot  = _duJunho.length; // 19
+  _duJunho.forEach(d => { if(d <= _diaHoje) duPass++; }); // inclui o dia atual (≤)
+  const duTot  = _duJunho.length; // 21
   const duRest = Math.max(0, duTot - duPass);
 
   const projecao = duTot > 0 ? Math.round(META_EMPRESA / duTot * duPass * 100) / 100 : 0;
@@ -3306,6 +3306,7 @@ function renderPPProjecao(){
   const pctMeta  = META_EMPRESA > 0 ? Math.round(atual / META_EMPRESA * 100) : 0;
   const falta    = Math.max(0, META_EMPRESA - atual);
   const mediaNec = duRest > 0 ? Math.round(falta / duRest * 100) / 100 : 0;
+  const faltaProjecao = Math.max(0, projecao - atual); // quanto falta para atingir o esperado hoje
 
   const fR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
   const fRK = v => {
@@ -3359,6 +3360,23 @@ function renderPPProjecao(){
         </div>
       </div>
 
+      <!-- Chip: Falta p/ projeção de hoje -->
+      ${faltaProjecao > 0 ? `
+      <div style="display:flex;align-items:center;gap:5px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:8px;padding:5px 10px">
+        <span style="font-size:10px">📉</span>
+        <div>
+          <div style="font-size:8px;color:rgba(248,113,113,.8);font-weight:700;letter-spacing:.5px">FALTA P/ HOJE</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:#F87171;line-height:1">${fRK(faltaProjecao)}</div>
+        </div>
+      </div>` : `
+      <div style="display:flex;align-items:center;gap:5px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);border-radius:8px;padding:5px 10px">
+        <span style="font-size:10px">✅</span>
+        <div>
+          <div style="font-size:8px;color:rgba(74,222,128,.8);font-weight:700;letter-spacing:.5px">DENTRO DA PROJEÇÃO</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:#4ADE80;line-height:1">No azul!</div>
+        </div>
+      </div>`}
+
       <!-- Chip: Média necessária -->
       <div style="display:flex;align-items:center;gap:5px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:5px 10px">
         <span style="font-size:10px">⚡</span>
@@ -3371,7 +3389,7 @@ function renderPPProjecao(){
 
     <!-- Linha 3: Falta sutil -->
     <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,.3)">
-      Falta <span style="color:rgba(255,255,255,.6);font-weight:800">${fR(falta)}</span> para R$1M · ${duRest} DUs restantes
+      Esperado hoje: <span style="color:rgba(0,220,255,.7);font-weight:800">${fRK(projecao)}</span> (${duPass}° DU de ${duTot}) · Falta <span style="color:rgba(255,255,255,.6);font-weight:800">${fR(falta)}</span> para R$800K · ${duRest} DUs restantes
     </div>
   </div>`;
 }
