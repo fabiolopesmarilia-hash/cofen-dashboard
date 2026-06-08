@@ -2718,11 +2718,11 @@ rebuildAll();
     'COFEN BIRIGUI BRUNA':      515233.20,
     'COFEN STEPHANIE 2° TURNO': 375956.23,
   };
-  // JUNHO ativo — defaults iniciais (só aplica se nunca foram salvas)
+  // JUNHO ativo — metas definidas para o mês
   const metasJunhoDefault = {
-    'COFEN MARILIA BRENDA':     450000,
-    'COFEN BIRIGUI BRUNA':      450000,
-    'COFEN STEPHANIE 2° TURNO': 450000,
+    'COFEN MARILIA BRENDA':     600000,
+    'COFEN BIRIGUI BRUNA':      1200000,
+    'COFEN STEPHANIE 2° TURNO': 600000,
   };
 
   function forcar(key, corretas){
@@ -2736,29 +2736,11 @@ rebuildAll();
   forcar('cofen_metas_eq_abril', metasAbril);
   forcar('cofen_metas_eq_maio',  metasMaio);
 
-  // Junho (mês ativo): só aplica o default se não existe nenhum valor salvo ainda
-  // Isso garante que o usuário pode alterar as metas e elas não serão sobrescritas
-  const jaTemJunho = (() => {
-    try {
-      const salvas = JSON.parse(localStorage.getItem('cofen_metas_eq_junho')||'{}');
-      return Object.keys(salvas).length > 0;
-    } catch(e) { return false; }
-  })();
-  if(!jaTemJunho) {
-    localStorage.setItem('cofen_metas_eq_junho', JSON.stringify(metasJunhoDefault));
-  }
+  // Junho: forçar sempre os valores corretos
+  forcar('cofen_metas_eq_junho', metasJunhoDefault);
 
-  // cofen_metas_eq (chave ativa usada pelo dashboard): usa metas de junho
-  // Só inicializa se ainda não tem nenhum valor — respeita o que o usuário salvou
-  const jaTemAtivo = (() => {
-    try {
-      const salvas = JSON.parse(localStorage.getItem('cofen_metas_eq')||'{}');
-      return Object.keys(salvas).length > 0;
-    } catch(e) { return false; }
-  })();
-  if(!jaTemAtivo) {
-    localStorage.setItem('cofen_metas_eq', JSON.stringify(metasJunhoDefault));
-  }
+  // cofen_metas_eq (chave ativa usada pelo dashboard): forçar metas de junho
+  forcar('cofen_metas_eq', metasJunhoDefault);
 })();
 
 // ── CALENDAR & DU ──
