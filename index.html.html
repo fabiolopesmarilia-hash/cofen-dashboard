@@ -2819,9 +2819,9 @@ rebuildAll();
   };
   // JUNHO ativo — defaults iniciais (só aplica se nunca foram salvas)
   const metasJunhoDefault = {
-    'COFEN MARILIA BRENDA':     450000,
-    'COFEN BIRIGUI BRUNA':      450000,
-    'COFEN STEPHANIE 2° TURNO': 450000,
+    'COFEN MARILIA BRENDA':     600000,
+    'COFEN BIRIGUI BRUNA':      1200000,
+    'COFEN STEPHANIE 2° TURNO': 600000,
   };
 
   function forcar(key, corretas){
@@ -3427,7 +3427,7 @@ function renderPPProjecao(){
 }
 
 function _buildMetasHtml(val, compact){
-  const META_STEP = 50000;
+  const META_STEP = 75000;
   const metas   = Math.floor(val / META_STEP);
   const prog    = val % META_STEP;
   const pct     = (prog / META_STEP * 100);
