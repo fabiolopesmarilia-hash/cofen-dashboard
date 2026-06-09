@@ -672,7 +672,7 @@ select.ev-inp{cursor:pointer}
     <!-- ══ TABELA METAS & PROJEÇÕES — dentro do hero ══ -->
     <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap;gap:6px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase">🏆 METAS & PROJEÇÕES — EQUIPES JUNHO 2026</div>
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase">🏆 METAS & PROJEÇÕES HO — EQUIPES JUNHO 2026</div>
         <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.3);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:3px 10px" id="eq-mt-badge">— DIAS ÚTEIS RESTANTES</div>
       </div>
       <div style="background:rgba(252,211,77,.12);border:1px solid rgba(252,211,77,.3);border-radius:var(--r);padding:6px 12px;font-size:10px;font-weight:700;color:#FCD34D;margin-bottom:8px;letter-spacing:.3px">
@@ -683,14 +683,13 @@ select.ev-inp{cursor:pointer}
           <thead>
             <tr style="background:rgba(255,255,255,.06)">
               <th style="padding:7px 12px;text-align:left;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">LÍDERES</th>
-              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#4ADE80;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">VALOR REC.</th>
-              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">META</th>
-              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#67E8F9;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">REC POR DIA</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#4ADE80;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">HO REC.</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">META HO</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#67E8F9;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">HO POR DIA</th>
               <th id="eq-mt-col-header" style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#FCD34D;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">META DE HOJE — DUs</th>
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#C084FC;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">DEVERIA ESTAR HOJE</th>
               <th id="eq-mt-col-pct-header" style="padding:7px 12px;text-align:center;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">% S/ META HOJE</th>
               <th id="eq-mt-col-pct-minus1-header" style="padding:7px 12px;text-align:center;font-size:9px;font-weight:800;color:rgba(255,180,0,.7);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">% COM -1 DU</th>
-              <th id="eq-mt-col-pct-minus1-header" style="padding:7px 12px;text-align:center;font-size:9px;font-weight:800;color:rgba(255,180,0,.6);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">% COM -1 DU</th>
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#F87171;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">⚡ FALTA P/ DIA</th>
             </tr>
           </thead>
@@ -3447,7 +3446,7 @@ function _buildMetasHtml(val, compact){
       background:${bat?c+'22':'rgba(255,255,255,.04)'};opacity:${bat?1:0.4}">
       <span style="font-size:${fs}">${bat?'🏆':'🔒'}</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:${bat?c:'rgba(255,255,255,.3)'};letter-spacing:.5px">
-        META ${i} · R$${(i*50).toFixed(0)}K</span>
+        META ${i} · R$${(i*75).toFixed(0)}K</span>
     </div>`;
   }
   if(val < proxima){
@@ -3455,7 +3454,7 @@ function _buildMetasHtml(val, compact){
       border-radius:100px;border:1.5px dashed rgba(255,255,255,.25);background:rgba(255,255,255,.04)">
       <span style="font-size:${fs}">🎯</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:rgba(255,255,255,.4);letter-spacing:.5px">
-        META ${metas+1} · R$${((metas+1)*50).toFixed(0)}K</span>
+        META ${metas+1} · R$${((metas+1)*75).toFixed(0)}K</span>
     </div>`;
   }
   // Atualiza o destaque de "falta" no topo (se existir)
@@ -3464,7 +3463,7 @@ function _buildMetasHtml(val, compact){
   if(faltaEl && val>0){
     faltaEl.textContent = fR(falta);
     faltaEl.style.color='#00E5FF';
-    if(faltaLbl) faltaLbl.textContent = 'para o objetivo de R$'+((metas+1)*50)+'K';
+    if(faltaLbl) faltaLbl.textContent = 'para o objetivo de R$'+((metas+1)*75)+'K';
   }
   return `
     <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:7px">${badgesHtml}</div>
@@ -13906,13 +13905,20 @@ function renderEqMetasTable(){
     const eq = D.equipes.find(e => e.name === eqName);
     if(!eq) return;
 
-    // Meta da equipe (usa metas configuradas ou padrão R$ 450k)
-    let metaEq = META_EQ_DEFAULT;
-    try { const m = gGetMetas(); if(m && m[eqName]) metaEq = parseFloat(m[eqName]) || META_EQ_DEFAULT; } catch(e){}
+    // Meta da equipe em Total Real (usa metas configuradas ou padrão R$ 450k)
+    // A tabela agora opera sobre HO (25%), então a meta HO = meta_rec * 0.25
+    // Meta HO por equipe (valores diretos em HO)
+    const META_HO = {
+      'COFEN BIRIGUI BRUNA'     : 300000,
+      'COFEN MARILIA BRENDA'    : 150000,
+      'COFEN STEPHANIE 2° TURNO': 150000,
+      'COFEN DIGITAL'           : 37500,
+    };
+    const metaEq = META_HO[eqName] || (META_EQ_DEFAULT * 0.25);
 
-    const rec      = eq.rec || 0;
+    const rec      = eq.ho || 0; // usa HO em vez de Total Real
 
-    // Quanto falta para bater a meta
+    // Quanto falta para bater a meta (em HO)
     const falta    = Math.max(0, metaEq - rec);
 
     // Rec por dia = meta ÷ total de DUs do mês
@@ -13959,7 +13965,7 @@ function renderEqMetasTable(){
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:rgba(255,255,255,.45)">${fR(metaEq)}</td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#67E8F9">
         ${fR(recDia)}
-        <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">por dia útil</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">por dia útil (HO)</div>
       </td>
       <td style="padding:8px 12px;text-align:right">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:${urgColor}">${fR(metaDuRest)}</div>
