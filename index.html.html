@@ -504,9 +504,11 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('recdia-op',this);rdopRender()">📆 Receb. por Dia/Op</div>
   <div class="tab"     onclick="go('editor',this)">✏️ Editar Valores</div>
   <div class="tab"     onclick="go('equipes',this)">🏢 Equipes</div>
-  <div class="tab"     onclick="go('ranking',this)">🏆 Ranking Equipe Stephanie</div>
+  <div class="tab"     onclick="go('ranking',this)">⭐ Ranking Stephanie</div>
+  <div class="tab"     onclick="go('ranking-brenda',this);renderRankingBrend()">🏙️ Ranking Brenda</div>
+  <div class="tab"     onclick="go('ranking-bruna',this);renderRankingBrun()">💙 Ranking Bruna</div>
   <div class="tab"     onclick="go('ranking-digital',this)">🖥️ Ranking Digital</div>
-  <div class="tab"     onclick="go('ranking-bb',this)">💙🏙️ Bruna + Brenda</div>
+  <div class="tab"     onclick="go('ranking-bb',this)">🏙️⭐ Brenda + Stephanie</div>
   <div class="tab"     onclick="go('diario',this)">📅 Diário</div>
   <div class="tab"     onclick="go('recdia',this)">⚡ Recebimento do Dia</div>
   <div class="tab"     onclick="go('gestao',this)">⚙️ Gestão de Equipes</div>
@@ -1093,26 +1095,60 @@ select.ev-inp{cursor:pointer}
 
 <!-- ══════════ PAGE: RANKING BRUNA + BRENDA ══════════ -->
 <div class="page" id="pg-ranking-bb">
-  <div style="background:linear-gradient(135deg,#002776 0%,#003d1a 45%,#004d22 70%,#001a55 100%);border-radius:var(--rxl);padding:18px 24px;position:relative;overflow:hidden">
+  <div style="background:linear-gradient(135deg,#00301a 0%,#1a1a00 45%,#2d2000 70%,#001a00 100%);border-radius:var(--rxl);padding:18px 24px;position:relative;overflow:hidden">
     <!-- Faixa Brasil topo -->
     <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#002776,#009C3B,#FFDF00,#009C3B,#002776)"></div>
     <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,223,0,.05);pointer-events:none"></div>
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:3px">
       <span style="font-size:22px">🇧🇷</span>
-      <div style="font-size:10px;font-weight:700;color:rgba(255,223,0,.6);letter-spacing:2px;text-transform:uppercase">COFEN Birigui Bruna · COFEN Marília Brenda</div>
+      <div style="font-size:10px;font-weight:700;color:rgba(255,223,0,.6);letter-spacing:2px;text-transform:uppercase">COFEN Marília Brenda · COFEN Stephanie 2° Turno</div>
     </div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#fff;line-height:1;margin-bottom:14px">💙🏙️ RANKING — BRUNA + BRENDA</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#fff;line-height:1;margin-bottom:14px">🏙️⭐ RANKING — BRENDA + STEPHANIE</div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px" id="rk-bb-kpis"></div>
   </div>
   <div style="display:flex;gap:8px;margin:10px 0 4px">
     <button class="fbtn on" id="bb-filter-all" onclick="bbSetFilter('all',this)">🏆 Todas</button>
-    <button class="fbtn" id="bb-filter-bruna" onclick="bbSetFilter('COFEN BIRIGUI BRUNA',this)" style="color:#4776E6;border-color:#4776E6">💙 Bruna</button>
     <button class="fbtn" id="bb-filter-brenda" onclick="bbSetFilter('COFEN MARILIA BRENDA',this)" style="color:#00A86B;border-color:#00A86B">🏙️ Brenda</button>
+    <button class="fbtn" id="bb-filter-stephanie" onclick="bbSetFilter('COFEN STEPHANIE 2° TURNO',this)" style="color:#F7971E;border-color:#F7971E">⭐ Stephanie</button>
   </div>
   <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
   <div class="rk-list" id="rk-list-bb"></div>
 </div>
-<!-- ══════════ FIM PAGE: RANKING BRUNA + BRENDA ══════════ -->
+<!-- ══════════ FIM PAGE: RANKING BRENDA + STEPHANIE ══════════ -->
+
+<!-- ══════════ PAGE: RANKING BRENDA ══════════ -->
+<div class="page" id="pg-ranking-brenda">
+  <div style="background:linear-gradient(135deg,#00301a 0%,#004d22 50%,#00683a 100%);border-radius:var(--rxl);padding:18px 24px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#002776,#009C3B,#FFDF00,#009C3B,#002776)"></div>
+    <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(0,168,107,.1);pointer-events:none"></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:3px">
+      <span style="font-size:22px">🇧🇷</span>
+      <div style="font-size:10px;font-weight:700;color:rgba(0,230,150,.6);letter-spacing:2px;text-transform:uppercase">COFEN Marília · Equipe Brenda</div>
+    </div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#fff;line-height:1;margin-bottom:14px">🏙️ RANKING — EQUIPE BRENDA</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="rk-brend-kpis"></div>
+  </div>
+  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
+  <div class="rk-list" id="rk-list-brenda"></div>
+</div>
+<!-- ══════════ FIM PAGE: RANKING BRENDA ══════════ -->
+
+<!-- ══════════ PAGE: RANKING BRUNA ══════════ -->
+<div class="page" id="pg-ranking-bruna">
+  <div style="background:linear-gradient(135deg,#001a4d 0%,#002776 50%,#003d99 100%);border-radius:var(--rxl);padding:18px 24px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#002776,#009C3B,#FFDF00,#009C3B,#002776)"></div>
+    <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(71,118,230,.1);pointer-events:none"></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:3px">
+      <span style="font-size:22px">🇧🇷</span>
+      <div style="font-size:10px;font-weight:700;color:rgba(100,180,255,.6);letter-spacing:2px;text-transform:uppercase">COFEN Birigui · Equipe Bruna</div>
+    </div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#fff;line-height:1;margin-bottom:14px">💙 RANKING — EQUIPE BRUNA</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="rk-brun-kpis"></div>
+  </div>
+  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
+  <div class="rk-list" id="rk-list-bruna"></div>
+</div>
+<!-- ══════════ FIM PAGE: RANKING BRUNA ══════════ -->
 
 <!-- ══════════ PAGE: DIÁRIO ══════════ -->
 <div class="page" id="pg-diario">
@@ -2981,6 +3017,7 @@ function duApplyManual(){
   buildCal('cal-grid');
   buildCal('cal-grid2');
   initHero();
+  renderPPProjecao();
   toast('✅ Dias úteis atualizados!');
 }
 
@@ -3291,15 +3328,10 @@ function renderPPProjecao(){
   const atual = (typeof ppEmpresaAbril !== 'undefined' && ppEmpresaAbril > 0)
                 ? ppEmpresaAbril : 0;
 
-  // ── DU de JUNHO 2026: 21 dias úteis (inclui 04/jun Corpus Christi como DU interno) ──
-  // Dias úteis: 2,3,4,5,6,9,10,11,12,13,16,17,18,19,20,23,24,25,26,27,30
-  const _duJunho = [2,3,4,5,6,9,10,11,12,13,16,17,18,19,20,23,24,25,26,27,30];
-  const _hoje    = new Date();
-  const _diaHoje = (_hoje.getMonth() === 5) ? _hoje.getDate() : 0; // mês 5 = junho (0-indexed)
-  let duPass = 0;
-  _duJunho.forEach(d => { if(d <= _diaHoje) duPass++; }); // inclui o dia atual (≤)
-  const duTot  = _duJunho.length; // 21
-  const duRest = Math.max(0, duTot - duPass);
+  // ── DU: usa o calendário dinâmico (DU global atualizado pelo calendário manual) ──
+  const duTot  = DU.total  || 21;
+  const duPass = DU.passou || 0;
+  const duRest = DU.restam || Math.max(0, duTot - duPass);
 
   const projecao = duTot > 0 ? Math.round(META_EMPRESA / duTot * duPass * 100) / 100 : 0;
   const pctAtual = projecao > 0 ? Math.round(atual / projecao * 100) : 0;
@@ -5141,8 +5173,8 @@ function mkRankingDigital(){
 
 // ── RANKING BRUNA + BRENDA ──
 let bbFilter = 'all';
-const BB_EQS = ['COFEN BIRIGUI BRUNA','COFEN MARILIA BRENDA'];
-const BB_COLORS = {'COFEN BIRIGUI BRUNA':'#4776E6','COFEN MARILIA BRENDA':'#00A86B'};
+const BB_EQS = ['COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO'];
+const BB_COLORS = {'COFEN MARILIA BRENDA':'#00A86B','COFEN STEPHANIE 2° TURNO':'#F7971E'};
 
 function bbSetFilter(f, btn){
   bbFilter = f;
@@ -5153,8 +5185,8 @@ function bbSetFilter(f, btn){
 
 function mkRankingBB(){
   const allBB = ALL.filter(o=>BB_EQS.includes(o.eq));
-  const bruna = allBB.filter(o=>o.eq==='COFEN BIRIGUI BRUNA');
-  const brenda = allBB.filter(o=>o.eq==='COFEN MARILIA BRENDA');
+  const brenda    = allBB.filter(o=>o.eq==='COFEN MARILIA BRENDA');
+  const stephanie = allBB.filter(o=>o.eq==='COFEN STEPHANIE 2° TURNO');
   const totalRec = allBB.reduce((s,o)=>s+o.rec,0);
   const totalHO  = totalRec*0.25;
   const totalAc  = allBB.reduce((s,o)=>s+(o.acordos||0),0);
@@ -5174,12 +5206,12 @@ function mkRankingBB(){
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FCD34D;line-height:1">${totalAc}</div>
     </div>
     <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
-      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">💙 Bruna</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#93C5FD;line-height:1">${fRK(bruna.reduce((s,o)=>s+o.rec,0))}</div>
-    </div>
-    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
       <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">🏙️ Brenda</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#6EE7B7;line-height:1">${fRK(brenda.reduce((s,o)=>s+o.rec,0))}</div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">⭐ Stephanie</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FCD34D;line-height:1">${fRK(stephanie.reduce((s,o)=>s+o.rec,0))}</div>
     </div>`;
 
   _renderBBList();
@@ -5197,7 +5229,7 @@ function _renderBBList(){
     const r=i+1;
     const cls=r===1?'r1':r===2?'r2':r===3?'r3':'';
     const cor = BB_COLORS[op.eq]||'#888';
-    const eqLabel = op.eq==='COFEN BIRIGUI BRUNA'?'💙 Bruna':'🏙️ Brenda';
+    const eqLabel = op.eq==='COFEN MARILIA BRENDA'?'🏙️ Brenda':'⭐ Stephanie';
     const bp=Math.round(op.rec/maxV*100);
     const metaInd = getMetaOp(op.name);
     const projData = calcProjecao(op.rec, metaInd);
@@ -5248,7 +5280,165 @@ function _renderBBList(){
   }).join('');
 }
 
-// ── DIÁRIO CHARTS ──
+// ── RANKING BRENDA (isolado) ──
+function renderRankingBrend(){
+  const COLOR = '#00A86B';
+  const ops = ALL.filter(o=>o.eq==='COFEN MARILIA BRENDA');
+  const totalRec = ops.reduce((s,o)=>s+o.rec,0);
+  const totalHO  = totalRec*0.25;
+  const totalAc  = ops.reduce((s,o)=>s+(o.acordos||0),0);
+  const kpis = document.getElementById('rk-brend-kpis');
+  if(kpis) kpis.innerHTML=`
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Total Recebido</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;line-height:1">${fRK(totalRec)}</div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">HO (25%)</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#67E8F9;line-height:1">${fRK(totalHO)}</div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Operadores</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FCD34D;line-height:1">${ops.length}</div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Acordos</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FCA5A5;line-height:1">${totalAc}</div>
+    </div>`;
+  const listEl = document.getElementById('rk-list-brenda');
+  if(!listEl) return;
+  if(!ops.length){ listEl.innerHTML='<div style="padding:32px;text-align:center;font-size:13px;color:var(--g400)">Nenhum operador encontrado</div>'; return; }
+  const maxV = ops[0]?.rec||1;
+  const feedbackAll = feedbackGetAll();
+  listEl.innerHTML = ops.map((op,i)=>{
+    const r=i+1; const cls=r===1?'r1':r===2?'r2':r===3?'r3':'';
+    const bp=Math.round(op.rec/maxV*100);
+    const metaInd=getMetaOp(op.name); const projData=calcProjecao(op.rec,metaInd);
+    const fbDone=!!feedbackAll[op.name];
+    const fbDate=fbDone?new Date(feedbackAll[op.name]).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):'';
+    const fbBtnStyle=fbDone?'background:#D1FAE5;border:1.5px solid #6EE7B7;color:#065F46;cursor:pointer;':'background:#FEF9C3;border:1.5px dashed #FCD34D;color:#92400E;cursor:pointer;';
+    return `<div class="rk-row ${cls}" style="animation-delay:${i*.03}s;--ra:${COLOR}" onclick="openM('${op.name}')">
+      <div class="r-pos">${r<=3?['🥇','🥈','🥉'][r-1]:r+'°'}</div>
+      <div class="r-info">
+        <div style="width:32px;height:32px;border-radius:8px;overflow:hidden;flex-shrink:0;background:${COLOR};display:flex;align-items:center;justify-content:center">
+          ${photoGet(op.name)?`<img src="${photoGet(op.name)}" style="width:100%;height:100%;object-fit:cover">`:`<span style="font-weight:900;font-size:11px;color:#fff">${ini(op.name)}</span>`}
+        </div>
+        <div>
+          <div class="r-n" style="display:flex;align-items:center;gap:5px">
+            ${op.name.replace(/_/g,' ')}
+            <button onclick="event.stopPropagation();feedbackToggle('${op.name.replace(/'/g,"\\'")}')"
+              style="padding:1px 6px;border-radius:100px;font-size:9px;font-weight:800;${fbBtnStyle}transition:all .2s;flex-shrink:0;line-height:1.6">
+              ${fbDone?'✅ FB '+fbDate:'○ Feedback'}
+            </button>
+          </div>
+          <div class="r-t" style="color:${COLOR}">🏙️ Equipe Brenda</div>
+        </div>
+      </div>
+      <div class="r-bar-w">
+        <div class="r-val" style="color:${COLOR}">${fR(op.rec)}</div>
+        <div class="r-bar-bg"><div class="r-bar-f" style="width:${bp}%;background:${COLOR}"></div></div>
+      </div>
+      <div class="r-ho">HO: <b>${fR(op.ho)}</b></div>
+      <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:13px;color:${projData.color};letter-spacing:.3px">${fRK(metaInd)}</div>
+        <div style="font-size:10px;color:var(--g500);font-weight:600">${projData.label}</div>`:`<div style="font-size:10px;color:var(--g300)">—</div>`}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
+        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${projData.color};letter-spacing:.5px">${projData.pct.toFixed(0)}%</div>
+        <div style="background:var(--g100);border-radius:100px;height:4px;width:60px;overflow:hidden">
+          <div style="width:${Math.min(100,projData.pct)}%;height:100%;border-radius:100px;background:${projData.color};transition:width 1s"></div>
+        </div>`:`<div style="font-size:10px;color:var(--g300)">—</div>`}
+      </div>
+      <div class="r-ac">${op.acordos}</div>
+      <div style="padding:2px 0">${efBadge(op.gerados||0,op.pagos||0,op.acordos||0)}</div>
+      <div style="display:flex;gap:3px;align-items:flex-end;height:20px;margin-top:1px">
+        ${(()=>{const de=Object.entries(op.daily||{}).sort((a,b)=>Number(a[0])-Number(b[0]));if(!de.length)return '<span style="font-size:9px;color:#aaa">—</span>';const mv=Math.max(...de.map(([,v])=>v),1);return de.map(([d,v])=>`<div title="Dia ${d}: ${fR(v)}" style="width:5px;border-radius:2px 2px 0 0;background:${COLOR};opacity:${.35+.65*(v/mv)};height:${Math.max(3,Math.round(v/mv*18))}px"></div>`).join('');})()}
+      </div>
+      <div class="r-ag">${op.n_ag>0?'+'+op.n_ag:'—'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── RANKING BRUNA (isolado) ──
+function renderRankingBrun(){
+  const COLOR = '#4776E6';
+  const ops = ALL.filter(o=>o.eq==='COFEN BIRIGUI BRUNA');
+  const totalRec = ops.reduce((s,o)=>s+o.rec,0);
+  const totalHO  = totalRec*0.25;
+  const totalAc  = ops.reduce((s,o)=>s+(o.acordos||0),0);
+  const kpis = document.getElementById('rk-brun-kpis');
+  if(kpis) kpis.innerHTML=`
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Total Recebido</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#93C5FD;line-height:1">${fRK(totalRec)}</div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">HO (25%)</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#67E8F9;line-height:1">${fRK(totalHO)}</div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Operadores</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FCD34D;line-height:1">${ops.length}</div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Acordos</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FCA5A5;line-height:1">${totalAc}</div>
+    </div>`;
+  const listEl = document.getElementById('rk-list-bruna');
+  if(!listEl) return;
+  if(!ops.length){ listEl.innerHTML='<div style="padding:32px;text-align:center;font-size:13px;color:var(--g400)">Nenhum operador encontrado</div>'; return; }
+  const maxV = ops[0]?.rec||1;
+  const feedbackAll = feedbackGetAll();
+  listEl.innerHTML = ops.map((op,i)=>{
+    const r=i+1; const cls=r===1?'r1':r===2?'r2':r===3?'r3':'';
+    const bp=Math.round(op.rec/maxV*100);
+    const metaInd=getMetaOp(op.name); const projData=calcProjecao(op.rec,metaInd);
+    const fbDone=!!feedbackAll[op.name];
+    const fbDate=fbDone?new Date(feedbackAll[op.name]).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):'';
+    const fbBtnStyle=fbDone?'background:#D1FAE5;border:1.5px solid #6EE7B7;color:#065F46;cursor:pointer;':'background:#FEF9C3;border:1.5px dashed #FCD34D;color:#92400E;cursor:pointer;';
+    return `<div class="rk-row ${cls}" style="animation-delay:${i*.03}s;--ra:${COLOR}" onclick="openM('${op.name}')">
+      <div class="r-pos">${r<=3?['🥇','🥈','🥉'][r-1]:r+'°'}</div>
+      <div class="r-info">
+        <div style="width:32px;height:32px;border-radius:8px;overflow:hidden;flex-shrink:0;background:${COLOR};display:flex;align-items:center;justify-content:center">
+          ${photoGet(op.name)?`<img src="${photoGet(op.name)}" style="width:100%;height:100%;object-fit:cover">`:`<span style="font-weight:900;font-size:11px;color:#fff">${ini(op.name)}</span>`}
+        </div>
+        <div>
+          <div class="r-n" style="display:flex;align-items:center;gap:5px">
+            ${op.name.replace(/_/g,' ')}
+            <button onclick="event.stopPropagation();feedbackToggle('${op.name.replace(/'/g,"\\'")}')"
+              style="padding:1px 6px;border-radius:100px;font-size:9px;font-weight:800;${fbBtnStyle}transition:all .2s;flex-shrink:0;line-height:1.6">
+              ${fbDone?'✅ FB '+fbDate:'○ Feedback'}
+            </button>
+          </div>
+          <div class="r-t" style="color:${COLOR}">💙 Equipe Bruna</div>
+        </div>
+      </div>
+      <div class="r-bar-w">
+        <div class="r-val" style="color:${COLOR}">${fR(op.rec)}</div>
+        <div class="r-bar-bg"><div class="r-bar-f" style="width:${bp}%;background:${COLOR}"></div></div>
+      </div>
+      <div class="r-ho">HO: <b>${fR(op.ho)}</b></div>
+      <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:13px;color:${projData.color};letter-spacing:.3px">${fRK(metaInd)}</div>
+        <div style="font-size:10px;color:var(--g500);font-weight:600">${projData.label}</div>`:`<div style="font-size:10px;color:var(--g300)">—</div>`}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
+        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${projData.color};letter-spacing:.5px">${projData.pct.toFixed(0)}%</div>
+        <div style="background:var(--g100);border-radius:100px;height:4px;width:60px;overflow:hidden">
+          <div style="width:${Math.min(100,projData.pct)}%;height:100%;border-radius:100px;background:${projData.color};transition:width 1s"></div>
+        </div>`:`<div style="font-size:10px;color:var(--g300)">—</div>`}
+      </div>
+      <div class="r-ac">${op.acordos}</div>
+      <div style="padding:2px 0">${efBadge(op.gerados||0,op.pagos||0,op.acordos||0)}</div>
+      <div style="display:flex;gap:3px;align-items:flex-end;height:20px;margin-top:1px">
+        ${(()=>{const de=Object.entries(op.daily||{}).sort((a,b)=>Number(a[0])-Number(b[0]));if(!de.length)return '<span style="font-size:9px;color:#aaa">—</span>';const mv=Math.max(...de.map(([,v])=>v),1);return de.map(([d,v])=>`<div title="Dia ${d}: ${fR(v)}" style="width:5px;border-radius:2px 2px 0 0;background:${COLOR};opacity:${.35+.65*(v/mv)};height:${Math.max(3,Math.round(v/mv*18))}px"></div>`).join('');})()}
+      </div>
+      <div class="r-ag">${op.n_ag>0?'+'+op.n_ag:'—'}</div>
+    </div>`;
+  }).join('');
+}
+
+
 function mkDf(){
   destroyC('df');
   const days=Object.keys(D.global.daily).map(Number).sort((a,b)=>a-b);
@@ -5520,13 +5710,15 @@ function closeM(e){
 function go(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
-  ['geral','editor','equipes','ranking','ranking-digital','ranking-bb','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas','recdia-op','tv'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
+  ['geral','editor','equipes','ranking','ranking-digital','ranking-bb','ranking-brenda','ranking-bruna','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas','recdia-op','tv'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
   document.getElementById('pg-'+id).classList.add('on');
   if(id==='geral'){mkGD();mkDist();buildDUManualGrid();if(typeof _updateOntemCard==='function')_updateOntemCard();}
   if(id==='editor') buildOpEditor();
   if(id==='ranking') mkRanking();
   if(id==='ranking-digital') mkRankingDigital();
   if(id==='ranking-bb') mkRankingBB();
+  if(id==='ranking-brenda') renderRankingBrend();
+  if(id==='ranking-bruna') renderRankingBrun();
   if(id==='diario'){mkDf();mkDe();buildCal('cal-grid2');}
   if(id==='recdia'){ rdInit(); setTimeout(rdRenderEqBreakdown,200); }
   if(id==='gestao') gestaoInit();
@@ -5551,6 +5743,8 @@ function refreshAll(){
   mkRanking();
   if(document.getElementById('pg-ranking-digital')?.classList.contains('on')) mkRankingDigital();
   if(document.getElementById('pg-ranking-bb')?.classList.contains('on')) mkRankingBB();
+  if(document.getElementById('pg-ranking-brenda')?.classList.contains('on')) renderRankingBrend();
+  if(document.getElementById('pg-ranking-bruna')?.classList.contains('on')) renderRankingBrun();
   if(typeof buildDiario==='function') buildDiario();
   // Atualiza RecDia KPIs e lista
   if(typeof rdUpdateKPIs==='function') rdUpdateKPIs();
@@ -7359,11 +7553,11 @@ function importParse(raw){
     }
   });
 
-  // Build lookup: norm(name) -> op object (from D.equipes directly)
+  // Build lookup: norm(name) -> {op, eqName} (from D.equipes directly)
   const lookup = {};
   D.equipes.forEach(eq=>{
     eq.ops.forEach(op=>{
-      lookup[norm(op.name)] = op;
+      lookup[norm(op.name)] = {op, eqName: eq.name};
     });
   });
 
@@ -7380,9 +7574,9 @@ function importParse(raw){
 
     // 2. Partial match (raw name contains op name or vice versa)
     if(!matched){
-      for(const [key, op] of Object.entries(lookup)){
+      for(const [key, entry] of Object.entries(lookup)){
         if(normRaw.includes(key) || key.includes(normRaw)){
-          matched = op; break;
+          matched = entry; break;
         }
       }
     }
@@ -7390,7 +7584,7 @@ function importParse(raw){
     // 3. Levenshtein fuzzy
     if(!matched){
       let best=null, bestDist=Infinity;
-      for(const [key, op] of Object.entries(lookup)){
+      for(const [key, entry] of Object.entries(lookup)){
         const a=normRaw, b=key;
         const m=a.length, n=b.length;
         if(Math.abs(m-n)>4) continue;
@@ -7398,17 +7592,19 @@ function importParse(raw){
         for(let i=1;i<=m;i++) for(let j=1;j<=n;j++)
           dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
         const d=dp[m][n];
-        if(d<bestDist){bestDist=d;best=op;}
+        if(d<bestDist){bestDist=d;best=entry;}
       }
       if(bestDist<=3) matched=best;
     }
 
     if(matched){
+      const mOp = matched.op;
+      const mEq = matched.eqName;
       found.push({
-        rawName, opName:matched.name, eq:matched.eq,
+        rawName, opName:mOp.name, eq:mEq,
         hoImport:totalReal * 0.25, recImport:totalReal,
-        recCurrent:matched.rec, hoCurrent:matched.ho,
-        diff:totalReal-matched.rec,
+        recCurrent:mOp.rec, hoCurrent:mOp.ho,
+        diff:totalReal-mOp.rec,
         daily: daily,
         tipos: accData.tipos || {},
         acordos: accData.docs ? accData.docs.size : 0,
