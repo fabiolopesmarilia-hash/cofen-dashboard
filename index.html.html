@@ -3144,10 +3144,11 @@ function renderHoProjTable(){
   const tbody = document.getElementById('ho-proj-tbody');
   if(!tbody) return;
 
-  const totalRec = getTotalRec();               // recebimento bruto atual
-  const hoAtual  = totalRec * 0.25;             // HO atual (25%)
-  const duPass   = DU.passou || 1;              // DUs passados (mínimo 1)
-  const duTotal  = DU.total  || 21;             // DUs totais do mês
+  // HO atual = ppEmpresaAbril (coluna PaguePay do arquivo empresa)
+  // Se não importado ainda, usa getTotalRec() * 0.25 como fallback
+  const hoAtual  = ppEmpresaAbril > 0 ? ppEmpresaAbril : (getTotalRec() * 0.25);
+  const duPass   = DU.passou || 1;
+  const duTotal  = DU.total  || 21;
 
   // Projeção = HO atual ÷ DUs passados × DUs totais
   const projecao = hoAtual / duPass * duTotal;
@@ -3173,7 +3174,7 @@ function renderHoProjTable(){
       <td style="padding:9px 12px;font-size:11px;font-weight:800;color:rgba(255,255,255,.85)">${c.label}</td>
       <td style="padding:9px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#67E8F9">${fR2(metaDia)}</td>
       <td style="padding:9px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#C084FC">${fR2(projecao)}</td>
-      <td style="padding:9px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#4ADE80" id="ho-proj-atual-${c.valor}">${fR2(hoAtual)}</td>
+      <td style="padding:9px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#4ADE80">${fR2(hoAtual)}</td>
       <td style="padding:9px 12px;text-align:center">
         <span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:800;
           color:${pctColor};background:${pctBg};border:1px solid ${pctBorder}">
