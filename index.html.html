@@ -875,68 +875,7 @@ select.ev-inp{cursor:pointer}
         <div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">
           📍 Subtotal por COREN — preenchido manualmente
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:10px">
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-MT (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-mt" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-PI (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-pi" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-MA (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-ma" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-CE (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-ce" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-SP (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-sp" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-RJ (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-rj" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-MG (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-mg" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-RS (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-rs" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-PR (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-pr" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-BA (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-ba" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-GO (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-go" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-PE (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-pe" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-SC (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-sc" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-AM (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-am" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-          <div class="ep-group" style="flex:none">
-            <label class="ep-label">COREN-PB (R$)</label>
-            <input class="ep-input" type="number" id="inp-coren-pb" placeholder="0,00" step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9">
-          </div>
-        </div>
+        <div id="coren-grid-dynamic" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:10px"></div>
         <div id="res-corens" style="display:flex;gap:12px;margin-top:8px;font-size:11px;font-weight:700;color:var(--g500)">
           Soma CORENs: <span id="res-corens-soma" style="color:var(--info)">—</span>
         </div>
@@ -2719,21 +2658,24 @@ let meta            = parseFloat(localStorage.getItem('cofen_meta')         || M
 let overrideTotalRec= parseFloat(localStorage.getItem('cofen_total')        || '0');
 
 // ── CORENS: subtotais por estado (preenchidos manualmente) ──
-let corenMT = parseFloat(localStorage.getItem('cofen_coren_mt') || '0');
-let corenPI = parseFloat(localStorage.getItem('cofen_coren_pi') || '0');
-let corenMA = parseFloat(localStorage.getItem('cofen_coren_ma') || '0');
-let corenCE = parseFloat(localStorage.getItem('cofen_coren_ce') || '0');
-let corenSP = parseFloat(localStorage.getItem('cofen_coren_sp') || '0');
-let corenRJ = parseFloat(localStorage.getItem('cofen_coren_rj') || '0');
-let corenMG = parseFloat(localStorage.getItem('cofen_coren_mg') || '0');
-let corenRS = parseFloat(localStorage.getItem('cofen_coren_rs') || '0');
-let corenPR = parseFloat(localStorage.getItem('cofen_coren_pr') || '0');
-let corenBA = parseFloat(localStorage.getItem('cofen_coren_ba') || '0');
-let corenGO = parseFloat(localStorage.getItem('cofen_coren_go') || '0');
-let corenPE = parseFloat(localStorage.getItem('cofen_coren_pe') || '0');
-let corenSC = parseFloat(localStorage.getItem('cofen_coren_sc') || '0');
-let corenAM = parseFloat(localStorage.getItem('cofen_coren_am') || '0');
-let corenPB = parseFloat(localStorage.getItem('cofen_coren_pb') || '0');
+// CORENs dinâmicos — carregados do localStorage
+const COREN_BASE = ['MT','PI','MA','CE','SP','RJ','MG','RS','PR','BA','GO','PE','SC','AM','PB'];
+let corenData = {}; // { MT: 0, PI: 0, ... + quaisquer novos }
+(function loadCorens(){
+  // Carrega os 15 base
+  COREN_BASE.forEach(k => {
+    corenData[k] = parseFloat(localStorage.getItem('cofen_coren_'+k.toLowerCase())||'0');
+  });
+  // Carrega extras do localStorage (CORENs novos vindos do XLS)
+  try {
+    const extras = JSON.parse(localStorage.getItem('cofen_corens_extra')||'{}');
+    Object.entries(extras).forEach(([k,v]) => { if(!corenData[k]) corenData[k] = parseFloat(v)||0; });
+  } catch(e){}
+})();
+// Compat: variáveis legadas apontam para corenData
+let corenMT,corenPI,corenMA,corenCE,corenSP,corenRJ,corenMG,corenRS,corenPR,corenBA,corenGO,corenPE,corenSC,corenAM,corenPB;
+function _syncCorenLegacy(){ corenMT=corenData.MT||0;corenPI=corenData.PI||0;corenMA=corenData.MA||0;corenCE=corenData.CE||0;corenSP=corenData.SP||0;corenRJ=corenData.RJ||0;corenMG=corenData.MG||0;corenRS=corenData.RS||0;corenPR=corenData.PR||0;corenBA=corenData.BA||0;corenGO=corenData.GO||0;corenPE=corenData.PE||0;corenSC=corenData.SC||0;corenAM=corenData.AM||0;corenPB=corenData.PB||0; }
+_syncCorenLegacy();
 
 // ── TOTAL ARRECADADO: valor que entra para a empresa (diferente do Total Real) ──
 let totalArrecadado    = parseFloat(localStorage.getItem('cofen_arrecadado')    || '0');
@@ -3298,6 +3240,7 @@ function buildOpEditor(){
   setV('inp-arrecadado',     totalArrecadado);
   setV('inp-meta-arrecadado', metaArrecadado>0&&metaArrecadado!==1000000 ? metaArrecadado : '');
   liveCalc();
+  renderCorenGrid(); // restaura CORENs salvos do localStorage
   liveCalcCorens();
   liveCalcArrecadado();
 
@@ -3381,23 +3324,56 @@ function liveCalc(){
 }
 
 // Atualiza soma dos CORENs em tempo real no editor
+// ── renderCorenGrid: gera inputs para qualquer conjunto de CORENs ──
+function renderCorenGrid(mapValores){
+  // mapValores: { MT: 1234, PI: 0, ES: 5678, ... } — pode ter qualquer sigla
+  // Mescla com corenData atual
+  if(mapValores) Object.entries(mapValores).forEach(([k,v])=>{ corenData[k]=(parseFloat(v)||0); });
+  
+  // Garante que os 15 base sempre existem
+  COREN_BASE.forEach(k=>{ if(corenData[k]===undefined) corenData[k]=0; });
+
+  const grid = document.getElementById('coren-grid-dynamic');
+  if(!grid) return;
+
+  const siglas = [...new Set([...COREN_BASE, ...Object.keys(corenData)])].sort();
+  grid.innerHTML = siglas.map(k => {
+    const val = corenData[k]||0;
+    return `<div class="ep-group" style="flex:none">
+      <label class="ep-label">COREN-${k} (R$)</label>
+      <input class="ep-input" type="number" id="inp-coren-${k.toLowerCase()}" placeholder="0,00"
+        step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9"
+        value="${val>0?val.toFixed(2):''}">
+    </div>`;
+  }).join('');
+  liveCalcCorens();
+}
+
+// ── _saveAllCorens: salva todos os inputs visíveis no localStorage ──
+function _saveAllCorens(){
+  const extras = {};
+  document.querySelectorAll('#coren-grid-dynamic input[id^="inp-coren-"]').forEach(inp => {
+    const sigla = inp.id.replace('inp-coren-','').toUpperCase();
+    const v = parseFloat(inp.value)||0;
+    corenData[sigla] = v;
+    if(COREN_BASE.includes(sigla)){
+      localStorage.setItem('cofen_coren_'+sigla.toLowerCase(), v);
+    } else {
+      extras[sigla] = v;
+    }
+  });
+  // Salva extras (CORENs novos)
+  const prevExtras = JSON.parse(localStorage.getItem('cofen_corens_extra')||'{}');
+  localStorage.setItem('cofen_corens_extra', JSON.stringify({...prevExtras, ...extras}));
+  _syncCorenLegacy();
+}
+
 function liveCalcCorens(){
-  const mt = parseFloat(document.getElementById('inp-coren-mt')?.value)||0;
-  const pi = parseFloat(document.getElementById('inp-coren-pi')?.value)||0;
-  const ma = parseFloat(document.getElementById('inp-coren-ma')?.value)||0;
-  const ce = parseFloat(document.getElementById('inp-coren-ce')?.value)||0;
-  const sp = parseFloat(document.getElementById('inp-coren-sp')?.value)||0;
-  const rj = parseFloat(document.getElementById('inp-coren-rj')?.value)||0;
-  const mg = parseFloat(document.getElementById('inp-coren-mg')?.value)||0;
-  const rs = parseFloat(document.getElementById('inp-coren-rs')?.value)||0;
-  const pr = parseFloat(document.getElementById('inp-coren-pr')?.value)||0;
-  const ba = parseFloat(document.getElementById('inp-coren-ba')?.value)||0;
-  const go = parseFloat(document.getElementById('inp-coren-go')?.value)||0;
-  const pe = parseFloat(document.getElementById('inp-coren-pe')?.value)||0;
-  const sc = parseFloat(document.getElementById('inp-coren-sc')?.value)||0;
-  const am = parseFloat(document.getElementById('inp-coren-am')?.value)||0;
-  const pb = parseFloat(document.getElementById('inp-coren-pb')?.value)||0;
-  const soma = mt+pi+ma+ce+sp+rj+mg+rs+pr+ba+go+pe+sc+am+pb;
+  // Soma todos os inputs dinâmicos
+  let soma = 0;
+  document.querySelectorAll('#coren-grid-dynamic input[id^="inp-coren-"]').forEach(inp => {
+    soma += parseFloat(inp.value)||0;
+  });
   const el = document.getElementById('res-corens-soma');
   if(el) el.textContent = soma>0 ? fR(soma) : '—';
 }
@@ -4258,39 +4234,17 @@ function aplicarGeral(){
   if(inpTotal){ inpTotal.value = result.totValorRec.toFixed(2); liveCalc(); }
 
   // 2. Preencher CORENs por estado
-  const corenFields = { MT:'inp-coren-mt', PI:'inp-coren-pi', MA:'inp-coren-ma', CE:'inp-coren-ce', SP:'inp-coren-sp', RJ:'inp-coren-rj', MG:'inp-coren-mg', RS:'inp-coren-rs', PR:'inp-coren-pr', BA:'inp-coren-ba', GO:'inp-coren-go', PE:'inp-coren-pe', SC:'inp-coren-sc', AM:'inp-coren-am', PB:'inp-coren-pb' };
-  let algumCoren = false;
-  for(const [nm, id] of Object.entries(corenFields)){
-    const el = document.getElementById(id);
-    if(el){
-      const v = result.corenMap[nm] || 0;
-      el.value = v > 0 ? v.toFixed(2) : '';
-      if(v > 0) algumCoren = true;
-    }
-  }
-  liveCalcCorens();
+  // Renderiza grid dinâmico com TODOS os CORENs do XLS (incluindo novos)
+  renderCorenGrid(result.corenMap);
+  const algumCoren = Object.values(result.corenMap).some(v=>v>0);
 
-  // 3. Salvar via applyTotal (preserva meta)
+  // 3. Salvar via _saveAllCorens (salva qualquer COREN presente no grid)
   if(result.totValorRec > 0){
     overrideTotalRec = result.totValorRec;
     localStorage.setItem('cofen_total', result.totValorRec);
-    // Salvar CORENs
-    ['mt','pi','ma','ce','sp','rj','mg','rs','pr','ba','go','pe','sc','am','pb'].forEach(k => {
-      const v = parseFloat(document.getElementById('inp-coren-'+k)?.value)||0;
-      if(k==='mt') corenMT=v; if(k==='pi') corenPI=v; if(k==='ma') corenMA=v; if(k==='ce') corenCE=v;
-      if(k==='sp') corenSP=v; if(k==='rj') corenRJ=v; if(k==='mg') corenMG=v; if(k==='rs') corenRS=v;
-      if(k==='pr') corenPR=v; if(k==='ba') corenBA=v; if(k==='go') corenGO=v; if(k==='pe') corenPE=v;
-      if(k==='sc') corenSC=v; if(k==='am') corenAM=v; if(k==='pb') corenPB=v;
-      localStorage.setItem('cofen_coren_'+k, v);
-    });
+    _saveAllCorens();
     refreshAll();
-    if(fbDb && fbRoom) fbPush('meta', {
-      total: result.totValorRec, meta,
-      mt: corenMT, pi: corenPI, ma: corenMA, ce: corenCE,
-      sp: corenSP, rj: corenRJ, mg: corenMG, rs: corenRS,
-      pr: corenPR, ba: corenBA, go: corenGO, pe: corenPE, sc: corenSC,
-      am: corenAM, pb: corenPB
-    });
+    if(fbDb && fbRoom) fbPush('meta', { total: result.totValorRec, meta, ...corenData });
   }
 
   const corenCount = Object.keys(result.corenMap).length;
@@ -4824,35 +4778,10 @@ function applyTotal(){
   meta = m;
   localStorage.setItem('cofen_meta',  m);
   localStorage.setItem('cofen_total', v);
-  // Salvar CORENs também (se preenchidos)
-  const mt = parseFloat(document.getElementById('inp-coren-mt')?.value)||corenMT;
-  const pi = parseFloat(document.getElementById('inp-coren-pi')?.value)||corenPI;
-  const ma = parseFloat(document.getElementById('inp-coren-ma')?.value)||corenMA;
-  const ce = parseFloat(document.getElementById('inp-coren-ce')?.value)||corenCE;
-  const sp = parseFloat(document.getElementById('inp-coren-sp')?.value)||corenSP;
-  const rj = parseFloat(document.getElementById('inp-coren-rj')?.value)||corenRJ;
-  const mg = parseFloat(document.getElementById('inp-coren-mg')?.value)||corenMG;
-  const rs = parseFloat(document.getElementById('inp-coren-rs')?.value)||corenRS;
-  const pr = parseFloat(document.getElementById('inp-coren-pr')?.value)||corenPR;
-  const ba = parseFloat(document.getElementById('inp-coren-ba')?.value)||corenBA;
-  const go = parseFloat(document.getElementById('inp-coren-go')?.value)||corenGO;
-  const pe = parseFloat(document.getElementById('inp-coren-pe')?.value)||corenPE;
-  const sc = parseFloat(document.getElementById('inp-coren-sc')?.value)||corenSC;
-  const am = parseFloat(document.getElementById('inp-coren-am')?.value)||corenAM;
-  const pb = parseFloat(document.getElementById('inp-coren-pb')?.value)||corenPB;
-  corenMT=mt; corenPI=pi; corenMA=ma; corenCE=ce;
-  corenSP=sp; corenRJ=rj; corenMG=mg; corenRS=rs; corenPR=pr;
-  corenBA=ba; corenGO=go; corenPE=pe; corenSC=sc; corenAM=am; corenPB=pb;
-  localStorage.setItem('cofen_coren_mt',mt); localStorage.setItem('cofen_coren_pi',pi);
-  localStorage.setItem('cofen_coren_ma',ma); localStorage.setItem('cofen_coren_ce',ce);
-  localStorage.setItem('cofen_coren_sp',sp); localStorage.setItem('cofen_coren_rj',rj);
-  localStorage.setItem('cofen_coren_mg',mg); localStorage.setItem('cofen_coren_rs',rs);
-  localStorage.setItem('cofen_coren_pr',pr); localStorage.setItem('cofen_coren_ba',ba);
-  localStorage.setItem('cofen_coren_go',go); localStorage.setItem('cofen_coren_pe',pe);
-  localStorage.setItem('cofen_coren_sc',sc); localStorage.setItem('cofen_coren_am',am);
-  localStorage.setItem('cofen_coren_pb',pb);
+  // Salvar todos os CORENs visíveis no grid (incluindo novos do XLS)
+  _saveAllCorens();
   refreshAll();
-  fbPush('meta', {total: v, meta: m, mt, pi, ma, ce, sp, rj, mg, rs, pr, ba, go, pe, sc, am, pb});
+  fbPush('meta', {total: v, meta: m, ...corenData});
   syncBroadcast('meta_update', JSON.stringify({total: v, meta: m}));
   const syncMsg = fbDb && fbRoom ? '✅ Aplicado e sincronizado para todos!' : '✅ Total e meta aplicados!';
   toast(syncMsg);
