@@ -715,10 +715,12 @@ select.ev-inp{cursor:pointer}
             <th style="padding:9px 14px;text-align:center;font-size:10px;font-weight:800;color:rgba(255,255,255,.6);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">% PROJEÇÃO</th>
             <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#FCD34D;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">DEVERIA ESTAR HOJE</th>
             <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#F87171;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">DIFERENÇA</th>
+            <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#FB923C;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12);border-left:2px solid rgba(251,146,60,.25)">HO MAIO<br><span style="font-size:8px;font-weight:600;opacity:.7">mesmo DU</span></th>
+            <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#A78BFA;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">VS MAIO</th>
           </tr>
         </thead>
         <tbody id="ho-proj-tbody">
-          <tr><td colspan="7" style="padding:16px;text-align:center;color:rgba(255,255,255,.35);font-size:11px;background:rgba(0,0,0,.2)">⏳ Carregando...</td></tr>
+          <tr><td colspan="9" style="padding:16px;text-align:center;color:rgba(255,255,255,.35);font-size:11px;background:rgba(0,0,0,.2)">⏳ Carregando...</td></tr>
         </tbody>
       </table>
     </div>
@@ -1107,7 +1109,7 @@ select.ev-inp{cursor:pointer}
       <span style="font-size:22px">🇧🇷</span>
       <div style="font-size:10px;font-weight:700;color:rgba(255,223,0,.6);letter-spacing:2px;text-transform:uppercase">Equipe Cofen Digital</div>
     </div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#fff;line-height:1;margin-bottom:14px">🖥️ RANKING DIGITAL — ABRIL 2026</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#fff;line-height:1;margin-bottom:14px">🖥️ RANKING DIGITAL — MAIO 2026</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="rk-dig-kpis"></div>
   </div>
   <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
@@ -2250,7 +2252,7 @@ select.ev-inp{cursor:pointer}
   <div style="background:linear-gradient(135deg,var(--ppd),#1B4332 55%,#0D3D2B);border-radius:var(--rxl);padding:20px 24px;position:relative;overflow:hidden">
     <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(0,200,127,.07);pointer-events:none"></div>
     <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">Comparativo de Recebimento</div>
-    <div style="font-family:Bebas Neue,sans-serif;font-size:26px;letter-spacing:3px;color:#fff;margin-bottom:14px">📊 ABRIL vs MAIO 2026</div>
+    <div style="font-family:Bebas Neue,sans-serif;font-size:26px;letter-spacing:3px;color:#fff;margin-bottom:14px">📊 MAIO vs JUNHO 2026</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
       <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
         <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Abril (mês cheio)</div>
@@ -2258,9 +2260,9 @@ select.ev-inp{cursor:pointer}
         <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">30 dias completos</div>
       </div>
       <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
-        <div id="cmp-hero-maio-label" style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Maio (parcial)</div>
-        <div id="cmp-hero-maio-val" style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#4ADE80;letter-spacing:.5px;line-height:1">—</div>
-        <div id="cmp-hero-maio-sub" style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">aguardando importação</div>
+        <div id="cmp-hero-junho-label" style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Junho (parcial)</div>
+        <div id="cmp-hero-junho-val" style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#4ADE80;letter-spacing:.5px;line-height:1">—</div>
+        <div id="cmp-hero-junho-sub" style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">aguardando importação</div>
       </div>
       <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
         <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">Diferença acumulada</div>
@@ -2299,8 +2301,8 @@ select.ev-inp{cursor:pointer}
           <thead>
             <tr style="background:var(--g50)">
               <th rowspan="2" style="padding:9px 12px;text-align:left;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200);vertical-align:middle">Dia</th>
-              <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#3B82F6;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(59,130,246,.3);border-left:2px solid rgba(59,130,246,.25);background:rgba(59,130,246,.06)">🔵 ABRIL</th>
-              <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#00A86B;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(0,168,107,.3);border-left:2px solid rgba(0,168,107,.25);background:rgba(0,168,107,.06)">🟢 MAIO</th>
+              <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#3B82F6;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(59,130,246,.3);border-left:2px solid rgba(59,130,246,.25);background:rgba(59,130,246,.06)">🔵 MAIO</th>
+              <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#00A86B;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(0,168,107,.3);border-left:2px solid rgba(0,168,107,.25);background:rgba(0,168,107,.06)">🟢 JUNHO</th>
               <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--g200);border-left:2px solid var(--g200);background:var(--g50)">⚡ DIFERENÇA</th>
             </tr>
             <tr style="background:var(--g50)">
@@ -2342,8 +2344,8 @@ select.ev-inp{cursor:pointer}
           <thead>
             <tr style="background:var(--g50)">
               <th rowspan="2" style="padding:9px 12px;text-align:left;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--g200);vertical-align:middle">Dia</th>
-              <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#3B82F6;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(59,130,246,.3);border-left:2px solid rgba(59,130,246,.25);background:rgba(59,130,246,.06)">🔵 ABRIL</th>
-              <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#00A86B;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(0,168,107,.3);border-left:2px solid rgba(0,168,107,.25);background:rgba(0,168,107,.06)">🟢 MAIO</th>
+              <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#3B82F6;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(59,130,246,.3);border-left:2px solid rgba(59,130,246,.25);background:rgba(59,130,246,.06)">🔵 MAIO</th>
+              <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:#00A86B;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(0,168,107,.3);border-left:2px solid rgba(0,168,107,.25);background:rgba(0,168,107,.06)">🟢 JUNHO</th>
               <th colspan="2" style="padding:7px 12px;text-align:center;font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--g200);border-left:2px solid var(--g200);background:var(--g50)">⚡ DIFERENÇA</th>
             </tr>
             <tr style="background:var(--g50)">
@@ -2367,7 +2369,7 @@ select.ev-inp{cursor:pointer}
       <div class="sec">👤 Comparativo por Operador — mês cheio vs parcial Maio</div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
         <button class="fbtn on" onclick="cmpSortOp('diff',this)">📉 Por Diferença</button>
-        <button class="fbtn" onclick="cmpSortOp('abril',this)">💰 Por Maio</button>
+        <button class="fbtn" onclick="cmpSortOp('abril',this)">💰 Por Junho</button>
         <button class="fbtn" onclick="cmpSortOp('nome',this)">🔤 Por Nome</button>
       </div>
       <div id="cmp-op-list" style="display:flex;flex-direction:column;gap:5px;max-height:600px;overflow-y:auto"></div>
@@ -2833,7 +2835,7 @@ rebuildAll();
     'COFEN BIRIGUI BRUNA':      200000,
     'COFEN STEPHANIE 2° TURNO': 200000,
   };
-  // MAIO encerrado: todas as equipes = 450k
+  // JUNHO encerrado: todas as equipes = 450k
   const metasMaio = {
     'COFEN MARILIA BRENDA':     450000,
     'COFEN BIRIGUI BRUNA':      450000,
@@ -3176,6 +3178,13 @@ function renderHoProjTable(){
     const pctBorder= acima ? 'rgba(74,222,128,.5)'  : quase ? 'rgba(252,211,77,.5)'  : 'rgba(248,113,113,.5)';
     const rowBg    = i%2===0 ? 'rgba(255,255,255,.04)' : 'rgba(0,0,0,.15)';
 
+    // Maio no mesmo DU — rec total × 0.25 (HO = 25%)
+    const maioRecDU  = CMP_MAIO_DU[duPass] || 0;
+    const hoMaioDU   = maioRecDU * 0.25;
+    const vsMaio     = hoAtual - hoMaioDU;
+    const vsMaioColor  = vsMaio >= 0 ? '#4ADE80' : '#F87171';
+    const vsMaioPrefix = vsMaio >= 0 ? '+' : '';
+
     return `<tr style="border-bottom:1px solid rgba(255,255,255,.08);background:${rowBg};transition:background .15s"
       onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='${rowBg}'">
       <td style="padding:10px 14px;font-size:12px;font-weight:800;color:#fff">${c.label}</td>
@@ -3190,6 +3199,8 @@ function renderHoProjTable(){
       </td>
       <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#FCD34D;letter-spacing:.5px">${fR2(deveria)}</td>
       <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:${difColor};letter-spacing:.5px;font-weight:900">${difPrefix}${fR2(diferenca)}</td>
+      <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#FB923C;letter-spacing:.5px;border-left:2px solid rgba(251,146,60,.15)">${hoMaioDU > 0 ? fR2(hoMaioDU) : '<span style=\'color:rgba(255,255,255,.25);font-size:11px\'>—</span>'}</td>
+      <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:${vsMaioColor};letter-spacing:.5px;font-weight:900">${hoMaioDU > 0 ? vsMaioPrefix+fR2(vsMaio) : '<span style=\'color:rgba(255,255,255,.25);font-size:11px\'>—</span>'}</td>
     </tr>`;
   }).join('');
 }
@@ -3942,21 +3953,21 @@ try{
   if(_sg) _histMensalGeral = JSON.parse(_sg);
   const _se = localStorage.getItem('cofen_hist_empresa');
   if(_se) _histMensalEmpresa = JSON.parse(_se);
-  const _sd = localStorage.getItem('cofen_geral_daily_maio');
+  const _sd = localStorage.getItem('cofen_geral_daily_junho');
   if(_sd) _geralDailyMaio = JSON.parse(_sd);
-  // Restaurar CMP_MAIO_EQ e CMP_MAIO_CUMUL do localStorage (salvo ao importar rec)
-  const _smEq = localStorage.getItem('cofen_maio_eq');
-  if(_smEq){ const v=JSON.parse(_smEq); Object.assign(CMP_MAIO_EQ,v); }
-  const _smCumul = localStorage.getItem('cofen_maio_cumul');
-  if(_smCumul){ const v=JSON.parse(_smCumul); Object.assign(CMP_MAIO_CUMUL,v); }
-  const _smDuDias = localStorage.getItem('cofen_maio_du_dias');
+  // Restaurar CMP_JUNHO_EQ e CMP_JUNHO_CUMUL do localStorage (salvo ao importar rec)
+  const _smEq = localStorage.getItem('cofen_junho_eq');
+  if(_smEq){ const v=JSON.parse(_smEq); Object.assign(CMP_JUNHO_EQ,v); }
+  const _smCumul = localStorage.getItem('cofen_junho_cumul');
+  if(_smCumul){ const v=JSON.parse(_smCumul); Object.assign(CMP_JUNHO_CUMUL,v); }
+  const _smDuDias = localStorage.getItem('cofen_junho_du_dias');
   if(_smDuDias){
     const v=JSON.parse(_smDuDias);
     // Só usa o localStorage se tiver dados mais completos que o estático (mais DUs)
-    if(v.length > CMP_MAIO_DU_DIAS.length){ CMP_MAIO_DU_DIAS.length=0; v.forEach(d=>CMP_MAIO_DU_DIAS.push(d)); }
+    if(v.length > CMP_JUNHO_DU_DIAS.length){ CMP_JUNHO_DU_DIAS.length=0; v.forEach(d=>CMP_JUNHO_DU_DIAS.push(d)); }
   }
-  const _saAbril = localStorage.getItem('cofen_abril_du');
-  if(_saAbril){ const v=JSON.parse(_saAbril); Object.keys(CMP_ABRIL_DU).forEach(k=>delete CMP_ABRIL_DU[k]); Object.assign(CMP_ABRIL_DU,v); }
+  const _saAbril = localStorage.getItem('cofen_maio_du');
+  if(_saAbril){ const v=JSON.parse(_saAbril); Object.keys(CMP_MAIO_DU).forEach(k=>delete CMP_MAIO_DU[k]); Object.assign(CMP_MAIO_DU,v); }
 }catch(e){}
 
 // ── Parser diário do arquivo geral: agrupa rec por dia do calendário de Maio ──
@@ -4295,7 +4306,7 @@ function aplicarGeral(){
 
   // Salvar breakdown diário de Maio (para comparativo DU a DU)
   _geralDailyMaio = _parseGeralDiario(raw);
-  localStorage.setItem('cofen_geral_daily_maio', JSON.stringify(_geralDailyMaio));
+  localStorage.setItem('cofen_geral_daily_junho', JSON.stringify(_geralDailyMaio));
 
   // ── NOVO: popular vgDB (Visão Geral / Comparativo) com o mesmo arquivo ──
   if(typeof vgParse === 'function'){
@@ -4314,29 +4325,29 @@ function aplicarGeral(){
     }
   }
 
-  // ── Extrair rec por DU e atualizar CMP_MAIO_CUMUL + CMP_ABRIL_DU ──
+  // ── Extrair rec por DU e atualizar CMP_JUNHO_CUMUL + CMP_MAIO_DU ──
   if(typeof _parseGeralPorEquipe === 'function'){
     const eqResult = _parseGeralPorEquipe(raw);
     if(eqResult && Object.keys(eqResult.cumulGlobal).length > 0){
-      Object.keys(CMP_MAIO_CUMUL).forEach(k=>delete CMP_MAIO_CUMUL[k]);
-      Object.assign(CMP_MAIO_CUMUL, eqResult.cumulGlobal);
-      localStorage.setItem('cofen_maio_cumul', JSON.stringify(eqResult.cumulGlobal));
+      Object.keys(CMP_JUNHO_CUMUL).forEach(k=>delete CMP_JUNHO_CUMUL[k]);
+      Object.assign(CMP_JUNHO_CUMUL, eqResult.cumulGlobal);
+      localStorage.setItem('cofen_junho_cumul', JSON.stringify(eqResult.cumulGlobal));
       // Atualiza lista de dias calendário por DU
       if(eqResult.duDias && eqResult.duDias.length > 0){
-        CMP_MAIO_DU_DIAS.length = 0;
-        eqResult.duDias.forEach(d => CMP_MAIO_DU_DIAS.push(d));
-        localStorage.setItem('cofen_maio_du_dias', JSON.stringify(eqResult.duDias));
+        CMP_JUNHO_DU_DIAS.length = 0;
+        eqResult.duDias.forEach(d => CMP_JUNHO_DU_DIAS.push(d));
+        localStorage.setItem('cofen_junho_du_dias', JSON.stringify(eqResult.duDias));
       }
-      // Atualiza CMP_ABRIL_DU com dados reais de Abril do mesmo arquivo
+      // Atualiza CMP_MAIO_DU com dados reais de Maio do mesmo arquivo
       if(eqResult.abrilCumul && Object.keys(eqResult.abrilCumul).length > 0){
-        Object.keys(CMP_ABRIL_DU).forEach(k=>delete CMP_ABRIL_DU[k]);
-        Object.assign(CMP_ABRIL_DU, eqResult.abrilCumul);
-        localStorage.setItem('cofen_abril_du', JSON.stringify(eqResult.abrilCumul));
+        Object.keys(CMP_MAIO_DU).forEach(k=>delete CMP_MAIO_DU[k]);
+        Object.assign(CMP_MAIO_DU, eqResult.abrilCumul);
+        localStorage.setItem('cofen_maio_du', JSON.stringify(eqResult.abrilCumul));
       }
-      // Atualiza CMP_MAIO_EQ por equipe (se rec_58 tiver coluna de equipe)
+      // Atualiza CMP_JUNHO_EQ por equipe (se rec_58 tiver coluna de equipe)
       if(Object.keys(eqResult.cumul).length > 0){
-        Object.entries(eqResult.cumul).forEach(([eq,duMap])=>{ CMP_MAIO_EQ[eq]=duMap; });
-        localStorage.setItem('cofen_maio_eq', JSON.stringify(eqResult.cumul));
+        Object.entries(eqResult.cumul).forEach(([eq,duMap])=>{ CMP_JUNHO_EQ[eq]=duMap; });
+        localStorage.setItem('cofen_junho_eq', JSON.stringify(eqResult.cumul));
       }
       if(typeof renderMiniComparativo === 'function') renderMiniComparativo();
       if(typeof cmpRenderGeral === 'function') cmpRenderGeral();
@@ -9170,11 +9181,11 @@ function tvShow(idx){
           const duAtual = DU.passou || 0;
 
           // Valor do operador em Abril no mesmo DU proporcional
-          // CMP_ABRIL_DU contém o acumulado GERAL de Abril por DU
-          // Calculamos a fatia do operador proporcionalmente ao total de Abril
-          const abrilDuTotal = CMP_ABRIL_DU[duAtual] || 0;           // acumulado geral de Abril até este DU
-          const abrilDuMax   = CMP_ABRIL_DU[21] || CMP_ABRIL_DU[Object.keys(CMP_ABRIL_DU).map(Number).sort((a,b)=>b-a)[0]] || 1; // total de Abril (último DU)
-          // Proporção do operador no total de Abril
+          // CMP_MAIO_DU contém o acumulado GERAL de Maio por DU
+          // Calculamos a fatia do operador proporcionalmente ao total de Maio
+          const abrilDuTotal = CMP_MAIO_DU[duAtual] || 0;           // acumulado geral de Maio até este DU
+          const abrilDuMax   = CMP_MAIO_DU[21] || CMP_MAIO_DU[Object.keys(CMP_MAIO_DU).map(Number).sort((a,b)=>b-a)[0]] || 1; // total de Maio encerrado (último DU)
+          // Proporção do operador no total de Maio
           const propOp = abrilDuMax > 0 ? opCmp.marco / abrilDuMax : 0;
           // Estimativa do valor deste operador em Abril até o DU atual
           const abrilOpDu = abrilDuTotal * propOp;
@@ -9190,7 +9201,7 @@ function tvShow(idx){
           const bg   = diff >= 0 ? 'rgba(74,222,128,.12)' : 'rgba(252,165,165,.12)';
           const bd   = diff >= 0 ? 'rgba(74,222,128,.35)' : 'rgba(252,165,165,.35)';
           const icon = diff >= 0 ? '▲' : '▼';
-          const diaCalendario = duAtual > 0 ? (CMP_MAIO_DU_DIAS[duAtual-1] || '?') : '?';
+          const diaCalendario = duAtual > 0 ? (CMP_JUNHO_DU_DIAS[duAtual-1] || '?') : '?';
 
           return `<div style="background:${bg};border:1px solid ${bd};border-radius:10px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
             <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase">📊 vs Abril (até ${duAtual}° DU — dia ${diaCalendario})</div>
@@ -10973,25 +10984,25 @@ function fbListenFeedback(){
 // ══════════════════════════════════════════
 // COMPARATIVO MARÇO vs ABRIL
 // ══════════════════════════════════════════
-// Dados acumulados de ABRIL 2026 por dia do calendário (ex-CMP_MARCO_CUMUL)
+// Dados acumulados de ABRIL 2026 por dia do calendário (histórico)
 const CMP_ABRIL_CUMUL_CAL = {1:54433.18,2:77553.86,3:78064.3,4:78611.18,5:79298.4,6:162654.19,7:248394.53,8:303384.0,9:396869.22,10:470103.24,11:481490.68,12:485161.28,13:547436.61,14:636489.76,15:701095.38,16:778159.51,17:856792.18,18:865893.8,19:869110.17,20:939292.87,21:942502.04,22:994939.26,23:1057052.82,24:1138902.29,25:1149900.18,26:1150826.37,27:1228960.12,28:1346422.59,29:1432140.1,30:1601416.79};
 // Mantido por compatibilidade
-const CMP_MARCO_CUMUL = CMP_ABRIL_CUMUL_CAL;
+const CMP_MARCO_CUMUL = CMP_ABRIL_CUMUL_CAL; // histórico Abril
 // Dados acumulados de ABRIL por Dia Útil (DU→acumulado)
 // DUs de Abril 2026: dias 1,2,3,6,7,8,9,10,13,14,15,16,17,20,22,23,24,27,28,29,30 (feriados: 18-Páscoa, 21-Tiradentes)
-const CMP_ABRIL_DU = {1:54433.18,2:77553.86,3:78064.3,4:161420.09,5:247160.43,6:302149.9,7:395635.12,8:457910.45,9:546963.6,10:611569.22,11:688633.35,12:767266.02,13:837448.72,14:889885.94,15:951999.5,16:1033848.97,17:1111982.72,18:1229445.19,19:1315162.7,20:1484439.39};
+const CMP_MAIO_DU = {1:146819.64,2:230203.99,3:323226.07,4:417065.92,5:532057.41,6:639173.06,7:767998.46,8:866252.42,9:952637.19,10:1049693.05,11:1146104.76,12:1259245.95,13:1359799.93,14:1483296.41,15:1585616.04,16:1713814.99,17:1859857.13,18:2004039.01,19:2007316.68}; // Maio 2026 encerrado
 // Dados acumulados de MAIO 2026 por Dia Útil (DU→acumulado) — atualizado dinamicamente via importação
-// CMP_MAIO_CUMUL: acumulado global de Maio por DU (gerado do arquivo rec_58_0905.xls)
-const CMP_MAIO_CUMUL_STATIC = {1:146819.64,2:230203.99,3:323226.07,4:417065.92,5:532057.41,6:639173.06,7:767998.46,8:866252.42,9:952637.19,10:1049693.05,11:1146104.76,12:1259245.95,13:1359799.93,14:1483296.41,15:1585616.04,16:1713814.99,17:1859857.13,18:2004039.01,19:2007316.68};
+// CMP_JUNHO_CUMUL: acumulado global de Junho por DU (gerado do arquivo rec_58_0905.xls)
+const CMP_JUNHO_CUMUL_STATIC = {}; // Junho 2026 — será preenchido via importação do rec_58
 // Inicia com dados estáticos do XLS — sobrescrito dinamicamente se houver importação mais recente
-const CMP_MAIO_CUMUL = {...CMP_MAIO_CUMUL_STATIC};
-// CMP_MAIO_EQ: acumulado POR EQUIPE por DU (gerado do arquivo rec_58_0905.xls)
-const CMP_MAIO_EQ = {"COFEN BIRIGUI BRUNA": {"1": 15174.49, "2": 25240.82, "3": 38543.48, "4": 49508.91, "5": 67373.7, "6": 80439.59, "7": 108303.76}, "COFEN STEPHANIE 2\u00b0 TURNO": {"1": 19622.32, "2": 43725.16, "3": 64522.56, "4": 94812.57, "5": 117123.72, "6": 134555.99, "7": 168282.18}, "COFEN MARILIA BRENDA": {"1": 25172.89, "2": 37574.38, "3": 48044.73, "4": 61470.63, "5": 84447.98, "6": 105946.52, "7": 130692.3}, "COFEN DIGITAL": {"1": 9315.93, "2": 22414.53, "3": 41557.81, "4": 52237.98, "5": 77331.23, "6": 107302.14, "7": 119268.66}};
+const CMP_JUNHO_CUMUL = {...CMP_JUNHO_CUMUL_STATIC};
+// CMP_JUNHO_EQ: acumulado POR EQUIPE por DU (gerado do arquivo rec_58_0905.xls)
+const CMP_JUNHO_EQ = {"COFEN BIRIGUI BRUNA": {"1": 15174.49, "2": 25240.82, "3": 38543.48, "4": 49508.91, "5": 67373.7, "6": 80439.59, "7": 108303.76}, "COFEN STEPHANIE 2\u00b0 TURNO": {"1": 19622.32, "2": 43725.16, "3": 64522.56, "4": 94812.57, "5": 117123.72, "6": 134555.99, "7": 168282.18}, "COFEN MARILIA BRENDA": {"1": 25172.89, "2": 37574.38, "3": 48044.73, "4": 61470.63, "5": 84447.98, "6": 105946.52, "7": 130692.3}, "COFEN DIGITAL": {"1": 9315.93, "2": 22414.53, "3": 41557.81, "4": 52237.98, "5": 77331.23, "6": 107302.14, "7": 119268.66}};
 // Dias do calendário de MAIO correspondentes a cada DU (índice 0 = DU1)
-const CMP_MAIO_DU_DIAS = [4,5,6,7,8,11,12,13,14,15,18,19,20,21,22,25,26,27,28,29];
-const CMP_ABRIL_CUMUL = CMP_MAIO_CUMUL;
+const CMP_JUNHO_DU_DIAS = [4,5,6,7,8,11,12,13,14,15,18,19,20,21,22,25,26,27,28,29];
+const CMP_ABRIL_CUMUL = CMP_JUNHO_CUMUL;
 // CMP_ABRIL_EQ: acumulado por equipe por DU em Abril (proporcional ao marco total)
-// Distribui CMP_ABRIL_DU na mesma proporção que cada equipe representa no total de Abril
+// Distribui CMP_MAIO_DU na mesma proporção que cada equipe representa no total de Maio encerrado
 const _totAbril = 1601416.79;
 const _abrilEqPct = {"COFEN BIRIGUI BRUNA": 371594.45, "COFEN DIGITAL": 206704.9, "COFEN STEPHANIE 2\u00b0 TURNO": 485724.16, "COFEN MARILIA BRENDA": 391979.58};
 const CMP_ABRIL_EQ = {"COFEN STEPHANIE 2\u00b0 TURNO": {"1": 12534.73, "2": 21712.76, "3": 22223.2, "4": 59738.02, "5": 91178.53, "6": 112756.64, "7": 140223.42, "8": 171028.06, "9": 204223.49, "10": 229191.9, "11": 255078.7, "12": 280012.59, "13": 298164.47, "14": 316683.44, "15": 339395.6, "16": 359826.41, "17": 385712.1, "18": 417344.47, "19": 442543.03, "20": 485724.16}, "COFEN BIRIGUI BRUNA": {"1": 16028.91, "2": 21898.29, "3": 21898.29, "4": 26377.69, "5": 50574.4, "6": 57942.32, "7": 76823.53, "8": 90119.17, "9": 105623.37, "10": 116119.53, "11": 147665.5, "12": 163961.3, "13": 188483.07, "14": 203569.3, "15": 218446.66, "16": 242742.12, "17": 265932.23, "18": 308081.43, "19": 324669.86, "20": 371594.45}, "COFEN MARILIA BRENDA": {"1": 19625.75, "2": 25225.46, "3": 25225.46, "4": 52980.15, "5": 73185.11, "6": 90584.02, "7": 119801.19, "8": 132626.96, "9": 159646.48, "10": 182782.37, "11": 197387.92, "12": 218290.8, "13": 233421.67, "14": 243953.52, "15": 258987.87, "16": 280026.8, "17": 295465.47, "18": 323070.74, "19": 346580.96, "20": 391979.58}, "COFEN DIGITAL": {"1": 401.87, "2": 1287.98, "3": 1287.98, "4": 8435.71, "5": 14772.31, "6": 22406.94, "7": 37751.54, "8": 42456.04, "9": 55562.08, "10": 61068.84, "11": 65269.43, "12": 81187.51, "13": 93565.69, "14": 101562.89, "15": 110882.36, "16": 126526.33, "17": 140007.3, "18": 156082.93, "19": 175416.72, "20": 206704.9}};
@@ -11003,7 +11014,7 @@ const CMP_TEAMS = [
   {nome:'LIDERANÇA',marco:0,abril:0},
   {nome:'COFEN DIGITAL',marco:206704.9,abril:0},
 ];
-// marco = valor de ABRIL 2026 (mês encerrado); abril = valor de MAIO 2026 (atualizado via importação)
+// marco = valor de MAIO 2026 (mês encerrado); abril = valor de MAIO 2026 (atualizado via importação)
 const CMP_OPS = [
   {nome:'AMABELLY_SANTOS',marco:45854.72,abril:14006.0},
   {nome:'ANA_BENTO',marco:16990.83,abril:547.04},
@@ -11072,8 +11083,8 @@ function cmpFmtK(v){ const a=Math.abs(v); const s=v>=0?'+':'-'; return s+'R$ '+(
 // Retorna o total real de Maio — prioridade: overrideTotalRec > último DU do cumul
 function cmpGetTotalMaioGeral(){
   if(typeof overrideTotalRec !== 'undefined' && overrideTotalRec > 0) return overrideTotalRec;
-  const dus = Object.keys(CMP_MAIO_CUMUL).map(Number);
-  if(dus.length > 0) return CMP_MAIO_CUMUL[Math.max(...dus)] || 0;
+  const dus = Object.keys(CMP_JUNHO_CUMUL).map(Number);
+  if(dus.length > 0) return CMP_JUNHO_CUMUL[Math.max(...dus)] || 0;
   return 0;
 }
 
@@ -11095,16 +11106,16 @@ function renderMiniComparativo(){
   const MAIN_EQ = ['COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO','COFEN BIRIGUI BRUNA','COFEN DIGITAL'];
 
   // DU atual de Maio (último DU com dado)
-  const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+  const dusMaio = Object.keys(CMP_JUNHO_CUMUL).map(Number).sort((a,b)=>a-b);
   const duAtual = dusMaio.length ? Math.max(...dusMaio) : 0;
 
   const eqRows = MAIN_EQ.map(nome => {
     const cfg      = EQ[nome]||{c:'#888',sh:nome};
     const abrilFim = (_abrilEqPct[nome]||0);                           // total Abril mês cheio
-    const maioAcum = (CMP_MAIO_EQ[nome]||{})[duAtual]||0;             // Maio acumulado até DU atual
+    const maioAcum = (CMP_JUNHO_EQ[nome]||{})[duAtual]||0;             // Maio acumulado até DU atual
     const abrilAcumDuAtual = (CMP_ABRIL_EQ[nome]||{})[duAtual]||0;   // Abril acumulado até mesmo DU
     const abrilDia  = duAtual>1 ? Math.round((abrilAcumDuAtual - ((CMP_ABRIL_EQ[nome]||{})[duAtual-1]||0))*100)/100 : abrilAcumDuAtual;
-    const maioDia   = duAtual>1 ? Math.round((maioAcum - ((CMP_MAIO_EQ[nome]||{})[duAtual-1]||0))*100)/100 : maioAcum;
+    const maioDia   = duAtual>1 ? Math.round((maioAcum - ((CMP_JUNHO_EQ[nome]||{})[duAtual-1]||0))*100)/100 : maioAcum;
     const diffDia   = maioDia  - abrilDia;
     const diffAcum  = maioAcum - abrilAcumDuAtual;
     return {sh:cfg.sh,c:cfg.c,abrilFim,abrilAcumDuAtual,maioAcum,abrilDia,maioDia,diffDia,diffAcum,posDia:diffDia>=0,posAcum:diffAcum>=0};
@@ -11162,16 +11173,16 @@ function renderMiniComparativo(){
   const maxDU = dusMaio.length ? Math.max(...dusMaio) : 0;
 
   for(let du=1; du<=Math.max(maxDU, 21); du++){
-    const aAcum = CMP_ABRIL_DU[du]||0;
-    const aDia  = du>1 ? Math.round((aAcum - (CMP_ABRIL_DU[du-1]||0))*100)/100 : aAcum;
-    const hasMaio = CMP_MAIO_CUMUL[du] !== undefined;
-    const mAcum = hasMaio ? CMP_MAIO_CUMUL[du] : null;
-    const mDia  = hasMaio ? (du>1 ? Math.round((mAcum-(CMP_MAIO_CUMUL[du-1]||0))*100)/100 : mAcum) : null;
+    const aAcum = CMP_MAIO_DU[du]||0;
+    const aDia  = du>1 ? Math.round((aAcum - (CMP_MAIO_DU[du-1]||0))*100)/100 : aAcum;
+    const hasMaio = CMP_JUNHO_CUMUL[du] !== undefined;
+    const mAcum = hasMaio ? CMP_JUNHO_CUMUL[du] : null;
+    const mDia  = hasMaio ? (du>1 ? Math.round((mAcum-(CMP_JUNHO_CUMUL[du-1]||0))*100)/100 : mAcum) : null;
     const diffDia  = hasMaio ? mDia  - aDia  : null;
     const diffAcum = hasMaio ? mAcum - aAcum : null;
     const pdDia    = diffDia!==null && diffDia>=0;
     const pdAcum   = diffAcum!==null && diffAcum>=0;
-    const diaLabel = CMP_MAIO_DU_DIAS[du-1] ? String(CMP_MAIO_DU_DIAS[du-1]).padStart(2,'0')+'/05' : '';
+    const diaLabel = CMP_JUNHO_DU_DIAS[du-1] ? String(CMP_JUNHO_DU_DIAS[du-1]).padStart(2,'0')+'/05' : '';
     const isHoje   = du===maxDU && hasMaio;
     const bg = isHoje?'rgba(0,200,130,.08)':du%2===0?'rgba(255,255,255,.03)':'transparent';
     const bdl = isHoje?'border-left:3px solid #34D399;':'';
@@ -11197,14 +11208,14 @@ function renderMiniComparativo(){
   <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">🔁 COMPARATIVO ABRIL VS MAIO 2026</div>
 
   <!-- TABELA POR EQUIPE -->
-  <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px">👥 POR EQUIPE — DU ${duAtual} (${CMP_MAIO_DU_DIAS[duAtual-1]?'0'+CMP_MAIO_DU_DIAS[duAtual-1]+'/05':'—'})</div>
+  <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px">👥 POR EQUIPE — DU ${duAtual} (${CMP_JUNHO_DU_DIAS[duAtual-1]?'0'+CMP_JUNHO_DU_DIAS[duAtual-1]+'/05':'—'})</div>
   <div style="overflow:hidden;border-radius:10px;border:1px solid rgba(0,0,0,.1);margin-bottom:12px;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.14)">
     <table style="width:100%;border-collapse:collapse;font-family:Nunito,sans-serif">
       <thead>
         <tr style="background:#f1f5f9;border-bottom:2px solid #e2e8f0">
           <th style="padding:7px 10px;font-size:9px;font-weight:800;color:#475569;letter-spacing:1px;text-align:left">EQUIPE</th>
-          <th style="padding:7px 8px;font-size:9px;font-weight:800;color:#3B82F6;text-align:right">🔵 ABRIL<div style="font-size:8px;color:#93c5fd;font-weight:600">dia / acumulado</div></th>
-          <th style="padding:7px 8px;font-size:9px;font-weight:800;color:#059669;text-align:right">🟢 MAIO<div style="font-size:8px;color:#6ee7b7;font-weight:600">dia / acumulado</div></th>
+          <th style="padding:7px 8px;font-size:9px;font-weight:800;color:#3B82F6;text-align:right">🔵 MAIO<div style="font-size:8px;color:#93c5fd;font-weight:600">dia / acumulado</div></th>
+          <th style="padding:7px 8px;font-size:9px;font-weight:800;color:#059669;text-align:right">🟢 JUNHO<div style="font-size:8px;color:#6ee7b7;font-weight:600">dia / acumulado</div></th>
           <th style="padding:7px 8px;font-size:9px;font-weight:800;color:#475569;text-align:right">⚡ DIFERENÇA<div style="font-size:8px;font-weight:600;opacity:.6">dia / acumulado</div></th>
           <th style="padding:7px 8px;font-size:9px;font-weight:800;color:#475569;text-align:center">STATUS</th>
         </tr>
@@ -11220,8 +11231,8 @@ function renderMiniComparativo(){
       <thead>
         <tr style="background:rgba(255,255,255,.08)">
           <th style="padding:6px 10px;font-size:9px;font-weight:800;color:rgba(255,255,255,.45);text-align:left">DU</th>
-          <th style="padding:6px 8px;font-size:9px;font-weight:800;color:#60A5FA;text-align:right">🔵 ABRIL<div style="font-size:8px;opacity:.6">dia / acum</div></th>
-          <th style="padding:6px 8px;font-size:9px;font-weight:800;color:#34D399;text-align:right">🟢 MAIO<div style="font-size:8px;opacity:.6">dia / acum</div></th>
+          <th style="padding:6px 8px;font-size:9px;font-weight:800;color:#60A5FA;text-align:right">🔵 MAIO<div style="font-size:8px;opacity:.6">dia / acum</div></th>
+          <th style="padding:6px 8px;font-size:9px;font-weight:800;color:#34D399;text-align:right">🟢 JUNHO<div style="font-size:8px;opacity:.6">dia / acum</div></th>
           <th style="padding:6px 8px;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);text-align:right">DIF DIA</th>
           <th style="padding:6px 8px;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);text-align:right">DIF ACUM</th>
         </tr>
@@ -11240,25 +11251,25 @@ function cmpTab(view, el){
   if(view==='operadores') cmpRenderOps();
 }
 
-// Reconstrói CMP_MAIO_CUMUL (por DU) usando vgDB.dia (Visão Geral Financeira) como fonte principal
+// Reconstrói CMP_JUNHO_CUMUL (por DU) usando vgDB.dia (Visão Geral Financeira) como fonte principal
 // Hierarquia: 1) vgDB.dia (rec diário real do arquivo geral) → 2) overrideTotalRec linear → 3) operadores
 function cmpAtualizarCumul(){
-  Object.keys(CMP_MAIO_CUMUL).forEach(k=>delete CMP_MAIO_CUMUL[k]);
-  Object.assign(CMP_MAIO_CUMUL, CMP_MAIO_CUMUL_STATIC);
+  Object.keys(CMP_JUNHO_CUMUL).forEach(k=>delete CMP_JUNHO_CUMUL[k]);
+  Object.assign(CMP_JUNHO_CUMUL, CMP_JUNHO_CUMUL_STATIC);
   // Injeta overrideTotalRec no DU atual se for maior que último acumulado
   if(typeof overrideTotalRec !== 'undefined' && overrideTotalRec > 0){
-    const _dus = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+    const _dus = Object.keys(CMP_JUNHO_CUMUL).map(Number).sort((a,b)=>a-b);
     const _ultDU = _dus.length ? Math.max(..._dus) : 0;
-    const _ultVal = _ultDU > 0 ? (CMP_MAIO_CUMUL[_ultDU] || 0) : 0;
+    const _ultVal = _ultDU > 0 ? (CMP_JUNHO_CUMUL[_ultDU] || 0) : 0;
     if(overrideTotalRec > _ultVal){
       const _hoje = new Date().getDate();
-      const _duHoje = CMP_MAIO_DU_DIAS.indexOf(_hoje);
+      const _duHoje = CMP_JUNHO_DU_DIAS.indexOf(_hoje);
       const _duAlvo = _duHoje >= 0 ? (_duHoje + 1) : (_ultDU + 1);
-      CMP_MAIO_CUMUL[_duAlvo] = overrideTotalRec;
+      CMP_JUNHO_CUMUL[_duAlvo] = overrideTotalRec;
     }
   }
 
-  // CMP_MAIO_EQ usa dados reais por DU (não proporcional)
+  // CMP_JUNHO_EQ usa dados reais por DU (não proporcional)
 
   // CMP_TEAMS.abril = fechamento real de Maio (NÃO atualizar com dados de Junho)
   // Os valores abaixo são fixos do cociliação_geral.xls
@@ -11285,21 +11296,21 @@ function cmpInit(){
   cmpBuildTableGeral();
   cmpBuildTableEquipes();
   // Atualiza hero cards dinamicos
-  const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
-  const totalAbril = CMP_ABRIL_DU[Math.max(...Object.keys(CMP_ABRIL_DU).map(Number))] || 0;
+  const dusMaio = Object.keys(CMP_JUNHO_CUMUL).map(Number).sort((a,b)=>a-b);
+  const totalAbril = CMP_MAIO_DU[Math.max(...Object.keys(CMP_MAIO_DU).map(Number))] || 0;
   // Fonte de verdade: total geral (Visão Geral Financeira / overrideTotalRec) se disponível, senão último DU do cumul
   const totalMaio  = cmpGetTotalMaioGeral() > 0
     ? cmpGetTotalMaioGeral()
-    : (dusMaio.length ? CMP_MAIO_CUMUL[Math.max(...dusMaio)] : null);
-  const heroDia = dusMaio.length ? CMP_MAIO_DU_DIAS[Math.max(...dusMaio)-1] : null;
-  const heroLabel = document.getElementById('cmp-hero-maio-label');
-  const heroVal   = document.getElementById('cmp-hero-maio-val');
-  const heroSub   = document.getElementById('cmp-hero-maio-sub');
+    : (dusMaio.length ? CMP_JUNHO_CUMUL[Math.max(...dusMaio)] : null);
+  const heroDia = dusMaio.length ? CMP_JUNHO_DU_DIAS[Math.max(...dusMaio)-1] : null;
+  const heroLabel = document.getElementById('cmp-hero-junho-label');
+  const heroVal   = document.getElementById('cmp-hero-junho-val');
+  const heroSub   = document.getElementById('cmp-hero-junho-sub');
   const heroDiff  = document.getElementById('cmp-hero-diff-val');
   const heroDSub  = document.getElementById('cmp-hero-diff-sub');
   if(heroVal){
     if(totalMaio !== null){
-      if(heroLabel) heroLabel.textContent = heroDia ? 'Maio (ate dia '+heroDia+')' : 'Maio (parcial)';
+      if(heroLabel) heroLabel.textContent = heroDia ? 'Maio (ate dia '+heroDia+')' : 'Junho (parcial)';
       heroVal.textContent = cmpFmt(totalMaio);
       if(heroSub) heroSub.textContent = dusMaio.length+' DU(s) registrados';
       if(heroDiff){
@@ -11317,7 +11328,7 @@ function cmpInit(){
 
 function cmpRenderGeral(){
   // Eixo X = DUs de 1 até 22 (total de DUs de Abril)
-  const maxDU = Math.max(...Object.keys(CMP_ABRIL_DU).map(Number));
+  const maxDU = Math.max(...Object.keys(CMP_MAIO_DU).map(Number));
   const dus = Array.from({length:maxDU},(_,i)=>i+1);
   if(cmpCharts.geral){ cmpCharts.geral.destroy(); delete cmpCharts.geral; }
   const canvas = document.getElementById('cmp-chart-geral');
@@ -11327,8 +11338,8 @@ function cmpRenderGeral(){
     data:{
       labels: dus.map(d=>'DU '+d),
       datasets:[
-        { label:'Abril', data: dus.map(d=>CMP_ABRIL_DU[d]||null), borderColor:'#3B82F6', backgroundColor:'rgba(59,130,246,.07)', tension:.3, fill:true, borderDash:[5,3], borderWidth:2 },
-        { label:'Maio',  data: dus.map(d=>CMP_MAIO_CUMUL[d]||null), borderColor:'#00A86B', backgroundColor:'rgba(0,168,107,.08)', tension:.3, fill:true, borderWidth:2.5 }
+        { label:'Abril', data: dus.map(d=>CMP_MAIO_DU[d]||null), borderColor:'#3B82F6', backgroundColor:'rgba(59,130,246,.07)', tension:.3, fill:true, borderDash:[5,3], borderWidth:2 },
+        { label:'Maio',  data: dus.map(d=>CMP_JUNHO_CUMUL[d]||null), borderColor:'#00A86B', backgroundColor:'rgba(0,168,107,.08)', tension:.3, fill:true, borderWidth:2.5 }
       ]
     },
     options:{
@@ -11347,21 +11358,21 @@ function cmpBuildTableGeral(){
   const tbody = document.getElementById('cmp-table-geral');
   if(!tbody) return;
   tbody.innerHTML='';
-  const maxDU = Math.max(...Object.keys(CMP_ABRIL_DU).map(Number)); // 22 DUs de Abril
-  const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+  const maxDU = Math.max(...Object.keys(CMP_MAIO_DU).map(Number)); // 22 DUs de Abril
+  const dusMaio = Object.keys(CMP_JUNHO_CUMUL).map(Number).sort((a,b)=>a-b);
 
   // Helper: valor diário (não acumulado) a partir de objeto acumulado
   function recDia(obj, du){ return Math.max(0, (obj[du]||0) - (obj[du-1]||0)); }
 
   for(let du=1; du<=maxDU; du++){
-    const abrilAcum = CMP_ABRIL_DU[du] || 0;
-    const abrilDia  = recDia(CMP_ABRIL_DU, du);
-    const maioAcum  = CMP_MAIO_CUMUL[du];
+    const abrilAcum = CMP_MAIO_DU[du] || 0;
+    const abrilDia  = recDia(CMP_MAIO_DU, du);
+    const maioAcum  = CMP_JUNHO_CUMUL[du];
     const hasM      = maioAcum !== undefined;
-    const maioDia   = hasM ? recDia(CMP_MAIO_CUMUL, du) : null;
+    const maioDia   = hasM ? recDia(CMP_JUNHO_CUMUL, du) : null;
 
     // Dia do calendário de Maio para este DU
-    const diaCalMaio = CMP_MAIO_DU_DIAS[du-1] ? ' ('+('0'+CMP_MAIO_DU_DIAS[du-1]).slice(-2)+'/05)' : '';
+    const diaCalMaio = CMP_JUNHO_DU_DIAS[du-1] ? ' ('+('0'+CMP_JUNHO_DU_DIAS[du-1]).slice(-2)+'/05)' : '';
 
     // Diferenças
     const diffDia  = hasM ? (maioDia - abrilDia) : null;
@@ -11383,11 +11394,11 @@ function cmpBuildTableGeral(){
   }
 
   // Linha de total — usa total geral (Visão Geral Financeira) como fonte de verdade quando disponível
-  const totalAbril = CMP_ABRIL_DU[maxDU] || 0;
+  const totalAbril = CMP_MAIO_DU[maxDU] || 0;
   const _vgTotal = cmpGetTotalMaioGeral();
   const totalMaio  = _vgTotal > 0
     ? _vgTotal
-    : (dusMaio.length ? CMP_MAIO_CUMUL[Math.max(...dusMaio)] : null);
+    : (dusMaio.length ? CMP_JUNHO_CUMUL[Math.max(...dusMaio)] : null);
   const totalDiff  = totalMaio !== null ? totalMaio - totalAbril : null;
   const tcls = totalDiff !== null ? (totalDiff >= 0 ? '#065F46' : '#991B1B') : '#555';
   tbody.innerHTML += `<tr style="border-top:2px solid var(--g200);background:var(--g50)">
@@ -11403,11 +11414,11 @@ function cmpBuildTableGeral(){
 
 function cmpGetAbrilProporcional(totalAbrilMes){
   // Retorna o valor de Abril proporcional ao mesmo DU atual de Maio
-  const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+  const dusMaio = Object.keys(CMP_JUNHO_CUMUL).map(Number).sort((a,b)=>a-b);
   const duAtual = dusMaio.length ? Math.max(...dusMaio) : 0;
   if(duAtual === 0) return totalAbrilMes; // sem dados de Maio, retorna total
-  const totalAbrilDuAtual = CMP_ABRIL_DU[duAtual] || 0;
-  const totalAbrilFinal   = CMP_ABRIL_DU[Math.max(...Object.keys(CMP_ABRIL_DU).map(Number))] || 1;
+  const totalAbrilDuAtual = CMP_MAIO_DU[duAtual] || 0;
+  const totalAbrilFinal   = CMP_MAIO_DU[Math.max(...Object.keys(CMP_MAIO_DU).map(Number))] || 1;
   const proporcao = totalAbrilFinal > 0 ? totalAbrilDuAtual / totalAbrilFinal : 1;
   return Math.round(totalAbrilMes * proporcao * 100) / 100;
 }
@@ -11429,7 +11440,7 @@ function cmpRenderEquipes(){
 
   const nome = cmpEqAtual;
   const abrilEq = CMP_ABRIL_EQ[nome] || {};
-  const maioEq  = CMP_MAIO_EQ[nome]  || {};
+  const maioEq  = CMP_JUNHO_EQ[nome]  || {};
 
   const maxDU = Math.max(...Object.keys(abrilEq).map(Number), 1);
   const dus   = Array.from({length: maxDU}, (_,i) => i+1);
@@ -11469,7 +11480,7 @@ function cmpBuildTableEquipes(){
 
   const nome    = cmpEqAtual;
   const abrilEq = CMP_ABRIL_EQ[nome] || {};
-  const maioEq  = CMP_MAIO_EQ[nome]  || {};
+  const maioEq  = CMP_JUNHO_EQ[nome]  || {};
 
   const maxDU    = Math.max(...Object.keys(abrilEq).map(Number), 1);
   const dusMaio  = Object.keys(maioEq).map(Number).sort((a,b)=>a-b);
@@ -11483,7 +11494,7 @@ function cmpBuildTableEquipes(){
     const hasM      = maioAcumV !== undefined;
     const maioDia   = hasM ? recDia(maioEq, du) : null;
 
-    const diaCalMaio = CMP_MAIO_DU_DIAS[du-1] ? ' ('+ ('0'+CMP_MAIO_DU_DIAS[du-1]).slice(-2)+'/05)' : '';
+    const diaCalMaio = CMP_JUNHO_DU_DIAS[du-1] ? ' ('+ ('0'+CMP_JUNHO_DU_DIAS[du-1]).slice(-2)+'/05)' : '';
 
     const diffDia  = hasM ? (maioDia - abrilDia) : null;
     const diffAcum = hasM ? (maioAcumV - abrilAcum) : null;
@@ -11528,11 +11539,11 @@ function cmpSortOp(field, btn){
 }
 
 function cmpRenderOps(){
-  const dusMaio = Object.keys(CMP_MAIO_CUMUL).map(Number).sort((a,b)=>a-b);
+  const dusMaio = Object.keys(CMP_JUNHO_CUMUL).map(Number).sort((a,b)=>a-b);
   const duAtual = dusMaio.length ? Math.max(...dusMaio) : 0;
-  // Proporção geral de Abril no DU atual vs total de Abril
-  const totalAbrilDuAtual = duAtual > 0 ? (CMP_ABRIL_DU[duAtual] || 0) : 0;
-  const totalAbrilFinal   = CMP_ABRIL_DU[Math.max(...Object.keys(CMP_ABRIL_DU).map(Number))] || 1;
+  // Proporção geral de Abril no DU atual vs total de Maio
+  const totalAbrilDuAtual = duAtual > 0 ? (CMP_MAIO_DU[duAtual] || 0) : 0;
+  const totalAbrilFinal   = CMP_MAIO_DU[Math.max(...Object.keys(CMP_MAIO_DU).map(Number))] || 1;
   const propAbril = totalAbrilFinal > 0 ? totalAbrilDuAtual / totalAbrilFinal : 1;
 
   const list = [...CMP_OPS_DEDUP].sort((a,b)=>{
