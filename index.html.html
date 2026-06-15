@@ -2642,7 +2642,7 @@ function agFuturoBlock(agFuturo, agFuturoVal, ticket){
 
 
 // FERIADOS março 2026 — editável
-const FERIADOS_BASE = ['2026-01-01','2026-04-03','2026-04-21','2026-05-01','2026-09-07','2026-10-12','2026-11-02','2026-11-20','2026-12-25'];
+const FERIADOS_BASE = ['2026-01-01','2026-04-03','2026-04-21','2026-05-01','2026-06-04','2026-09-07','2026-10-12','2026-11-02','2026-11-20','2026-12-25'];
 function getFeriados(){
   try{
     const saved = JSON.parse(localStorage.getItem('cofen_feriados')||JSON.stringify(FERIADOS_BASE));
@@ -5880,6 +5880,14 @@ function rdTodayKey(){
   const d=new Date();
   return 'cofen_rd_'+d.getFullYear()+'_'+(d.getMonth()+1)+'_'+d.getDate();
 }
+// Meta diária por equipe (total 200k: Bruna 100k, Stephanie 40k, Brenda 40k, Digital 20k)
+const RD_META_EQ = {
+  'COFEN MARILIA BRENDA':      40000,
+  'COFEN BIRIGUI BRUNA':       100000,
+  'COFEN STEPHANIE 2° TURNO':  40000,
+  'COFEN DIGITAL':             20000
+};
+
 function rdGetSaved(){try{return JSON.parse(localStorage.getItem(rdTodayKey())||'{}')}catch(e){return {}}}
 
 function rdSumToday(){return Object.values(rdGetSaved()).reduce((s,v)=>s+(parseFloat(v)||0),0)}
@@ -5926,6 +5934,23 @@ function rdRenderEqHeroCards(){
     var hoje=eq.ops.reduce(function(s,op){ return s+(parseFloat(saved[op.name])||0); },0);
     var total=eq.rec+hoje;
     var hojeColor=hoje>0?'#4ADE80':'rgba(255,255,255,.3)';
+    var meta=RD_META_EQ[eq.name]||0;
+    var pct=meta>0?Math.min(100,hoje/meta*100):0;
+    var falta=Math.max(0,meta-hoje);
+    var metaHtml=meta>0
+      ?('<div style="margin-top:8px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
+        +'<span style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">Meta dia '+fR(meta)+'</span>'
+        +'<span style="font-size:10px;font-weight:800;color:'+(pct>=100?'#4ADE80':cfg.c)+'">'+pct.toFixed(0)+'%</span>'
+        +'</div>'
+        +'<div style="background:rgba(255,255,255,.1);border-radius:100px;height:4px;overflow:hidden">'
+        +'<div style="height:100%;border-radius:100px;background:'+cfg.c+';transition:width .8s cubic-bezier(.4,0,.2,1);width:'+pct+'%"></div>'
+        +'</div>'
+        +(falta>0
+          ?'<div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:3px">Falta '+fR(falta)+'</div>'
+          :'<div style="font-size:9px;color:#4ADE80;margin-top:3px">✅ Meta batida!</div>')
+        +'</div>')
+      :'';
     return '<div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);'
       +'border-radius:12px;padding:12px 14px;border-top:2px solid '+cfg.c+'">'
       +'<div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;'
@@ -5935,6 +5960,7 @@ function rdRenderEqHeroCards(){
       +'<div style="height:1px;background:rgba(255,255,255,.08);margin-bottom:7px"></div>'
       +'<div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600;margin-bottom:1px">Total mês</div>'
       +'<div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:rgba(255,255,255,.7);letter-spacing:.3px;line-height:1">'+fR(total)+'</div>'
+      +metaHtml
       +'</div>';
   }).join('');
 }
