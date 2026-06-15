@@ -1178,7 +1178,7 @@ select.ev-inp{cursor:pointer}
           <div style="margin-top:12px">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
               <span style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase">Meta</span>
-              <input type="number" id="rd-meta-dia" value="30680" step="100" min="0"
+              <input type="number" id="rd-meta-dia" value="180000" step="100" min="0"
                 style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:4px 8px;
                 font-family:Nunito,sans-serif;font-size:11px;font-weight:800;color:#fff;outline:none;width:95px;text-align:right"
                 oninput="rdUpdateMeta()"
@@ -5880,12 +5880,12 @@ function rdTodayKey(){
   const d=new Date();
   return 'cofen_rd_'+d.getFullYear()+'_'+(d.getMonth()+1)+'_'+d.getDate();
 }
-// Meta diária por equipe (total 200k: Bruna 100k, Stephanie 40k, Brenda 40k, Digital 20k)
+// Meta diária por equipe (total 180k: Bruna 100k, Stephanie 40k, Brenda 40k)
 const RD_META_EQ = {
   'COFEN MARILIA BRENDA':      40000,
   'COFEN BIRIGUI BRUNA':       100000,
   'COFEN STEPHANIE 2° TURNO':  40000,
-  'COFEN DIGITAL':             20000
+  'COFEN DIGITAL':             0
 };
 
 function rdGetSaved(){try{return JSON.parse(localStorage.getItem(rdTodayKey())||'{}')}catch(e){return {}}}
