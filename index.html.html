@@ -3120,9 +3120,11 @@ function renderHoProjTable(){
     const pctBorder= acima ? 'rgba(74,222,128,.5)'  : quase ? 'rgba(252,211,77,.5)'  : 'rgba(248,113,113,.5)';
     const rowBg    = i%2===0 ? 'rgba(255,255,255,.04)' : 'rgba(0,0,0,.15)';
 
-    // Maio no mesmo DU — rec total × 0.25 (HO = 25%)
-    const maioRecDU  = CMP_MAIO_DU[duPass] || 0;
-    const hoMaioDU   = maioRecDU * 0.25;
+    // Maio no mesmo DU — usa CMP_HO_MAIO_DU (HO real, recalculado do arquivo Empresa).
+    // Fallback para a estimativa antiga (rec total × 0.25) se ainda não houver dados reais importados.
+    const hoMaioDU   = (typeof CMP_HO_MAIO_DU !== 'undefined' && CMP_HO_MAIO_DU[duPass])
+                        ? CMP_HO_MAIO_DU[duPass]
+                        : (CMP_MAIO_DU[duPass] || 0) * 0.25;
     const vsMaio     = hoAtual - hoMaioDU;
     const vsMaioColor  = vsMaio >= 0 ? '#4ADE80' : '#F87171';
     const vsMaioPrefix = vsMaio >= 0 ? '+' : '';
@@ -4076,6 +4078,78 @@ function _parseMensal(raw){
   return meses;
 }
 
+// ── Extrai PP (Pague Play 24,96%) por Dia Útil de MAIO a partir do arquivo Empresa real ──
+// Substitui o array estático CMP_MAIO_DU por dados recalculados do próprio arquivo importado.
+function _parseEmpresaPPporDUMaio(raw){
+  const lines = raw.trim().split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length < 2) return null;
+  const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
+  const norm = s => s.trim().replace(/^"|"$/g,'').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const headers = lines[0].split(sep).map(norm);
+  const col = cands => { for(const c of cands){ const i=headers.findIndex(h=>h.includes(c)); if(i>=0)return i; } return -1; };
+
+  const iData = col(['dt.baixa','dt baixa','data baixa','data']);
+  const iPP   = col(['pague play','pagueplay','24,96','24.96']);
+  if(iData < 0 || iPP < 0) return null;
+
+  const pN = s => {
+    if(!s||s.trim()===''||s.trim()==='-') return 0;
+    let v = s.trim().replace(/^"/,'').replace(/"$/,'').replace(/R\$\s*/,'').trim();
+    if(/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(v)) return parseFloat(v.replace(/\./g,'').replace(',','.'));
+    return parseFloat(v.replace(',','.')) || 0;
+  };
+  const pData = s => {
+    if(!s) return null;
+    s = s.trim();
+    let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/); // ISO
+    if(m) return {y:+m[1], mo:+m[2], d:+m[3]};
+    m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); // DD/MM/YYYY ou MM/DD/YYYY
+    if(m){
+      const a=+m[1], b=+m[2], y=+m[3];
+      if(a>12) return {y, mo:b, d:a};
+      if(b>12) return {y, mo:a, d:b};
+      return {y, mo:b, d:a}; // assume BR
+    }
+    return null;
+  };
+
+  // Monta mapa data->DU para Maio/2026 usando os mesmos feriados do dashboard
+  const feriados = typeof getFeriados==='function' ? getFeriados() : [];
+  const dt2du = {};
+  let du = 0;
+  for(let d=1; d<=31; d++){
+    const dt = new Date(2026, 4, d); // mês 5 = índice 4
+    if(dt.getMonth() !== 4) break;
+    const dow = dt.getDay();
+    const iso = `2026-05-${String(d).padStart(2,'0')}`;
+    if(dow!==0 && dow!==6 && !feriados.includes(iso)){ du++; dt2du[d]=du; }
+  }
+  // dias não-úteis no início do mês (1,2,3) contam como DU1 para fins de comparação
+  [1,2,3].forEach(d=>{ if(!dt2du[d]) dt2du[d]=1; });
+
+  const ppPorDU = {};
+  for(let i=1;i<lines.length;i++){
+    const cells = lines[i].split(sep).map(c=>c.trim().replace(/^"|"$/g,''));
+    if(cells.length <= Math.max(iData,iPP)) continue;
+    const dp = pData(cells[iData]);
+    if(!dp || dp.y!==2026 || dp.mo!==5) continue;
+    const d = dt2du[dp.d];
+    if(!d) continue;
+    const pp = pN(cells[iPP]);
+    if(!pp) continue;
+    ppPorDU[d] = (ppPorDU[d]||0) + pp;
+  }
+
+  if(!Object.keys(ppPorDU).length) return null;
+
+  const maxDU = Math.max(...Object.keys(ppPorDU).map(Number));
+  const cumul = {};
+  let acum = 0;
+  for(let d=1; d<=maxDU; d++){ acum += ppPorDU[d]||0; cumul[d] = Math.round(acum*100)/100; }
+  return cumul;
+}
+
 function _parseImportCSV(raw){
   const lines = raw.trim().split(/\r?\n/).filter(l => l.trim());
   if(lines.length < 2) return null;
@@ -4532,6 +4606,19 @@ function aplicarEmpresa(){
     : 0;
   ppEmpresaAbril = Math.round(ppAbrilCalc * 100) / 100;
   localStorage.setItem('cofen_pp_maio', ppEmpresaAbril);
+
+  // ── Recalcula CMP_HO_MAIO_DU (HO real por DU de Maio) a partir do arquivo Empresa importado ──
+  // Variável dedicada — NÃO sobrescreve CMP_MAIO_DU, que é usado por outros gráficos com
+  // semântica de Valor Recebido total (Março vs Abril, etc).
+  try{
+    const maioDuReal = _parseEmpresaPPporDUMaio(raw);
+    if(maioDuReal && Object.keys(maioDuReal).length){
+      if(typeof CMP_HO_MAIO_DU === 'undefined') window.CMP_HO_MAIO_DU = {};
+      Object.keys(CMP_HO_MAIO_DU).forEach(k=>delete CMP_HO_MAIO_DU[k]);
+      Object.assign(CMP_HO_MAIO_DU, maioDuReal);
+      localStorage.setItem('cofen_ho_maio_du', JSON.stringify(CMP_HO_MAIO_DU));
+    }
+  }catch(e){}
 
   // Preencher campo Total Arrecadado (oculto)
   const inpArr = document.getElementById('inp-arrecadado');
