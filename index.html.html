@@ -511,6 +511,7 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('ranking-bb',this)">🏙️⭐ Brenda + Stephanie</div>
   <div class="tab"     onclick="go('diario',this)">📅 Diário</div>
   <div class="tab"     onclick="go('recdia',this)">⚡ Recebimento do Dia</div>
+  <div class="tab"     onclick="go('proj-op',this)">📊 Projeção dos Operadores</div>
   <div class="tab"     onclick="go('gestao',this)">⚙️ Gestão de Equipes</div>
   <div class="tab"     onclick="go('import',this)">📥 Importar Relatório</div>
   <div class="tab"     onclick="go('acordos',this)">🤝 Acordos</div>
@@ -1268,6 +1269,100 @@ select.ev-inp{cursor:pointer}
       <span style="text-align:right"></span>
       <span style="font-family:Bebas Neue,sans-serif;font-size:15px;color:#FCD34D;text-align:right" id="rd-rod-hoje">R$ 0</span>
       <span style="font-family:Bebas Neue,sans-serif;font-size:17px;color:#fff;text-align:right" id="rd-rod-total">R$ 0</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════ PAGE: PROJEÇÃO DOS OPERADORES ══════════ -->
+<div class="page" id="pg-proj-op">
+
+  <!-- HEADER -->
+  <div style="background:linear-gradient(135deg,var(--ppd) 0%,#1B4332 45%,#0D3D2B 100%);
+    border-radius:var(--rxl);padding:22px 28px;position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.25)">
+    <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;
+      background:radial-gradient(circle,rgba(0,200,127,.1),transparent 70%);pointer-events:none"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1">
+      <div>
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:4px">📊 Painel de Desempenho</div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:26px;letter-spacing:3px;color:#fff;line-height:1">PROJEÇÃO DOS OPERADORES</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);font-weight:600;margin-top:4px" id="proj-op-subtitle">Atualizado automaticamente</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <!-- Quartil summary cards -->
+        <div id="proj-op-quartil-summary" style="display:flex;gap:8px"></div>
+        <button onclick="refreshAll();projOpRender();toast('📊 Projeção atualizada!')"
+          style="padding:9px 18px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.2);
+          background:rgba(255,255,255,.1);color:#fff;font-family:Nunito,sans-serif;font-weight:700;
+          font-size:11px;cursor:pointer;transition:all .2s"
+          onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">🔄 Atualizar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT: Table + Chart side by side -->
+  <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start">
+
+    <!-- TABLE SECTION -->
+    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden">
+      <!-- Filter bar -->
+      <div style="padding:12px 16px;background:var(--g50);border-bottom:1px solid var(--g200);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase">Filtrar:</span>
+        <button class="proj-flt on" data-flt="all" onclick="projFilter('all',this)"
+          style="padding:5px 12px;border-radius:100px;border:none;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:var(--pp);color:#fff">🏆 Todos</button>
+        <button class="proj-flt" data-flt="q1" onclick="projFilter('q1',this)"
+          style="padding:5px 12px;border-radius:100px;border:1.5px solid var(--ok);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:transparent;color:var(--ok)">🟢 1º Quartil</button>
+        <button class="proj-flt" data-flt="q2" onclick="projFilter('q2',this)"
+          style="padding:5px 12px;border-radius:100px;border:1.5px solid var(--info);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:transparent;color:var(--info)">🔵 2º Quartil</button>
+        <button class="proj-flt" data-flt="q3" onclick="projFilter('q3',this)"
+          style="padding:5px 12px;border-radius:100px;border:1.5px solid var(--warn);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:transparent;color:var(--warn)">🟡 3º Quartil</button>
+        <button class="proj-flt" data-flt="q4" onclick="projFilter('q4',this)"
+          style="padding:5px 12px;border-radius:100px;border:1.5px solid var(--danger);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:transparent;color:var(--danger)">🔴 4º Quartil</button>
+      </div>
+      <!-- Table header -->
+      <div style="display:grid;grid-template-columns:36px 1fr 100px 110px 95px 110px 110px 90px 90px;
+        gap:6px;padding:9px 14px;background:var(--ppd);
+        font-size:9px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase">
+        <span style="text-align:center">#</span>
+        <span>Operador</span>
+        <span style="text-align:right">Meta</span>
+        <span style="text-align:right">Recebimento</span>
+        <span style="text-align:right">Diário</span>
+        <span style="text-align:right">Hoje</span>
+        <span style="text-align:right">Falta/Sobra</span>
+        <span style="text-align:right">Alcance</span>
+        <span style="text-align:center">Quartil</span>
+      </div>
+      <!-- Table body -->
+      <div id="proj-op-list" style="max-height:calc(100vh - 380px);overflow-y:auto"></div>
+      <!-- Footer totals -->
+      <div id="proj-op-footer" style="display:grid;grid-template-columns:36px 1fr 100px 110px 95px 110px 110px 90px 90px;
+        gap:6px;padding:11px 14px;background:var(--ppd);align-items:center;border-top:1px solid rgba(255,255,255,.1)"></div>
+    </div>
+
+    <!-- RIGHT COLUMN: Chart + Stats -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <!-- Pie chart card -->
+      <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px;box-shadow:var(--sh)">
+        <div style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px">📊 Distribuição por Quartil</div>
+        <div style="position:relative;width:200px;height:200px;margin:0 auto">
+          <canvas id="proj-op-pie" width="200" height="200"></canvas>
+        </div>
+        <!-- Legend -->
+        <div id="proj-op-legend" style="display:flex;flex-direction:column;gap:8px;margin-top:16px"></div>
+      </div>
+
+      <!-- Destaques card -->
+      <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:16px;box-shadow:var(--sh)">
+        <div style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">🏅 Destaques</div>
+        <div id="proj-op-destaques"></div>
+      </div>
+
+      <!-- Leitura gerencial -->
+      <div style="background:linear-gradient(135deg,#0D3D2B,#1B4332);border-radius:var(--rl);padding:16px;box-shadow:var(--sh)">
+        <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">📋 Leitura Gerencial</div>
+        <div id="proj-op-gerencial" style="font-size:11px;color:rgba(255,255,255,.75);font-weight:600;line-height:1.8"></div>
+      </div>
     </div>
   </div>
 
@@ -2579,7 +2674,7 @@ select.ev-inp{cursor:pointer}
 // ══════════════════════════════
 // DATA
 // ══════════════════════════════
-const ORIG = {"global":{"total":76462.34,"pp":0,"coren":0,"cofen":0,"daily":{}},"equipes":[{"name":"COFEN MARILIA BRENDA","rec":31479.56,"ho":7869.9,"n_op":14,"acordos":0,"ops":[{"name":"STEPHANIE_FAGUNDES","rec":3852.15,"ho":963.04,"acordos":0,"ligacoes":0,"med_atraso":1741.0,"med_lig_baixa":2.6,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":5.9,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"raissa_paloma","rec":6797.27,"ho":1699.32,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"itallo_cardamoni","rec":838.81,"ho":209.7,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"silva_beatriz","rec":1589.7,"ho":397.43,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"caio_shimite","rec":2662.99,"ho":665.75,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"BIANCA_V_SILVA","rec":1657.89,"ho":414.47,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"GIOVANA_SOUZA","rec":2879.72,"ho":719.93,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"thauany_moura","rec":5479.27,"ho":1369.82,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"felipe_arruda","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":2298.0,"med_lig_baixa":1.9,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":1.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"carulini_santos","rec":216.9,"ho":54.23,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"KELY_SILVA","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":1091.0,"med_lig_baixa":3.5,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":30.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"leticia_romeu","rec":5504.86,"ho":1376.21,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"BRENDA_FERREIRA","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":1894.0,"med_lig_baixa":1.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"eq":"COFEN MARILIA BRENDA","gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"JESSICA_O_SILVA","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}}],"gerados":154,"pagos":47,"pendentes":107},{"name":"COFEN BIRIGUI BRUNA","rec":16264.0,"ho":4066.0,"n_op":20,"acordos":0,"ops":[{"name":"HELTON_ROLDON","rec":487.38,"ho":121.84,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"MAYSA_OLIVEIRA","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"MATHEUS_SOUZA","rec":3766.27,"ho":941.57,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"LYVIA_DIAS","rec":1272.92,"ho":318.23,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"MARIA_BRAIDOTI","rec":580.94,"ho":145.24,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"RAFAELA_MINHOTO","rec":322.13,"ho":80.53,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"BRUNA_JUSTIMIANO","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":2537.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"eq":"COFEN BIRIGUI BRUNA","gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"HELENA_SANTOS","rec":829.98,"ho":207.5,"acordos":0,"ligacoes":0,"med_atraso":3420.0,"med_lig_baixa":2.5,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":5.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"ANA_BENTO","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":1187.0,"med_lig_baixa":2.5,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.5,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"MARIA_MOREIRASANTOS","rec":912.86,"ho":228.22,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"FRANCISCA_BRITO","rec":1034.05,"ho":258.51,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"DEBORA_ANDRIELLY","rec":213.7,"ho":53.42,"acordos":0,"ligacoes":0,"med_atraso":764.0,"med_lig_baixa":5.1,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":2.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"EDUARDO_SILVA","rec":461.85,"ho":115.46,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"NAYARA_CRUZ","rec":164.76,"ho":41.19,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"LEONARDO_NUNES","rec":4485.39,"ho":1121.35,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"MARIA_RODARTE","rec":1185.13,"ho":296.28,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"JOAO_MIRANDA","rec":546.64,"ho":136.66,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"}],"gerados":115,"pagos":21,"pendentes":94},{"name":"COFEN STEPHANIE 2° TURNO","rec":16261.11,"ho":4065.27,"n_op":11,"acordos":0,"ops":[{"name":"larissa_santana","rec":57.57,"ho":14.39,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"jussara_pereira","rec":2314.27,"ho":578.57,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"aline_pupim","rec":2081.19,"ho":520.3,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"thais_mayara","rec":4202.95,"ho":1050.74,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"geovanna_almeida","rec":1743.79,"ho":435.95,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"ISABELA_MONTEIRO","rec":915.86,"ho":228.96,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"thalia_thomaz","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"katia_regina","rec":1637.45,"ho":409.36,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"kauane_azevedo","rec":1011.85,"ho":252.96,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"thais_c_ferreira","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"AMABELLY_SANTOS","rec":2296.18,"ho":574.04,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"}],"gerados":59,"pagos":15,"pendentes":44},{"name":"COFEN DIGITAL","rec":12457.67,"ho":3114.41,"n_op":5,"acordos":0,"ops":[{"name":"RENATARODRIGUES","rec":597.29,"ho":149.32,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0","eq":"COFEN DIGITAL"},{"name":"KAROLAINE_SILVA","rec":7279.58,"ho":1819.89,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0","eq":"COFEN DIGITAL"},{"name":"THAYRA_FERREIRASILVA","rec":1780.71,"ho":445.18,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0","eq":"COFEN DIGITAL"},{"name":"CLEBER_JUNIOR","rec":2519.57,"ho":629.89,"acordos":0,"ligacoes":0,"med_atraso":2032.0,"med_lig_baixa":0.2,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.2,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0","eq":"COFEN DIGITAL"},{"name":"JHONATA_NASCIMENTO","rec":280.52,"ho":70.13,"acordos":0,"ligacoes":0,"med_atraso":1314.0,"med_lig_baixa":0.2,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":2.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0","eq":"COFEN DIGITAL"}]}]};
+const ORIG = {"global":{"total":76462.34,"pp":0,"coren":0,"cofen":0,"daily":{}},"equipes":[{"name":"COFEN MARILIA BRENDA","rec":31479.56,"ho":7869.9,"n_op":14,"acordos":0,"ops":[{"name":"STEPHANIE_FAGUNDES","rec":24845.88,"ho":6201.53,"acordos":0,"ligacoes":0,"med_atraso":1741.0,"med_lig_baixa":2.6,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":5.9,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"raissa_paloma","rec":26528.0,"ho":6621.39,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"itallo_cardamoni","rec":27174.83,"ho":6782.84,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"silva_beatriz","rec":35793.21,"ho":8933.99,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"caio_shimite","rec":34797.11,"ho":8685.36,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"BIANCA_V_SILVA","rec":1657.89,"ho":414.47,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"GIOVANA_SOUZA","rec":25543.92,"ho":6375.76,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"thauany_moura","rec":13696.49,"ho":3418.64,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"felipe_arruda","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":2298.0,"med_lig_baixa":1.9,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":1.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"carulini_santos","rec":216.9,"ho":54.23,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"KELY_SILVA","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":1091.0,"med_lig_baixa":3.5,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":30.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"leticia_romeu","rec":23100.0,"ho":5765.76,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"BRENDA_FERREIRA","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":1894.0,"med_lig_baixa":1.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"eq":"COFEN MARILIA BRENDA","gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"JESSICA_O_SILVA","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}}],"gerados":154,"pagos":47,"pendentes":107},{"name":"COFEN BIRIGUI BRUNA","rec":16264.0,"ho":4066.0,"n_op":20,"acordos":0,"ops":[{"name":"HELTON_ROLDON","rec":77352.48,"ho":19307.18,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"MAYSA_OLIVEIRA","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"MATHEUS_SOUZA","rec":97290.5,"ho":24283.71,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"LYVIA_DIAS","rec":68130.69,"ho":17005.42,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"MARIA_BRAIDOTI","rec":916.6,"ho":228.78,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"RAFAELA_MINHOTO","rec":322.13,"ho":80.53,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"BRUNA_JUSTIMIANO","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":2537.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"eq":"COFEN BIRIGUI BRUNA","gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"HELENA_SANTOS","rec":10228.77,"ho":2553.1,"acordos":0,"ligacoes":0,"med_atraso":3420.0,"med_lig_baixa":2.5,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":5.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"ANA_BENTO","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":1187.0,"med_lig_baixa":2.5,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.5,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"MARIA_MOREIRASANTOS","rec":21552.47,"ho":5379.5,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"FRANCISCA_BRITO","rec":60485.36,"ho":15097.15,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"DEBORA_ANDRIELLY","rec":213.7,"ho":53.42,"acordos":0,"ligacoes":0,"med_atraso":764.0,"med_lig_baixa":5.1,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":2.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"EDUARDO_SILVA","rec":2767.58,"ho":690.79,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"NAYARA_CRUZ","rec":164.76,"ho":41.19,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"LEONARDO_NUNES","rec":63984.42,"ho":15970.51,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"MARIA_RODARTE","rec":1185.13,"ho":296.28,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"JOAO_MIRANDA","rec":397.23,"ho":99.15,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"}],"gerados":115,"pagos":21,"pendentes":94},{"name":"COFEN STEPHANIE 2° TURNO","rec":16261.11,"ho":4065.27,"n_op":11,"acordos":0,"ops":[{"name":"larissa_santana","rec":3574.02,"ho":892.08,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"jussara_pereira","rec":2314.27,"ho":578.57,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"aline_pupim","rec":37666.27,"ho":9401.5,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"thais_mayara","rec":20524.45,"ho":5122.9,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"geovanna_almeida","rec":18893.28,"ho":4715.76,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"ISABELA_MONTEIRO","rec":19917.55,"ho":4971.42,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"thalia_thomaz","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"katia_regina","rec":42675.45,"ho":10651.79,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"kauane_azevedo","rec":21299.43,"ho":5316.34,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"},{"name":"thais_c_ferreira","rec":0,"ho":0,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{}},{"name":"AMABELLY_SANTOS","rec":34426.8,"ho":8592.93,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0"}],"gerados":59,"pagos":15,"pendentes":44},{"name":"COFEN DIGITAL","rec":12457.67,"ho":3114.41,"n_op":5,"acordos":0,"ops":[{"name":"RENATARODRIGUES","rec":37501.74,"ho":9360.43,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0","eq":"COFEN DIGITAL"},{"name":"KAROLAINE_SILVA","rec":107539.66,"ho":26841.9,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0","eq":"COFEN DIGITAL"},{"name":"THAYRA_FERREIRASILVA","rec":36253.34,"ho":9048.83,"acordos":0,"ligacoes":0,"med_atraso":0.0,"med_lig_baixa":0.0,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0","eq":"COFEN DIGITAL"},{"name":"CLEBER_JUNIOR","rec":10899.03,"ho":2720.4,"acordos":0,"ligacoes":0,"med_atraso":2032.0,"med_lig_baixa":0.2,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":0.2,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0","eq":"COFEN DIGITAL"},{"name":"JHONATA_NASCIMENTO","rec":8872.24,"ho":2214.51,"acordos":0,"ligacoes":0,"med_atraso":1314.0,"med_lig_baixa":0.2,"daily":{},"tipos":{},"n_ag":0,"val_ag":0,"gerados":0,"pagos":0,"avista":0,"ate3dias":0,"mais3dias":0,"ticket":0,"media_dias":2.0,"pendentes":0,"agendados":0,"eficiencia":0.0,"ag_futuro":{},"pagos_total":"0","eq":"COFEN DIGITAL"}]}]};
 
 // Working state — deep clone so edits don't corrupt original
 // ── AUTO-FIX: Remove override inválido da Isabela ──
@@ -2694,6 +2789,43 @@ const fRK=v=>v>=1000?"R$ "+(v/1000).toFixed(1)+"K":fR(v);
 const ini=n=>{const p=n.replace(/_/g," ").split(" ");return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():n.slice(0,2).toUpperCase()};
 
 // All operators sorted
+// ── DADOS XLS JUNHO 2026 — rec_58_1806 ──────────────────────────────
+// Atualizado automaticamente via arquivo importado (18/06/2026)
+const REC_JUNHO_XLS = {
+  "AMABELLY_SANTOS": 34426.8,
+  "CAIO_SHIMITE": 34797.11,
+  "CLEBER_JUNIOR": 10899.03,
+  "EDUARDO_SILVA": 2767.58,
+  "FRANCISCA_BRITO": 60485.36,
+  "GIOVANA_SOUZA": 25543.92,
+  "HELENA_SANTOS": 10228.77,
+  "HELTON_ROLDON": 77352.48,
+  "ISABELA_MONTEIRO": 19917.55,
+  "JHONATA_NASCIMENTO": 8872.24,
+  "JOAO_MIRANDA": 397.23,
+  "KAROLAINE_SILVA": 107539.66,
+  "KATIA_REGINA": 42675.45,
+  "LEONARDO_NUNES": 63984.42,
+  "LYVIA_DIAS": 68130.69,
+  "MARIA_BRAIDOTI": 916.6,
+  "MARIA_MOREIRASANTOS": 21552.47,
+  "MATHEUS_SOUZA": 97290.5,
+  "RENATARODRIGUES": 37501.74,
+  "STEPHANIE_FAGUNDES": 24845.88,
+  "THAYRA_FERREIRASILVA": 36253.34,
+  "aline_pupim": 37666.27,
+  "geovanna_almeida": 18893.28,
+  "itallo_cardamoni": 27174.83,
+  "kauane_azevedo": 21299.43,
+  "larissa_santana": 3574.02,
+  "leticia_romeu": 23100.0,
+  "raissa_paloma": 26528.0,
+  "silva_beatriz": 35793.21,
+  "thais_mayara": 20524.45,
+  "thauany_moura": 13696.49
+};
+// ─────────────────────────────────────────────────────────────────────
+
 let ALL = [];
 function rebuildAll(){
   // NÃO modifica D — apenas filtra ao montar ALL
@@ -5813,7 +5945,7 @@ function closeM(e){
 function go(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
-  ['geral','editor','equipes','ranking','ranking-digital','ranking-bb','ranking-brenda','ranking-bruna','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas','recdia-op','tv'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
+  ['geral','editor','equipes','ranking','ranking-digital','ranking-bb','ranking-brenda','ranking-bruna','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas','recdia-op','tv','proj-op'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
   document.getElementById('pg-'+id).classList.add('on');
   if(id==='geral'){mkGD();mkDist();buildDUManualGrid();if(typeof _updateOntemCard==='function')_updateOntemCard();}
   if(id==='editor') buildOpEditor();
@@ -5833,6 +5965,7 @@ function go(id,el){
   if(id==='inadimpl') inadimplInit();
   if(id==='metas'){ mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho(); }
   if(id==='recdia-op') rdopRender();
+  if(id==='proj-op') projOpRender();
 }
 
 // ── REFRESH ALL ──
@@ -5883,6 +6016,8 @@ function refreshAll(){
   // ── Atualiza gráfico Recebimento por Equipe (pp-metas-wrap) ──
   if(typeof renderPpMetas==='function') renderPpMetas();
   if(typeof _updateOntemCard==='function') _updateOntemCard();
+  // ── Atualiza Projeção dos Operadores se ativa ──
+  if(document.getElementById('pg-proj-op')?.classList.contains('on')) projOpRender();
 }
 
 // ── TOAST ──
@@ -7960,6 +8095,9 @@ function importApply(){
 
   // ── Atualizar aba Recebimento por Dia/Operador automaticamente ──
   rdopRender();
+
+  // ── Atualizar Projeção dos Operadores automaticamente ──
+  if(typeof projOpRender==='function') projOpRender();
   const _rdopBadge = document.getElementById('rdop-src-badge');
   if(_rdopBadge){
     const _ts = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
@@ -13762,6 +13900,302 @@ function rdopGetTextColor(v){
   if(v >= 2000) return '#1d4ed8';
   if(v >= 1000) return '#92400e';
   return '#991b1b';
+}
+
+// ══════════════════════════════════════════════════════
+//  PROJEÇÃO DOS OPERADORES — render completo
+// ══════════════════════════════════════════════════════
+let _projPieChart = null;
+let _projAllData  = [];
+
+function projOpQuartilInfo(pct){
+  if(pct >= 100) return { q:'q1', label:'1º QUARTIL', color:'#00A86B', bg:'#D1FAE5', text:'#065F46', badge:'🟢' };
+  if(pct >= 80)  return { q:'q2', label:'2º QUARTIL', color:'#3B82F6', bg:'#DBEAFE', text:'#1E40AF', badge:'🔵' };
+  if(pct >= 57)  return { q:'q3', label:'3º QUARTIL', color:'#F59E0B', bg:'#FEF3C7', text:'#92400E', badge:'🟡' };
+  return             { q:'q4', label:'4º QUARTIL', color:'#EF4444', bg:'#FEE2E2', text:'#991B1B', badge:'🔴' };
+}
+
+function projOpGetMeta(op){
+  // 1) Meta individual configurada
+  const metaInd = getMetaOp(op.name);
+  if(metaInd > 0) return metaInd;
+  // 2) Fallback: meta da equipe ÷ nº de operadores visíveis da equipe
+  const metaEq = getMetaEquipe(op.eq) || 0;
+  if(metaEq > 0){
+    const eqObj = D.equipes.find(e=>e.name===op.eq);
+    const nOp   = eqObj ? Math.max(eqObj.n_op, 1) : 1;
+    return metaEq / nOp;
+  }
+  return 0;
+}
+
+function projFilter(flt, el){
+  document.querySelectorAll('.proj-flt').forEach(b=>{
+    b.classList.remove('on');
+    const k=b.dataset.flt;
+    b.style.background='transparent';
+    b.style.color=k==='q1'?'var(--ok)':k==='q2'?'var(--info)':k==='q3'?'var(--warn)':k==='q4'?'var(--danger)':'var(--g700)';
+    b.style.borderColor=k==='q1'?'var(--ok)':k==='q2'?'var(--info)':k==='q3'?'var(--warn)':k==='q4'?'var(--danger)':'var(--g200)';
+  });
+  el.classList.add('on');
+  el.style.background=flt==='all'?'var(--pp)':flt==='q1'?'var(--ok)':flt==='q2'?'var(--info)':flt==='q3'?'var(--warn)':'var(--danger)';
+  el.style.color='#fff';
+  projOpRenderList(flt);
+}
+
+function projOpRender(){
+  const fR2 = v => (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const duTotal  = (DU&&DU.total)  || 19;
+  const duPassou = (DU&&DU.passou) || 1;
+  const BLOCKED  = new Set(['fabio_aquino','BRENDA_FERREIRA','BRUNA_JUSTIMIANO','STEPHANIE_BERNARDES']);
+
+  // ── Fonte de dados: localStorage > REC_JUNHO_XLS > D.equipes ──────
+  const lsOps  = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+  const rdHoje = (typeof rdGetSaved==='function') ? rdGetSaved() : {};
+
+  // Mapa case-insensitive do REC_JUNHO_XLS para resolver mismatch de capitalização
+  const _xlsUpper = {};
+  Object.keys(REC_JUNHO_XLS).forEach(k=>{ _xlsUpper[k.toUpperCase()] = REC_JUNHO_XLS[k]; });
+  const xlsGet = name => {
+    if(REC_JUNHO_XLS[name] !== undefined) return REC_JUNHO_XLS[name];
+    return _xlsUpper[name.toUpperCase()];
+  };
+
+  // Mapa case-insensitive do localStorage para o mesmo motivo
+  const _lsUpper = {};
+  Object.keys(lsOps).forEach(k=>{ _lsUpper[k.toUpperCase()] = lsOps[k]; });
+  const lsGet = name => {
+    if(lsOps[name] !== undefined) return lsOps[name];
+    return _lsUpper[name.toUpperCase()];
+  };
+
+  // Montar lista de operadores com rec atualizado
+  const opMap = {}; // name → {name, eq, rec, ho}
+  D.equipes.forEach(eq=>{
+    eq.ops.forEach(op=>{
+      if(BLOCKED.has(op.name)) return;
+      // Prioridade: 1) localStorage importado (case-insensitive), 2) XLS hardcoded (case-insensitive), 3) D hardcoded
+      const lsVal = lsGet(op.name);
+      const xlsVal = xlsGet(op.name);
+      let base = lsVal  !== undefined ? parseFloat(lsVal)
+               : xlsVal !== undefined ? xlsVal
+               : op.rec || 0;
+      const extra = parseFloat(rdHoje[op.name]||0);
+      const rec   = base + extra;
+      opMap[op.name] = { name: op.name, eq: eq.name, rec, ho: rec*0.2496 };
+    });
+  });
+
+  // Atualizar D com os valores corretos e rebuildAll
+  try{
+    D.equipes.forEach(eq=>{
+      eq.ops.forEach(op=>{ if(opMap[op.name]){ op.rec=opMap[op.name].rec; op.ho=opMap[op.name].ho; } });
+      const vis = eq.ops.filter(o=>!BLOCKED.has(o.name));
+      eq.rec = vis.reduce((s,o)=>s+o.rec,0);
+      eq.ho  = vis.reduce((s,o)=>s+o.ho, 0);
+    });
+    rebuildAll();
+  }catch(e){}
+
+  // Lista final: ALL se populado, senão opMap direto
+  const srcList = ALL.length > 0 ? ALL
+    : Object.values(opMap).sort((a,b)=>b.rec-a.rec);
+
+  // ── 4. Build _projAllData ──
+  _projAllData = srcList.map(op=>{
+    const rec  = op.rec || 0;
+    const meta = projOpGetMeta(op);
+    // Meta esperada até hoje (proporcional aos DUs passados)
+    const hoje     = meta > 0 ? meta * (duPassou / duTotal) : 0;
+    const diario   = meta > 0 ? meta / duTotal : 0;
+    // Alcance: vs meta-hoje se tiver meta, senão relativo à meta total
+    const alcance  = hoje > 0
+      ? (rec / hoje * 100)
+      : (meta > 0 ? (rec / meta * 100) : 0);
+    const faltaSob = rec - hoje;
+    const qi       = projOpQuartilInfo(alcance);
+    return { op, meta, rec, diario, hoje, faltaSob, alcance, qi };
+  })
+  .sort((a,b)=>b.rec-a.rec)
+  .map((d,i)=>({...d, rank:i+1}));
+
+  // Subtitle
+  const now = new Date();
+  const sub = document.getElementById('proj-op-subtitle');
+  if(sub) sub.textContent=`Atualizado em ${now.toLocaleTimeString('pt-BR')} · ${_projAllData.length} operadores · DU ${duPassou}/${duTotal}`;
+
+  // Quartil counts
+  const qCounts={q1:0,q2:0,q3:0,q4:0};
+  _projAllData.forEach(d=>qCounts[d.qi.q]++);
+  const total=_projAllData.length||1;
+
+  // Summary cards in header
+  const sumEl=document.getElementById('proj-op-quartil-summary');
+  if(sumEl){
+    const qDef=[
+      {k:'q1',label:'1º',color:'#4ADE80',bg:'rgba(74,222,128,.15)'},
+      {k:'q2',label:'2º',color:'#67E8F9',bg:'rgba(103,232,249,.15)'},
+      {k:'q3',label:'3º',color:'#FCD34D',bg:'rgba(252,211,77,.15)'},
+      {k:'q4',label:'4º',color:'#FCA5A5',bg:'rgba(252,165,165,.15)'},
+    ];
+    sumEl.innerHTML=qDef.map(q=>`
+      <div style="background:${q.bg};border:1px solid ${q.color}55;border-radius:10px;padding:7px 11px;text-align:center;min-width:56px">
+        <div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:${q.color};line-height:1">${qCounts[q.k]}</div>
+        <div style="font-size:8px;font-weight:800;color:${q.color};letter-spacing:.5px;opacity:.9">${q.label} QUARTIL</div>
+      </div>`).join('');
+  }
+
+  // Pie chart
+  const canvas=document.getElementById('proj-op-pie');
+  if(canvas){
+    if(_projPieChart){try{_projPieChart.destroy();}catch(e){} _projPieChart=null;}
+    const ctx=canvas.getContext('2d');
+    _projPieChart=new Chart(ctx,{
+      type:'doughnut',
+      data:{
+        labels:['1º Quartil','2º Quartil','3º Quartil','4º Quartil'],
+        datasets:[{
+          data:[qCounts.q1,qCounts.q2,qCounts.q3,qCounts.q4],
+          backgroundColor:['#00A86B','#3B82F6','#F59E0B','#EF4444'],
+          borderColor:'#fff',borderWidth:3,hoverOffset:10
+        }]
+      },
+      options:{
+        responsive:false,cutout:'50%',
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label(c){const v=c.parsed;return ` ${v} ops (${(v/total*100).toFixed(0)}%)`;}}}
+        },
+        animation:{duration:500}
+      }
+    });
+  }
+
+  // Legend
+  const legEl=document.getElementById('proj-op-legend');
+  if(legEl){
+    const qDef2=[
+      {q:'q1',label:'1º Quartil',color:'#00A86B',desc:'≥ 100% da meta esperada'},
+      {q:'q2',label:'2º Quartil',color:'#3B82F6',desc:'80% – 99%'},
+      {q:'q3',label:'3º Quartil',color:'#F59E0B',desc:'57% – 79%'},
+      {q:'q4',label:'4º Quartil',color:'#EF4444',desc:'< 57%'},
+    ];
+    legEl.innerHTML=qDef2.map(q=>{
+      const n=qCounts[q.q]; const pct=(n/total*100).toFixed(0);
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:${q.color}12;border-radius:8px;border-left:3px solid ${q.color}">
+        <div style="width:28px;height:28px;border-radius:7px;background:${q.color};display:flex;align-items:center;justify-content:center;
+          font-family:Bebas Neue,sans-serif;font-size:15px;color:#fff;flex-shrink:0">${n}</div>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:11px;color:var(--g900)">${q.label}</div>
+          <div style="font-size:9px;color:var(--g500);font-weight:600">${q.desc}</div>
+        </div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${q.color}">${pct}%</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Destaques top 3
+  const destEl=document.getElementById('proj-op-destaques');
+  if(destEl){
+    const medals=['🥇','🥈','🥉'];
+    const top3=_projAllData.slice(0,3);
+    destEl.innerHTML=top3.map((d,i)=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 10px;
+        border-radius:var(--rm);background:${i===0?'#D1FAE5':i===1?'#DBEAFE':'#FEF3C7'};margin-bottom:7px">
+        <span style="font-size:20px">${medals[i]}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:11px;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+            ${d.op.name.replace(/_/g,' ')}</div>
+          <div style="font-size:9px;color:var(--g500);font-weight:600">${(d.op.eq||'').replace('COFEN ','').replace(' 2° TURNO','')}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${d.qi.color}">${d.alcance.toFixed(1)}%</div>
+          <div style="font-size:9px;color:var(--g500);font-weight:600">${fR2(d.rec)}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  // Leitura gerencial
+  const gerEl=document.getElementById('proj-op-gerencial');
+  if(gerEl){
+    const acima=qCounts.q1+qCounts.q2;
+    const critico=qCounts.q4;
+    gerEl.innerHTML=`
+      ✅ <b style="color:#4ADE80">${qCounts.q1}</b> operadores já superaram 100% da meta projetada.<br>
+      📊 <b style="color:#67E8F9">${acima}</b> (${(acima/total*100).toFixed(0)}%) estão no 1º ou 2º quartil.<br>
+      ⚠️ <b style="color:#FCD34D">${qCounts.q3}</b> no 3º quartil precisam de atenção.<br>
+      🔴 <b style="color:#FCA5A5">${critico}</b> operador${critico!==1?'es':''} em situação crítica.<br>
+      📈 <b style="color:#fff">${total}</b> operadores no total.`;
+  }
+
+  // Render list (default all)
+  projOpRenderList('all');
+}
+
+function projOpRenderList(flt){
+  const fR2=v=>(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const listEl=document.getElementById('proj-op-list');
+  const footerEl=document.getElementById('proj-op-footer');
+  if(!listEl) return;
+
+  const filtered=flt==='all'?_projAllData:_projAllData.filter(d=>d.qi.q===flt);
+
+  if(filtered.length===0){
+    const totalOps = _projAllData.length;
+    listEl.innerHTML=`<div style="padding:40px;text-align:center;color:var(--g500);font-size:13px;font-weight:700">
+      ${totalOps===0
+        ? '⚠️ Nenhum operador encontrado. Importe o relatório na aba <b>Importar Relatório</b> e clique em Atualizar.'
+        : 'Nenhum operador neste quartil'}
+    </div>`;
+    if(footerEl) footerEl.innerHTML='';
+    return;
+  }
+
+  listEl.innerHTML=filtered.map((d,idx)=>{
+    const isPos=d.faltaSob>=0;
+    const rowBg=idx%2===0?'var(--w)':'var(--g50)';
+    const rowHighlight=d.rank<=3?d.rank===1?'#D1FAE5':d.rank===2?'#DBEAFE':'#FEF3C7':rowBg;
+    return `<div style="display:grid;grid-template-columns:36px 1fr 100px 110px 95px 110px 110px 90px 90px;
+      gap:6px;padding:8px 14px;border-bottom:1px solid var(--g200);align-items:center;
+      background:${rowHighlight};cursor:default"
+      onmouseover="this.style.background='#F0FDF4'" onmouseout="this.style.background='${rowHighlight}'">
+      <span style="font-family:Bebas Neue,sans-serif;font-size:13px;color:var(--g500);text-align:center">${d.rank}</span>
+      <div style="min-width:0">
+        <div style="font-weight:800;font-size:12px;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.op.name.replace(/_/g,' ')}</div>
+        <div style="font-size:9px;color:var(--g500);font-weight:600">${(d.op.eq||'').replace('COFEN ','').replace(' 2° TURNO',' 2°T')}</div>
+      </div>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:var(--g700);text-align:right">${d.meta>0?fR2(d.meta):'—'}</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:13px;color:var(--g900);text-align:right;font-weight:800">${fR2(d.rec)}</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:var(--g500);text-align:right">${d.diario>0?fR2(d.diario):'—'}</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:var(--info);text-align:right">${d.hoje>0?fR2(d.hoje):'—'}</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:${isPos?'var(--ok)':'var(--danger)'};text-align:right">
+        ${isPos?'+':''}${fR2(d.faltaSob)}</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:14px;color:${d.qi.color};text-align:right;font-weight:800">${d.alcance.toFixed(2)}%</span>
+      <div style="text-align:center">
+        <span style="display:inline-block;padding:2px 7px;border-radius:100px;font-size:8px;font-weight:800;
+          background:${d.qi.bg};color:${d.qi.text};letter-spacing:.4px;white-space:nowrap">${d.qi.label}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Footer
+  if(footerEl){
+    const totRec=filtered.reduce((s,d)=>s+d.rec,0);
+    const totMeta=filtered.reduce((s,d)=>s+d.meta,0);
+    const totHoje=filtered.reduce((s,d)=>s+d.hoje,0);
+    const totFS=filtered.reduce((s,d)=>s+d.faltaSob,0);
+    const totAlc=totHoje>0?(totRec/totHoje*100):0;
+    footerEl.innerHTML=`
+      <span></span>
+      <span style="font-weight:900;font-size:11px;color:#fff">💰 TOTAL (${filtered.length})</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:12px;color:#FCD34D;text-align:right">${fR2(totMeta)}</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:14px;color:#4ADE80;text-align:right">${fR2(totRec)}</span>
+      <span></span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:12px;color:#67E8F9;text-align:right">${fR2(totHoje)}</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:12px;color:${totFS>=0?'#4ADE80':'#FCA5A5'};text-align:right">${totFS>=0?'+':''}${fR2(totFS)}</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:15px;color:#fff;text-align:right">${totAlc.toFixed(1)}%</span>
+      <span></span>`;
+  }
 }
 
 function rdopRender(){
