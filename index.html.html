@@ -4069,7 +4069,15 @@ try{
   const _smEq = localStorage.getItem('cofen_junho_eq');
   if(_smEq){ const v=JSON.parse(_smEq); Object.assign(CMP_JUNHO_EQ,v); }
   const _smCumul = localStorage.getItem('cofen_junho_cumul');
-  if(_smCumul){ const v=JSON.parse(_smCumul); Object.assign(CMP_JUNHO_CUMUL,v); }
+  if(_smCumul){ 
+    try {
+      const v=JSON.parse(_smCumul); 
+      // Merge: STATIC values first, then localStorage overrides for higher DUs
+      const mergedCumul = Object.assign({}, CMP_JUNHO_CUMUL_STATIC, v);
+      Object.keys(CMP_JUNHO_CUMUL).forEach(k=>delete CMP_JUNHO_CUMUL[k]);
+      Object.assign(CMP_JUNHO_CUMUL, mergedCumul);
+    } catch(e) {}
+  }
   const _smDuDias = localStorage.getItem('cofen_junho_du_dias');
   if(_smDuDias){
     const v=JSON.parse(_smDuDias);
@@ -11186,7 +11194,7 @@ const CMP_MARCO_CUMUL = CMP_ABRIL_CUMUL_CAL; // histórico Abril
 const CMP_MAIO_DU = {1:146819.64,2:230203.99,3:323226.07,4:417065.92,5:532057.41,6:639173.06,7:767998.46,8:866252.42,9:952637.19,10:1049693.05,11:1146104.76,12:1259245.95,13:1359799.93,14:1483296.41,15:1585616.04,16:1713814.99,17:1859857.13,18:2004039.01,19:2007316.68}; // Maio 2026 encerrado
 // Dados acumulados de MAIO 2026 por Dia Útil (DU→acumulado) — atualizado dinamicamente via importação
 // CMP_JUNHO_CUMUL: acumulado global de Junho por DU (gerado do arquivo rec_58_0905.xls)
-const CMP_JUNHO_CUMUL_STATIC = {}; // Junho 2026 — será preenchido via importação do rec_58
+const CMP_JUNHO_CUMUL_STATIC = {"1":42685.88,"2":67503.85,"3":96037.16,"4":99765.25,"5":117113.39,"6":151540.32,"7":153824.49,"8":154048.73}; // Junho 2026 — rec_conciliação_09-06 (DUs 9+ via importação diária)
 // Inicia com dados estáticos do XLS — sobrescrito dinamicamente se houver importação mais recente
 const CMP_JUNHO_CUMUL = {...CMP_JUNHO_CUMUL_STATIC};
 // CMP_JUNHO_EQ: acumulado POR EQUIPE por DU (gerado do arquivo rec_58_0905.xls)
