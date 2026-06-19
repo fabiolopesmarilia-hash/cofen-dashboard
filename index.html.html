@@ -6047,6 +6047,7 @@ function loadSavedOverrides(){
     localStorage.removeItem('cofen_total');
     localStorage.removeItem('cofen_daily_hist');
     localStorage.removeItem('cofen_op_hist');
+    localStorage.removeItem('cofen_op_daily');
     localStorage.setItem('cofen_file_version', FILE_VERSION);
     // Gravar valores do ORIG como overrides iniciais
     const initOv = {};
@@ -6078,7 +6079,9 @@ function loadSavedOverrides(){
     const savedOpHist = JSON.parse(localStorage.getItem('cofen_op_hist')||'{}');
     // Retrocompatibilidade: cofen_daily_hist (só daily)
     const savedDaily  = JSON.parse(localStorage.getItem('cofen_daily_hist')||'{}');
-    const hasHist = Object.keys(savedOpHist).length > 0 || Object.keys(savedDaily).length > 0;
+    // Novo: cofen_op_daily (daily salvo pelo importApply)
+    const savedOpDaily = JSON.parse(localStorage.getItem('cofen_op_daily')||'{}');
+    const hasHist = Object.keys(savedOpHist).length > 0 || Object.keys(savedDaily).length > 0 || Object.keys(savedOpDaily).length > 0;
     if(hasHist){
       D.equipes.forEach(eq=>{
         eq.ops.forEach(op=>{
@@ -6088,6 +6091,10 @@ function loadSavedOverrides(){
             if(savedOpHist[op.name].acordos) op.acordos = savedOpHist[op.name].acordos;
           } else if(savedDaily[op.name]){
             op.daily = savedDaily[op.name];
+          }
+          // Aplica cofen_op_daily por cima (fonte mais recente do importApply)
+          if(savedOpDaily[op.name] && Object.keys(savedOpDaily[op.name]).length > 0){
+            op.daily = savedOpDaily[op.name];
           }
         });
       });
@@ -8033,12 +8040,16 @@ function importApply(){
       const opReal = eq.ops.find(o=>o.name===r.opName);
       if(!opReal) return;
       found = true;
-      if(Math.abs(r.recImport - opReal.rec) < 0.01 && Object.keys(r.daily||{}).length===0){ unchanged++; return; }
+      // Só pula se rec E daily são iguais (não pula se só daily mudou)
+      const recIgual = Math.abs(r.recImport - opReal.rec) < 0.01;
+      const dailyVazio = Object.keys(r.daily||{}).length===0;
+      const dailyIgual = dailyVazio && Object.keys(opReal.daily||{}).length===0;
+      if(recIgual && dailyIgual){ unchanged++; return; }
       opReal.rec = r.recImport;
       opReal.ho  = r.recImport * 0.25;
       // Aplicar acordos (NrDocumento únicos)
       if(r.acordos > 0) opReal.acordos = r.acordos;
-      // Aplicar daily breakdown se existir
+      // Aplicar daily breakdown se existir — se vazio, preserva o daily atual
       if(r.daily && Object.keys(r.daily).length > 0){
         opReal.daily = r.daily;
       }
@@ -8059,10 +8070,15 @@ function importApply(){
   // Rebuild ALL ordenado → ranking atualizado
   rebuildAll();
 
-  // Salvar no localStorage
+  // Salvar no localStorage — rec e daily por operador
   const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
-  importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
+  const ovDaily = JSON.parse(localStorage.getItem('cofen_op_daily')||'{}');
+  importParsed.found.forEach(r=>{
+    ov[r.opName]=r.recImport;
+    if(r.daily && Object.keys(r.daily).length > 0) ovDaily[r.opName] = r.daily;
+  });
   localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
+  localStorage.setItem('cofen_op_daily', JSON.stringify(ovDaily));
 
   // Resetar snapshot base (novos valores importados = nova base)
   localStorage.removeItem('cofen_base_rec');
