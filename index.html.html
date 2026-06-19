@@ -520,8 +520,6 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('comparativo',this)">📊 Comparativo Mês</div>
   <div class="tab"     onclick="go('inadimpl',this)">🚨 Inadimplência</div>
   <div class="tab"     onclick="go('metas',this)">🎯 Metas 2026</div>
-  <div class="tab"     onclick="go('quartil',this);setTimeout(renderQuartil,50)">🏆 Quartil</div>
-  <div class="tab"     onclick="go('controle',this);setTimeout(renderControle,50)">📋 Controle Líderes</div>
   <div class="tab"     onclick="go('tv',this);tvEnter()" style="background:linear-gradient(135deg,#001a0a,#003d1a);color:#FFDF00;font-weight:900;border-left:2px solid #FFDF00">📺 MODO TV</div>
 
 </div>
@@ -2691,7 +2689,6 @@ const ORIG = {"global":{"total":76462.34,"pp":0,"coren":0,"cofen":0,"daily":{}},
 })();
 
 let D = JSON.parse(JSON.stringify(ORIG));
-window.D = D;
 
 // ── EFICIÊNCIA: cor e label (>50% verde, 40-50% azul, <40% vermelho) ──
 function efColor(pct){
@@ -7701,9 +7698,11 @@ function importParse(raw){
   };
 
   const iCob  = colIdx(['cobradora','operador','cobrador','nome']);
-  const iRec  = colIdx(['recebido','rec ','valor rec','total rec','vlr rec']);
+  const iRec  = colIdx(['recebido','rec ','valor rec','total rec','vlr rec','pague play','pagueplay','pague']);
   const iHO   = colIdx(['total ho','ho','honorar']);
   const iDate = colIdx(['dtpagamento','dt.pagamento','data pagamento','dtpgto','dt.pgto','dt pgto','data pgto','data pag','dtlig','dt.lig','dt lig','dtbaixa','dt.baixa','dt baixa','data baixa','data lig','baixa','pgto','ligacao','dt','date','data']);
+  // Coluna D.U do relatório de conciliação
+  const iDU = colIdx(['d.u','du','dia util','dia útil','dia_util','diasutil','dias util']);
   const iDoc  = colIdx(['nrdocumento','nr documento','nrdoc','documento','doc','numero','número','parcela','titulo','título']);
   const iTipo = colIdx(['forma pgto','forma pag','tipo pgto','tipo pag','forma de pag','tipo de pag','tipo','forma','pagamento']);
 
@@ -7768,6 +7767,17 @@ function importParse(raw){
       const day = extractDay(row[iDate]);
       if(day && day >= 1 && day <= 31){
         acc[rawName].daily[day] = (acc[rawName].daily[day]||0) + recVal;
+      }
+    } else if(iDU >= 0 && recVal > 0){
+      // Coluna D.U do relatório de conciliação → mapeia DU para dia do mês
+      const duNum = parseInt(row[iDU]) || 0;
+      if(duNum >= 1 && duNum <= 31){
+        // Dias úteis de junho 2026: 1,2,3,5,8,9,10,11,12,15,16,17,18,19,22,23,24,25,26,29,30
+        const DU_JUNHO = [1,2,3,5,8,9,10,11,12,15,16,17,18,19,22,23,24,25,26,29,30];
+        const dayOfMonth = DU_JUNHO[duNum-1] || duNum;
+        acc[rawName].daily[dayOfMonth] = (acc[rawName].daily[dayOfMonth]||0) + recVal;
+      } else {
+        acc[rawName]._semData = true;
       }
     } else if(iDate < 0 && recVal > 0){
       acc[rawName]._semData = true;
@@ -13284,117 +13294,6 @@ function mtsAtualizarJunho(){
 <!-- ══════════ PAGE: METAS 2026 ══════════ -->
 
 
-<!-- ══════════ PAGE: QUARTIL ══════════ -->
-<div class="page" id="pg-quartil">
-
-  <!-- Hero dark -->
-  <div style="background:linear-gradient(135deg,#1a1a2e,#16213e 55%,#0f3460);border-radius:20px;padding:20px 24px;margin-bottom:4px;position:relative;overflow:hidden">
-    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">PaguePay HO — Recebimento Total</div>
-    <div style="font-family:Bebas Neue,sans-serif;font-size:26px;letter-spacing:3px;color:#fff;margin-bottom:4px">🏆 QUARTIL OPERACIONAL — JUNHO 2026</div>
-    <div style="font-size:11px;color:rgba(255,255,255,.4)">Meta individual ÷ DU do mês × DU passados = Meta esperada hoje &nbsp;|&nbsp; Quartil baseado em % de alcance</div>
-  </div>
-
-  <!-- Config row -->
-  <div class="card" style="flex-direction:row;flex-wrap:wrap;gap:16px;align-items:flex-end;padding:14px 18px">
-    <div>
-      <div style="font-size:10px;color:var(--g500);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px">DU Passados</div>
-      <input id="qt-du-passados" type="number" value="13" min="1" max="22"
-        style="width:70px;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--r);color:var(--g900);font-size:15px;font-weight:800;padding:8px 10px;outline:none">
-    </div>
-    <div>
-      <div style="font-size:10px;color:var(--g500);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px">DU Total Mês</div>
-      <input id="qt-du-total" type="number" value="21" min="1" max="31"
-        style="width:70px;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--r);color:var(--g900);font-size:15px;font-weight:800;padding:8px 10px;outline:none">
-    </div>
-    <div>
-      <button onclick="renderQuartil()" style="background:linear-gradient(135deg,var(--pp),var(--pp2));border:none;border-radius:var(--r);color:#fff;font-size:13px;font-weight:800;padding:10px 18px;cursor:pointer">🔄 RECALCULAR</button>
-    </div>
-    <!-- Quartil counts -->
-    <div id="qt-counts" style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap"></div>
-  </div>
-
-  <!-- Filtro equipe -->
-  <div style="display:flex;gap:8px;flex-wrap:wrap;padding:0 2px">
-    <button class="fbtn on" id="qt-all"   onclick="qtFilter('',this)">Todas</button>
-    <button class="fbtn"     onclick="qtFilter('COFEN MARILIA BRENDA',this)" style="color:#00A86B;border-color:#00A86B">🏙️ Brenda</button>
-    <button class="fbtn"     onclick="qtFilter('COFEN STEPHANIE 2° TURNO',this)" style="color:#F7971E;border-color:#F7971E">⭐ Stephanie</button>
-    <button class="fbtn"     onclick="qtFilter('COFEN BIRIGUI BRUNA',this)" style="color:#4776E6;border-color:#4776E6">💙 Bruna</button>
-    <button class="fbtn"     onclick="qtFilter('COFEN DIGITAL',this)" style="color:#9C27B0;border-color:#9C27B0">🖥️ Digital</button>
-  </div>
-
-  <!-- Busca -->
-  <div style="display:flex;gap:8px;align-items:center">
-    <input id="qt-search" type="text" placeholder="🔍 Buscar operador..."
-      oninput="renderQuartil()"
-      style="flex:1;max-width:300px;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--r);color:var(--g900);font-size:13px;padding:8px 12px;outline:none">
-    <div style="font-size:11px;color:var(--g500)" id="qt-sort-label">Ordenar:</div>
-    <button onclick="qtSort('rec')" id="qt-sort-rec" style="padding:5px 12px;border-radius:100px;border:1.5px solid var(--pp);background:var(--pp);color:#fff;font-size:11px;font-weight:800;cursor:pointer">💰 Recebimento</button>
-    <button onclick="qtSort('alcance')" id="qt-sort-alc" style="padding:5px 12px;border-radius:100px;border:1.5px solid var(--g200);background:transparent;color:var(--g700);font-size:11px;font-weight:800;cursor:pointer">📊 Alcance</button>
-  </div>
-
-  <!-- Tabela -->
-  <div class="card" style="padding:0;overflow:hidden">
-    <div style="overflow-x:auto">
-      <table id="qt-table" style="width:100%;border-collapse:collapse;font-size:12px">
-        <thead>
-          <tr style="background:#1A2330;color:#fff">
-            <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:.8px;text-transform:uppercase">#</th>
-            <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:.8px;text-transform:uppercase">Operador</th>
-            <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:.8px;text-transform:uppercase">Equipe</th>
-            <th style="padding:10px 12px;text-align:right;font-size:10px;letter-spacing:.8px;text-transform:uppercase">Meta</th>
-            <th style="padding:10px 12px;text-align:right;font-size:10px;letter-spacing:.8px;text-transform:uppercase">Recebimento</th>
-            <th style="padding:10px 12px;text-align:right;font-size:10px;letter-spacing:.8px;text-transform:uppercase">Por Dia</th>
-            <th style="padding:10px 12px;text-align:right;font-size:10px;letter-spacing:.8px;text-transform:uppercase">Meta Hoje</th>
-            <th style="padding:10px 12px;text-align:right;font-size:10px;letter-spacing:.8px;text-transform:uppercase">Falta/Sobra</th>
-            <th style="padding:10px 12px;text-align:right;font-size:10px;letter-spacing:.8px;text-transform:uppercase">Alcance</th>
-            <th style="padding:10px 12px;text-align:center;font-size:10px;letter-spacing:.8px;text-transform:uppercase">Quartil</th>
-          </tr>
-        </thead>
-        <tbody id="qt-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-</div>
-<!-- ══════════ FIM PAGE: QUARTIL ══════════ -->
-
-<!-- ══════════ PAGE: CONTROLE LÍDERES ══════════ -->
-<div class="page" id="pg-controle">
-
-  <!-- Hero -->
-  <div style="background:linear-gradient(135deg,#0d1b2a,#1b2a3b 55%,#0a2847);border-radius:20px;padding:20px 24px;margin-bottom:4px;position:relative;overflow:hidden">
-    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">COB COFEN — Dashboard Completo</div>
-    <div style="font-family:Bebas Neue,sans-serif;font-size:26px;letter-spacing:3px;color:#fff;margin-bottom:4px">📋 CONTROLE DIÁRIO — LÍDERES JUNHO 2026</div>
-    <div style="font-size:11px;color:rgba(255,255,255,.4)">Acumulado, Projeção e Quartil por equipe em tempo real</div>
-  </div>
-
-  <!-- Config -->
-  <div class="card" style="flex-direction:row;gap:16px;align-items:flex-end;padding:14px 18px">
-    <div>
-      <div style="font-size:10px;color:var(--g500);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px">DU Passados</div>
-      <input id="ct-du-passados" type="number" value="13" min="1" max="22"
-        style="width:70px;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--r);color:var(--g900);font-size:15px;font-weight:800;padding:8px 10px;outline:none">
-    </div>
-    <div>
-      <div style="font-size:10px;color:var(--g500);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px">DU Total Mês</div>
-      <input id="ct-du-total" type="number" value="21" min="1" max="31"
-        style="width:70px;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--r);color:var(--g900);font-size:15px;font-weight:800;padding:8px 10px;outline:none">
-    </div>
-    <div>
-      <button onclick="renderControle()" style="background:linear-gradient(135deg,var(--pp),var(--pp2));border:none;border-radius:var(--r);color:#fff;font-size:13px;font-weight:800;padding:10px 18px;cursor:pointer">🔄 RECALCULAR</button>
-    </div>
-    <div id="ct-quartil-geral" style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap"></div>
-  </div>
-
-  <!-- Cards gerais -->
-  <div id="ct-geral-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px"></div>
-
-  <!-- Blocos por equipe -->
-  <div id="ct-equipes-container"></div>
-
-</div>
-<!-- ══════════ FIM PAGE: CONTROLE LÍDERES ══════════ -->
-
 <div class="page" id="pg-metas">
 
   <!-- Hero -->
@@ -13910,7 +13809,7 @@ function rdopGetDados(){
   // Usa os dias do mês de maio 2026 com dados disponíveis
   const _hoje = new Date().getDate();
   const diasAtivos = new Set();
-  _D.equipes.forEach(eq => {
+  D.equipes.forEach(eq => {
     (eq.ops||[]).forEach(op => {
       if(op.rec > 0) {
         if(op.daily && typeof op.daily === 'object' && Object.keys(op.daily).length > 0) {
@@ -15345,276 +15244,7 @@ function tvEnter(){
     document.documentElement.requestFullscreen().catch(()=>{});
   }
 }
-
-// ══════════════════════════════════════════
-// QUARTIL & CONTROLE LÍDERES
-// ══════════════════════════════════════════
-
-// Meta individual por operador (baseado no arquivo de Marília)
-const QT_META_OP = {
-  // BRUNA
-  'MATHEUS_SOUZA':21000,'LEONARDO_NUNES':21000,'LYVIA_DIAS':21000,'HELTON_ROLDON':12500,
-  'FRANCISCA_BRITO':21000,'HELENA_SANTOS':21000,'MARIA_MOREIRASANTOS':21000,
-  'MARIA_BRAIDOTI':21000,'RAFAELA_MINHOTO':21000,'BRUNA_JUSTIMIANO':21000,
-  'DEBORA_ANDRIELLY':21000,'EDUARDO_SILVA':21000,'NAYARA_CRUZ':21000,
-  'JOAO_MIRANDA':21000,'MARIA_RODARTE':21000,'ANA_BENTO':21000,'MAYSA_OLIVEIRA':21000,
-  // DIGITAL
-  'KAROLAINE_SILVA':21000,'RENATARODRIGUES':21000,'THAYRA_FERREIRASILVA':21000,
-  'CLEBER_JUNIOR':10500,'JHONATA_NASCIMENTO':10500,
-  // BRENDA
-  'raissa_paloma':21000,'thauany_moura':21000,'leticia_romeu':21000,
-  'STEPHANIE_FAGUNDES':21000,'caio_shimite':21000,'silva_beatriz':21000,
-  'GIOVANA_SOUZA':21000,'itallo_cardamoni':10500,'BIANCA_V_SILVA':10500,
-  'felipe_arruda':10500,'carulini_santos':10500,'KELY_SILVA':10500,
-  'BRENDA_FERREIRA':10500,'JESSICA_O_SILVA':10500,
-  // STEPHANIE
-  'geovanna_almeida':21000,'katia_regina':21000,'thais_mayara':21000,
-  'larissa_santana':10500,'AMABELLY_SANTOS':21000,'jussara_pereira':21000,
-  'kauane_azevedo':21000,'aline_pupim':21000,'ISABELA_MONTEIRO':21000,
-  'thalia_thomaz':10500,'thais_c_ferreira':10500,
-};
-
-// Meta por equipe (HO)
-const QT_META_EQ = {
-  'COFEN MARILIA BRENDA':   150000,
-  'COFEN BIRIGUI BRUNA':    300000,
-  'COFEN STEPHANIE 2° TURNO': 150000,
-  'COFEN DIGITAL':          0,  // incluída em Bruna
-};
-
-const QT_EQ_COLORS = {
-  'COFEN MARILIA BRENDA':     {c:'#00A86B',bg:'#E6F7F1',ico:'🏙️'},
-  'COFEN BIRIGUI BRUNA':      {c:'#4776E6',bg:'#EEF2FF',ico:'💙'},
-  'COFEN STEPHANIE 2° TURNO': {c:'#F7971E',bg:'#FFF7ED',ico:'⭐'},
-  'COFEN DIGITAL':            {c:'#9C27B0',bg:'#F3E5F5',ico:'🖥️'},
-};
-
-let qtCurrentFilter = '';
-let qtCurrentSort   = 'rec';
-
-function qtGetAllOps(duPassados, duTotal) {
-  const _D = window.D || D; if (!_D || !_D.equipes) return [];
-  const all = [];
-  D.equipes.forEach(eq => {
-    (eq.ops||[]).forEach(op => {
-      const meta    = QT_META_OP[op.name] || 21000;
-      const rec     = op.rec || 0;
-      const porDia  = meta / duTotal;
-      const metaHoje = porDia * duPassados;
-      const falta   = rec - metaHoje;
-      const alcance = metaHoje > 0 ? rec / metaHoje : 0;
-      const proj    = duPassados > 0 ? (rec / duPassados) * duTotal : 0;
-      let q, qColor;
-      if (alcance >= 1.0)  { q = '1º QUARTIL'; qColor = '#22c55e'; }
-      else if (alcance >= 0.80) { q = '2º QUARTIL'; qColor = '#3B82F6'; }
-      else if (alcance >= 0.57) { q = '3º QUARTIL'; qColor = '#F59E0B'; }
-      else { q = '4º QUARTIL'; qColor = '#ef4444'; }
-      all.push({ name:op.name, eq:eq.name, meta, rec, porDia, metaHoje, falta, alcance, proj, q, qColor });
-    });
-  });
-  return all;
-}
-
-function _fmtR(v){ return 'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-
-function renderQuartil() {
-  const duP  = parseInt(document.getElementById('qt-du-passados')?.value) || 13;
-  const duT  = parseInt(document.getElementById('qt-du-total')?.value) || 21;
-  const srch = (document.getElementById('qt-search')?.value || '').toLowerCase();
-  let ops = qtGetAllOps(duP, duT);
-  if (qtCurrentFilter) ops = ops.filter(o => o.eq === qtCurrentFilter);
-  if (srch) ops = ops.filter(o => o.name.toLowerCase().includes(srch));
-  ops.sort((a, b) => qtCurrentSort === 'rec' ? b.rec - a.rec : b.alcance - a.alcance);
-
-  // Counts
-  const counts = {'1º QUARTIL':0,'2º QUARTIL':0,'3º QUARTIL':0,'4º QUARTIL':0};
-  ops.forEach(o => counts[o.q]++);
-  const qColors = {'1º QUARTIL':'#22c55e','2º QUARTIL':'#3B82F6','3º QUARTIL':'#F59E0B','4º QUARTIL':'#ef4444'};
-  document.getElementById('qt-counts').innerHTML = Object.entries(counts).map(([q,n]) =>
-    `<div style="background:${qColors[q]};color:#fff;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:800">${q}: ${n}</div>`
-  ).join('');
-
-  // Table
-  const tbody = document.getElementById('qt-tbody');
-  if (!tbody) return;
-  tbody.innerHTML = ops.map((o, i) => {
-    const eq = QT_EQ_COLORS[o.eq] || {c:'#888',bg:'#f5f5f5',ico:'👤'};
-    const faltaCor = o.falta >= 0 ? '#22c55e' : '#ef4444';
-    return `<tr style="border-bottom:1px solid #EFF2F5;${i%2===0?'background:#F8FAFB':''}">
-      <td style="padding:9px 12px;font-size:11px;color:#7A8899;font-weight:700">${i+1}</td>
-      <td style="padding:9px 12px;font-weight:700;color:#1A2330">${o.name.replace(/_/g,' ')}</td>
-      <td style="padding:9px 12px">
-        <span style="background:${eq.bg};color:${eq.c};padding:2px 8px;border-radius:100px;font-size:10px;font-weight:800">${eq.ico} ${o.eq.replace('COFEN ','')}</span>
-      </td>
-      <td style="padding:9px 12px;text-align:right;color:#7A8899;font-size:11px">${_fmtR(o.meta)}</td>
-      <td style="padding:9px 12px;text-align:right;font-weight:900;color:#1A2330">${_fmtR(o.rec)}</td>
-      <td style="padding:9px 12px;text-align:right;color:#7A8899;font-size:11px">${_fmtR(o.porDia)}</td>
-      <td style="padding:9px 12px;text-align:right;color:#4776E6;font-size:11px;font-weight:700">${_fmtR(o.metaHoje)}</td>
-      <td style="padding:9px 12px;text-align:right;font-weight:800;color:${faltaCor}">${o.falta>=0?'+':''}${_fmtR(o.falta)}</td>
-      <td style="padding:9px 12px;text-align:right;font-weight:800;color:${o.qColor}">${(o.alcance*100).toFixed(1)}%</td>
-      <td style="padding:9px 12px;text-align:center">
-        <span style="background:${o.qColor};color:#fff;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:800">${o.q}</span>
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-function qtFilter(eq, btn) {
-  qtCurrentFilter = eq;
-  document.querySelectorAll('[onclick^="qtFilter"]').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  renderQuartil();
-}
-
-function qtSort(by) {
-  qtCurrentSort = by;
-  document.getElementById('qt-sort-rec').style.background = by==='rec' ? 'var(--pp)' : 'transparent';
-  document.getElementById('qt-sort-rec').style.color = by==='rec' ? '#fff' : 'var(--g700)';
-  document.getElementById('qt-sort-rec').style.borderColor = by==='rec' ? 'var(--pp)' : 'var(--g200)';
-  document.getElementById('qt-sort-alc').style.background = by==='alcance' ? 'var(--pp)' : 'transparent';
-  document.getElementById('qt-sort-alc').style.color = by==='alcance' ? '#fff' : 'var(--g700)';
-  document.getElementById('qt-sort-alc').style.borderColor = by==='alcance' ? 'var(--pp)' : 'var(--g200)';
-  renderQuartil();
-}
-
-// ─── CONTROLE LÍDERES ───────────────────────
-function renderControle() {
-  const duP = parseInt(document.getElementById('ct-du-passados')?.value) || 13;
-  const duT = parseInt(document.getElementById('ct-du-total')?.value) || 21;
-
-  window.D = window.D || D;
-  if (!window.D || !window.D.equipes) return;
-  D = window.D;
-
-  const allOps = qtGetAllOps(duP, duT);
-  const recTotal = allOps.reduce((s,o)=>s+o.rec,0);
-  const metaGeral = 600000;
-  const metaHojeGeral = (metaGeral / duT) * duP;
-  const projGeral = duP > 0 ? (recTotal / duP) * duT : 0;
-  const pctGeral  = metaHojeGeral > 0 ? recTotal / metaHojeGeral : 0;
-
-  // Quartil counts geral
-  const qCounts = {'1º QUARTIL':0,'2º QUARTIL':0,'3º QUARTIL':0,'4º QUARTIL':0};
-  allOps.forEach(o => qCounts[o.q]++);
-  const qColors = {'1º QUARTIL':'#22c55e','2º QUARTIL':'#3B82F6','3º QUARTIL':'#F59E0B','4º QUARTIL':'#ef4444'};
-  document.getElementById('ct-quartil-geral').innerHTML = Object.entries(qCounts).map(([q,n])=>
-    `<div style="background:${qColors[q]};color:#fff;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:800">${q}: ${n}</div>`
-  ).join('');
-
-  // Cards gerais
-  const pctCorG = pctGeral>=1?'#22c55e':pctGeral>=0.8?'#84cc16':pctGeral>=0.6?'#F59E0B':'#ef4444';
-  document.getElementById('ct-geral-cards').innerHTML = [
-    {lbl:'Recebimento Total',val:_fmtR(recTotal),cor:'#1A2330',sub:'HO acumulado'},
-    {lbl:'Meta Esperada Hoje',val:_fmtR(metaHojeGeral),cor:'#4776E6',sub:`${duP} DU de ${duT}`},
-    {lbl:'% da Meta',val:(pctGeral*100).toFixed(1)+'%',cor:pctCorG,sub:'vs meta de hoje'},
-    {lbl:'Projeção Final',val:_fmtR(projGeral),cor:projGeral>=metaGeral?'#22c55e':'#F59E0B',sub:'no ritmo atual'},
-    {lbl:'Meta do Mês',val:_fmtR(metaGeral),cor:'#7A8899',sub:'objetivo total'},
-    {lbl:'Falta',val:_fmtR(Math.max(0,metaGeral-recTotal)),cor:'#ef4444',sub:'para bater meta'},
-  ].map(c=>`
-    <div style="background:#fff;border:1px solid #EFF2F5;border-radius:12px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
-      <div style="font-size:9px;color:#7A8899;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">${c.lbl}</div>
-      <div style="font-size:17px;font-weight:900;color:${c.cor}">${c.val}</div>
-      <div style="font-size:10px;color:#C5CDD8;margin-top:2px">${c.sub}</div>
-    </div>`).join('');
-
-  // Blocos por equipe
-  const container = document.getElementById('ct-equipes-container');
-  if (!container) return;
-
-  const equipeNames = [...new Set(D.equipes.map(e=>e.name))];
-  container.innerHTML = equipeNames.map(eqNm => {
-    const eq     = D.equipes.find(e=>e.name===eqNm);
-    if (!eq) return '';
-    const eqOps  = allOps.filter(o=>o.eq===eqNm);
-    const rec    = eqOps.reduce((s,o)=>s+o.rec,0);
-    const meta   = QT_META_EQ[eqNm] || 150000;
-    if (meta === 0) return ''; // digital agrupada com bruna
-    const mHoje  = (meta / duT) * duP;
-    const proj   = duP > 0 ? (rec / duP) * duT : 0;
-    const diar   = duP > 0 ? rec / duP : 0;
-    const pct    = mHoje > 0 ? rec / mHoje : 0;
-    const cor    = pct>=1?'#22c55e':pct>=0.8?'#84cc16':pct>=0.6?'#F59E0B':'#ef4444';
-    const eqC    = QT_EQ_COLORS[eqNm] || {c:'#888',bg:'#f5f5f5',ico:'👤'};
-
-    // Quartil counts para equipe
-    const eqQC = {'1º QUARTIL':0,'2º QUARTIL':0,'3º QUARTIL':0,'4º QUARTIL':0};
-    eqOps.forEach(o=>eqQC[o.q]++);
-
-    // Operador table
-    const opRows = [...eqOps].sort((a,b)=>b.rec-a.rec).map((o,i)=>`
-      <tr style="border-bottom:1px solid #EFF2F5;${i%2===0?'background:#F8FAFB':''}">
-        <td style="padding:7px 10px;font-weight:700;font-size:11px;color:#1A2330">${o.name.replace(/_/g,' ')}</td>
-        <td style="padding:7px 10px;text-align:right;font-size:11px;color:#7A8899">${_fmtR(o.meta)}</td>
-        <td style="padding:7px 10px;text-align:right;font-size:11px;color:#7A8899">${_fmtR(o.porDia)}</td>
-        <td style="padding:7px 10px;text-align:right;font-size:11px;color:#4776E6;font-weight:700">${_fmtR(o.metaHoje)}</td>
-        <td style="padding:7px 10px;text-align:right;font-weight:900;color:#1A2330">${_fmtR(o.rec)}</td>
-        <td style="padding:7px 10px;text-align:right;font-size:11px;font-weight:700;color:${o.falta>=0?'#22c55e':'#ef4444'}">${o.falta>=0?'+':''}${_fmtR(o.falta)}</td>
-        <td style="padding:7px 10px;text-align:right;font-size:11px;font-weight:700;color:${o.qColor}">${(o.alcance*100).toFixed(1)}%</td>
-        <td style="padding:7px 10px;text-align:center">
-          <span style="background:${o.qColor};color:#fff;padding:2px 7px;border-radius:100px;font-size:9px;font-weight:800">${o.q}</span>
-        </td>
-        <td style="padding:7px 10px;text-align:right;font-size:11px;color:#7A8899">${_fmtR(o.proj)}</td>
-      </tr>`).join('');
-
-    return `
-    <div style="background:#fff;border:1px solid #EFF2F5;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:16px">
-      <!-- Header equipe -->
-      <div style="background:${eqC.c};padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        <span style="font-size:20px">${eqC.ico}</span>
-        <div style="flex:1">
-          <div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:2px;color:#fff">${eqNm}</div>
-        </div>
-        ${Object.entries(eqQC).map(([q,n])=>`<div style="background:${qColors[q]};padding:3px 9px;border-radius:100px;font-size:10px;font-weight:800;color:#fff">${q}: ${n}</div>`).join('')}
-      </div>
-      <!-- Métricas equipe -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;padding:14px 16px;border-bottom:1px solid #EFF2F5">
-        ${[
-          {l:'Acumulado',v:_fmtR(rec),c:'#1A2330'},
-          {l:'Meta Hoje',v:_fmtR(mHoje),c:'#4776E6'},
-          {l:'% Meta',v:(pct*100).toFixed(1)+'%',c:cor},
-          {l:'Diário Médio',v:_fmtR(diar),c:'#7A8899'},
-          {l:'Projeção',v:_fmtR(proj),c:proj>=meta?'#22c55e':'#F59E0B'},
-          {l:'Falta Meta',v:_fmtR(Math.max(0,meta-rec)),c:'#ef4444'},
-        ].map(m=>`<div style="background:#F8FAFB;border-radius:8px;padding:8px 10px">
-          <div style="font-size:9px;color:#7A8899;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">${m.l}</div>
-          <div style="font-size:14px;font-weight:900;color:${m.c}">${m.v}</div>
-        </div>`).join('')}
-      </div>
-      <!-- Tabela operadores -->
-      <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:11px">
-          <thead>
-            <tr style="background:#F8FAFB">
-              ${['Operador','Meta','Por Dia','Meta Hoje','Recebimento','Falta/Sobra','Alcance','Quartil','Projeção'].map(h=>
-                `<th style="padding:8px 10px;text-align:${h==='Operador'?'left':'right'};font-size:9px;color:#7A8899;font-weight:700;text-transform:uppercase;letter-spacing:.5px;${h==='Quartil'?'text-align:center':''}">${h}</th>`
-              ).join('')}
-            </tr>
-          </thead>
-          <tbody>${opRows}</tbody>
-        </table>
-      </div>
-    </div>`;
-  }).join('');
-}
-// ── FIM QUARTIL & CONTROLE ──────────────────
-
 </script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Pre-render Quartil and Controle after D is initialized
-  function _tryRenderQC(attempt) {
-    if (attempt > 20) return;
-    if (window.D && window.D.equipes && window.D.equipes.length > 0) {
-      try { renderQuartil(); } catch(e) { console.warn('renderQuartil:', e); }
-      try { renderControle(); } catch(e) { console.warn('renderControle:', e); }
-    } else {
-      setTimeout(function(){ _tryRenderQC(attempt+1); }, 200);
-    }
-  }
-  setTimeout(function(){ _tryRenderQC(0); }, 500);
-});
-</script>
-
 
 <!-- ══ PÁGINA MODO TV ══ -->
 <div class="page" id="pg-tv" style="padding:0;margin:0;background:#001a0a">
