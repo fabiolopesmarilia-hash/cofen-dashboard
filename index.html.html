@@ -2769,7 +2769,30 @@ let corenData = {}; // { MT: 0, PI: 0, ... + quaisquer novos }
 })();
 // Compat: variáveis legadas apontam para corenData
 let corenMT,corenPI,corenMA,corenCE,corenSP,corenRJ,corenMG,corenRS,corenPR,corenBA,corenGO,corenPE,corenSC,corenAM,corenPB;
-function _syncCorenLegacy(){ corenMT=corenData.MT||0;corenPI=corenData.PI||0;corenMA=corenData.MA||0;corenCE=corenData.CE||0;corenSP=corenData.SP||0;corenRJ=corenData.RJ||0;corenMG=corenData.MG||0;corenRS=corenData.RS||0;corenPR=corenData.PR||0;corenBA=corenData.BA||0;corenGO=corenData.GO||0;corenPE=corenData.PE||0;corenSC=corenData.SC||0;corenAM=corenData.AM||0;corenPB=corenData.PB||0; }
+function _syncCorenLegacy(){
+  // Prioridade: corenData (sincronizado via applyArrecadado/importação)
+  // Fallback: inputs do editor de CORENs (inp-coren-XX)
+  function _gc(key, inp){
+    if(corenData[key] > 0) return corenData[key];
+    const el = document.getElementById(inp);
+    return el ? (parseFloat(el.value)||0) : 0;
+  }
+  corenMT = _gc('MT','inp-coren-mt');
+  corenPI = _gc('PI','inp-coren-pi');
+  corenMA = _gc('MA','inp-coren-ma');
+  corenCE = _gc('CE','inp-coren-ce');
+  corenSP = _gc('SP','inp-coren-sp');
+  corenRJ = _gc('RJ','inp-coren-rj');
+  corenMG = _gc('MG','inp-coren-mg');
+  corenRS = _gc('RS','inp-coren-rs');
+  corenPR = _gc('PR','inp-coren-pr');
+  corenBA = _gc('BA','inp-coren-ba');
+  corenGO = _gc('GO','inp-coren-go');
+  corenPE = _gc('PE','inp-coren-pe');
+  corenSC = _gc('SC','inp-coren-sc');
+  corenAM = _gc('AM','inp-coren-am');
+  corenPB = _gc('PB','inp-coren-pb');
+}
 _syncCorenLegacy();
 
 // ── TOTAL ARRECADADO: valor que entra para a empresa (diferente do Total Real) ──
@@ -3139,6 +3162,7 @@ function getTotalRec(){
 
 // ── INIT HERO & GERAL ──
 function initHero(){
+  _syncCorenLegacy(); // garante que corenMT..corenPB estão atualizados
   const totalRec = getTotalRec();
   const totalHO  = totalRec * 0.25;
   const falta    = Math.max(0, meta - totalRec);
@@ -3353,6 +3377,23 @@ function mkTop5(){
 // ── EDITOR ──
 function buildOpEditor(){
   document.getElementById('inp-total').value = overrideTotalRec > 0 ? overrideTotalRec : '';
+  // ── Restaurar painel 2 (Editar Valores) com dados do localStorage ──
+  (function _restorePainel2(){
+    const _ia = document.getElementById('inp-arrecadado');
+    if(_ia){
+      const savedArr = parseFloat(localStorage.getItem('cofen_arrecadado')||'0');
+      if(savedArr > 0) _ia.value = savedArr;
+      else if(overrideTotalRec > 0) _ia.value = overrideTotalRec;
+    }
+    // Preencher inputs dos CORENs com valores do corenData (já carregado do localStorage)
+    Object.entries(corenData).forEach(([sigla, val]) => {
+      if(val <= 0) return;
+      const el = document.getElementById('inp-coren-' + sigla.toLowerCase());
+      if(el && !el.value) el.value = val;
+    });
+    // Chamar _syncCorenLegacy para garantir variáveis globais
+    if(typeof _syncCorenLegacy === 'function') _syncCorenLegacy();
+  })();
   document.getElementById('inp-meta').value  = meta;
   // Preencher campos COREN
   const setV = (id,v)=>{ const el=document.getElementById(id); if(el) el.value=v>0?v:''; };
@@ -3926,9 +3967,22 @@ function applyArrecadado(){
   localStorage.setItem('cofen_coren_sc', sc);
   localStorage.setItem('cofen_coren_am', am);
   localStorage.setItem('cofen_coren_pb', pb);
+  // ── Sincronizar com painel 1 (Recebimento Global) ──
+  // O Total Arrecadado (inp-arrecadado) É o Total Real — sincroniza automaticamente
+  overrideTotalRec = v;
+  localStorage.setItem('cofen_total', v);
+  const _inpTotal = document.getElementById('inp-total');
+  if(_inpTotal) _inpTotal.value = v > 0 ? v : '';
+  // Salvar CORENs via corenData para _syncCorenLegacy
+  if(typeof corenData !== 'undefined'){
+    corenData.MT=mt; corenData.PI=pi; corenData.MA=ma; corenData.CE=ce;
+    corenData.SP=sp; corenData.RJ=rj; corenData.MG=mg; corenData.RS=rs;
+    corenData.PR=pr; corenData.BA=ba; corenData.GO=go; corenData.PE=pe;
+    corenData.SC=sc; corenData.AM=am; corenData.PB=pb;
+  }
   initHero();
   fbPush('arrecadado', {v, m:metaArrecadado, mt, pi, ma, ce, sp, rj, mg, rs, pr, ba, go, pe, sc, am, pb, ppAbril:ppEmpresaAbril});
-  toast('✅ PaguePay e CORENs salvos!');
+  toast('✅ Painel 1 e PaguePay sincronizados!');
 }
 
 function resetArrecadado(){
@@ -4999,6 +5053,12 @@ function applyTotal(){
   meta = m;
   localStorage.setItem('cofen_meta',  m);
   localStorage.setItem('cofen_total', v);
+  // ── Sincronizar com painel 2 (Editar Valores / Total Arrecadado) ──
+  if(v > 0){
+    const _ia = document.getElementById('inp-arrecadado');
+    if(_ia && (!_ia.value || parseFloat(_ia.value) === 0)) { _ia.value = v; }
+    if(v > 0) { totalArrecadado = v; localStorage.setItem('cofen_arrecadado', v); }
+  }
   // Salvar todos os CORENs visíveis no grid (incluindo novos do XLS)
   _saveAllCorens();
   refreshAll();
@@ -6047,7 +6107,6 @@ function loadSavedOverrides(){
     localStorage.removeItem('cofen_total');
     localStorage.removeItem('cofen_daily_hist');
     localStorage.removeItem('cofen_op_hist');
-    localStorage.removeItem('cofen_op_daily');
     localStorage.setItem('cofen_file_version', FILE_VERSION);
     // Gravar valores do ORIG como overrides iniciais
     const initOv = {};
@@ -6079,9 +6138,7 @@ function loadSavedOverrides(){
     const savedOpHist = JSON.parse(localStorage.getItem('cofen_op_hist')||'{}');
     // Retrocompatibilidade: cofen_daily_hist (só daily)
     const savedDaily  = JSON.parse(localStorage.getItem('cofen_daily_hist')||'{}');
-    // Novo: cofen_op_daily (daily salvo pelo importApply)
-    const savedOpDaily = JSON.parse(localStorage.getItem('cofen_op_daily')||'{}');
-    const hasHist = Object.keys(savedOpHist).length > 0 || Object.keys(savedDaily).length > 0 || Object.keys(savedOpDaily).length > 0;
+    const hasHist = Object.keys(savedOpHist).length > 0 || Object.keys(savedDaily).length > 0;
     if(hasHist){
       D.equipes.forEach(eq=>{
         eq.ops.forEach(op=>{
@@ -6091,10 +6148,6 @@ function loadSavedOverrides(){
             if(savedOpHist[op.name].acordos) op.acordos = savedOpHist[op.name].acordos;
           } else if(savedDaily[op.name]){
             op.daily = savedDaily[op.name];
-          }
-          // Aplica cofen_op_daily por cima (fonte mais recente do importApply)
-          if(savedOpDaily[op.name] && Object.keys(savedOpDaily[op.name]).length > 0){
-            op.daily = savedOpDaily[op.name];
           }
         });
       });
@@ -8040,16 +8093,12 @@ function importApply(){
       const opReal = eq.ops.find(o=>o.name===r.opName);
       if(!opReal) return;
       found = true;
-      // Só pula se rec E daily são iguais (não pula se só daily mudou)
-      const recIgual = Math.abs(r.recImport - opReal.rec) < 0.01;
-      const dailyVazio = Object.keys(r.daily||{}).length===0;
-      const dailyIgual = dailyVazio && Object.keys(opReal.daily||{}).length===0;
-      if(recIgual && dailyIgual){ unchanged++; return; }
+      if(Math.abs(r.recImport - opReal.rec) < 0.01 && Object.keys(r.daily||{}).length===0){ unchanged++; return; }
       opReal.rec = r.recImport;
       opReal.ho  = r.recImport * 0.25;
       // Aplicar acordos (NrDocumento únicos)
       if(r.acordos > 0) opReal.acordos = r.acordos;
-      // Aplicar daily breakdown se existir — se vazio, preserva o daily atual
+      // Aplicar daily breakdown se existir
       if(r.daily && Object.keys(r.daily).length > 0){
         opReal.daily = r.daily;
       }
@@ -8070,15 +8119,10 @@ function importApply(){
   // Rebuild ALL ordenado → ranking atualizado
   rebuildAll();
 
-  // Salvar no localStorage — rec e daily por operador
+  // Salvar no localStorage
   const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
-  const ovDaily = JSON.parse(localStorage.getItem('cofen_op_daily')||'{}');
-  importParsed.found.forEach(r=>{
-    ov[r.opName]=r.recImport;
-    if(r.daily && Object.keys(r.daily).length > 0) ovDaily[r.opName] = r.daily;
-  });
+  importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
   localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
-  localStorage.setItem('cofen_op_daily', JSON.stringify(ovDaily));
 
   // Resetar snapshot base (novos valores importados = nova base)
   localStorage.removeItem('cofen_base_rec');
