@@ -8804,6 +8804,8 @@ try {
     if(e.data.type === 'photo_update'){
       const photos = JSON.parse(e.data.payload||'{}');
       localStorage.setItem('cofen_photos', JSON.stringify(photos));
+      if(typeof tvRefresh==='function') tvRefresh();
+      if(document.getElementById('fotos-grid')) fotosRenderGrid();
     }
     if(e.data.type === 'meta_update'){
       // Outra aba editou total/meta — aplicar aqui também
@@ -8856,7 +8858,7 @@ function tvSetMode(mode, btnEl){
   if(btnEl){ btnEl.style.background='rgba(255,255,255,.18)'; btnEl.style.color='#fff'; }
   // Atualiza label
   const lbl = document.getElementById('tv-mode-label');
-  if(lbl) lbl.textContent = mode==='geral' ? 'RANKING GERAL' : mode==='bb' ? 'BRUNA + BRENDA' : mode==='bs' ? 'BRENDA + STEPHANIE' : mode==='COFEN BIRIGUI BRUNA' ? 'BRUNA + DIGITAL + ELITE' : (EQ[mode]?.sh||mode).toUpperCase();
+  if(lbl) lbl.textContent = mode==='geral' ? 'RANKING GERAL' : mode==='bb' ? 'BRUNA + BRENDA' : mode==='bs' ? 'BRENDA + STEPHANIE' : mode==='COFEN BIRIGUI BRUNA' ? 'BRUNA + DIGITAL + ELITE' : mode==='COFEN KATIA' ? 'EQUIPE KATIA' : (EQ[mode]?.sh||mode).toUpperCase();
 
   // Reconstrói lista e reinicia
   tvBuildList();
@@ -9869,6 +9871,8 @@ function fbStartListening(){
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
     localStorage.setItem('cofen_photos', JSON.stringify({...local,...remote}));
     pulseSyncDot();
+    if(typeof tvRefresh==='function') tvRefresh();
+    if(document.getElementById('fotos-grid')) fotosRenderGrid();
   });
   fbListeners.photos = true;
 
@@ -12030,6 +12034,11 @@ setInterval(()=>{
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
         font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
         💙 Bruna + Digital + Elite
+      </button>
+      <button id="tv-btn-COFEN_KATIA" onclick="tvSetMode('COFEN KATIA',this)"
+        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
+        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
+        💜 Katia
       </button>
     </div>
     <!-- Nav -->
