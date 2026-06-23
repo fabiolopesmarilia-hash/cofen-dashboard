@@ -9601,11 +9601,14 @@ async function syncConnect(){
   document.getElementById('sync-connect-btn').disabled=true;
 
   try {
-    // Init Firebase (or reuse)
+    // Init Firebase (ou reutiliza se já existe)
     if(!fbApp){
-      fbApp = firebase.initializeApp({
-        databaseURL: url
-      }, 'cofen-sync-'+Date.now());
+      const appName = 'cofen-sync-manual';
+      try {
+        fbApp = firebase.app(appName);
+      } catch(notFound){
+        fbApp = firebase.initializeApp({databaseURL: url}, appName);
+      }
     }
     fbDb   = firebase.database(fbApp);
     fbRoom = room;
@@ -10237,7 +10240,13 @@ async function fbAutoConnect(){
   fbSaveCfg({url, room});
   try {
     if(!fbApp){
-      fbApp = firebase.initializeApp({databaseURL: url}, 'cofen-sync-auto');
+      // Verifica se já existe um app com esse nome (ex: após reload sem fechar aba)
+      const appName = 'cofen-sync-auto';
+      try {
+        fbApp = firebase.app(appName); // reutiliza se já existe
+      } catch(notFound){
+        fbApp = firebase.initializeApp({databaseURL: url}, appName);
+      }
     }
     fbDb  = firebase.database(fbApp);
     fbRoom= room;
@@ -11776,7 +11785,16 @@ tick(); setInterval(tick,1000);
 buildCal('cal-grid');
 buildDUManualGrid();
 initHero();
-fbAutoConnect();
+// Aguarda o SDK do Firebase estar disponível antes de conectar (evita erro em conexões lentas)
+(function fbWaitAndConnect(attempt){
+  if(typeof firebase !== 'undefined' && firebase.initializeApp){
+    fbAutoConnect();
+  } else if(attempt < 20){
+    setTimeout(()=>fbWaitAndConnect(attempt+1), 300);
+  } else {
+    console.warn('Firebase SDK não carregou após 6s — sync desativado.');
+  }
+})(0);
 mkGD(); mkDist(); mkTop5();
 mkEq();
 // Restaurar extras de equipe do localStorage ao iniciar
