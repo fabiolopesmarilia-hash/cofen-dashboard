@@ -1196,7 +1196,7 @@ select.ev-inp{cursor:pointer}
         <!-- Divisor vertical -->
         <div style="width:1px;background:rgba(255,255,255,.1);flex-shrink:0;margin:4px 0"></div>
         <!-- Mini cards das equipes -->
-        <div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:center" id="rd-eq-hero-cards">
+        <div style="flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-items:stretch" id="rd-eq-hero-cards">
         </div>
       </div>
     </div>
@@ -6176,7 +6176,7 @@ function rdRenderEqHeroCards(){
         +'</div>')
       :'';
     return '<div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);'
-      +'border-radius:12px;padding:12px 14px;border-top:2px solid '+cfg.c+'">'
+      +'border-radius:12px;padding:12px 14px;border-top:2px solid '+cfg.c+';min-height:145px;box-sizing:border-box">'
       +'<div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;'
       +'text-transform:uppercase;margin-bottom:6px">'+cfg.ico+' '+cfg.sh+'</div>'
       +'<div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600;margin-bottom:1px">Hoje</div>'
@@ -8856,7 +8856,7 @@ function tvSetMode(mode, btnEl){
   if(btnEl){ btnEl.style.background='rgba(255,255,255,.18)'; btnEl.style.color='#fff'; }
   // Atualiza label
   const lbl = document.getElementById('tv-mode-label');
-  if(lbl) lbl.textContent = mode==='geral' ? 'RANKING GERAL' : mode==='bb' ? 'BRUNA + BRENDA' : mode==='bs' ? 'BRENDA + STEPHANIE' : mode==='COFEN BIRIGUI BRUNA' ? 'BRUNA + DIGITAL + ELITE' : mode==='COFEN KATIA' ? 'EQUIPE KATIA' : (EQ[mode]?.sh||mode).toUpperCase();
+  if(lbl) lbl.textContent = mode==='geral' ? 'RANKING GERAL' : mode==='bb' ? 'BRUNA + BRENDA' : mode==='bs' ? 'BRENDA + STEPHANIE' : mode==='COFEN BIRIGUI BRUNA' ? 'BRUNA + DIGITAL + ELITE' : (EQ[mode]?.sh||mode).toUpperCase();
 
   // Reconstrói lista e reinicia
   tvBuildList();
@@ -12012,11 +12012,6 @@ setInterval(()=>{
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
         font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
         💙 Bruna + Digital + Elite
-      </button>
-      <button id="tv-btn-COFEN_KATIA" onclick="tvSetMode('COFEN KATIA',this)"
-        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
-        💜 Katia
       </button>
     </div>
     <!-- Nav -->
