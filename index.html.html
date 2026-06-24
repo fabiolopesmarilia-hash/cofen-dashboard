@@ -459,8 +459,8 @@ select.ev-inp{cursor:pointer}
 </style>
 
 <!-- Firebase SDK -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-app-compat.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-database-compat.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 </head>
 <body>
@@ -9607,7 +9607,14 @@ async function syncConnect(){
   const room = document.getElementById('sync-room').value.trim().replace(/[^a-zA-Z0-9_-]/g,'-');
   const url  = document.getElementById('sync-fburl').value.trim().replace(/\/$/,'');
   if(!room){ toast('cofen-principal'); return; }
-  if(!url||!url.startsWith('https')){ toast('https://cofen-dashboard-622a8-default-rtdb.firebaseio.com'); return; }
+  if(!url||!url.startsWith('https')||!url.includes('firebaseio.com')){
+    toast('URL inválida. Ex: https://meu-projeto-default-rtdb.firebaseio.com');
+    return;
+  }
+  if(typeof firebase === 'undefined' || !firebase.initializeApp){
+    syncSetStatus('error','❌ Firebase SDK não carregou. Verifique sua conexão com a internet.');
+    return;
+  }
 
   syncSetStatus('connecting','🔄 Conectando...');
   document.getElementById('sync-connect-btn').textContent='⏳ Conectando...';
@@ -9617,9 +9624,11 @@ async function syncConnect(){
     // Init Firebase (ou reutiliza se já existe)
     if(!fbApp){
       const appName = 'cofen-sync-manual';
-      try {
-        fbApp = firebase.app(appName);
-      } catch(notFound){
+      const existingApps = firebase.apps || [];
+      const found = existingApps.find(function(a){ return a && a.name === appName; });
+      if(found){
+        fbApp = found;
+      } else {
         fbApp = firebase.initializeApp({databaseURL: url}, appName);
       }
     }
@@ -10257,9 +10266,11 @@ async function fbAutoConnect(){
     if(!fbApp){
       // Verifica se já existe um app com esse nome (ex: após reload sem fechar aba)
       const appName = 'cofen-sync-auto';
-      try {
-        fbApp = firebase.app(appName); // reutiliza se já existe
-      } catch(notFound){
+      const existingApps = firebase.apps || [];
+      const found = existingApps.find(function(a){ return a && a.name === appName; });
+      if(found){
+        fbApp = found;
+      } else {
         fbApp = firebase.initializeApp({databaseURL: url}, appName);
       }
     }
