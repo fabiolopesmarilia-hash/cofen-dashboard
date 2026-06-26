@@ -459,8 +459,8 @@ select.ev-inp{cursor:pointer}
 </style>
 
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-app-compat.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-database-compat.min.js"></script>
 
 </head>
 <body>
@@ -1157,11 +1157,18 @@ select.ev-inp{cursor:pointer}
         <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:4px">⚡ Painel em Tempo Real</div>
         <div style="font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:4px;color:#fff;line-height:1" id="rd-data-hoje">— / — / —</div>
       </div>
-      <button onclick="rdClearDay()"
-        style="padding:8px 16px;border-radius:var(--rm);border:1px solid rgba(255,100,100,.4);
-        background:rgba(255,60,60,.15);color:#FCA5A5;font-family:Nunito,sans-serif;font-weight:700;
-        font-size:11px;cursor:pointer;transition:all .2s"
-        onmouseover="this.style.background='rgba(255,60,60,.3)'" onmouseout="this.style.background='rgba(255,60,60,.15)'">🗑 Zerar Dia</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="rdAbrirImportModal()"
+          style="padding:8px 16px;border-radius:var(--rm);border:1px solid rgba(74,222,128,.4);
+          background:rgba(74,222,128,.15);color:#4ADE80;font-family:Nunito,sans-serif;font-weight:700;
+          font-size:11px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px"
+          onmouseover="this.style.background='rgba(74,222,128,.28)'" onmouseout="this.style.background='rgba(74,222,128,.15)'">📂 Importar Arquivo</button>
+        <button onclick="rdClearDay()"
+          style="padding:8px 16px;border-radius:var(--rm);border:1px solid rgba(255,100,100,.4);
+          background:rgba(255,60,60,.15);color:#FCA5A5;font-family:Nunito,sans-serif;font-weight:700;
+          font-size:11px;cursor:pointer;transition:all .2s"
+          onmouseover="this.style.background='rgba(255,60,60,.3)'" onmouseout="this.style.background='rgba(255,60,60,.15)'">🗑 Zerar Dia</button>
+      </div>
     </div>
 
     <!-- DESTAQUE PRINCIPAL: Recebido Hoje + mini cards por equipe -->
@@ -2526,6 +2533,160 @@ select.ev-inp{cursor:pointer}
 
 </div>
 
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     MODAL: IMPORTAR RECEBIMENTO DO DIA
+     Lógica: filtrar coluna DtPgto == data escolhida
+     ══════════════════════════════════════════════════════════════ -->
+<div id="rd-import-modal"
+  style="display:none;position:fixed;inset:0;z-index:9800;background:rgba(0,0,0,.7);
+  backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;
+  padding:20px 16px;overflow-y:auto"
+  onclick="if(event.target===this)rdFecharImportModal()">
+  <div style="background:var(--w);border-radius:var(--rxl);max-width:680px;width:100%;
+    box-shadow:0 24px 80px rgba(0,0,0,.4);margin:auto;font-family:Nunito,sans-serif">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,var(--ppd) 0%,#1B4332 100%);
+      padding:18px 22px;border-radius:var(--rxl) var(--rxl) 0 0;
+      display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:20px;color:#4ADE80;letter-spacing:2px">
+          📂 IMPORTAR RECEBIMENTO DO DIA
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px">
+          Lê o arquivo <strong style="color:rgba(255,255,255,.8)">rec_*.xls</strong> e filtra apenas os pagamentos da data escolhida
+        </div>
+      </div>
+      <button onclick="rdFecharImportModal()"
+        style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.3);
+        background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:17px;line-height:1">✕</button>
+    </div>
+
+    <div style="padding:20px 22px;display:flex;flex-direction:column;gap:16px">
+
+      <!-- Info -->
+      <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--rm);
+        padding:11px 14px;font-size:12px;color:#166534;line-height:1.7">
+        <strong>Como funciona:</strong> Importe o arquivo <code>rec_XX_DD-MM.xls</code> exportado do sistema.
+        O dashboard lê a coluna <strong>DtPgto</strong> e soma apenas os pagamentos da <strong>data escolhida</strong> — sem precisar subtrair nada.
+      </div>
+
+      <!-- Tabs -->
+      <div style="display:flex;border-bottom:2px solid var(--g200)" id="rd-imp-tabs">
+        <button class="rd-imp-tab rd-imp-tab-on" onclick="rdImpTab('file',this)"
+          style="padding:9px 18px;border:none;background:transparent;font-family:Nunito,sans-serif;
+          font-weight:800;font-size:12px;cursor:pointer;color:var(--pp);
+          border-bottom:2px solid var(--pp);margin-bottom:-2px;transition:all .2s">
+          📂 Importar Arquivo
+        </button>
+        <button class="rd-imp-tab" onclick="rdImpTab('manual',this)"
+          style="padding:9px 18px;border:none;background:transparent;font-family:Nunito,sans-serif;
+          font-weight:800;font-size:12px;cursor:pointer;color:var(--g500);
+          border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s">
+          ✏️ Lançamento Manual
+        </button>
+      </div>
+
+      <!-- TAB ARQUIVO -->
+      <div id="rd-imp-panel-file" style="display:flex;flex-direction:column;gap:12px">
+
+        <!-- Drop zone -->
+        <div id="rd-imp-drop"
+          ondragover="event.preventDefault();this.style.borderColor='var(--pp)';this.style.background='var(--ppl)'"
+          ondragleave="this.style.borderColor='var(--g300)';this.style.background=''"
+          ondrop="event.preventDefault();this.style.borderColor='var(--g300)';this.style.background='';rdImpLerArquivo(event.dataTransfer.files[0])"
+          onclick="document.getElementById('rd-imp-finput').click()"
+          style="border:2px dashed var(--g300);border-radius:var(--rl);padding:28px 16px;
+          text-align:center;cursor:pointer;transition:all .2s;background:var(--g50)">
+          <div style="font-size:36px;margin-bottom:8px">📊</div>
+          <div style="font-size:14px;font-weight:800;color:var(--pp)">Clique ou arraste o arquivo aqui</div>
+          <div style="font-size:11px;color:var(--g500);margin-top:4px">rec_*.xls · .xlsx · .csv</div>
+          <input id="rd-imp-finput" type="file" accept=".xls,.xlsx,.csv,.txt"
+            style="display:none" onchange="rdImpLerArquivo(this.files[0])">
+        </div>
+
+        <!-- Seletor de data -->
+        <div style="background:#FFF7ED;border:1px solid #FDE68A;border-radius:var(--rm);padding:12px 14px">
+          <div style="font-size:11px;font-weight:800;color:#92400E;margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">
+            📅 Selecione o dia a importar
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <select id="rd-imp-date" onchange="rdImpFiltrarEPreview()"
+              style="flex:1;min-width:200px;padding:8px 12px;border:1.5px solid #FCD34D;border-radius:var(--rm);
+              font-family:Nunito,sans-serif;font-size:13px;font-weight:800;color:var(--g900);
+              background:#fff;outline:none;cursor:pointer">
+              <option value="">— importe o arquivo primeiro —</option>
+            </select>
+            <span style="font-size:11px;color:#92400E;font-weight:600">← datas com pagamentos no arquivo</span>
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div id="rd-imp-status" style="font-size:11px;font-weight:700;color:var(--g500);min-height:16px"></div>
+
+        <!-- Preview -->
+        <div id="rd-imp-preview" style="display:none;border:1px solid var(--g200);border-radius:var(--rl);overflow:hidden">
+          <div style="background:var(--ppd);padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+            <div style="font-family:Bebas Neue,sans-serif;font-size:15px;color:#4ADE80;letter-spacing:1.5px">
+              PRÉVIA — PAGAMENTOS DO DIA SELECIONADO
+            </div>
+            <div id="rd-imp-preview-total" style="font-size:13px;font-weight:800;color:#FCD34D"></div>
+          </div>
+          <div id="rd-imp-preview-list" style="max-height:280px;overflow-y:auto;background:var(--w)"></div>
+        </div>
+
+        <!-- Botões -->
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">
+          <button onclick="rdFecharImportModal()"
+            style="padding:10px 20px;border-radius:var(--rm);border:2px solid var(--g200);
+            background:var(--w);font-family:Nunito,sans-serif;font-weight:800;font-size:13px;
+            cursor:pointer;color:var(--g500)">Cancelar</button>
+          <button id="rd-imp-btn-apply" onclick="rdImpAplicar()" disabled
+            style="padding:10px 24px;border-radius:var(--rm);border:none;
+            background:linear-gradient(135deg,var(--pp),#00A86B);color:#fff;
+            font-family:Nunito,sans-serif;font-weight:800;font-size:13px;cursor:pointer;
+            opacity:.4;transition:all .2s">
+            ✅ Aplicar no Dashboard
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB MANUAL -->
+      <div id="rd-imp-panel-manual" style="display:none;flex-direction:column;gap:10px">
+        <div style="font-size:12px;color:var(--g600);font-weight:600;line-height:1.6;background:var(--g50);
+          border-radius:var(--rm);padding:10px 14px;border:1px solid var(--g200)">
+          Digite o valor de <strong>hoje</strong> para cada operador. Ao aplicar, o valor é <em>somado</em> ao acumulado do dia.
+        </div>
+        <div style="background:var(--g50);border-radius:var(--rm);padding:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1px solid var(--g200)">
+          <input id="rd-imp-man-search" placeholder="🔍 Filtrar operador..." oninput="rdImpManualFiltrar(this.value)"
+            style="flex:1;min-width:160px;padding:7px 12px;border:1.5px solid var(--g200);border-radius:var(--rm);
+            font-family:Nunito,sans-serif;font-size:12px;outline:none;background:var(--w)">
+          <button onclick="rdImpManualZerarTodos()"
+            style="padding:6px 12px;border-radius:var(--rm);border:1.5px solid var(--g300);
+            background:var(--w);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer;color:var(--g500)">
+            🗑 Limpar tudo
+          </button>
+        </div>
+        <div id="rd-imp-manual-list" style="display:flex;flex-direction:column;gap:4px;max-height:360px;overflow-y:auto"></div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">
+          <button onclick="rdFecharImportModal()"
+            style="padding:10px 20px;border-radius:var(--rm);border:2px solid var(--g200);
+            background:var(--w);font-family:Nunito,sans-serif;font-weight:800;font-size:13px;
+            cursor:pointer;color:var(--g500)">Cancelar</button>
+          <button onclick="rdImpManualAplicar()"
+            style="padding:10px 24px;border-radius:var(--rm);border:none;
+            background:linear-gradient(135deg,var(--pp),#00A86B);color:#fff;
+            font-family:Nunito,sans-serif;font-weight:800;font-size:13px;cursor:pointer">
+            ✅ Aplicar Lançamentos
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <!-- MODAL OPERADOR -->
 <div id="mov" onclick="closeM(event)">
@@ -6547,6 +6708,406 @@ function rdZerarOperador(opName){
 
 function rdSave(){toast('💾 Salvo automaticamente!');}
 
+// ══════════════════════════════════════════════════════════════
+// IMPORTAR RECEBIMENTO DO DIA — Modal Functions
+// Lógica: filtrar DtPgto == data selecionada no arquivo XLS
+// Colunas: Cobradora(0), DtPgto(11), Recebido(13)
+// ══════════════════════════════════════════════════════════════
+
+var _rdImpRawRows    = [];   // linhas brutas lidas do arquivo
+var _rdImpDataFiltrado = {}; // {opName: valorDoDia} após filtro de data
+var _rdImpDataAtual  = {};   // alias usado para preview/aplicar
+var _rdImpDateTarget = '';   // data alvo no formato 'YYYY-MM-DD'
+
+function rdAbrirImportModal(){
+  var modal = document.getElementById('rd-import-modal');
+  if(!modal) return;
+  // Pré-preenche data alvo com hoje
+  var d = new Date();
+  _rdImpDateTarget = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var dtInp = document.getElementById('rd-imp-date');
+  if(dtInp) dtInp.value = _rdImpDateTarget;
+
+  modal.style.display = 'flex';
+  _rdImpRawRows = [];
+  _rdImpDataAtual = {};
+  document.getElementById('rd-imp-preview').style.display = 'none';
+  document.getElementById('rd-imp-status').textContent = '';
+  var btn = document.getElementById('rd-imp-btn-apply');
+  if(btn){ btn.disabled=true; btn.style.opacity='.4'; }
+  var txt = document.getElementById('rd-imp-txt');
+  if(txt) txt.value = '';
+  rdImpTab('file', document.querySelector('.rd-imp-tab'));
+  rdImpManualRender();
+}
+
+function rdFecharImportModal(){
+  var modal = document.getElementById('rd-import-modal');
+  if(modal) modal.style.display = 'none';
+}
+
+// Troca de tab
+function rdImpTab(which, btn){
+  document.querySelectorAll('.rd-imp-tab').forEach(function(b){
+    b.style.color = 'var(--g500)';
+    b.style.borderBottomColor = 'transparent';
+  });
+  if(btn){ btn.style.color = 'var(--pp)'; btn.style.borderBottomColor = 'var(--pp)'; }
+  document.getElementById('rd-imp-panel-file').style.display   = which==='file'   ? 'flex' : 'none';
+  document.getElementById('rd-imp-panel-manual').style.display = which==='manual' ? 'flex' : 'none';
+  if(which==='manual') rdImpManualRender();
+}
+
+// Lê arquivo XLS/XLSX/CSV via SheetJS
+function rdImpLerArquivo(file){
+  if(!file) return;
+  var st = document.getElementById('rd-imp-status');
+  st.textContent = '⏳ Lendo '+file.name+'...';
+  st.style.color = 'var(--pp)';
+
+  var ext = file.name.split('.').pop().toLowerCase();
+  if(ext==='csv'||ext==='txt'){
+    var reader = new FileReader();
+    reader.onload = function(e){ rdImpParsarTexto(e.target.result, false); };
+    reader.readAsText(file,'UTF-8');
+  } else {
+    function doRead(XLSX){
+      var reader = new FileReader();
+      reader.onload = function(e){
+        try{
+          var wb = XLSX.read(e.target.result,{type:'array',cellDates:false});
+          var ws = wb.Sheets[wb.SheetNames[0]];
+          // Exporta como CSV com separador ; e inclui datas como números seriais
+          var csv = XLSX.utils.sheet_to_csv(ws,{FS:';'});
+          // Guarda o datemode para converter seriais depois
+          window._rdImpXlsDateMode = wb.Workbook ? 0 : 0;
+          rdImpParsarTexto(csv, true, wb.SSF ? wb : null);
+        }catch(err){
+          st.textContent = '❌ Erro ao ler arquivo: '+err.message;
+          st.style.color = 'var(--danger)';
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+    if(window.XLSX){ doRead(window.XLSX); return; }
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = function(){ doRead(window.XLSX); };
+    s.onerror = function(){ st.textContent='❌ Erro ao carregar leitor XLS.'; st.style.color='var(--danger)'; };
+    document.head.appendChild(s);
+  }
+}
+
+// Converte serial Excel para string 'YYYY-MM-DD'
+function rdImpSerialToDate(serial){
+  // Excel epoch: 1/1/1900, com bug do 1900 (dia 60 inexistente)
+  var d = new Date(Math.round((serial - 25569) * 86400 * 1000));
+  // Ajusta UTC
+  var utc = new Date(d.getTime() + d.getTimezoneOffset()*60000);
+  return utc.getFullYear()+'-'+String(utc.getMonth()+1).padStart(2,'0')+'-'+String(utc.getDate()).padStart(2,'0');
+}
+
+// Detecta se string é uma data no formato DD/MM/YYYY ou YYYY-MM-DD
+function rdImpParseDataStr(s){
+  s = (s||'').trim();
+  // DD/MM/YYYY
+  var m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if(m) return m[3]+'-'+m[2]+'-'+m[1];
+  // YYYY-MM-DD
+  m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m) return m[1]+'-'+m[2]+'-'+m[3];
+  // Número serial (ex: "46174")
+  var n = parseFloat(s);
+  if(!isNaN(n) && n > 40000 && n < 60000) return rdImpSerialToDate(n);
+  return null;
+}
+
+// Parser principal: lê CSV e monta _rdImpRawRows
+function rdImpParsarTexto(raw, isXls){
+  if(!raw||!raw.trim()) return;
+  var st = document.getElementById('rd-imp-status');
+  var lines = raw.trim().split(/\r?\n/).filter(function(l){ return l.trim(); });
+  if(lines.length < 2){
+    st.textContent = '⚠️ Arquivo sem dados.';
+    st.style.color = 'var(--warn)';
+    return;
+  }
+
+  // Detectar separador
+  var sep = ';';
+  if(lines[0].split('\t').length > lines[0].split(';').length) sep = '\t';
+  else if(!lines[0].includes(';') && lines[0].split(',').length > 2) sep = ',';
+
+  function splitLine(l){ return l.split(sep).map(function(c){ return c.trim().replace(/^"|"$/g,''); }); }
+
+  var headers = splitLine(lines[0]).map(function(h){ return h.toLowerCase().trim(); });
+
+  // Detectar colunas chave
+  // Cobradora: col 0 normalmente, ou 'cobradora','operador','cobrador','nome'
+  var colOp   = 0;
+  var colDt   = -1;
+  var colRec  = -1;
+
+  headers.forEach(function(h,i){
+    if(['cobradora','operador','cobrador','nome operador','atendente'].some(function(k){ return h.includes(k); })) colOp = i;
+    if(['dtpgto','dt.pgto','data pgto','data pagamento','pagamento','dt pagto','dtpagto'].some(function(k){ return h.includes(k); })) colDt = i;
+    if(['recebido','recebimento','valor recebido','valor','total recebido','rec'].some(function(k){ return h===k||h.includes(k); })) colRec = i;
+  });
+
+  // Fallback: coluna 11 = DtPgto, coluna 13 = Recebido (padrão do arquivo rec_58)
+  if(colDt  < 0) colDt  = 11;
+  if(colRec < 0) colRec = 13;
+
+  var rows = [];
+  var datasVistas = {};
+  for(var i=1; i<lines.length; i++){
+    var cols = splitLine(lines[i]);
+    if(cols.length <= Math.max(colOp, colDt, colRec)) continue;
+    var nome  = (cols[colOp]||'').trim();
+    var dtRaw = (cols[colDt]||'').trim();
+    var recRaw= (cols[colRec]||'').replace(/\./g,'').replace(',','.');
+    var rec   = parseFloat(recRaw)||0;
+    if(!nome || rec <= 0) continue;
+
+    var dtStr = rdImpParseDataStr(dtRaw);
+    if(!dtStr) continue;
+    datasVistas[dtStr] = (datasVistas[dtStr]||0) + rec;
+    // Normaliza nome: maiúsculas + underscores
+    var nomeNorm = nome.toUpperCase().replace(/\s+/g,'_');
+    rows.push({op: nomeNorm, dt: dtStr, rec: rec});
+  }
+
+  if(rows.length === 0){
+    st.textContent = '⚠️ Nenhuma linha válida encontrada. Verifique o arquivo.';
+    st.style.color = 'var(--danger)';
+    return;
+  }
+
+  _rdImpRawRows = rows;
+
+  // Preenche seletor de datas disponíveis
+  var datas = Object.keys(datasVistas).sort();
+  var sel = document.getElementById('rd-imp-date');
+  if(sel){
+    // Guarda valor atual selecionado
+    var cur = sel.value || _rdImpDateTarget;
+    // Limpa e repopula
+    sel.innerHTML = datas.map(function(d){
+      var parts = d.split('-');
+      var label = parts[2]+'/'+parts[1]+'/'+parts[0];
+      var total = (datasVistas[d]||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+      return '<option value="'+d+'"'+(d===cur?' selected':'')+'>'+label+' — '+total+'</option>';
+    }).join('');
+    // Se a data atual não está nas opções, usa a última
+    if(!datas.includes(cur) && datas.length > 0){
+      sel.value = datas[datas.length-1];
+    }
+    _rdImpDateTarget = sel.value;
+  }
+
+  st.textContent = '✅ '+rows.length+' registros lidos · '+datas.length+' dias disponíveis. Selecione a data e confirme.';
+  st.style.color = '#059669';
+
+  rdImpFiltrarEPreview();
+}
+
+// Filtra por data e monta preview
+function rdImpFiltrarEPreview(){
+  var sel = document.getElementById('rd-imp-date');
+  if(sel) _rdImpDateTarget = sel.value;
+
+  var agrupado = {};
+  _rdImpRawRows.forEach(function(r){
+    if(r.dt !== _rdImpDateTarget) return;
+    // Tenta casar com nome de operador em ALL
+    var key = r.op;
+    if(typeof ALL !== 'undefined'){
+      var match = null;
+      ALL.forEach(function(op){
+        var opNorm = op.name.toUpperCase().replace(/\s+/g,'_');
+        if(opNorm === r.op) match = op.name;
+        else if(opNorm.startsWith(r.op.substring(0,6)) || r.op.startsWith(opNorm.substring(0,6))) match = op.name;
+      });
+      if(match) key = match;
+    }
+    agrupado[key] = (agrupado[key]||0) + r.rec;
+  });
+
+  _rdImpDataAtual = agrupado;
+
+  var entries = Object.keys(agrupado).map(function(op){ return {op:op, v:agrupado[op]}; });
+  entries.sort(function(a,b){ return b.v-a.v; });
+
+  var totalHoje = entries.reduce(function(s,e){ return s+e.v; },0);
+
+  var preview = document.getElementById('rd-imp-preview');
+  var list    = document.getElementById('rd-imp-preview-list');
+  var totalEl = document.getElementById('rd-imp-preview-total');
+  var btn     = document.getElementById('rd-imp-btn-apply');
+
+  if(entries.length === 0){
+    preview.style.display = 'none';
+    var st = document.getElementById('rd-imp-status');
+    if(st){ st.textContent = '⚠️ Nenhum registro encontrado para esta data.'; st.style.color='var(--warn)'; }
+    if(btn){ btn.disabled=true; btn.style.opacity='.4'; }
+    return;
+  }
+
+  list.innerHTML = entries.map(function(e){
+    var cfg = {c:'#888'};
+    if(typeof ALL !== 'undefined' && typeof EQ !== 'undefined'){
+      var op = ALL.find(function(o){ return o.name===e.op; });
+      if(op && EQ[op.eq]) cfg = EQ[op.eq];
+    }
+    var jaTemHoje = '';
+    if(typeof rdGetSaved === 'function'){
+      var saved = rdGetSaved();
+      if((saved[e.op]||0) > 0) jaTemHoje = '<span style="font-size:9px;background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;border-radius:100px;padding:1px 6px;margin-left:4px;font-weight:800">já tem valor</span>';
+    }
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--g100)">'
+      +'<div style="font-weight:800;font-size:12px;color:var(--g900)">'
+      +  e.op.replace(/_/g,' ')+jaTemHoje
+      +'</div>'
+      +'<div style="font-family:Bebas Neue,sans-serif;font-size:17px;color:'+cfg.c+';letter-spacing:.5px">+'+fR(e.v)+'</div>'
+      +'</div>';
+  }).join('');
+
+  totalEl.textContent = 'Total do dia: '+fR(totalHoje);
+  preview.style.display = 'block';
+  if(btn){ btn.disabled=false; btn.style.opacity='1'; }
+}
+
+// Aplica no dashboard
+function rdImpAplicar(){
+  var entries = Object.keys(_rdImpDataAtual);
+  if(!entries.length){ toast('⚠️ Nenhum dado para aplicar'); return; }
+
+  var map = rdGetSaved();
+  var aplicados = 0;
+  var totalAplicado = 0;
+
+  entries.forEach(function(opName){
+    var v = _rdImpDataAtual[opName]||0;
+    if(v <= 0) return;
+    map[opName] = v;  // SUBSTITUI (não soma) — é o total do dia do relatório
+    aplicados++;
+    totalAplicado += v;
+
+    // Histórico
+    var sid = opName.replace(/[^a-zA-Z0-9]/g,'_');
+    var histKey = rdTodayKey()+'_hist_'+sid;
+    var hist=[]; try{ hist=JSON.parse(localStorage.getItem(histKey)||'[]'); }catch(e){}
+    var now = new Date();
+    hist.push({v:v, hora:now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}), imp:true});
+    localStorage.setItem(histKey, JSON.stringify(hist));
+  });
+
+  _rdSyncingFromFirebase = false;
+  localStorage.setItem(rdTodayKey(), JSON.stringify(map));
+
+  if(typeof fbDb!=='undefined' && fbDb && typeof fbRoom!=='undefined' && fbRoom){
+    var payload = {};
+    entries.forEach(function(op){ payload[op] = _rdImpDataAtual[op]; });
+    var now = new Date();
+    payload['_date'] = now.getFullYear()+'_'+(now.getMonth()+1)+'_'+now.getDate();
+    fbDb.ref(fbRoom+'/rd').update(payload).catch(function(e){ console.warn('FB rd imp err:',e); });
+  }
+
+  rdFecharImportModal();
+  rdRender();
+  rdUpdateKPIs();
+  try{ if(typeof rdBC!=='undefined'&&rdBC) rdBC.postMessage({type:'rd',key:rdTodayKey(),data:map}); }catch(e){}
+  if(typeof tvRefresh==='function') tvRefresh();
+  toast('📂 '+aplicados+' operadores importados · '+fR(totalAplicado)+' do dia '+_rdImpDateTarget.split('-').reverse().join('/')+'!');
+}
+
+// ── Lançamento manual ──
+var _rdImpManualData = {};
+
+function rdImpManualRender(filter){
+  var list = document.getElementById('rd-imp-manual-list');
+  if(!list) return;
+  var ops = (typeof ALL!=='undefined') ? ALL : [];
+  if(filter&&filter.trim()){
+    var q = filter.toLowerCase();
+    ops = ops.filter(function(o){ return o.name.toLowerCase().replace(/_/g,' ').includes(q); });
+  }
+  var saved = (typeof rdGetSaved==='function') ? rdGetSaved() : {};
+  list.innerHTML = ops.map(function(op){
+    var sid = op.name.replace(/[^a-zA-Z0-9]/g,'_');
+    var cfg = (typeof EQ!=='undefined'&&EQ[op.eq])||{c:'#888',sh:op.eq};
+    var existente = parseFloat(saved[op.name]||0);
+    var manual    = parseFloat(_rdImpManualData[op.name]||0);
+    return '<div style="display:grid;grid-template-columns:28px 1fr 80px 110px;gap:8px;align-items:center;'
+      +'padding:7px 10px;border-radius:var(--rm);border:1px solid '+(manual>0?cfg.c:'var(--g200)')+';'
+      +'background:'+(manual>0?cfg.c+'10':'var(--w)')+';">'
+      +'<div style="width:26px;height:26px;border-radius:6px;background:'+cfg.c+';display:flex;align-items:center;justify-content:center;font-weight:900;font-size:9px;color:#fff">'+ini(op.name)+'</div>'
+      +'<div>'
+      +  '<div style="font-weight:800;font-size:11px;color:var(--g900)">'+op.name.replace(/_/g,' ')+'</div>'
+      +  '<div style="font-size:9px;color:'+cfg.c+';font-weight:700">'+cfg.sh+'</div>'
+      +  (existente>0?'<div style="font-size:9px;color:var(--g500)">Acum. hoje: '+fR(existente)+'</div>':'')
+      +'</div>'
+      +'<div style="font-family:Bebas Neue,sans-serif;font-size:12px;color:var(--g500);text-align:right">'+fR(op.rec)+'</div>'
+      +'<input type="number" step="0.01" min="0" placeholder="Hoje R$"'
+      +' value="'+(manual>0?manual.toFixed(2):'')+'"'
+      +' id="rd-imp-maninp-'+sid+'"'
+      +' onchange="rdImpManualUpdate(\''+op.name.replace(/'/g,"\\'")+'\')"'
+      +' style="width:100%;padding:5px 8px;border:1.5px solid '+(manual>0?cfg.c:'var(--g200)')+';'
+      +'border-radius:var(--rm);font-family:Nunito,sans-serif;font-size:11px;font-weight:800;text-align:right;outline:none">'
+      +'</div>';
+  }).join('');
+}
+
+function rdImpManualUpdate(opName){
+  var sid = opName.replace(/[^a-zA-Z0-9]/g,'_');
+  var inp = document.getElementById('rd-imp-maninp-'+sid);
+  if(!inp) return;
+  var v = parseFloat(inp.value||0);
+  if(v>0) _rdImpManualData[opName]=v; else delete _rdImpManualData[opName];
+}
+
+function rdImpManualFiltrar(q){ rdImpManualRender(q); }
+function rdImpManualZerarTodos(){ _rdImpManualData={}; rdImpManualRender(document.getElementById('rd-imp-man-search').value); }
+
+function rdImpManualAplicar(){
+  var ops = Object.keys(_rdImpManualData);
+  if(!ops.length){ toast('⚠️ Nenhum valor preenchido'); return; }
+  var map = rdGetSaved();
+  var total = 0;
+  ops.forEach(function(opName){
+    var v = parseFloat(_rdImpManualData[opName]||0);
+    if(v<=0) return;
+    map[opName] = (parseFloat(map[opName]||0))+v;
+    total += v;
+    var sid = opName.replace(/[^a-zA-Z0-9]/g,'_');
+    var histKey = rdTodayKey()+'_hist_'+sid;
+    var hist=[]; try{ hist=JSON.parse(localStorage.getItem(histKey)||'[]'); }catch(e){}
+    var now=new Date();
+    hist.push({v:v,hora:now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),manual:true});
+    localStorage.setItem(histKey,JSON.stringify(hist));
+  });
+  _rdSyncingFromFirebase=false;
+  localStorage.setItem(rdTodayKey(),JSON.stringify(map));
+  if(typeof fbDb!=='undefined'&&fbDb&&typeof fbRoom!=='undefined'&&fbRoom){
+    var payload={};
+    ops.forEach(function(op){ if(_rdImpManualData[op]>0) payload[op]=map[op]; });
+    var now2=new Date();
+    payload['_date']=now2.getFullYear()+'_'+(now2.getMonth()+1)+'_'+now2.getDate();
+    fbDb.ref(fbRoom+'/rd').update(payload).catch(function(e){ console.warn('FB manual err:',e); });
+  }
+  _rdImpManualData={};
+  rdFecharImportModal();
+  rdRender();
+  rdUpdateKPIs();
+  try{ if(typeof rdBC!=='undefined'&&rdBC) rdBC.postMessage({type:'rd',key:rdTodayKey(),data:map}); }catch(e){}
+  if(typeof tvRefresh==='function') tvRefresh();
+  toast('✅ '+ops.length+' operadores lançados · '+fR(total)+' adicionados!');
+}
+
+// ── FIM: IMPORTAR RECEBIMENTO DO DIA ──
+
+
+
 function rdClearDay(){
   if(!confirm('Zerar todos os valores do dia?\nEsta ação não pode ser desfeita.')) return;
   localStorage.removeItem(rdTodayKey());
@@ -9607,14 +10168,7 @@ async function syncConnect(){
   const room = document.getElementById('sync-room').value.trim().replace(/[^a-zA-Z0-9_-]/g,'-');
   const url  = document.getElementById('sync-fburl').value.trim().replace(/\/$/,'');
   if(!room){ toast('cofen-principal'); return; }
-  if(!url||!url.startsWith('https')||!url.includes('firebaseio.com')){
-    toast('URL inválida. Ex: https://meu-projeto-default-rtdb.firebaseio.com');
-    return;
-  }
-  if(typeof firebase === 'undefined' || !firebase.initializeApp){
-    syncSetStatus('error','❌ Firebase SDK não carregou. Verifique sua conexão com a internet.');
-    return;
-  }
+  if(!url||!url.startsWith('https')){ toast('https://cofen-dashboard-622a8-default-rtdb.firebaseio.com'); return; }
 
   syncSetStatus('connecting','🔄 Conectando...');
   document.getElementById('sync-connect-btn').textContent='⏳ Conectando...';
@@ -9624,11 +10178,9 @@ async function syncConnect(){
     // Init Firebase (ou reutiliza se já existe)
     if(!fbApp){
       const appName = 'cofen-sync-manual';
-      const existingApps = firebase.apps || [];
-      const found = existingApps.find(function(a){ return a && a.name === appName; });
-      if(found){
-        fbApp = found;
-      } else {
+      try {
+        fbApp = firebase.app(appName);
+      } catch(notFound){
         fbApp = firebase.initializeApp({databaseURL: url}, appName);
       }
     }
@@ -10266,11 +10818,9 @@ async function fbAutoConnect(){
     if(!fbApp){
       // Verifica se já existe um app com esse nome (ex: após reload sem fechar aba)
       const appName = 'cofen-sync-auto';
-      const existingApps = firebase.apps || [];
-      const found = existingApps.find(function(a){ return a && a.name === appName; });
-      if(found){
-        fbApp = found;
-      } else {
+      try {
+        fbApp = firebase.app(appName); // reutiliza se já existe
+      } catch(notFound){
         fbApp = firebase.initializeApp({databaseURL: url}, appName);
       }
     }
