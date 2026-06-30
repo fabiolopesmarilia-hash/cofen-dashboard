@@ -1647,7 +1647,7 @@ select.ev-inp{cursor:pointer}
         </select>
       </div>
       <div>
-        <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Rec. Acumulado (R$)</label>
+        <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">HO Acumulado (R$)</label>
         <input id="novo-rec" type="number" placeholder="0,00" step="0.01" min="0" value="0"
           style="width:100%;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);
           padding:10px 13px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);outline:none;transition:all .2s"
@@ -1762,7 +1762,7 @@ select.ev-inp{cursor:pointer}
           </select>
         </div>
         <div>
-          <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Rec. Acumulado (R$)</label>
+          <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">HO Acumulado (R$)</label>
           <input id="add-op-rec" type="number" placeholder="0,00" step="0.01" min="0" value="0"
             style="width:100%;background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--rm);
             padding:10px 13px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:var(--g900);outline:none;transition:all .2s"
@@ -2315,7 +2315,7 @@ select.ev-inp{cursor:pointer}
   <!-- HERO -->
   <div style="background:linear-gradient(135deg,var(--ppd),#1B4332 55%,#0D3D2B);border-radius:var(--rxl);padding:20px 24px;position:relative;overflow:hidden">
     <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(0,200,127,.07);pointer-events:none"></div>
-    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">Comparativo de Recebimento</div>
+    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">Comparativo de HO / PaguePay</div>
     <div style="font-family:Bebas Neue,sans-serif;font-size:26px;letter-spacing:3px;color:#fff;margin-bottom:14px">📊 MAIO vs JUNHO 2026</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
       <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 14px">
@@ -2351,7 +2351,7 @@ select.ev-inp{cursor:pointer}
   <!-- VIEW: GERAL -->
   <div id="cmpv-geral" class="cmpview">
     <div class="card">
-      <div class="sec">📈 Recebimento Acumulado por Dia Útil — Maio vs Junho</div>
+      <div class="sec">📈 HO/PaguePay Acumulado por Dia Útil — Maio vs Junho</div>
       <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--g700)"><div style="width:20px;height:3px;background:#3B82F6;border-radius:2px;border:2px dashed #3B82F6"></div>Maio 2026</div>
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--g700)"><div style="width:20px;height:3px;background:#00A86B;border-radius:2px"></div>Junho 2026</div>
@@ -2387,7 +2387,7 @@ select.ev-inp{cursor:pointer}
   <!-- VIEW: EQUIPES -->
   <div id="cmpv-equipes" class="cmpview" style="display:none">
     <div class="card">
-      <div class="sec">🏢 Recebimento Acumulado por Dia Útil — Por Equipe</div>
+      <div class="sec">🏢 HO/PaguePay Acumulado por Dia Útil — Por Equipe</div>
       <!-- Seletor de equipe -->
       <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px" id="eq-filter-btns">
         <button class="fbtn on" onclick="cmpEqSelect('COFEN MARILIA BRENDA',this)">Marília Brenda</button>
@@ -2430,7 +2430,7 @@ select.ev-inp{cursor:pointer}
   <!-- VIEW: OPERADORES -->
   <div id="cmpv-operadores" class="cmpview" style="display:none">
     <div class="card" style="margin-bottom:0">
-      <div class="sec">👤 Comparativo por Operador — Maio (mês cheio) vs Junho (parcial)</div>
+      <div class="sec">👤 Comparativo HO/PaguePay por Operador — Maio (mês cheio) vs Junho (parcial)</div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
         <button class="fbtn on" onclick="cmpSortOp('diff',this)">📉 Por Diferença</button>
         <button class="fbtn" onclick="cmpSortOp('abril',this)">💰 Por Junho</button>
@@ -11260,14 +11260,14 @@ const CMP_ABRIL_CUMUL_CAL = {1:54433.18,2:77553.86,3:78064.3,4:78611.18,5:79298.
 const CMP_MARCO_CUMUL = CMP_ABRIL_CUMUL_CAL; // histórico Abril
 // Dados acumulados de ABRIL por Dia Útil (DU→acumulado)
 // DUs de Abril 2026: dias 1,2,3,6,7,8,9,10,13,14,15,16,17,20,22,23,24,27,28,29,30 (feriados: 18-Páscoa, 21-Tiradentes)
-const CMP_MAIO_DU = {1:146819.64,2:230203.99,3:323226.07,4:417065.92,5:532057.41,6:639173.06,7:767998.46,8:866252.42,9:952637.19,10:1049693.05,11:1146104.76,12:1259245.95,13:1359799.93,14:1483296.41,15:1585616.04,16:1713814.99,17:1859857.13,18:2004039.01,19:2007316.68}; // Maio 2026 encerrado
+const CMP_MAIO_DU = {1:36646.18,2:57458.92,3:80677.23,4:104099.65,5:132801.53,6:159537.6,7:191692.42,8:216216.6,9:237778.24,10:262003.39,11:286067.75,12:314307.79,13:339406.06,14:370230.78,15:395769.76,16:427768.22,17:464220.34,18:500208.14,19:501026.24}; // Maio 2026 encerrado — HO/PaguePay (24,96%)
 // Dados acumulados de MAIO 2026 por Dia Útil (DU→acumulado) — atualizado dinamicamente via importação
 // CMP_JUNHO_CUMUL: acumulado global de Junho por DU (gerado do arquivo rec_58_0905.xls)
-const CMP_JUNHO_CUMUL_STATIC = {1:270017.68,2:369790.69,3:475888.7,4:554223.08,5:734735.21,6:861633.11,7:957421.44,8:1068096.28,9:1143156.01,10:1358119.38,11:1527205.86,12:1639577.32,13:1781810.41,14:1886694.12,15:2047412.98,16:2151543.15,17:2265240.18,18:2403380.82,19:2524966.54,20:2723016.12,21:2750503.57}; // Junho 2026 — rec_conciliação_3006.xls
+const CMP_JUNHO_CUMUL_STATIC = {1:67397.04,2:93051.1,3:120807.72,4:142217.95,5:187993.28,6:219667.06,7:243575.96,8:271200.6,9:289935.76,10:343591.42,11:385795.66,12:413843.82,13:449345.35,14:475524.28,15:515640.11,16:541631.23,17:570010.3,18:604542.43,19:635078.24,20:684915.29,21:691776.36}; // Junho 2026 — HO/PaguePay (24,96%) — rec_conciliação_3006.xls
 // Inicia com dados estáticos do XLS — sobrescrito dinamicamente se houver importação mais recente
 const CMP_JUNHO_CUMUL = {...CMP_JUNHO_CUMUL_STATIC};
 // CMP_JUNHO_EQ: acumulado POR EQUIPE por DU (gerado do arquivo rec_58_0905.xls)
-const CMP_JUNHO_EQ = {"COFEN BIRIGUI BRUNA": {"1": 15174.49, "2": 25240.82, "3": 38543.48, "4": 49508.91, "5": 67373.7, "6": 80439.59, "7": 108303.76}, "COFEN STEPHANIE 2\u00b0 TURNO": {"1": 19622.32, "2": 43725.16, "3": 64522.56, "4": 94812.57, "5": 117123.72, "6": 134555.99, "7": 168282.18}, "COFEN MARILIA BRENDA": {"1": 25172.89, "2": 37574.38, "3": 48044.73, "4": 61470.63, "5": 84447.98, "6": 105946.52, "7": 130692.3}, "COFEN DIGITAL": {"1": 9315.93, "2": 22414.53, "3": 41557.81, "4": 52237.98, "5": 77331.23, "6": 107302.14, "7": 119268.66}};
+const CMP_JUNHO_EQ = {"COFEN MARILIA BRENDA": {"1": 12733.78, "2": 18106.28, "3": 23084.29, "4": 27052.0, "5": 33276.82, "6": 39111.39, "7": 42573.67, "8": 46674.28, "9": 49707.4, "10": 57727.25, "11": 62837.67, "12": 66815.51, "13": 72157.34, "14": 76009.37, "15": 81089.52, "16": 83982.58, "17": 90113.32, "18": 93976.78, "19": 98904.86, "20": 107338.29, "21": 109494.36}, "COFEN BIRIGUI BRUNA": {"1": 17518.59, "2": 25840.96, "3": 34182.79, "4": 41824.04, "5": 55932.01, "6": 63072.25, "7": 71329.05, "8": 79629.78, "9": 82704.29, "10": 98121.96, "11": 108295.65, "12": 117032.66, "13": 126429.92, "14": 130006.6, "15": 138728.19, "16": 144820.08, "17": 153777.98, "18": 162020.72, "19": 166619.77, "20": 175550.47, "21": 177123.75}, "COFEN STEPHANIE 2° TURNO": {"1": 11641.64, "2": 16491.83, "3": 18106.28, "4": 20309.12, "5": 26008.17, "6": 30302.78, "7": 32196.71, "8": 35586.21, "9": 37571.22, "10": 43843.38, "11": 48887.11, "12": 50768.9, "13": 53763.05, "14": 56600.66, "15": 59106.41, "16": 62112.19, "17": 64034.83, "18": 65473.02, "19": 67949.92, "20": 74018.68, "21": 74754.89}, "COFEN DIGITAL": {"1": 4044.64, "2": 4881.74, "3": 6246.46, "4": 8552.49, "5": 12952.29, "6": 15600.42, "7": 17250.67, "8": 20004.77, "9": 20433.52, "10": 23655.85, "11": 25592.34, "12": 26585.4, "13": 27844.35, "14": 28861.15, "15": 30384.39, "16": 30759.63, "17": 31401.85, "18": 33165.53, "19": 33922.55, "20": 38316.88, "21": 38590.27}};
 // Dias do calendário de MAIO correspondentes a cada DU (índice 0 = DU1)
 const CMP_JUNHO_DU_DIAS = [1,2,3,5,8,9,10,11,12,15,16,17,18,19,22,23,24,25,26,29,30];
 const CMP_ABRIL_CUMUL = CMP_JUNHO_CUMUL;
@@ -11275,7 +11275,7 @@ const CMP_ABRIL_CUMUL = CMP_JUNHO_CUMUL;
 // Distribui CMP_MAIO_DU na mesma proporção que cada equipe representa no total de Maio encerrado
 const _totAbril = 1601416.79;
 const _abrilEqPct = {"COFEN BIRIGUI BRUNA": 371594.45, "COFEN DIGITAL": 206704.9, "COFEN STEPHANIE 2\u00b0 TURNO": 485724.16, "COFEN MARILIA BRENDA": 391979.58};
-const CMP_ABRIL_EQ = {"COFEN STEPHANIE 2\u00b0 TURNO": {"1": 12534.73, "2": 21712.76, "3": 22223.2, "4": 59738.02, "5": 91178.53, "6": 112756.64, "7": 140223.42, "8": 171028.06, "9": 204223.49, "10": 229191.9, "11": 255078.7, "12": 280012.59, "13": 298164.47, "14": 316683.44, "15": 339395.6, "16": 359826.41, "17": 385712.1, "18": 417344.47, "19": 442543.03, "20": 485724.16}, "COFEN BIRIGUI BRUNA": {"1": 16028.91, "2": 21898.29, "3": 21898.29, "4": 26377.69, "5": 50574.4, "6": 57942.32, "7": 76823.53, "8": 90119.17, "9": 105623.37, "10": 116119.53, "11": 147665.5, "12": 163961.3, "13": 188483.07, "14": 203569.3, "15": 218446.66, "16": 242742.12, "17": 265932.23, "18": 308081.43, "19": 324669.86, "20": 371594.45}, "COFEN MARILIA BRENDA": {"1": 19625.75, "2": 25225.46, "3": 25225.46, "4": 52980.15, "5": 73185.11, "6": 90584.02, "7": 119801.19, "8": 132626.96, "9": 159646.48, "10": 182782.37, "11": 197387.92, "12": 218290.8, "13": 233421.67, "14": 243953.52, "15": 258987.87, "16": 280026.8, "17": 295465.47, "18": 323070.74, "19": 346580.96, "20": 391979.58}, "COFEN DIGITAL": {"1": 401.87, "2": 1287.98, "3": 1287.98, "4": 8435.71, "5": 14772.31, "6": 22406.94, "7": 37751.54, "8": 42456.04, "9": 55562.08, "10": 61068.84, "11": 65269.43, "12": 81187.51, "13": 93565.69, "14": 101562.89, "15": 110882.36, "16": 126526.33, "17": 140007.3, "18": 156082.93, "19": 175416.72, "20": 206704.9}};
+const CMP_ABRIL_EQ = {"COFEN STEPHANIE 2° TURNO": {"1": 3128.67, "2": 5419.5, "3": 5546.91, "4": 14910.61, "5": 22758.16, "6": 28144.06, "7": 34999.77, "8": 42688.6, "9": 50974.18, "10": 57206.3, "11": 63667.64, "12": 69891.14, "13": 74421.85, "14": 79044.19, "15": 84713.14, "16": 89812.67, "17": 96273.74, "18": 104169.18, "19": 110458.74, "20": 121236.75}, "COFEN BIRIGUI BRUNA": {"1": 4000.82, "2": 5465.81, "3": 5465.81, "4": 6583.87, "5": 12623.37, "6": 14462.4, "7": 19175.15, "8": 22493.74, "9": 26363.59, "10": 28983.43, "11": 36857.31, "12": 40924.74, "13": 47045.37, "14": 50810.9, "15": 54524.29, "16": 60588.43, "17": 66376.68, "18": 76897.12, "19": 81037.6, "20": 92749.97}, "COFEN MARILIA BRENDA": {"1": 4898.59, "2": 6296.27, "3": 6296.27, "4": 13223.85, "5": 18267.0, "6": 22609.77, "7": 29902.38, "8": 33103.69, "9": 39847.76, "10": 45622.48, "11": 49268.02, "12": 54485.38, "13": 58262.05, "14": 60890.8, "15": 64643.37, "16": 69894.69, "17": 73748.18, "18": 80638.46, "19": 86506.61, "20": 97838.1}, "COFEN DIGITAL": {"1": 100.31, "2": 321.48, "3": 321.48, "4": 2105.55, "5": 3687.17, "6": 5592.77, "7": 9422.78, "8": 10597.03, "9": 13868.3, "10": 15242.78, "11": 16291.25, "12": 20264.4, "13": 23354.0, "14": 25350.1, "15": 27676.24, "16": 31580.97, "17": 34945.82, "18": 38958.3, "19": 43784.01, "20": 51593.54}};
 const CMP_TEAMS = [
   // marco = Abril 2026 (mês cheio); abril = Maio 2026 (atualizado via importação)
   {nome:'COFEN MARILIA BRENDA',marco:391979.58,abril:0},
@@ -11286,57 +11286,57 @@ const CMP_TEAMS = [
 ];
 // marco = valor de MAIO 2026 (mês encerrado); abril = valor de MAIO 2026 (atualizado via importação)
 const CMP_OPS = [
-  {nome:'AMABELLY_SANTOS',marco:45854.72,abril:14006.0},
-  {nome:'ANA_BENTO',marco:16990.83,abril:547.04},
-  {nome:'BIANCA_V_SILVA',marco:36750.97,abril:2409.02},
-  {nome:'BRENDA_FERREIRA',marco:6843.92,abril:3032.41},
-  {nome:'BRUNA_JUSTIMIANO',marco:6962.64,abril:154.87},
-  {nome:'CAIO_SHIMITE',marco:53630.26,abril:21094.24},
-  {nome:'CLEBER_JUNIOR',marco:28863.67,abril:16539.28},
-  {nome:'DEBORA_ANDRIELLY',marco:3340.58,abril:1133.53},
-  {nome:'EDUARDO_SILVA',marco:16577.75,abril:10882.21},
-  {nome:'FABIO_AQUINO',marco:537.53,abril:0},
-  {nome:'FRANCISCA_BRITO',marco:43190.85,abril:6007.55},
-  {nome:'GABRIELY_ALVES',marco:430.87,abril:0},
-  {nome:'GIOVANA_SOUZA',marco:61480.51,abril:21279.18},
-  {nome:'HELENA_SANTOS',marco:17641.83,abril:4069.96},
-  {nome:'HELTON_ROLDON',marco:46816.26,abril:15416.84},
-  {nome:'ISABELA_MONTEIRO',marco:33699.7,abril:10689.67},
-  {nome:'JESSICA_O_SILVA',marco:1255.99,abril:62.47},
-  {nome:'JHONATA_NASCIMENTO',marco:11853.38,abril:9595.04},
-  {nome:'JOAO_MIRANDA',marco:9178.34,abril:4997.84},
-  {nome:'KAROLAINE_SILVA',marco:110494.36,abril:49028.97},
-  {nome:'KELY_SILVA',marco:535.12,abril:0},
-  {nome:'LEONARDO_NUNES',marco:60884.16,abril:14001.68},
-  {nome:'LUCIANO_COSTA',marco:1375.26,abril:0},
-  {nome:'LYVIA_DIAS',marco:20324.1,abril:13431.07},
-  {nome:'MARIA_BRAIDOTI',marco:16899.59,abril:6118.08},
-  {nome:'MARIA_MOREIRASANTOS',marco:51600.97,abril:2843.75},
-  {nome:'MARIA_RODARTE',marco:15620.19,abril:8031.94},
-  {nome:'MATHEUS_SOUZA',marco:64347.09,abril:24357.86},
-  {nome:'MAYSA_OLIVEIRA',marco:16930.23,abril:483.6},
-  {nome:'NAYARA_CRUZ',marco:1043.63,abril:334.34},
-  {nome:'RAFAELA_MINHOTO',marco:20824.45,abril:2038.11},
-  {nome:'RENATARODRIGUES',marco:53722.82,abril:22968.04},
-  {nome:'STEPHANIE_FAGUNDES',marco:70448.62,abril:18725.2},
-  {nome:'THAYRA_FERREIRASILVA',marco:23470.19,abril:29229.56},
-  {nome:'aline_pupim',marco:50195.16,abril:13985.38},
-  {nome:'caio_shimite',marco:53630.26,abril:21094.24},
-  {nome:'carulini_santos',marco:24369.19,abril:670.1},
-  {nome:'felipe_arruda',marco:556.59,abril:0},
-  {nome:'geovanna_almeida',marco:39550.72,abril:19302.76},
-  {nome:'itallo_cardamoni',marco:46380.88,abril:19528.09},
-  {nome:'jussara_pereira',marco:41839.23,abril:10376.25},
-  {nome:'katia_regina',marco:66284.35,abril:25599.73},
-  {nome:'kauane_azevedo',marco:46974.31,abril:18937.13},
-  {nome:'larissa_santana',marco:24661.92,abril:13302.85},
-  {nome:'leticia_romeu',marco:59097.3,abril:27044.22},
-  {nome:'raissa_paloma',marco:65116.95,abril:19079.48},
-  {nome:'silva_beatriz',marco:61866.17,abril:25835.94},
-  {nome:'thais_c_ferreira',marco:4002.56,abril:0},
-  {nome:'thais_mayara',marco:40194.8,abril:16271.18},
-  {nome:'thalia_thomaz',marco:5712.15,abril:362.13},
-  {nome:'thauany_moura',marco:54193.13,abril:16947.0}
+  {nome:'AMABELLY_SANTOS',marco:11445.34,abril:12018.99},
+  {nome:'ANA_BENTO',marco:4240.91,abril:386.43},
+  {nome:'BIANCA_V_SILVA',marco:9173.04,abril:2211.93},
+  {nome:'BRENDA_FERREIRA',marco:1708.24,abril:5692.62},
+  {nome:'BRUNA_JUSTIMIANO',marco:1737.87,abril:461.96},
+  {nome:'CAIO_SHIMITE',marco:13386.11,abril:12450.54},
+  {nome:'CLEBER_JUNIOR',marco:7204.37,abril:5811.96},
+  {nome:'DEBORA_ANDRIELLY',marco:833.81,abril:1131.92},
+  {nome:'EDUARDO_SILVA',marco:4137.81,abril:2744.69},
+  {nome:'FABIO_AQUINO',marco:134.17,abril:716.57},
+  {nome:'FRANCISCA_BRITO',marco:10780.44,abril:17994.1},
+  {nome:'GABRIELY_ALVES',marco:107.55,abril:0.0},
+  {nome:'GIOVANA_SOUZA',marco:15345.54,abril:13558.96},
+  {nome:'HELENA_SANTOS',marco:4403.4,abril:5211.26},
+  {nome:'HELTON_ROLDON',marco:11685.34,abril:23214.74},
+  {nome:'ISABELA_MONTEIRO',marco:8411.45,abril:7944.51},
+  {nome:'JESSICA_O_SILVA',marco:313.5,abril:309.44},
+  {nome:'JHONATA_NASCIMENTO',marco:2958.6,abril:4979.53},
+  {nome:'JOAO_MIRANDA',marco:2290.91,abril:1722.19},
+  {nome:'KAROLAINE_SILVA',marco:27579.39,abril:30683.97},
+  {nome:'KELY_SILVA',marco:133.57,abril:642.99},
+  {nome:'LEONARDO_NUNES',marco:15196.69,abril:21656.01},
+  {nome:'LUCIANO_COSTA',marco:343.26,abril:36.4},
+  {nome:'LYVIA_DIAS',marco:5072.9,abril:20178.05},
+  {nome:'MARIA_BRAIDOTI',marco:4218.14,abril:2916.14},
+  {nome:'MARIA_MOREIRASANTOS',marco:12879.6,abril:18817.2},
+  {nome:'MARIA_RODARTE',marco:3898.8,abril:1488.05},
+  {nome:'MATHEUS_SOUZA',marco:16061.03,abril:25956.08},
+  {nome:'MAYSA_OLIVEIRA',marco:4225.79,abril:1233.31},
+  {nome:'NAYARA_CRUZ',marco:260.49,abril:127.7},
+  {nome:'RAFAELA_MINHOTO',marco:5197.78,abril:1199.95},
+  {nome:'RENATARODRIGUES',marco:13409.22,abril:15087.9},
+  {nome:'STEPHANIE_FAGUNDES',marco:17583.98,abril:11166.67},
+  {nome:'THAYRA_FERREIRASILVA',marco:5858.16,abril:12710.88},
+  {nome:'aline_pupim',marco:12528.71,abril:13928.79},
+  {nome:'caio_shimite',marco:13386.11,abril:12450.54},
+  {nome:'carulini_santos',marco:6082.55,abril:1410.7},
+  {nome:'felipe_arruda',marco:138.92,abril:210.11},
+  {nome:'geovanna_almeida',marco:9871.86,abril:7272.63},
+  {nome:'itallo_cardamoni',marco:11576.67,abril:11547.55},
+  {nome:'jussara_pereira',marco:10443.07,abril:4031.3},
+  {nome:'katia_regina',marco:16544.57,abril:7671.29},
+  {nome:'kauane_azevedo',marco:11724.79,abril:8111.69},
+  {nome:'larissa_santana',marco:6155.62,abril:3969.51},
+  {nome:'leticia_romeu',marco:14750.69,abril:12792.37},
+  {nome:'raissa_paloma',marco:16253.19,abril:13816.1},
+  {nome:'silva_beatriz',marco:15441.8,abril:14258.52},
+  {nome:'thais_c_ferreira',marco:999.04,abril:15.82},
+  {nome:'thais_mayara',marco:10032.62,abril:9663.56},
+  {nome:'thalia_thomaz',marco:1425.75,abril:126.8},
+  {nome:'thauany_moura',marco:13526.61,abril:9425.86}
 ]
 // deduplicate
 const CMP_OPS_DEDUP = [];
