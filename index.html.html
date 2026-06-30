@@ -11683,12 +11683,15 @@ function cmpBuildTableGeral(){
 }
 
 function cmpGetAbrilProporcional(totalAbrilMes){
-  // Retorna o valor de Abril proporcional ao mesmo DU atual de Maio
+  // Retorna o valor de Maio proporcional ao mesmo DU atual de Junho
   const dusMaio = Object.keys(CMP_JUNHO_CUMUL).map(Number).sort((a,b)=>a-b);
   const duAtual = dusMaio.length ? Math.max(...dusMaio) : 0;
-  if(duAtual === 0) return totalAbrilMes; // sem dados de Maio, retorna total
-  const totalAbrilDuAtual = CMP_MAIO_DU[duAtual] || 0;
-  const totalAbrilFinal   = CMP_MAIO_DU[Math.max(...Object.keys(CMP_MAIO_DU).map(Number))] || 1;
+  if(duAtual === 0) return totalAbrilMes;
+  // Se Junho já ultrapassou os DUs de Maio encerrado → Maio = mês completo (prop=1)
+  const duMaioMax = Math.max(...Object.keys(CMP_MAIO_DU).map(Number));
+  const duRef = Math.min(duAtual, duMaioMax);
+  const totalAbrilDuAtual = CMP_MAIO_DU[duRef] || 0;
+  const totalAbrilFinal   = CMP_MAIO_DU[duMaioMax] || 1;
   const proporcao = totalAbrilFinal > 0 ? totalAbrilDuAtual / totalAbrilFinal : 1;
   return Math.round(totalAbrilMes * proporcao * 100) / 100;
 }
@@ -11811,9 +11814,12 @@ function cmpSortOp(field, btn){
 function cmpRenderOps(){
   const dusMaio = Object.keys(CMP_JUNHO_CUMUL).map(Number).sort((a,b)=>a-b);
   const duAtual = dusMaio.length ? Math.max(...dusMaio) : 0;
-  // Proporção geral de Maio no DU atual vs total de Maio encerrado
-  const totalMaioDuAtual = duAtual > 0 ? (CMP_MAIO_DU[duAtual] || 0) : 0;
-  const totalMaioFinal   = CMP_MAIO_DU[Math.max(...Object.keys(CMP_MAIO_DU).map(Number))] || 1;
+  // Proporção de Maio: se Junho já tem mais DUs que Maio encerrado, usa Maio completo (prop=1)
+  const dusMaioDispo = Object.keys(CMP_MAIO_DU).map(Number);
+  const duMaioMax    = dusMaioDispo.length ? Math.max(...dusMaioDispo) : 19;
+  const duMaioRef    = Math.min(duAtual, duMaioMax); // nunca passa do último DU de Maio
+  const totalMaioDuAtual = duMaioRef > 0 ? (CMP_MAIO_DU[duMaioRef] || 0) : 0;
+  const totalMaioFinal   = CMP_MAIO_DU[duMaioMax] || 1;
   const propMaio = totalMaioFinal > 0 ? totalMaioDuAtual / totalMaioFinal : 1;
 
   const list = [...CMP_OPS_DEDUP].sort((a,b)=>{
