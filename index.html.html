@@ -1184,7 +1184,7 @@ select.ev-inp{cursor:pointer}
           color:#fff;transition:all .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           📥 Importar Arquivo
-          <input type="file" accept=".xls,.xlsx,.csv" style="display:none" onchange="(function(f){if(!f)return;_lerXLS(f,function(csv){var raw=csv;document.getElementById('import-area').value=raw;importPreview(raw);document.getElementById('modal-import-geral').style.display='flex';})})(this.files[0]);this.value=''">
+          <input type="file" accept=".xls,.xlsx,.csv" style="display:none" onchange="(function(f){if(!f)return;_lerXLS(f,function(csv){document.getElementById('import-area').value=csv;importPreview(csv);importApply();})})(this.files[0]);this.value=''">
         </label>
         <button onclick="rdClearDay()"
           style="padding:8px 16px;border-radius:var(--rm);border:1px solid rgba(255,100,100,.4);
