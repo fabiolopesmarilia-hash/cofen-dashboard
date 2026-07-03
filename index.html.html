@@ -2935,12 +2935,12 @@ rebuildAll();
 // ── METAS DE EQUIPE — Abril, Maio e Julho em chaves separadas ──
 (function forcarMetasCorretas(){
   // ABRIL encerrado: Brenda=300k, Bruna=200k, Stephanie=200k
-  const metasJunho = {
+  const metasMaio = {
     'COFEN MARILIA BRENDA':     300000,
     'COFEN BIRIGUI BRUNA':      200000,
     'COFEN STEPHANIE 2° TURNO': 200000,
   };
-  // JULHO encerrado: todas as equipes = 450k
+  // JUNHO encerrado: todas as equipes = 450k
   const metasJunho = {
     'COFEN MARILIA BRENDA':     450000,
     'COFEN BIRIGUI BRUNA':      450000,
@@ -4768,34 +4768,49 @@ function previewEmpresa(raw){
 }
 
 function aplicarEmpresa(){
-  const raw = document.getElementById('txt-empresa-modal').value;
+  const raw = document.getElementById('txt-empresa-modal')?.value || '';
   const statusEl = document.getElementById('status-empresa');
-  statusEl.style.display = 'block';
+  if(statusEl){ statusEl.style.display='block'; statusEl.textContent='⏳ Processando...'; statusEl.style.background='#EFF6FF'; statusEl.style.color='#1E40AF'; }
 
-  if(!raw.trim()){ statusEl.textContent='⚠️ Cole o conteúdo do arquivo primeiro!'; statusEl.style.background='#FFFBEB'; statusEl.style.color='#92400E'; return; }
+  if(!raw.trim()){
+    if(statusEl){ statusEl.textContent='⚠️ Cole o conteúdo do arquivo primeiro!'; statusEl.style.background='#FFFBEB'; statusEl.style.color='#92400E'; }
+    return;
+  }
 
-  const result = _empresaParsed || _parseImportCSV(raw);
-  if(!result || result.error){ statusEl.textContent='❌ ' + (result?.error||'Erro ao processar'); statusEl.style.background='#FEF2F2'; statusEl.style.color='#991B1B'; return; }
+  let result;
+  try{
+    result = _empresaParsed || _parseImportCSV(raw);
+  }catch(e){
+    if(statusEl){ statusEl.textContent='❌ Erro ao processar: '+e.message; statusEl.style.background='#FEF2F2'; statusEl.style.color='#991B1B'; }
+    return;
+  }
+
+  if(!result || result.error){
+    if(statusEl){ statusEl.textContent='❌ '+(result?.error||'Arquivo inválido ou formato não reconhecido.'); statusEl.style.background='#FEF2F2'; statusEl.style.color='#991B1B'; }
+    return;
+  }
 
   // Valor a usar: PaguePay se disponível, senão Valor Recebido
   const ppVal = result.totPP > 0 ? result.totPP : result.totValorRec;
 
-  if(ppVal <= 0){ statusEl.textContent='⚠️ Nenhum valor encontrado no arquivo.'; statusEl.style.background='#FFFBEB'; statusEl.style.color='#92400E'; return; }
+  if(!ppVal || ppVal <= 0){
+    if(statusEl){ statusEl.textContent='⚠️ Nenhum valor de PaguePay encontrado. Verifique se o arquivo é o rec_total_empresa.'; statusEl.style.background='#FFFBEB'; statusEl.style.color='#92400E'; }
+    return;
+  }
 
-  // Calcular PaguePay de Abril separadamente — extrair .pp do objeto mensal
-  const mesAtualKey2 = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
-  const mesalEmpTemp = _parseMensal(raw);
-  // _parseMensal retorna {rec, pp, corens} por mês — precisa pegar .pp
-  const _mesAbril = mesalEmpTemp[mesAtualKey2] || mesalEmpTemp['2026-05'] || null;
-  const ppAbrilCalc = _mesAbril
-    ? (typeof _mesAbril === 'object' ? (_mesAbril.pp || _mesAbril.rec || 0) : _mesAbril)
-    : 0;
-  ppEmpresaAbril = Math.round(ppAbrilCalc * 100) / 100;
-  localStorage.setItem('cofen_pp_junho', ppEmpresaAbril);
+  // Calcular PaguePay do mês atual separadamente
+  try{
+    const mesAtualKey2 = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
+    const mesalEmpTemp = _parseMensal(raw);
+    const _mesAbril = mesalEmpTemp[mesAtualKey2] || mesalEmpTemp['2026-07'] || mesalEmpTemp['2026-06'] || null;
+    const ppAbrilCalc = _mesAbril
+      ? (typeof _mesAbril === 'object' ? (_mesAbril.pp || _mesAbril.rec || 0) : _mesAbril)
+      : ppVal;
+    ppEmpresaAbril = Math.round(ppAbrilCalc * 100) / 100;
+    localStorage.setItem('cofen_pp_junho', ppEmpresaAbril);
+  }catch(e){ ppEmpresaAbril = ppVal; }
 
-  // ── Recalcula CMP_HO_JUNHO_DU (HO real por DU de Maio) a partir do arquivo Empresa importado ──
-  // Variável dedicada — NÃO sobrescreve CMP_JUNHO_DU, que é usado por outros gráficos com
-  // semântica de Valor Recebido total (Março vs Abril, etc).
+  // Recalcula CMP_HO_JUNHO_DU
   try{
     const maioDuReal = _parseEmpresaPPporDUMaio(raw);
     if(maioDuReal && Object.keys(maioDuReal).length){
@@ -4806,33 +4821,44 @@ function aplicarEmpresa(){
     }
   }catch(e){}
 
-  // Preencher campo Total Arrecadado (oculto)
-  const inpArr = document.getElementById('inp-arrecadado');
-  if(inpArr){ inpArr.value = ppVal.toFixed(2); liveCalcArrecadado(); }
+  // Preencher campo Total Arrecadado
+  try{
+    const inpArr = document.getElementById('inp-arrecadado');
+    if(inpArr){ inpArr.value = ppVal.toFixed(2); liveCalcArrecadado(); }
+  }catch(e){}
 
-  // Salvar via applyArrecadado (sem alterar operadores/equipes/meta)
+  // Salvar
   totalArrecadado = ppVal;
   localStorage.setItem('cofen_arrecadado', ppVal);
-  initHero();
-  if(fbDb && fbRoom) fbPush('arrecadado', {
-    v: ppVal, m: metaArrecadado,
-    mt: corenMT, pi: corenPI, ma: corenMA, ce: corenCE,
-    sp: corenSP, rj: corenRJ, mg: corenMG, rs: corenRS,
-    pr: corenPR, ba: corenBA, go: corenGO, pe: corenPE, sc: corenSC,
-    am: corenAM, pb: corenPB,
-    ppAbril: ppEmpresaAbril
-  });
 
-  statusEl.innerHTML = `✅ PaguePay Ano: <strong>${fR(ppVal)}</strong> · Abril: <strong>${fR(ppEmpresaAbril)}</strong>`;
-  statusEl.style.background = '#FFFBEB';
-  statusEl.style.color = '#065F46';
+  try{ initHero(); }catch(e){}
+  try{ renderHoProjTable(); }catch(e){}
+
+  try{
+    if(fbDb && fbRoom) fbPush('arrecadado', {
+      v: ppVal, m: metaArrecadado,
+      mt: corenMT, pi: corenPI, ma: corenMA, ce: corenCE,
+      sp: corenSP, rj: corenRJ, mg: corenMG, rs: corenRS,
+      pr: corenPR, ba: corenBA, go: corenGO, pe: corenPE, sc: corenSC,
+      am: corenAM, pb: corenPB,
+      ppAbril: ppEmpresaAbril
+    });
+  }catch(e){}
+
+  if(statusEl){
+    statusEl.innerHTML = `✅ PaguePay aplicado: <strong>${fR(ppVal)}</strong> · Mês atual: <strong>${fR(ppEmpresaAbril)}</strong>`;
+    statusEl.style.background = '#F0FDF4';
+    statusEl.style.color = '#065F46';
+  }
 
   // Salvar historico mensal PP
-  const mesalEmp = _parseMensal(raw);
-  _histMensalEmpresa = {};
-  Object.entries(mesalEmp).forEach(([k,v])=>{ _histMensalEmpresa[k] = v.pp>0?v.pp:v.rec; });
-  localStorage.setItem('cofen_hist_empresa', JSON.stringify(_histMensalEmpresa));
-  renderResumoEditor();
+  try{
+    const mesalEmp = _parseMensal(raw);
+    _histMensalEmpresa = {};
+    Object.entries(mesalEmp).forEach(([k,v])=>{ _histMensalEmpresa[k] = v.pp>0?v.pp:v.rec; });
+    localStorage.setItem('cofen_hist_empresa', JSON.stringify(_histMensalEmpresa));
+    renderResumoEditor();
+  }catch(e){}
 
   setTimeout(() => fecharModalEmpresa(), 2000);
 }
