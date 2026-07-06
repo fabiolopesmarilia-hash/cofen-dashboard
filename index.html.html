@@ -9487,20 +9487,20 @@ function tvShow(idx){
             ${prev?`<div style="display:flex;justify-content:space-between;padding:4px 7px;
                 border-radius:6px;background:rgba(255,255,255,.04);margin-bottom:4px">
               <span style="font-size:10px;color:rgba(255,255,255,.3)">${idx}° ${prev.name.replace(/_/g,' ')}</span>
-              <span style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700">${fRK(prev.rec)}</span>
+              <span style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700">${fRK(tvGetRec(prev))}</span>
             </div>`:''}
             <div style="display:flex;justify-content:space-between;align-items:center;
                 padding:6px 9px;border-radius:8px;background:${cfg.c}22;border:1px solid ${cfg.c}55;margin-bottom:4px">
               <span style="font-size:12px;color:${cfg.c};font-weight:800">${posLabel} VOCÊ</span>
               <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-size:13px;color:#4ADE80;font-weight:900">${fRK(op.rec)}</span>
+                <span style="font-size:13px;color:#4ADE80;font-weight:900">${fRK(tvGetRec(op))}</span>
                 ${(()=>{ return ''; /* premiação removida a pedido do usuário */ })()}
               </div>
             </div>
             ${next?`<div style="display:flex;justify-content:space-between;padding:4px 7px;
                 border-radius:6px;background:rgba(255,255,255,.04)">
               <span style="font-size:10px;color:rgba(255,255,255,.3)">${idx+2}° ${next.name.replace(/_/g,' ')}</span>
-              <span style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700">${fRK(next.rec)}</span>
+              <span style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700">${fRK(tvGetRec(next))}</span>
             </div>`:''}
           </div>
 
