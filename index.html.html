@@ -804,7 +804,7 @@ select.ev-inp{cursor:pointer}
     <div class="card"><div class="sec">📈 Recebimento Diário (PaguePlay Consolidado)</div><div class="ch-w"><canvas id="ch-gd"></canvas></div></div>
     <div>
       <div class="du-strip" style="margin-bottom:12px">
-        <div class="du-title">📅 Dias Úteis — Junho 2026 (Seg–Sex)</div>
+        <div class="du-title" id="du-title-1">📅 Dias Úteis — Junho 2026 (Seg–Sex)</div>
         <div class="du-grid">
           <div class="du-item"><div class="du-num" id="du-total">20</div><div class="du-lbl">Total</div></div>
           <div class="du-item"><div class="du-num" id="du-passou">13</div><div class="du-lbl">Passados</div></div>
@@ -1141,7 +1141,7 @@ select.ev-inp{cursor:pointer}
     <div class="card"><div class="sec">📅 Diário Global — PaguePlay</div><div style="height:220px"><canvas id="ch-df"></canvas></div></div>
     <div>
       <div class="du-strip" style="margin-bottom:12px">
-        <div class="du-title">Dias Úteis — Junho 2026</div>
+        <div class="du-title" id="du-title-2">Dias Úteis — Junho 2026</div>
         <div class="du-grid">
           <div class="du-item"><div class="du-num" id="du2-total">21</div><div class="du-lbl">Total</div></div>
           <div class="du-item"><div class="du-num" id="du2-passou">0</div><div class="du-lbl">Passados</div></div>
@@ -1149,7 +1149,7 @@ select.ev-inp{cursor:pointer}
         </div>
       </div>
       <div class="cal-card">
-        <div class="cal-title">Junho 2026</div>
+        <div class="cal-title" id="cal-title-2">Junho 2026</div>
         <div class="cal-year" style="margin-bottom:10px">Calendário automático</div>
         <div class="cal-grid" id="cal-grid2"></div>
       </div>
@@ -2996,13 +2996,19 @@ function buildCal(gridId){
   const now = new Date();
   const year = now.getFullYear(), month = now.getMonth();
   const today = now.getDate();
-  const months = ["Janeiro","Fevereiro","Março","Abril","Maio","Julho",
+  const months = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho",
     "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
   if(document.getElementById('cal-title'))
     document.getElementById('cal-title').textContent = months[month];
   if(document.getElementById('cal-year-txt'))
     document.getElementById('cal-year-txt').textContent = year + ' · Seg a Sex = Dia Útil';
+  if(document.getElementById('cal-title-2'))
+    document.getElementById('cal-title-2').textContent = months[month] + ' ' + year;
+  if(document.getElementById('du-title-1'))
+    document.getElementById('du-title-1').textContent = '📅 Dias Úteis — ' + months[month] + ' ' + year + ' (Seg–Sex)';
+  if(document.getElementById('du-title-2'))
+    document.getElementById('du-title-2').textContent = 'Dias Úteis — ' + months[month] + ' ' + year;
 
   const firstDay = new Date(year,month,1).getDay(); // 0=sun
   const daysInMonth = new Date(year,month+1,0).getDate();
@@ -3655,7 +3661,7 @@ function renderPPProjecao(){
 }
 
 function _buildMetasHtml(val, compact){
-  const META_STEP = 1000000/21;
+  const META_STEP = 75000; // cada meta = R$75K (Meta1=75K, Meta2=150K, Meta3=225K, Meta4=300K)
   const metas   = Math.floor(val / META_STEP);
   const prog    = val % META_STEP;
   const pct     = (prog / META_STEP * 100);
@@ -4599,6 +4605,23 @@ function _parseGeralPorEquipe(raw){
     return null;
   }
 
+  // ── Pré-varredura da coluna de data para detectar o formato real (BR dd/mm vs US mm/dd) ──
+  let _dtFmtHint = 'BR'; // padrão: sistema brasileiro, dd/mm/aaaa
+  {
+    let _vBR = 0, _vUS = 0;
+    for(let i=1; i<lines.length; i++){
+      const _row = lines[i].split(sep);
+      if(_row.length <= iDt) continue;
+      const _raw = (_row[iDt]||'').trim().replace(/^"|"$/g,'');
+      const _m = _raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-]\d{2,4}/);
+      if(!_m) continue;
+      const _a = parseInt(_m[1]), _b = parseInt(_m[2]);
+      if(_a>12 && _b<=12) _vBR++;
+      else if(_b>12 && _a<=12) _vUS++;
+    }
+    if(_vUS > _vBR) _dtFmtHint = 'US';
+  }
+
   function normEq(eq){
     eq = (eq||'').trim().toUpperCase();
     if(eq.includes('DIGITAL')) return 'COFEN DIGITAL';
@@ -4630,8 +4653,10 @@ function _parseGeralPorEquipe(raw){
         return `${yr}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       if(mo > 12 && d <= 12) // segundo número > 12 → é o dia, primeiro é mês (formato americano)
         return `${yr}-${String(d).padStart(2,'0')}-${String(mo).padStart(2,'0')}`;
-      // Ambos ≤ 12: SheetJS sempre gera M/D/YYYY → assume americano (mês primeiro)
-      return `${yr}-${String(d).padStart(2,'0')}-${String(mo).padStart(2,'0')}`;
+      // Ambos ≤ 12: usa o formato detectado na pré-varredura do arquivo (padrão BR: dia/mês)
+      if(_dtFmtHint === 'US')
+        return `${yr}-${String(d).padStart(2,'0')}-${String(mo).padStart(2,'0')}`;
+      return `${yr}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     }
     // M/D/YY ou M/D/YYYY americano curto
     m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})$/);
@@ -5743,7 +5768,9 @@ function mkDf(){
 
 function mkDe(){
   destroyC('de');
-  const days=Array.from({length:22},(_,i)=>i+1);
+  const _mkDeNow = new Date();
+  const _mkDeDaysInMonth = new Date(_mkDeNow.getFullYear(), _mkDeNow.getMonth()+1, 0).getDate();
+  const days=Array.from({length:_mkDeDaysInMonth},(_,i)=>i+1);
   const ds=D.equipes.map(eq=>{
     const cfg=EQ[eq.name]||{c:'#888',sh:eq.name};
     const dm={};
@@ -7769,6 +7796,24 @@ function importParse(raw){
       .replace(/[\s_.-]+/g,'');
   }
 
+  // ── Pré-varredura da coluna de data para detectar o formato real (BR dd/mm vs US mm/dd) ──
+  // Evita assumir cegamente "mês primeiro" em datas ambíguas (ex.: 05/07 pode ser 5-jul ou mai-07)
+  let _dateFmtHint = 'BR'; // padrão: sistema brasileiro, dd/mm/aaaa
+  if(iDate >= 0){
+    let _votesBR = 0, _votesUS = 0;
+    for(let i=1; i<lines.length; i++){
+      const _row = lines[i].split(sep);
+      if(_row.length <= iDate) continue;
+      const _raw = (_row[iDate]||'').trim().replace(/^"|"$/g,'');
+      const _m = _raw.match(/^(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-]\d{2,4}/);
+      if(!_m) continue;
+      const _a = parseInt(_m[1]), _b = parseInt(_m[2]);
+      if(_a>12 && _b<=12) _votesBR++;      // só pode ser dia/mês
+      else if(_b>12 && _a<=12) _votesUS++; // só pode ser mês/dia
+    }
+    if(_votesUS > _votesBR) _dateFmtHint = 'US';
+  }
+
   // Extrai dia do mês de uma string de data (DD/MM/YYYY ou YYYY-MM-DD)
   function extractDay(str){
     if(!str) return null;
@@ -7784,7 +7829,8 @@ function importParse(raw){
         var _a=parseInt(m[1]), _b=parseInt(m[2]), _yr=parseInt(m[3].length<4?'20'+m[3]:m[3]);
         if(_a>12&&_b<=12){ day=_a; month=_b; }       // BR: dia>12 → não pode ser mês
         else if(_b>12&&_a<=12){ day=_b; month=_a; }  // US: segundo>12 → é o dia
-        else { day=_b; month=_a; }                    // Ambos≤12: SheetJS M/D/YYYY → mês primeiro
+        else if(_dateFmtHint==='US'){ day=_b; month=_a; } // Ambíguo: arquivo detectado como mês/dia (SheetJS/US)
+        else { day=_a; month=_b; }                    // Ambíguo: padrão BR dia/mês (a maioria dos arquivos)
         year=_yr;
       }
     }
