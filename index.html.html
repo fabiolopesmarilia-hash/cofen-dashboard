@@ -9338,44 +9338,7 @@ function tvShow(idx){
                   text-shadow:0 0 24px ${pCor}66">${proj.pct.toFixed(0)}%</div>`;
               })()}
             </div>
-            ${(()=>{
-              // Nível da operação baseado no HO total acumulado (só exibe a partir de N2 = 600k HO)
-              const _hoOp = getTotalRec() * 0.25;
-              const _nivelOp = _hoOp >= 1000000 ? 'n4' : _hoOp >= 700000 ? 'n3' : _hoOp >= 600000 ? 'n2' : null;
-              if(!_nivelOp) return ''; // abaixo de 600k HO: não exibe nada
-              const _tabelaOp = PREM_NIVEIS[_nivelOp];
-              const _entryOp  = _tabelaOp.valores.find(v=>v.pos===Number(pos));
-              if(!_entryOp) return '';
-              const prem = { pos: Number(pos), valor: _entryOp.valor, label: _tabelaOp.label };
-              const _pi = pos - 1;
-              const premCores = ['#FFD700','#D0D0D0','#CD8C55'];
-              const premGlows = ['rgba(255,215,0,.7)','rgba(192,192,192,.5)','rgba(205,127,50,.6)'];
-              const premBgs   = ['rgba(255,215,0,.13)','rgba(192,192,192,.1)','rgba(205,127,50,.12)'];
-              const premBds   = ['rgba(255,215,0,.6)','rgba(192,192,192,.45)','rgba(205,127,50,.5)'];
-              const premCor  = premCores[_pi] || '#FCD34D';
-              const premGlow = premGlows[_pi] || 'rgba(252,211,77,.5)';
-              const premBg   = premBgs[_pi]   || 'rgba(252,211,77,.1)';
-              const premBd   = premBds[_pi]   || 'rgba(252,211,77,.4)';
-              const medals   = ['🥇','🥈','🥉'];
-              const medal    = medals[_pi] || '🏆';
-              return `<div style="flex-shrink:0;background:${premBg};border:2px solid ${premBd};
-                border-radius:18px;padding:12px 22px;text-align:center;
-                box-shadow:0 0 40px ${premGlow}, inset 0 0 20px ${premBg};
-                backdrop-filter:blur(12px);animation:tvIn .5s cubic-bezier(.22,1,.36,1)">
-                <div style="font-size:9px;font-weight:900;color:${premCor};letter-spacing:2.5px;
-                  text-transform:uppercase;opacity:.75;margin-bottom:2px">
-                  ${medal} SE TERMINAR AQUI
-                </div>
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:54px;color:${premCor};
-                  letter-spacing:2px;line-height:1;
-                  text-shadow:0 0 30px ${premGlow}, 0 2px 10px rgba(0,0,0,.8)">
-                  ${fR(prem.valor)}
-                </div>
-                <div style="font-size:10px;font-weight:800;color:${premCor};opacity:.6;margin-top:4px;letter-spacing:.5px">
-                  ${_nivelOp === 'n4' ? '🚀 NÍVEL 4 · HO +R$1M' : _nivelOp === 'n3' ? '🔥 NÍVEL 3 · HO +R$700k' : '⭐ NÍVEL 2 · HO +R$600k'}
-                </div>
-              </div>`;
-            })()}
+            ${(()=>{ return ''; /* premiação removida a pedido do usuário */ })()}
           </div>
           <div style="display:flex;gap:8px;align-items:center;margin-top:5px;flex-wrap:wrap">
             ${posGlobalBadge}
@@ -9531,22 +9494,7 @@ function tvShow(idx){
               <span style="font-size:12px;color:${cfg.c};font-weight:800">${posLabel} VOCÊ</span>
               <div style="display:flex;align-items:center;gap:8px">
                 <span style="font-size:13px;color:#4ADE80;font-weight:900">${fRK(op.rec)}</span>
-                ${(()=>{
-                  // Nível da operação pelo HO total (só exibe a partir de 600k HO)
-                  const _hoOp2 = getTotalRec() * 0.25;
-                  const _nivelOp2 = _hoOp2 >= 1000000 ? 'n4' : _hoOp2 >= 700000 ? 'n3' : _hoOp2 >= 600000 ? 'n2' : null;
-                  if(!_nivelOp2) return '';
-                  const _tabOp2  = PREM_NIVEIS[_nivelOp2];
-                  const _entOp2  = _tabOp2.valores.find(v=>v.pos===Number(pos));
-                  if(!_entOp2) return '';
-                  const prem2 = { pos: Number(pos), valor: _entOp2.valor, label: _tabOp2.label };
-                  if(!prem2) return '';
-                  const _pi2=posGlobal-1;
-                  const pc2=_pi2===0?'#FFD700':_pi2===1?'#C0C0C0':_pi2===2?'#CD7F32':'#FCD34D';
-                  return `<span style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:${pc2};
-                    background:${pc2}22;border:1px solid ${pc2}55;border-radius:6px;padding:2px 7px;
-                    letter-spacing:.5px;white-space:nowrap">🏆 ${fRK(prem2.valor)}</span>`;
-                })()}
+                ${(()=>{ return ''; /* premiação removida a pedido do usuário */ })()}
               </div>
             </div>
             ${next?`<div style="display:flex;justify-content:space-between;padding:4px 7px;
