@@ -5098,7 +5098,7 @@ function resetTotal(){
 // ── EQUIPES PAGE ──
 function mkEq(){
   const totalRec=getTotalRec();
-  document.getElementById('eq-grid').innerHTML=D.equipes.map(eq=>{
+  document.getElementById('eq-grid').innerHTML=D.equipes.filter(eq=>eq.n_op>0).map(eq=>{
     const cfg=EQ[eq.name]||{c:'#888',bg:'#eee',ico:'📌',sh:eq.name};
     const pct=(eq.rec/totalRec*100).toFixed(1);
     // Checklist progress for this team
