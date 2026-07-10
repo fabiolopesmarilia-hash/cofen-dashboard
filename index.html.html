@@ -7868,6 +7868,10 @@ function importParse(raw){
       const day = extractDay(row[iDate]);
       if(day && day >= 1 && day <= 31){
         acc[rawName].daily[day] = (acc[rawName].daily[day]||0) + recVal;
+      } else {
+        // Coluna de data existe mas essa linha não foi reconhecida (formato diferente, vazio, etc.)
+        // Sem isso, o valor entrava no total mas sumia do "recebido hoje" — marca para o fallback abaixo.
+        acc[rawName]._semData = true;
       }
     } else if(iDate < 0 && recVal > 0){
       acc[rawName]._semData = true;
@@ -7892,7 +7896,9 @@ function importParse(raw){
   if(_lastUtil < 1) _lastUtil = 1;
 
   Object.values(acc).forEach(a => {
-    if(a._semData && a.total > 0 && Object.keys(a.daily).length === 0){
+    const _dailySum = Object.values(a.daily).reduce((s,v)=>s+v,0);
+    const _remainder = a.total - _dailySum; // parte que não caiu em nenhum dia (data ausente/irreconhecível)
+    if(a._semData && _remainder > 0.01){
       // Tenta pegar histórico diário do rd_hist salvo no localStorage
       try {
         const _hist = JSON.parse(localStorage.getItem('cofen_rd_hist') || '{}');
@@ -7912,10 +7918,10 @@ function importParse(raw){
             });
           });
         });
-        // Sem histórico: joga no último dia útil (não no dia atual)
-        if(!_foundDaily) a.daily[_lastUtil] = a.total;
+        // Sem histórico: joga a sobra (não atribuída) no último dia útil
+        if(!_foundDaily) a.daily[_lastUtil] = (a.daily[_lastUtil]||0) + _remainder;
       } catch(e) {
-        a.daily[_lastUtil] = a.total;
+        a.daily[_lastUtil] = (a.daily[_lastUtil]||0) + _remainder;
       }
     }
   });
