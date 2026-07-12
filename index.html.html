@@ -8276,15 +8276,25 @@ function importApply(){
   const totalImportado = importParsed.found.reduce((s,r)=>s+r.recImport,0);
 
   // ── 4. Salvar rec de hoje de cada operador no rdSaved (para cards de equipe mostrarem "Hoje") ──
+  // Prioridade: valor do dia explícito no relatório (coluna de data bateu com hoje).
+  // Fallback: diferença entre o valor novo e o valor que o operador tinha ANTES desta
+  // importação — cobre relatórios sem coluna de data (só nome + valor total).
+  // Isso garante que "Recebido Hoje" sempre reflita o relatório importado, nunca fique
+  // zerado por falta de coluna de data, e sempre substitua (nunca some com) valor manual.
   const _rdMap = {};
   const _hoje = new Date().getDate();
   importParsed.found.forEach(r=>{
+    let hojeVal = 0;
     if(r.daily && r.daily[_hoje] && r.daily[_hoje] > 0){
-      _rdMap[r.opName] = r.daily[_hoje];
+      hojeVal = r.daily[_hoje];
+    } else if(r.diff && r.diff > 0){
+      hojeVal = r.diff;
     }
+    if(hojeVal > 0) _rdMap[r.opName] = hojeVal;
   });
-  if(Object.keys(_rdMap).length > 0){
-    // Mescla com o que já existe (não apaga Katia manual)
+  // Sempre grava (mesmo vazio) — garante que o "zerar manual" do passo 1 não fique
+  // "pendurado" sem o valor novo do relatório entrar no lugar.
+  {
     const _rdAtual = rdGetSaved();
     Object.assign(_rdAtual, _rdMap);
     rdSetSaved(_rdAtual);
