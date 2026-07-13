@@ -2796,7 +2796,7 @@ const EQ={
 };
 
 const fR=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-const fRK=v=>v>=1000?"R$ "+(v/1000).toFixed(1)+"K":fR(v);
+const fRK=v=>v>=1e6?"R$ "+(v/1e6).toFixed(2).replace('.',',')+"M":v>=1000?"R$ "+(v/1000).toFixed(1)+"K":fR(v);
 const ini=n=>{const p=n.replace(/_/g," ").split(" ");return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():n.slice(0,2).toUpperCase()};
 
 // All operators sorted
