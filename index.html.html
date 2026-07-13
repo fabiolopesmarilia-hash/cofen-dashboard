@@ -2551,6 +2551,7 @@ select.ev-inp{cursor:pointer}
       <button class="mclose" onclick="closeM()">✕</button>
     </div>
     <input type="file" id="m-photo-file" accept="image/*" style="display:none" onchange="photoFileSelected(this)">
+    <input type="file" id="lider-photo-file" accept="image/*" style="display:none" onchange="liderPhotoFileSelected(this)">
     <div class="mbody">
       <div class="mk-row" id="m-kpis"></div>
       <div class="mg2">
@@ -8892,6 +8893,39 @@ function photoFileSelected(inp){
   inp.value='';
 }
 
+// ── FOTO DO LÍDER DE EQUIPE (usada na tabela Metas & Projeções HO) ──
+// Reaproveita o mesmo storage/compressão de photoSet/photoGet, só que
+// com a chave 'LIDER_'+nomeDaEquipe em vez do nome de um operador.
+let currentLiderEq = null;
+function liderPhotoUpload(eqName){
+  currentLiderEq = eqName;
+  const inp = document.getElementById('lider-photo-file');
+  if(!inp) return;
+  inp.value = '';
+  inp.click();
+}
+function liderPhotoFileSelected(inp){
+  if(!inp.files||!inp.files[0]) return;
+  const eqName = currentLiderEq;
+  if(!eqName){ toast('❌ Erro ao identificar a equipe!'); return; }
+  const file = inp.files[0];
+  if(!file.type.startsWith('image/')){
+    toast('❌ Selecione uma imagem (JPG, PNG, etc)');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    photoSet('LIDER_'+eqName, e.target.result);
+    setTimeout(()=>{
+      if(typeof renderEqMetasTable==='function') renderEqMetasTable();
+      toast('✅ Foto do líder salva!');
+    }, 300);
+  };
+  reader.onerror = ()=>{ toast('❌ Erro ao ler o arquivo. Tente novamente.'); };
+  reader.readAsDataURL(file);
+  inp.value='';
+}
+
 
 // ══════════════════════════════════════════
 // GRÁFICO EVOLUÇÃO SEMANAL — MODAL
@@ -14858,7 +14892,7 @@ function renderEqMetasTable(){
   const pctColor = p => p>=100?'#4ADE80':p>=70?'#67E8F9':p>=50?'#FCD34D':'#F87171';
   const pctBg    = p => p>=100?'rgba(74,222,128,.15)':p>=70?'rgba(103,232,249,.12)':p>=50?'rgba(252,211,77,.12)':'rgba(248,113,113,.12)';
 
-  const ORDER = ['COFEN BIRIGUI BRUNA','COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA'];
+  const ORDER = ['COFEN BIRIGUI BRUNA','COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO','COFEN KATIA'];
   const EQ_LABELS = {
     'COFEN BIRIGUI BRUNA'     : 'COFEN BIRIGUI BRUNA',
     'COFEN MARILIA BRENDA'    : 'COFEN MARILIA BRENDA',
@@ -14920,13 +14954,30 @@ function renderEqMetasTable(){
     // Cor de urgência para a coluna de meta restante
     const urgColor = duRest <= 2 ? '#F87171' : duRest <= 5 ? '#FCD34D' : '#67E8F9';
 
+    // Foto do líder (clique na tabela abre upload) — chave própria, separada dos operadores
+    const liderPhoto = photoGet('LIDER_'+eqName);
+    const liderLabel = (EQ_LABELS[eqName]||eqName).replace('EQUIPE ','').replace('COFEN ','').trim();
+    const liderIni = liderLabel.charAt(0).toUpperCase();
+
     rows += `<tr style="border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s"
       onmouseover="this.style.background='rgba(255,255,255,.04)'"
       onmouseout="this.style.background=''">
       <td style="padding:8px 12px">
-        <div style="font-weight:800;font-size:11px;color:rgba(255,255,255,.85);margin-bottom:3px">${EQ_LABELS[eqName]||eqName}</div>
-        <div style="background:rgba(255,255,255,.1);border-radius:100px;height:3px;overflow:hidden;width:90px">
-          <div style="height:100%;border-radius:100px;background:${pc};width:${barW}%;transition:width 1s"></div>
+        <div style="display:flex;align-items:center;gap:9px">
+          <div onclick="liderPhotoUpload('${eqName}')" title="Clique para adicionar/trocar a foto do líder"
+            style="width:34px;height:34px;border-radius:9px;flex-shrink:0;cursor:pointer;overflow:hidden;
+            background:${(EQ[eqName]&&EQ[eqName].c)||'#888'};display:flex;align-items:center;justify-content:center;
+            border:1.5px solid rgba(255,255,255,.15)">
+            ${liderPhoto
+              ? `<img src="${liderPhoto}" style="width:100%;height:100%;object-fit:cover">`
+              : `<span style="font-weight:900;font-size:13px;color:#fff;font-family:'Bebas Neue',sans-serif">${liderIni}</span>`}
+          </div>
+          <div>
+            <div style="font-weight:800;font-size:11px;color:rgba(255,255,255,.85);margin-bottom:3px">${EQ_LABELS[eqName]||eqName}</div>
+            <div style="background:rgba(255,255,255,.1);border-radius:100px;height:3px;overflow:hidden;width:90px">
+              <div style="height:100%;border-radius:100px;background:${pc};width:${barW}%;transition:width 1s"></div>
+            </div>
+          </div>
         </div>
       </td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#4ADE80">${fR(rec)}</td>
