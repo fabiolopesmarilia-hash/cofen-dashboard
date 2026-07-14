@@ -14144,13 +14144,19 @@ function mtsAtualizarJulho(){
   <!-- Gráfico histórico por dia -->
   <div class="card">
     <div class="sec" id="hist-chart-title">📊 Recebimento Total por Dia — Abril</div>
-    <div style="height:200px;position:relative"><canvas id="hist-chart-dias"></canvas></div>
+    <div style="height:200px;position:relative">
+      <canvas id="hist-chart-dias"></canvas>
+      <div id="hist-chart-dias-empty" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:var(--g500);font-size:12px;font-weight:600">📭 Sem dados importados ainda</div>
+    </div>
   </div>
 
   <!-- Top 10 histórico -->
   <div class="card">
     <div class="sec" id="hist-chart-ops-title">🏆 Top 10 Operadores — Abril</div>
-    <div style="height:240px;position:relative"><canvas id="hist-chart-ops"></canvas></div>
+    <div style="height:240px;position:relative">
+      <canvas id="hist-chart-ops"></canvas>
+      <div id="hist-chart-ops-empty" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:var(--g500);font-size:12px;font-weight:600">📭 Sem dados importados ainda</div>
+    </div>
   </div>
 
 </div>
@@ -15208,6 +15214,29 @@ let histSortAtual  = 'total';
 let histChartDias  = null;
 let histChartOps   = null;
 
+// Plugin: mostra o valor de cada dia acima da coluna, em preto negrito, sempre legível
+const histBarValuePlugin = {
+  id: 'histBarValuePlugin',
+  afterDatasetsDraw(chart){
+    const meta = chart.getDatasetMeta(0);
+    if(!meta || !meta.data || !meta.data.length) return;
+    const ctx = chart.ctx;
+    ctx.save();
+    ctx.font = "900 11px Nunito, sans-serif";
+    ctx.fillStyle = '#111827';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    meta.data.forEach((bar, i)=>{
+      const val = chart.data.datasets[0].data[i];
+      if(!val || val <= 0) return;
+      const label = 'R$ '+Number(val).toLocaleString('pt-BR',{maximumFractionDigits:0});
+      const {x, y} = bar.getProps(['x','y'], true);
+      ctx.fillText(label, x, y - 4);
+    });
+    ctx.restore();
+  }
+};
+
 // Mapeamento equipe de exibição → fragmento do nome do operador (sem equipe no dado)
 // Como os dados históricos não têm coluna equipe, usamos lookup do RDOP_DADOS do mês atual
 // para correspondência por nome, com fallback '—'
@@ -15298,7 +15327,25 @@ function histRender(){
     if(theadTr) theadTr.innerHTML = '';
     const tfoot = document.getElementById('hist-tfoot');
     if(tfoot) tfoot.innerHTML = '';
+    // Atualiza os títulos dos gráficos e apaga os gráficos antigos —
+    // sem isso, ficavam presos mostrando o último mês que tinha dado (ex: Abril)
+    const ct1x = document.getElementById('hist-chart-title');
+    if(ct1x) ct1x.textContent = '📊 Recebimento Total por Dia — '+mes;
+    const ct2x = document.getElementById('hist-chart-ops-title');
+    if(ct2x) ct2x.textContent = '🏆 Top 10 Operadores — '+mes;
+    if(histChartDias){ histChartDias.destroy(); histChartDias=null; }
+    if(histChartOps){ histChartOps.destroy(); histChartOps=null; }
+    const emptyD = document.getElementById('hist-chart-dias-empty');
+    if(emptyD) emptyD.style.display = 'flex';
+    const emptyO = document.getElementById('hist-chart-ops-empty');
+    if(emptyO) emptyO.style.display = 'flex';
     return;
+  }
+  {
+    const emptyD = document.getElementById('hist-chart-dias-empty');
+    if(emptyD) emptyD.style.display = 'none';
+    const emptyO = document.getElementById('hist-chart-ops-empty');
+    if(emptyO) emptyO.style.display = 'none';
   }
   const nDias = info.dias;
   const mesNum = HIST_MES_NUM[mes];
@@ -15416,8 +15463,10 @@ function histRenderCharts(rows, nDias, mesNum){
           borderRadius:4,borderSkipped:false
         }]
       },
+      plugins:[histBarValuePlugin],
       options:{
         responsive:true,maintainAspectRatio:false,
+        layout:{padding:{top:28}},
         plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},
         scales:{
           x:{grid:{display:false},ticks:{font:{family:'Nunito',size:9},color:'#7A8899'}},
