@@ -6072,7 +6072,7 @@ function go(id,el){
   if(id==='check') checkInit();
   if(id==='comparativo') cmpInit();
   if(id==='inadimpl') inadimplInit();
-  if(id==='metas'){ mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJulho==='function') mtsAtualizarJulho(); }
+  if(id==='metas'){ mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho(); if(typeof mtsAtualizarJulho==='function') mtsAtualizarJulho(); if(typeof mtsAtualizarAgosto==='function') mtsAtualizarAgosto(); }
   if(id==='recdia-op') rdopRender();
   if(id==='proj-op') projOpRender();
 }
@@ -6081,7 +6081,7 @@ function go(id,el){
 function refreshAll(){
   rebuildAll();
   initHero();
-  if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJulho==='function') mtsAtualizarJulho();
+  if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho(); if(typeof mtsAtualizarJulho==='function') mtsAtualizarJulho(); if(typeof mtsAtualizarAgosto==='function') mtsAtualizarAgosto();
   // Sempre atualiza todos os componentes — independente de qual aba está visível
   mkGD(); mkDist(); mkTop5();
   mkEq();
@@ -7597,7 +7597,9 @@ function metasSave(){
   // Atualiza aba Metas 2026
   if(typeof mtsAtualizarAbril === 'function') mtsAtualizarAbril();
   if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio();
+  if(typeof mtsAtualizarJunho === 'function') mtsAtualizarJunho();
   if(typeof mtsAtualizarJulho === 'function') mtsAtualizarJulho();
+  if(typeof mtsAtualizarAgosto === 'function') mtsAtualizarAgosto();
   // Atualiza hero e indicadores gerais
   if(typeof initHero === 'function') initHero();
   if(typeof renderPpMetas === 'function') renderPpMetas();
@@ -8320,6 +8322,41 @@ function importApply(){
     Object.assign(_rdAtual, _rdMap);
     rdSetSaved(_rdAtual);
     if(fbDb && fbRoom) fbPush('rd', _rdAtual);
+  }
+
+  // ── 4b. Atualizar HISTÓRICO — Recebimento por Dia/Operador (mês ativo do dashboard) ──
+  // Antes essa tabela só existia se eu digitasse na mão. Agora todo import diário
+  // já alimenta ela sozinho. Se o relatório tem coluna de data, usa daily{} (pode
+  // preencher vários dias de uma vez). Se NÃO tem data (só nome+valor total, caso
+  // mais comum aqui), usa o mesmo fallback do "Recebido Hoje": a diferença (diff)
+  // entre o valor novo e o valor antes desta importação vira o valor de HOJE.
+  {
+    const MES_ATIVO = 'Julho';
+    const DIAS_MES_ATIVO = 31;
+    if(!HIST_DADOS[MES_ATIVO]) HIST_DADOS[MES_ATIVO] = {dias: DIAS_MES_ATIVO, rows: []};
+    const histInfo = HIST_DADOS[MES_ATIVO];
+    const _hojeIdx = new Date().getDate() - 1;
+    importParsed.found.forEach(r=>{
+      const temData = r.daily && Object.keys(r.daily).length > 0;
+      if(!temData && !(r.diff && r.diff > 0)) return; // nada de novo pra registrar
+      let row = histInfo.rows.find(x=>x.nome===r.opName);
+      if(!row){
+        row = {nome:r.opName, d:new Array(histInfo.dias).fill(0), total:0};
+        histInfo.rows.push(row);
+      }
+      if(temData){
+        Object.entries(r.daily).forEach(([dia,val])=>{
+          const idx = parseInt(dia)-1;
+          if(idx>=0 && idx<row.d.length && val>0) row.d[idx] = val;
+        });
+      } else if(_hojeIdx>=0 && _hojeIdx<row.d.length){
+        row.d[_hojeIdx] = r.diff;
+      }
+      row.total = row.d.reduce((s,v)=>s+v,0);
+    });
+    try{ localStorage.setItem('cofen_hist_dados_'+MES_ATIVO.toLowerCase(), JSON.stringify(histInfo.rows)); }catch(e){}
+    if(fbDb && fbRoom){ try{ fbDb.ref(fbRoom+'/hist_'+MES_ATIVO.toLowerCase()).set(histInfo.rows); }catch(e){} }
+    if(typeof histRender==='function' && typeof histMesAtual!=='undefined' && histMesAtual===MES_ATIVO) histRender();
   }
 
   // ── 5. Forçar atualização completa de tudo que mostra "hoje" e totais ──
@@ -9912,6 +9949,7 @@ function syncDisconnect(){
   if(fbListeners.metas_eq)  { fbDb?.ref(fbRoom+'/metas_eq').off(); }
   if(fbListeners.metas_op)  { fbDb?.ref(fbRoom+'/metas_op').off(); }
   if(fbListeners.gestao)    { fbDb?.ref(fbRoom+'/gestao').off(); }
+  if(fbListeners.hist_julho){ fbDb?.ref(fbRoom+'/hist_julho').off(); }
   if(fbListeners.acordos)   { fbDb?.ref(fbRoom+'/acordos').off(); }
   fbListeners={};
   fbApp=null; fbDb=null; fbRoom=null;
@@ -10181,7 +10219,9 @@ function fbStartListening(){
     if(typeof renderEqMetasTable === 'function') renderEqMetasTable();
     if(typeof mtsAtualizarAbril === 'function') mtsAtualizarAbril();
     if(typeof mtsAtualizarMaio  === 'function') mtsAtualizarMaio();
+    if(typeof mtsAtualizarJunho === 'function') mtsAtualizarJunho();
     if(typeof mtsAtualizarJulho === 'function') mtsAtualizarJulho();
+    if(typeof mtsAtualizarAgosto === 'function') mtsAtualizarAgosto();
     if(typeof initHero === 'function') initHero();
     if(typeof renderPpMetas === 'function') renderPpMetas();
     // Só re-renderiza o formulário se o usuário NÃO estiver digitando em algum campo de meta
@@ -10235,6 +10275,19 @@ function fbStartListening(){
     pulseSyncDot();
   });
   fbListeners.gestao = true;
+
+  // ── Histórico — Recebimento por Dia/Operador (Julho, alimentado pelo import diário) ──
+  fbDb.ref(fbRoom+'/hist_julho').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote || !Array.isArray(remote) || !remote.length) return;
+    const localStr = localStorage.getItem('cofen_hist_dados_julho');
+    if(localStr === JSON.stringify(remote)) return;
+    localStorage.setItem('cofen_hist_dados_julho', JSON.stringify(remote));
+    if(typeof HIST_DADOS!=='undefined') HIST_DADOS['Julho'] = {dias:31, rows:remote};
+    if(typeof histRender==='function' && typeof histMesAtual!=='undefined' && histMesAtual==='Julho') histRender();
+    pulseSyncDot();
+  });
+  fbListeners.hist_julho = true;
 
   // ── Extra por Equipe ──
   fbDb.ref(fbRoom+'/extra_eq').on('value', snap=>{
@@ -12154,7 +12207,7 @@ mkEq();
 // Restaurar extras de equipe do localStorage ao iniciar
 setTimeout(()=>{ if(typeof extraRestoreOnLoad==='function') extraRestoreOnLoad(); }, 500);
 // Inicializa cards de Abril na página Metas 2026
-setTimeout(()=>{ if(typeof mtsAtualizarAbril==='function') mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJulho==='function') mtsAtualizarJulho(); }, 300);
+setTimeout(()=>{ if(typeof mtsAtualizarAbril==='function') mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho(); if(typeof mtsAtualizarJulho==='function') mtsAtualizarJulho(); if(typeof mtsAtualizarAgosto==='function') mtsAtualizarAgosto(); }, 300);
 // ══════════════════════════════════════════════════════════════
 // SISTEMA DE EVENTOS DO CALENDÁRIO
 // ══════════════════════════════════════════════════════════════
@@ -13536,6 +13589,102 @@ function indRenderRanking(){
 // ══════════════════════════════════════════
 </script>
 <script>
+// ── Editor de Metas Mensais (Total Recebido, Maio/Junho/Julho/Agosto) ──
+const MTS_EDITAR_TEAMS = [
+  { eq: 'COFEN MARILIA BRENDA',     label: 'Marília · Stephanie' },
+  { eq: 'COFEN BIRIGUI BRUNA',      label: 'Bruna · Birigui' },
+  { eq: 'COFEN STEPHANIE 2° TURNO', label: 'Laysa Lopes · 2°T' },
+];
+// Chave de storage por mês (clara e sem ambiguidade, diferente das chaves legadas usadas em outros lugares)
+const MTS_EDITAR_KEYS = {
+  maio:   'cofen_meta_totalrec_maio',
+  junho:  'cofen_meta_totalrec_junho',
+  julho:  'cofen_meta_totalrec_julho',
+  agosto: 'cofen_meta_totalrec_agosto',
+};
+let mtsEditarMesAtual = 'maio';
+
+function mtsEditarAbrir(){
+  document.getElementById('mts-editar-modal').style.display = 'flex';
+  mtsEditarRenderCampos();
+}
+function mtsEditarFechar(){
+  document.getElementById('mts-editar-modal').style.display = 'none';
+}
+function mtsEditarSelecionarMes(mes, btn){
+  mtsEditarMesAtual = mes;
+  document.querySelectorAll('#mts-editar-meses .fbtn').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  mtsEditarRenderCampos();
+}
+function mtsEditarGetMetas(mes){
+  const key = MTS_EDITAR_KEYS[mes];
+  let m = {};
+  try{ m = JSON.parse(localStorage.getItem(key)||'{}'); }catch(e){}
+  // Fallback nas chaves legadas, só pra não perder valor já salvo antes desse editor existir
+  if(Object.keys(m).length===0){
+    if(mes==='maio')  try{ m = JSON.parse(localStorage.getItem('cofen_metas_eq_junho')||'{}'); }catch(e){}
+    if(mes==='junho') try{ m = JSON.parse(localStorage.getItem('cofen_metas_eq_junho_fechado')||'{}'); }catch(e){}
+    if(mes==='julho') try{ m = JSON.parse(localStorage.getItem('cofen_metas_eq')||'{}'); }catch(e){}
+  }
+  return m;
+}
+function mtsEditarRenderCampos(){
+  const wrap = document.getElementById('mts-editar-campos');
+  if(!wrap) return;
+  const metas = mtsEditarGetMetas(mtsEditarMesAtual);
+  wrap.innerHTML = MTS_EDITAR_TEAMS.map(t=>`
+    <div>
+      <label style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:.6px;text-transform:uppercase;display:block;margin-bottom:4px">${t.label}</label>
+      <input type="number" id="mts-editar-inp-${t.eq.replace(/[^a-zA-Z0-9]/g,'_')}"
+        value="${metas[t.eq]||450000}" step="1000" min="0"
+        style="width:100%;border:1.5px solid var(--g200);border-radius:var(--rm);padding:10px 12px;
+        font-family:Nunito,sans-serif;font-size:14px;font-weight:800;color:var(--g900);outline:none">
+    </div>`).join('');
+}
+function mtsEditarSalvar(){
+  const metas = {};
+  MTS_EDITAR_TEAMS.forEach(t=>{
+    const inp = document.getElementById('mts-editar-inp-'+t.eq.replace(/[^a-zA-Z0-9]/g,'_'));
+    const val = parseFloat(inp?.value||0);
+    if(val>0) metas[t.eq] = val;
+  });
+  const key = MTS_EDITAR_KEYS[mtsEditarMesAtual];
+  localStorage.setItem(key, JSON.stringify(metas));
+  if(fbDb && fbRoom){ try{ fbDb.ref(fbRoom+'/'+key).set(metas); }catch(e){} }
+  toast('✅ Meta de '+mtsEditarMesAtual.charAt(0).toUpperCase()+mtsEditarMesAtual.slice(1)+' salva!');
+  mtsEditarFechar();
+  if(typeof mtsAtualizarMaio==='function')  mtsAtualizarMaio();
+  if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho();
+  if(typeof mtsAtualizarJulho==='function') mtsAtualizarJulho();
+  if(typeof mtsAtualizarAgosto==='function') mtsAtualizarAgosto();
+}
+
+function mtsAtualizarAgosto(){
+  const cardsEl = document.getElementById('mts-agosto-cards');
+  if(!cardsEl) return;
+  let metas = {};
+  try{ metas = JSON.parse(localStorage.getItem('cofen_meta_totalrec_agosto')||'{}'); }catch(e){}
+  if(Object.keys(metas).length===0){
+    cardsEl.innerHTML = `<div style="padding:24px;text-align:center;font-size:12px;color:var(--g400);grid-column:1/-1">
+      📅 Agosto ainda não começou. As metas serão configuradas quando o mês iniciar.
+    </div>`;
+    return;
+  }
+  const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+  const labels = { 'COFEN MARILIA BRENDA':'Marília · Stephanie', 'COFEN BIRIGUI BRUNA':'Bruna · Birigui', 'COFEN STEPHANIE 2° TURNO':'Laysa Lopes · 2°T' };
+  cardsEl.innerHTML = `<div style="padding:16px;grid-column:1/-1">
+    <div style="font-size:11px;color:var(--g500);font-weight:700;margin-bottom:10px">🎯 Metas já configuradas para Agosto (mês ainda não começou):</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      ${Object.entries(metas).map(([eq,val])=>`
+        <div style="background:var(--g50);border:1px solid var(--g200);border-radius:var(--rm);padding:10px 16px">
+          <div style="font-size:10px;color:var(--g500);font-weight:700">${labels[eq]||eq}</div>
+          <div style="font-size:15px;font-weight:900;color:var(--g900)">${fBR(val)}</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
 function mtsAtualizarAbril(){
   const cardsEl = document.getElementById('mts-abril-cards');
   if(!cardsEl) return;
@@ -13606,8 +13755,9 @@ function mtsAtualizarMaio(){
   };
   // NÃO sobrescrever com CMP_TEAMS — esses valores são o fechamento real de Maio
 
-  // Metas FIXAS de Maio — chave separada cofen_metas_eq_junho
+  // Metas de Maio — editáveis em "✏️ Editar Metas Mensais" (chave cofen_meta_totalrec_maio)
   const _mm = {}; try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_metas_eq_junho')||'{}')); }catch(e){}
+  try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_meta_totalrec_maio')||'{}')); }catch(e){}
   const SUPERVISORES = [
     { eq: 'COFEN MARILIA BRENDA',     meta: _mm['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
     { eq: 'COFEN BIRIGUI BRUNA',      meta: _mm['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
@@ -13652,15 +13802,86 @@ function mtsAtualizarMaio(){
   cardsEl.innerHTML = html;
 }
 
+function mtsAtualizarJunho(){
+  const cardsEl = document.getElementById('mts-junho-cards');
+  if(!cardsEl) return;
+
+  // Valores REAIS de Junho encerrado — calculados do rec_conciliação.xls que você mandou
+  // (Valor Recebido por operador, somado por equipe conforme o time atual de cada um).
+  // Total do arquivo em Junho = R$ 3.225.445,10 — desse total, R$ 1.299.829,67 são
+  // pagamentos diretos/automáticos do Coren sem operador vinculado (não entram no
+  // desempenho de nenhuma equipe). O resto (R$ 1.925.615,43) foi distribuído abaixo.
+  const recJunhoPorEq = {
+    'COFEN MARILIA BRENDA':      528206.81,
+    'COFEN BIRIGUI BRUNA':       682506.62,
+    'COFEN STEPHANIE 2° TURNO':  344252.07,
+    'COFEN DIGITAL':             319621.77,
+  };
+
+  // Metas de Junho — não sei qual foi a meta real definida naquele mês, por isso uso
+  // o mesmo valor padrão (R$450.000) usado nos outros meses encerrados. Se a meta de
+  // Junho foi outra, me fala o valor certo que eu ajusto.
+  // Metas de Junho — editáveis em "✏️ Editar Metas Mensais" (chave cofen_meta_totalrec_junho)
+  const _mj = {}; try{ Object.assign(_mj, JSON.parse(localStorage.getItem('cofen_metas_eq_junho_fechado')||'{}')); }catch(e){}
+  try{ Object.assign(_mj, JSON.parse(localStorage.getItem('cofen_meta_totalrec_junho')||'{}')); }catch(e){}
+  const SUPERVISORES = [
+    { eq: 'COFEN MARILIA BRENDA',     meta: _mj['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
+    { eq: 'COFEN BIRIGUI BRUNA',      meta: _mj['COFEN BIRIGUI BRUNA']      || 450000, av: 'BN',  avClass: 'mts-av-br', nome: 'Bruna · Birigui'   },
+    { eq: 'COFEN STEPHANIE 2° TURNO', meta: _mj['COFEN STEPHANIE 2° TURNO'] || 450000, av: 'ST',  avClass: 'mts-av-st', nome: 'Laysa Lopes · 2°T'   },
+  ];
+
+  const fBR = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+
+  function quartilInfo(pct){
+    if(pct >= 100) return { cardClass:'c-meta', rvClass:'meta', pctClass:'meta', badgeClass:'mts-qb-meta', label:'Meta batida', barClass:'meta', barW: Math.min(pct,150) };
+    if(pct >= 80)  return { cardClass:'c-q1',   rvClass:'q1',   pctClass:'q1',   badgeClass:'mts-qb-1',    label:'2° Quartil',  barClass:'q1',   barW: pct };
+    if(pct >= 50)  return { cardClass:'c-q2',   rvClass:'q2',   pctClass:'q2',   badgeClass:'mts-qb-2',    label:'3° Quartil',  barClass:'q2',   barW: pct };
+    return             { cardClass:'c-q3',   rvClass:'q3',   pctClass:'q3',   badgeClass:'mts-qb-3',    label:'4° Quartil',  barClass:'q3',   barW: pct };
+  }
+
+  let html = '';
+  SUPERVISORES.forEach(sup => {
+    const rec  = recJunhoPorEq[sup.eq] || 0;
+    const pct  = sup.meta > 0 ? (rec / sup.meta * 100) : 0;
+    const q    = quartilInfo(pct);
+    const barW = Math.min(q.barW, 100).toFixed(1);
+
+    html += `
+    <div class="mts-card ${q.cardClass}">
+      <div class="mts-av ${sup.avClass}">${sup.av}</div>
+      <div class="mts-name">${sup.nome}</div>
+      <div class="mts-sub">Junho encerrado</div>
+      <div class="mts-fl">Meta</div>
+      <div class="mts-fv">${fBR(sup.meta)}</div>
+      <div class="mts-divider"></div>
+      <div class="mts-fl">Recebido</div>
+      <div class="mts-rv ${q.rvClass}">${fBR(rec)}</div>
+      <div class="mts-pct-row">
+        <span class="mts-pct-num ${q.pctClass}">${pct.toFixed(1)}%</span>
+        <span class="mts-pct-lbl">da meta</span>
+      </div>
+      <span class="mts-qbadge ${q.badgeClass}">${q.label}</span>
+      <div class="mts-bar-bg"><div class="mts-bar-f ${q.barClass}" style="width:${barW}%;transition:width .8s ease"></div></div>
+    </div>`;
+  });
+
+  cardsEl.innerHTML = html;
+
+  const totalEl = document.getElementById('mts-junho-total');
+  if(totalEl) totalEl.textContent = fBR(3225445.10);
+}
+
 function mtsAtualizarJulho(){
   const cardsEl = document.getElementById('mts-julho-cards');
   const totalEl = document.getElementById('mts-julho-total');
   if(!cardsEl) return;
 
   // Metas ATIVAS de Julho — lê de cofen_metas_eq (chave ativa), fallback cofen_metas_eq_julho
+  // e agora também a chave nova do editor "✏️ Editar Metas Mensais"
   const _mm = {};
   try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_metas_eq_julho')||'{}')); }catch(e){}
   try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_metas_eq')||'{}')); }catch(e){}
+  try{ Object.assign(_mm, JSON.parse(localStorage.getItem('cofen_meta_totalrec_julho')||'{}')); }catch(e){}
 
   const SUPERVISORES = [
     { eq: 'COFEN MARILIA BRENDA',     meta: _mm['COFEN MARILIA BRENDA']     || 450000, av: 'B+B', avClass: 'mts-av-bb', nome: 'Brenda · Marília'  },
@@ -13741,7 +13962,32 @@ function mtsAtualizarJulho(){
   <div class="mts-hero">
     <div class="mts-hero-title">Recebimento Geral · Equipe Comercial</div>
     <div class="mts-hero-h">🎯 METAS & RESULTADOS — 2026</div>
-    <div class="mts-hero-sub">Janeiro · Fevereiro · Março · Abril · Maio · Julho · Julho</div>
+    <div class="mts-hero-sub">Janeiro · Fevereiro · Março · Abril · Maio · Junho · Julho · Agosto</div>
+    <button onclick="mtsEditarAbrir()" style="margin-top:10px;padding:8px 16px;border-radius:var(--rm);border:none;
+      background:linear-gradient(135deg,#00A86B,#00C97C);color:#fff;font-family:Nunito,sans-serif;font-weight:800;
+      font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px">✏️ Editar Metas Mensais</button>
+  </div>
+
+  <!-- Modal: Editar Metas Mensais (Total Recebido, por mês/equipe) -->
+  <div id="mts-editar-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);
+    align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this) mtsEditarFechar()">
+    <div style="background:#fff;border-radius:16px;max-width:480px;width:100%;padding:24px;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--g900);letter-spacing:1px">✏️ EDITAR METAS MENSAIS</div>
+        <button onclick="mtsEditarFechar()" style="border:none;background:var(--g100);width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:14px">✕</button>
+      </div>
+      <div style="font-size:11px;color:var(--g500);margin-bottom:14px">Meta de Total Recebido por equipe. Escolha o mês e ajuste os valores.</div>
+      <div style="display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap" id="mts-editar-meses">
+        <button class="fbtn on" onclick="mtsEditarSelecionarMes('maio',this)" style="font-size:11px">Maio</button>
+        <button class="fbtn" onclick="mtsEditarSelecionarMes('junho',this)" style="font-size:11px">Junho</button>
+        <button class="fbtn" onclick="mtsEditarSelecionarMes('julho',this)" style="font-size:11px">Julho</button>
+        <button class="fbtn" onclick="mtsEditarSelecionarMes('agosto',this)" style="font-size:11px">Agosto</button>
+      </div>
+      <div id="mts-editar-campos" style="display:flex;flex-direction:column;gap:12px"></div>
+      <button onclick="mtsEditarSalvar()" style="margin-top:20px;width:100%;padding:12px;border-radius:var(--rm);border:none;
+        background:linear-gradient(135deg,#00A86B,#00C97C);color:#fff;font-family:Nunito,sans-serif;font-weight:800;
+        font-size:13px;cursor:pointer">💾 Salvar Metas</button>
+    </div>
   </div>
 
   <!-- Quartil Reference -->
@@ -13985,6 +14231,26 @@ function mtsAtualizarJulho(){
     </div>
   </div>
 
+  <!-- JUNHO — encerrado (aguardando você mandar o relatório de fechamento) -->
+  <div class="mts-month-block">
+    <div class="mts-month-hdr">
+      <span class="mts-month-name">JUNHO</span>
+      <div class="mts-month-rule"></div>
+      <span class="mts-badge" style="background:#EFF2F5;color:#3D4B5C;border:1px solid #C5CDD8">✅ Encerrado</span>
+    </div>
+    <div class="mts-total-bar">
+      <div>
+        <span class="mts-total-label">Total recebido no mês</span>
+      </div>
+      <span class="mts-total-value" id="mts-junho-total">—</span>
+    </div>
+    <div class="mts-cards" id="mts-junho-cards">
+      <div style="padding:24px;text-align:center;font-size:12px;color:var(--g500);grid-column:1/-1">
+        ⏳ Carregando dados de Junho...
+      </div>
+    </div>
+  </div>
+
   <!-- JULHO — em andamento -->
   <div class="mts-month-block">
     <div class="mts-month-hdr">
@@ -14006,10 +14272,10 @@ function mtsAtualizarJulho(){
     </div>
   </div>
 
-  <!-- JULHO — planejado -->
+  <!-- AGOSTO — planejado -->
   <div class="mts-month-block">
     <div class="mts-month-hdr">
-      <span class="mts-month-name">JULHO</span>
+      <span class="mts-month-name">AGOSTO</span>
       <div class="mts-month-rule"></div>
       <span class="mts-badge" style="background:#EFF2F5;color:#7A8899;border:1px solid #DDE2E8">🔒 Planejado</span>
     </div>
@@ -14018,9 +14284,9 @@ function mtsAtualizarJulho(){
         <span class="mts-total-label" style="color:var(--g500)">Aguardando início do mês</span>
       </div>
     </div>
-    <div class="mts-cards">
+    <div class="mts-cards" id="mts-agosto-cards">
       <div style="padding:24px;text-align:center;font-size:12px;color:var(--g400);grid-column:1/-1">
-        📅 Julho ainda não começou. As metas serão configuradas quando o mês iniciar.
+        📅 Agosto ainda não começou. As metas serão configuradas quando o mês iniciar.
       </div>
     </div>
   </div>
@@ -14925,8 +15191,8 @@ function renderEqMetasTable(){
   const ORDER = ['COFEN BIRIGUI BRUNA','COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO','COFEN KATIA'];
   const EQ_LABELS = {
     'COFEN BIRIGUI BRUNA'     : 'COFEN BIRIGUI BRUNA',
-    'COFEN MARILIA BRENDA'    : 'COFEN MARILIA STEPHANIE',
-    'COFEN STEPHANIE 2° TURNO': 'COFEN LAYSA LOPES 2° TURNO',
+    'COFEN MARILIA BRENDA'    : 'COFEN MARILIA BRENDA',
+    'COFEN STEPHANIE 2° TURNO': 'COFEN STEPHANIE 2° TURNO',
     'COFEN DIGITAL'           : 'EQUIPE COFEN DIGITAL',
     'COFEN KATIA'             : 'EQUIPE COFEN KATIA',
   };
@@ -15207,35 +15473,21 @@ const HIST_DADOS = {
   },
 };
 
+// Restaurar HISTÓRICO — Recebimento por Dia/Operador de Julho salvo pelo import
+try{
+  const _smHistJulho = localStorage.getItem('cofen_hist_dados_julho');
+  if(_smHistJulho){
+    const v = JSON.parse(_smHistJulho);
+    if(Array.isArray(v) && v.length){ HIST_DADOS['Julho'] = {dias:31, rows:v}; }
+  }
+}catch(e){}
+
 // ── Estado do carrossel histórico ──
 let histMesAtual   = 'Abril';
 let histFiltroEq   = 'TODAS';
 let histSortAtual  = 'total';
 let histChartDias  = null;
 let histChartOps   = null;
-
-// Plugin: mostra o valor de cada dia acima da coluna, em preto negrito, sempre legível
-const histBarValuePlugin = {
-  id: 'histBarValuePlugin',
-  afterDatasetsDraw(chart){
-    const meta = chart.getDatasetMeta(0);
-    if(!meta || !meta.data || !meta.data.length) return;
-    const ctx = chart.ctx;
-    ctx.save();
-    ctx.font = "900 11px Nunito, sans-serif";
-    ctx.fillStyle = '#111827';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
-    meta.data.forEach((bar, i)=>{
-      const val = chart.data.datasets[0].data[i];
-      if(!val || val <= 0) return;
-      const label = 'R$ '+Number(val).toLocaleString('pt-BR',{maximumFractionDigits:0});
-      const {x, y} = bar.getProps(['x','y'], true);
-      ctx.fillText(label, x, y - 4);
-    });
-    ctx.restore();
-  }
-};
 
 // Mapeamento equipe de exibição → fragmento do nome do operador (sem equipe no dado)
 // Como os dados históricos não têm coluna equipe, usamos lookup do RDOP_DADOS do mês atual
@@ -15327,8 +15579,6 @@ function histRender(){
     if(theadTr) theadTr.innerHTML = '';
     const tfoot = document.getElementById('hist-tfoot');
     if(tfoot) tfoot.innerHTML = '';
-    // Atualiza os títulos dos gráficos e apaga os gráficos antigos —
-    // sem isso, ficavam presos mostrando o último mês que tinha dado (ex: Abril)
     const ct1x = document.getElementById('hist-chart-title');
     if(ct1x) ct1x.textContent = '📊 Recebimento Total por Dia — '+mes;
     const ct2x = document.getElementById('hist-chart-ops-title');
@@ -15463,10 +15713,8 @@ function histRenderCharts(rows, nDias, mesNum){
           borderRadius:4,borderSkipped:false
         }]
       },
-      plugins:[histBarValuePlugin],
       options:{
         responsive:true,maintainAspectRatio:false,
-        layout:{padding:{top:28}},
         plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},
         scales:{
           x:{grid:{display:false},ticks:{font:{family:'Nunito',size:9},color:'#7A8899'}},
