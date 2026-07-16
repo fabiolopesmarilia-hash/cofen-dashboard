@@ -859,7 +859,7 @@ select.ev-inp{cursor:pointer}
       <!-- ── TOTAL REAL + META 1 ── -->
       <div class="ep-row">
         <div class="ep-group">
-          <label class="ep-label">💰 Total Real Recebido (R$)</label>
+          <label class="ep-label">💰 Total Real Recebido (R$) — só de JULHO, não o ano todo</label>
           <input class="ep-input yellow" type="number" id="inp-total" placeholder="Ex: 362260.36" step="0.01" min="0" oninput="liveCalc()">
         </div>
         <div class="ep-group">
@@ -2761,6 +2761,17 @@ const META_DEFAULT = 1000000;
 let meta            = parseFloat(localStorage.getItem('cofen_meta')         || META_DEFAULT);
 let overrideTotalRec= parseFloat(localStorage.getItem('cofen_total')        || '0');
 
+// Trava de sanidade: se o Total ou a Meta digitados manualmente forem absurdamente
+// maiores que o total real das equipes deste mês, é digitação errada — descarta e
+// deixa recalcular sozinho a partir dos dados reais, em vez de mostrar um número
+// impossível (ex: R$11,8M de total quando as equipes somam R$1,6M).
+(function _saneidadeTotalMeta(){
+  const _somaReal = D.equipes.reduce((s,e)=>s+e.rec,0);
+  const _teto = Math.max(_somaReal * 3, 5000000);
+  if(overrideTotalRec > _teto){ overrideTotalRec = 0; localStorage.removeItem('cofen_total'); }
+  if(meta > _teto){ meta = META_DEFAULT; localStorage.removeItem('cofen_meta'); }
+})();
+
 // ── CORENS: subtotais por estado (preenchidos manualmente) ──
 // CORENs dinâmicos — carregados do localStorage
 const COREN_BASE = ['MT','PI','MA','CE','SP','RJ','MG','RS','PR','BA','GO','PE','SC','AM','PB'];
@@ -3492,11 +3503,34 @@ function renderCorenGrid(mapValores){
     const val = corenData[k]||0;
     return `<div class="ep-group" style="flex:none">
       <label class="ep-label">COREN-${k} (R$)</label>
-      <input class="ep-input" type="number" id="inp-coren-${k.toLowerCase()}" placeholder="0,00"
-        step="0.01" min="0" oninput="liveCalcCorens()" style="border-color:#67E8F9"
-        value="${val>0?val.toFixed(2):''}">
+      <input class="ep-input" type="text" inputmode="decimal" id="inp-coren-${k.toLowerCase()}" placeholder="R$ 0,00"
+        oninput="liveCalcCorens()" onfocus="corenFocoCampo(this)" onblur="corenFormatarCampo(this)"
+        style="border-color:#67E8F9"
+        value="${val>0?corenFmtBRL(val):''}">
     </div>`;
   }).join('');
+  liveCalcCorens();
+}
+
+// Converte texto do campo (formatado ou não) para número puro
+function corenParseVal(str){
+  if(!str) return 0;
+  const limpo = String(str).replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',', '.');
+  return parseFloat(limpo) || 0;
+}
+// Formata número pro padrão R$ 0.000.000,00
+function corenFmtBRL(v){
+  return v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+}
+// Ao focar: mostra número "cru" (sem R$/milhar), mais fácil de editar
+function corenFocoCampo(inp){
+  const v = corenParseVal(inp.value);
+  inp.value = v > 0 ? v.toFixed(2).replace('.', ',') : '';
+}
+// Ao sair do campo: reformata pro padrão R$ 0.000.000,00
+function corenFormatarCampo(inp){
+  const v = corenParseVal(inp.value);
+  inp.value = v > 0 ? corenFmtBRL(v) : '';
   liveCalcCorens();
 }
 
@@ -3505,7 +3539,7 @@ function _saveAllCorens(){
   const extras = {};
   document.querySelectorAll('#coren-grid-dynamic input[id^="inp-coren-"]').forEach(inp => {
     const sigla = inp.id.replace('inp-coren-','').toUpperCase();
-    const v = parseFloat(inp.value)||0;
+    const v = corenParseVal(inp.value);
     corenData[sigla] = v;
     if(COREN_BASE.includes(sigla)){
       localStorage.setItem('cofen_coren_'+sigla.toLowerCase(), v);
@@ -3523,7 +3557,7 @@ function liveCalcCorens(){
   // Soma todos os inputs dinâmicos
   let soma = 0;
   document.querySelectorAll('#coren-grid-dynamic input[id^="inp-coren-"]').forEach(inp => {
-    soma += parseFloat(inp.value)||0;
+    soma += corenParseVal(inp.value);
   });
   const el = document.getElementById('res-corens-soma');
   if(el) el.textContent = soma>0 ? fR(soma) : '—';
@@ -5100,6 +5134,17 @@ function renderResumoEditor(){
 function applyTotal(){
   const v = parseFloat(document.getElementById('inp-total').value)||0;
   const m = parseFloat(document.getElementById('inp-meta').value)||META_DEFAULT;
+
+  // Trava: esse campo é só o total de JULHO. Se o valor digitado for muito maior
+  // que o que as equipes já somam neste mês, provavelmente é um total anual/de
+  // vários meses (ex: soma dos CORENs do ano todo) — bloqueia e avisa.
+  const _somaEquipesMes = D.equipes.reduce((s,e)=>s+e.rec,0);
+  const _teto = Math.max(_somaEquipesMes * 3, 5000000);
+  if(v > _teto){
+    toast('⚠️ Esse valor (' + v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) + ') parece ser do ANO todo, não só de Julho. Confira e digite apenas o total recebido neste mês.');
+    return;
+  }
+
   if(v>0) overrideTotalRec = v;
   meta = m;
   localStorage.setItem('cofen_meta',  m);
