@@ -2208,6 +2208,11 @@ select.ev-inp{cursor:pointer}
       border-bottom:2px solid var(--pp);border-right:1px solid var(--g200);background:var(--ppl)">
       🏆 Ranking de Acordos
     </div>
+    <div class="ac-stab" data-view="eficiencia" onclick="acTab('eficiencia',this)"
+      style="padding:11px 18px;font-weight:800;font-size:12px;cursor:pointer;color:var(--g500);
+      border-bottom:2px solid transparent;border-right:1px solid var(--g200)">
+      📊 Eficiência
+    </div>
     <div class="ac-stab" data-view="fechamento" onclick="acTab('fechamento',this)"
       style="padding:11px 18px;font-weight:800;font-size:12px;cursor:pointer;color:var(--g500);
       border-bottom:2px solid transparent;border-right:1px solid var(--g200)">
@@ -2236,6 +2241,33 @@ select.ev-inp{cursor:pointer}
       <span style="text-align:right">Ticket Médio</span>
     </div>
     <div id="ac-ranking-list" style="background:var(--w);border:1px solid var(--g200);border-top:none;border-radius:0 0 var(--rl) var(--rl)"></div>
+  </div>
+
+  <!-- ── VIEW: EFICIÊNCIA (por equipe e por operador) ── -->
+  <div id="acv-eficiencia" class="acview" style="display:none">
+
+    <!-- Resumo por equipe -->
+    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:16px;box-shadow:var(--sh);margin-bottom:14px">
+      <div style="font-size:12px;font-weight:800;color:var(--g700);letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px">🏢 Eficiência por Equipe</div>
+      <div style="display:grid;grid-template-columns:1fr 90px 90px 90px 100px;gap:10px;padding:8px 12px;
+        background:var(--g50);border-radius:8px 8px 0 0;font-size:10px;font-weight:800;color:var(--g500);
+        letter-spacing:.8px;text-transform:uppercase">
+        <span>Equipe</span><span style="text-align:center">Pago</span><span style="text-align:center">Não Pago</span>
+        <span style="text-align:center">Total</span><span style="text-align:center">Eficiência</span>
+      </div>
+      <div id="ac-efic-equipes"></div>
+    </div>
+
+    <!-- Ranking por operador -->
+    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden">
+      <div style="display:grid;grid-template-columns:1fr 90px 90px 90px 100px;gap:10px;padding:9px 16px;
+        background:var(--g50);border-bottom:1px solid var(--g200);
+        font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase">
+        <span>Login</span><span style="text-align:center">Pago</span><span style="text-align:center">Não Pago</span>
+        <span style="text-align:center">Total</span><span style="text-align:center">Eficiência</span>
+      </div>
+      <div id="ac-efic-operadores"></div>
+    </div>
   </div>
 
   <!-- ── VIEW: FECHAMENTO ── -->
@@ -8510,10 +8542,83 @@ function importClear(){
 // ACORDOS — RANKING + FECHAMENTO + IMPORT
 // ══════════════════════════════════════════
 
+// ── Eficiência: por operador e por equipe (Login/Pago/Não Pago/Total/Eficiência) ──
+function _acEficCor(pct){
+  // Mesmas faixas de cor usadas na planilha do Fábio
+  if(pct >= 55) return {bg:'#C6EFCE', fg:'#006100'}; // verde
+  if(pct >= 40) return {bg:'#FFEB9C', fg:'#9C6500'}; // amarelo
+  return {bg:'#FFC7CE', fg:'#9C0006'};                // vermelho
+}
+function acRenderEficiencia(){
+  const elOps = document.getElementById('ac-efic-operadores');
+  const elEq  = document.getElementById('ac-efic-equipes');
+  if(!elOps || !elEq) return;
+
+  // ── Por operador ──
+  const ops = ALL.filter(op => (op.gerados||0) > 0)
+    .map(op => {
+      const total = op.gerados||0, pago = op.pagos||0, naoPago = Math.max(0, total-pago);
+      const ef = total>0 ? (pago/total*100) : 0;
+      return {op, total, pago, naoPago, ef};
+    })
+    .sort((a,b) => b.total - a.total);
+
+  elOps.innerHTML = ops.map(({op,total,pago,naoPago,ef}) => {
+    const cor = _acEficCor(ef);
+    const cfg = EQ[op.eq]||{c:'#888',sh:op.eq};
+    return `<div style="display:grid;grid-template-columns:1fr 90px 90px 90px 100px;gap:10px;
+      align-items:center;padding:9px 16px;border-bottom:1px solid var(--g100);cursor:pointer"
+      onclick="openM('${op.name}')" onmouseover="this.style.background='var(--g50)'" onmouseout="this.style.background=''">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <div style="width:26px;height:26px;border-radius:7px;background:${cfg.c};flex-shrink:0;
+          display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff">${ini(op.name)}</div>
+        <div style="min-width:0">
+          <div style="font-weight:800;font-size:12px;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${op.name.replace(/_/g,' ')}</div>
+          <div style="font-size:9px;color:${cfg.c};font-weight:700">${cfg.sh}</div>
+        </div>
+      </div>
+      <div style="text-align:center;font-family:Bebas Neue,sans-serif;font-size:16px;color:var(--g700)">${pago}</div>
+      <div style="text-align:center;font-family:Bebas Neue,sans-serif;font-size:16px;color:var(--g700)">${naoPago}</div>
+      <div style="text-align:center;font-family:Bebas Neue,sans-serif;font-size:16px;font-weight:800;color:var(--g900)">${total}</div>
+      <div style="text-align:center">
+        <span style="background:${cor.bg};color:${cor.fg};font-weight:800;font-size:12px;padding:3px 10px;border-radius:6px">${ef.toFixed(0)}%</span>
+      </div>
+    </div>`;
+  }).join('') || `<div style="padding:24px;text-align:center;color:var(--g500);font-size:12px">📭 Sem dados de acordos importados ainda.</div>`;
+
+  // ── Por equipe (agregado) ──
+  const eqAgg = {};
+  ops.forEach(({op,total,pago,naoPago}) => {
+    const k = op.eq || 'SEM EQUIPE';
+    if(!eqAgg[k]) eqAgg[k] = {pago:0, naoPago:0, total:0};
+    eqAgg[k].pago += pago; eqAgg[k].naoPago += naoPago; eqAgg[k].total += total;
+  });
+  const eqRows = Object.entries(eqAgg).sort((a,b)=>b[1].total-a[1].total);
+  elEq.innerHTML = eqRows.map(([eqName, d]) => {
+    const ef = d.total>0 ? (d.pago/d.total*100) : 0;
+    const cor = _acEficCor(ef);
+    const cfg = EQ[eqName]||{c:'#888',sh:eqName};
+    return `<div style="display:grid;grid-template-columns:1fr 90px 90px 90px 100px;gap:10px;
+      align-items:center;padding:10px 12px;border-bottom:1px solid var(--g100)">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="width:10px;height:10px;border-radius:3px;background:${cfg.c};flex-shrink:0"></span>
+        <span style="font-weight:800;font-size:12px;color:var(--g900)">${cfg.sh||eqName}</span>
+      </div>
+      <div style="text-align:center;font-family:Bebas Neue,sans-serif;font-size:17px;color:var(--g700)">${d.pago}</div>
+      <div style="text-align:center;font-family:Bebas Neue,sans-serif;font-size:17px;color:var(--g700)">${d.naoPago}</div>
+      <div style="text-align:center;font-family:Bebas Neue,sans-serif;font-size:17px;font-weight:800;color:var(--g900)">${d.total}</div>
+      <div style="text-align:center">
+        <span style="background:${cor.bg};color:${cor.fg};font-weight:800;font-size:12px;padding:3px 10px;border-radius:6px">${ef.toFixed(1)}%</span>
+      </div>
+    </div>`;
+  }).join('') || `<div style="padding:16px;text-align:center;color:var(--g500);font-size:12px">📭 Sem dados ainda.</div>`;
+}
+
 function acordosInit(){
   acCalcKPIs();
   acRenderRanking();
   acRenderFechamento();
+  if(typeof acRenderEficiencia==='function') acRenderEficiencia();
 }
 
 function acTab(view, el){
@@ -8525,6 +8630,7 @@ function acTab(view, el){
   el.style.color='var(--pp)'; el.style.borderBottomColor='var(--pp)'; el.style.background='var(--ppl)';
   document.querySelectorAll('.acview').forEach(v=>v.style.display='none');
   document.getElementById('acv-'+view).style.display='block';
+  if(view==='eficiencia' && typeof acRenderEficiencia==='function') acRenderEficiencia();
 }
 
 function acCalcKPIs(){
@@ -9194,14 +9300,16 @@ try {
       const d = JSON.parse(e.data.payload||'{}');
       const remTotal = parseFloat(d.total)||0;
       const remMeta  = parseFloat(d.meta)||META_DEFAULT;
-      if(remTotal > 0) overrideTotalRec = remTotal;
-      meta = remMeta;
-      localStorage.setItem('cofen_total', remTotal);
-      localStorage.setItem('cofen_meta',  remMeta);
+      const _somaEq = D.equipes.reduce((s,e)=>s+e.rec,0);
+      const _teto   = Math.max(_somaEq * 3, 5000000);
+      if(remTotal > 0 && remTotal <= _teto) overrideTotalRec = remTotal;
+      if(remMeta <= _teto) meta = remMeta;
+      localStorage.setItem('cofen_total', overrideTotalRec);
+      localStorage.setItem('cofen_meta',  meta);
       const inpTotal = document.getElementById('inp-total');
       const inpMeta  = document.getElementById('inp-meta');
-      if(inpTotal && remTotal > 0) inpTotal.value = remTotal;
-      if(inpMeta) inpMeta.value = remMeta;
+      if(inpTotal && overrideTotalRec > 0) inpTotal.value = overrideTotalRec;
+      if(inpMeta) inpMeta.value = meta;
       refreshAll();
     }
   };
@@ -10220,17 +10328,30 @@ function fbStartListening(){
     const localMeta  = parseFloat(localStorage.getItem('cofen_meta'))||META_DEFAULT;
     if(remTotal === localTotal && remMeta === localMeta) return;
 
-    // Aplicar valores remotos
-    if(remTotal > 0) overrideTotalRec = remTotal;
-    meta = remMeta;
-    localStorage.setItem('cofen_total', remTotal);
-    localStorage.setItem('cofen_meta',  remMeta);
+    // Trava de sanidade: nunca aceitar um total/meta vindo do Firebase que seja
+    // absurdamente maior que o que as equipes já somam neste mês (ex: total do
+    // ano todo digitado por engano no lugar do total só de Julho).
+    const _somaEq = D.equipes.reduce((s,e)=>s+e.rec,0);
+    const _teto   = Math.max(_somaEq * 3, 5000000);
+
+    // Aplicar valores remotos (só se passarem na trava)
+    if(remTotal > 0 && remTotal <= _teto){
+      overrideTotalRec = remTotal;
+      localStorage.setItem('cofen_total', remTotal);
+    } else if(remTotal > _teto){
+      // Valor remoto inválido — não aplica, e limpa a chave remota pra não ficar repetindo
+      if(fbDb && fbRoom){ try{ fbDb.ref(fbRoom+'/meta/total').remove(); }catch(e){} }
+    }
+    if(remMeta <= _teto){
+      meta = remMeta;
+      localStorage.setItem('cofen_meta', remMeta);
+    }
 
     // Atualizar input no editor se ele estiver visível
     const inpTotal = document.getElementById('inp-total');
     const inpMeta  = document.getElementById('inp-meta');
-    if(inpTotal && remTotal > 0) inpTotal.value = remTotal;
-    if(inpMeta)  inpMeta.value  = remMeta;
+    if(inpTotal && overrideTotalRec > 0) inpTotal.value = overrideTotalRec;
+    if(inpMeta)  inpMeta.value  = meta;
 
     // Recalcular e atualizar tela de todos
     refreshAll();
