@@ -6296,7 +6296,29 @@ const RD_META_EQ = {
   'COFEN DIGITAL':             0
 };
 
-function rdGetSaved(){try{return JSON.parse(localStorage.getItem(rdTodayKey())||'{}')}catch(e){return {}}}
+function rdGetSaved(){
+  let saved;
+  try{ saved = JSON.parse(localStorage.getItem(rdTodayKey())||'{}'); }catch(e){ return {}; }
+  // Trava de sanidade: descarta "hoje" absurdamente maior que o normal do operador —
+  // cobre o caso de operador novo cujo acumulado inteiro (de vários dias) ficou
+  // registrado como se fosse tudo de um único dia, antes dessa trava existir.
+  try{
+    if(typeof D !== 'undefined' && D.equipes){
+      const _allOps = D.equipes.flatMap(e=>e.ops||[]);
+      Object.keys(saved).forEach(opName=>{
+        const op = _allOps.find(o=>o.name===opName);
+        if(!op) return;
+        const v = parseFloat(saved[opName])||0;
+        if(v<=0) return;
+        const diasComValor = Object.values(op.daily||{}).filter(x=>x>0);
+        const media = diasComValor.length>0 ? diasComValor.reduce((s,x)=>s+x,0)/diasComValor.length : 0;
+        const teto = Math.max(media*8, (op.rec||0)*0.35, 15000);
+        if(v > teto) delete saved[opName];
+      });
+    }
+  }catch(e){}
+  return saved;
+}
 
 function rdSumToday(){return Object.values(rdGetSaved()).reduce((s,v)=>s+(parseFloat(v)||0),0)}
 function rdAtivos(){return Object.values(rdGetSaved()).filter(v=>(parseFloat(v)||0)>0).length}
@@ -8387,7 +8409,10 @@ function importApply(){
     let hojeVal = 0;
     if(r.daily && r.daily[_hoje] && r.daily[_hoje] > 0){
       hojeVal = r.daily[_hoje];
-    } else if(r.diff && r.diff > 0){
+    } else if(r.diff && r.diff > 0 && r.recCurrent > 0){
+      // Só usa a diferença como "hoje" se o operador já tinha saldo conhecido antes.
+      // Operador novo (recCurrent=0, apareceu agora pela 1ª vez) pode trazer dinheiro
+      // acumulado de vários dias — não é correto jogar tudo isso como "recebido hoje".
       hojeVal = r.diff;
     }
     if(hojeVal > 0) _rdMap[r.opName] = hojeVal;
@@ -8598,10 +8623,19 @@ function acRenderEficiencia(){
     const ef = d.total>0 ? (d.pago/d.total*100) : 0;
     const cor = _acEficCor(ef);
     const cfg = EQ[eqName]||{c:'#888',sh:eqName};
+    const liderPhoto = typeof photoGet==='function' ? photoGet('LIDER_'+eqName) : null;
+    const liderIni = (cfg.sh||eqName).charAt(0).toUpperCase();
     return `<div style="display:grid;grid-template-columns:1fr 90px 90px 90px 100px;gap:10px;
       align-items:center;padding:10px 12px;border-bottom:1px solid var(--g100)">
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="width:10px;height:10px;border-radius:3px;background:${cfg.c};flex-shrink:0"></span>
+      <div style="display:flex;align-items:center;gap:9px">
+        <div onclick="if(typeof liderPhotoUpload==='function') liderPhotoUpload('${eqName}')" title="Clique para adicionar/trocar a foto do líder"
+          style="width:26px;height:26px;border-radius:8px;flex-shrink:0;overflow:hidden;cursor:pointer;
+          background:${cfg.c};display:flex;align-items:center;justify-content:center;
+          border:1.5px solid ${cfg.c}">
+          ${liderPhoto
+            ? `<img src="${liderPhoto}" style="width:100%;height:100%;object-fit:cover">`
+            : `<span style="font-weight:900;font-size:11px;color:#fff">${liderIni}</span>`}
+        </div>
         <span style="font-weight:800;font-size:12px;color:var(--g900)">${cfg.sh||eqName}</span>
       </div>
       <div style="text-align:center;font-family:Bebas Neue,sans-serif;font-size:17px;color:var(--g700)">${d.pago}</div>
@@ -9126,6 +9160,7 @@ function liderPhotoFileSelected(inp){
     photoSet('LIDER_'+eqName, e.target.result);
     setTimeout(()=>{
       if(typeof renderEqMetasTable==='function') renderEqMetasTable();
+      if(typeof acRenderEficiencia==='function') acRenderEficiencia();
       toast('✅ Foto do líder salva!');
     }, 300);
   };
