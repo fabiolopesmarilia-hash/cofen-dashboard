@@ -1299,6 +1299,13 @@ select.ev-inp{cursor:pointer}
         <div style="font-size:10px;color:rgba(255,255,255,.4);font-weight:600;margin-top:4px" id="proj-op-subtitle">Atualizado automaticamente</div>
       </div>
       <div style="display:flex;gap:10px;align-items:center">
+        <!-- Toggle: Por Operador / Por Equipe -->
+        <div style="display:flex;gap:4px;background:rgba(255,255,255,.08);border-radius:var(--rm);padding:3px" id="proj-view-toggle">
+          <button class="proj-vmode on" data-vm="operador" onclick="projSetViewMode('operador',this)"
+            style="padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:rgba(255,255,255,.18);color:#fff">👤 Operadores</button>
+          <button class="proj-vmode" data-vm="equipe" onclick="projSetViewMode('equipe',this)"
+            style="padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.6)">🏢 Equipes</button>
+        </div>
         <!-- Quartil summary cards -->
         <div id="proj-op-quartil-summary" style="display:flex;gap:8px"></div>
         <button onclick="refreshAll();projOpRender();toast('📊 Projeção atualizada!')"
@@ -1334,7 +1341,7 @@ select.ev-inp{cursor:pointer}
         gap:6px;padding:9px 14px;background:var(--ppd);
         font-size:9px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase">
         <span style="text-align:center">#</span>
-        <span>Operador</span>
+        <span id="proj-col-label">Operador</span>
         <span style="text-align:right">Meta</span>
         <span style="text-align:right">Recebimento</span>
         <span style="text-align:right">Diário</span>
@@ -14997,10 +15004,65 @@ function projOpRender(){
   const sub = document.getElementById('proj-op-subtitle');
   if(sub) sub.textContent=`Atualizado em ${now.toLocaleTimeString('pt-BR')} · ${_projAllData.length} operadores · DU ${duPassou}/${duTotal}`;
 
+  projOpRenderCurrentView();
+}
+
+// ── Agrega _projAllData por equipe (mesmas métricas, somadas) ──
+function projOpBuildEquipes(){
+  const duTotal = (DU&&DU.total) || 19;
+  const map = {};
+  _projAllData.forEach(d=>{
+    const eq = d.op.eq || 'SEM EQUIPE';
+    if(!map[eq]) map[eq] = { eqName:eq, meta:0, rec:0, hoje:0, nOps:0 };
+    const m = map[eq];
+    m.meta += d.meta; m.rec += d.rec; m.hoje += d.hoje; m.nOps += 1;
+  });
+  return Object.values(map).map(e=>{
+    const diario   = e.meta>0 ? e.meta/duTotal : 0;
+    const alcance  = e.hoje>0 ? (e.rec/e.hoje*100) : (e.meta>0 ? (e.rec/e.meta*100) : 0);
+    const faltaSob = e.rec - e.hoje;
+    const qi       = projOpQuartilInfo(alcance);
+    return { eqName:e.eqName, meta:e.meta, rec:e.rec, diario, hoje:e.hoje, faltaSob, alcance, qi, nOps:e.nOps };
+  })
+  .sort((a,b)=>b.rec-a.rec)
+  .map((d,i)=>({...d, rank:i+1}));
+}
+
+function projRowLabel(d){
+  return d.op ? d.op.name.replace(/_/g,' ') : (d.eqName||'').replace('COFEN ','').replace(' 2° TURNO',' 2°T');
+}
+function projRowSub(d){
+  return d.op ? (d.op.eq||'').replace('COFEN ','').replace(' 2° TURNO',' 2°T') : `${d.nOps} operador${d.nOps!==1?'es':''}`;
+}
+
+let projViewMode = 'operador';
+function projSetViewMode(mode, el){
+  projViewMode = mode;
+  document.querySelectorAll('.proj-vmode').forEach(b=>{
+    const on = b.dataset.vm===mode;
+    b.classList.toggle('on', on);
+    b.style.background = on ? 'rgba(255,255,255,.18)' : 'transparent';
+    b.style.color = on ? '#fff' : 'rgba(255,255,255,.6)';
+  });
+  const lbl = document.getElementById('proj-col-label');
+  if(lbl) lbl.textContent = mode==='equipe' ? 'Equipe' : 'Operador';
+  // Reset filtro de quartil pro "Todos" ao trocar de visão
+  document.querySelectorAll('.proj-flt').forEach(b=>{
+    const isAll = b.dataset.flt==='all';
+    b.classList.toggle('on', isAll);
+    b.style.background = isAll ? 'var(--pp)' : 'transparent';
+    b.style.color = isAll ? '#fff' : (b.dataset.flt==='q1'?'var(--ok)':b.dataset.flt==='q2'?'var(--info)':b.dataset.flt==='q3'?'var(--warn)':'var(--danger)');
+  });
+  projOpRenderCurrentView();
+}
+
+function projOpRenderCurrentView(){
+  const data = projViewMode==='equipe' ? projOpBuildEquipes() : _projAllData;
+
   // Quartil counts
   const qCounts={q1:0,q2:0,q3:0,q4:0};
-  _projAllData.forEach(d=>qCounts[d.qi.q]++);
-  const total=_projAllData.length||1;
+  data.forEach(d=>qCounts[d.qi.q]++);
+  const total=data.length||1;
 
   // Summary cards in header
   const sumEl=document.getElementById('proj-op-quartil-summary');
@@ -15037,7 +15099,7 @@ function projOpRender(){
         responsive:false,cutout:'50%',
         plugins:{
           legend:{display:false},
-          tooltip:{callbacks:{label(c){const v=c.parsed;return ` ${v} ops (${(v/total*100).toFixed(0)}%)`;}}}
+          tooltip:{callbacks:{label(c){const v=c.parsed;return ` ${v} ${projViewMode==='equipe'?'equipes':'ops'} (${(v/total*100).toFixed(0)}%)`;}}}
         },
         animation:{duration:500}
       }
@@ -15070,20 +15132,21 @@ function projOpRender(){
   // Destaques top 3
   const destEl=document.getElementById('proj-op-destaques');
   if(destEl){
+    const fR2b=v=>(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
     const medals=['🥇','🥈','🥉'];
-    const top3=_projAllData.slice(0,3);
+    const top3=data.slice(0,3);
     destEl.innerHTML=top3.map((d,i)=>`
       <div style="display:flex;align-items:center;gap:10px;padding:9px 10px;
         border-radius:var(--rm);background:${i===0?'#D1FAE5':i===1?'#DBEAFE':'#FEF3C7'};margin-bottom:7px">
         <span style="font-size:20px">${medals[i]}</span>
         <div style="flex:1;min-width:0">
           <div style="font-weight:800;font-size:11px;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-            ${d.op.name.replace(/_/g,' ')}</div>
-          <div style="font-size:9px;color:var(--g500);font-weight:600">${(d.op.eq||'').replace('COFEN ','').replace(' 2° TURNO','')}</div>
+            ${projRowLabel(d)}</div>
+          <div style="font-size:9px;color:var(--g500);font-weight:600">${projRowSub(d)}</div>
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${d.qi.color}">${d.alcance.toFixed(1)}%</div>
-          <div style="font-size:9px;color:var(--g500);font-weight:600">${fR2(d.rec)}</div>
+          <div style="font-size:9px;color:var(--g500);font-weight:600">${fR2b(d.rec)}</div>
         </div>
       </div>`).join('');
   }
@@ -15093,12 +15156,14 @@ function projOpRender(){
   if(gerEl){
     const acima=qCounts.q1+qCounts.q2;
     const critico=qCounts.q4;
+    const unidade = projViewMode==='equipe' ? 'equipe' : 'operador';
+    const unidadeS = projViewMode==='equipe' ? 'equipes' : 'operadores';
     gerEl.innerHTML=`
-      ✅ <b style="color:#4ADE80">${qCounts.q1}</b> operadores já superaram 100% da meta projetada.<br>
+      ✅ <b style="color:#4ADE80">${qCounts.q1}</b> ${unidadeS} já superaram 100% da meta projetada.<br>
       📊 <b style="color:#67E8F9">${acima}</b> (${(acima/total*100).toFixed(0)}%) estão no 1º ou 2º quartil.<br>
       ⚠️ <b style="color:#FCD34D">${qCounts.q3}</b> no 3º quartil precisam de atenção.<br>
-      🔴 <b style="color:#FCA5A5">${critico}</b> operador${critico!==1?'es':''} em situação crítica.<br>
-      📈 <b style="color:#fff">${total}</b> operadores no total.`;
+      🔴 <b style="color:#FCA5A5">${critico}</b> ${unidade}${critico!==1?(projViewMode==='equipe'?'s':'es'):''} em situação crítica.<br>
+      📈 <b style="color:#fff">${total}</b> ${unidadeS} no total.`;
   }
 
   // Render list (default all)
@@ -15111,14 +15176,16 @@ function projOpRenderList(flt){
   const footerEl=document.getElementById('proj-op-footer');
   if(!listEl) return;
 
-  const filtered=flt==='all'?_projAllData:_projAllData.filter(d=>d.qi.q===flt);
+  const srcData = projViewMode==='equipe' ? projOpBuildEquipes() : _projAllData;
+  const filtered=flt==='all'?srcData:srcData.filter(d=>d.qi.q===flt);
 
   if(filtered.length===0){
-    const totalOps = _projAllData.length;
+    const totalOps = srcData.length;
+    const unidadeVazia = projViewMode==='equipe' ? 'equipe' : 'operador';
     listEl.innerHTML=`<div style="padding:40px;text-align:center;color:var(--g500);font-size:13px;font-weight:700">
       ${totalOps===0
         ? '⚠️ Nenhum operador encontrado. Importe o relatório na aba <b>Importar Relatório</b> e clique em Atualizar.'
-        : 'Nenhum operador neste quartil'}
+        : `Nenhuma ${unidadeVazia} neste quartil`}
     </div>`;
     if(footerEl) footerEl.innerHTML='';
     return;
@@ -15134,8 +15201,8 @@ function projOpRenderList(flt){
       onmouseover="this.style.background='#F0FDF4'" onmouseout="this.style.background='${rowHighlight}'">
       <span style="font-family:Bebas Neue,sans-serif;font-size:13px;color:var(--g500);text-align:center">${d.rank}</span>
       <div style="min-width:0">
-        <div style="font-weight:800;font-size:12px;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.op.name.replace(/_/g,' ')}</div>
-        <div style="font-size:9px;color:var(--g500);font-weight:600">${(d.op.eq||'').replace('COFEN ','').replace(' 2° TURNO',' 2°T')}</div>
+        <div style="font-weight:800;font-size:12px;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${projRowLabel(d)}</div>
+        <div style="font-size:9px;color:var(--g500);font-weight:600">${projRowSub(d)}</div>
       </div>
       <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:var(--g700);text-align:right">${d.meta>0?fR2(d.meta):'—'}</span>
       <span style="font-family:Bebas Neue,sans-serif;font-size:13px;color:var(--g900);text-align:right;font-weight:800">${fR2(d.rec)}</span>
