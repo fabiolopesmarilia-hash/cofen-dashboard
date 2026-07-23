@@ -15007,32 +15007,37 @@ function projOpRender(){
   projOpRenderCurrentView();
 }
 
-// ── Agrega _projAllData por equipe (mesmas métricas, somadas) ──
-function projOpBuildEquipes(){
+// Nome de exibição correto da equipe (mesmo usado no resto do painel: EQ[...].sh)
+function projEqDisplay(eqKey){
+  return (EQ[eqKey] && EQ[eqKey].sh) || (eqKey||'SEM EQUIPE').replace('COFEN ','');
+}
+
+// ── Agrupa _projAllData por equipe: cada grupo mantém os operadores individuais + subtotal ──
+function projOpBuildEquipeGroups(){
   const duTotal = (DU&&DU.total) || 19;
   const map = {};
   _projAllData.forEach(d=>{
     const eq = d.op.eq || 'SEM EQUIPE';
-    if(!map[eq]) map[eq] = { eqName:eq, meta:0, rec:0, hoje:0, nOps:0 };
+    if(!map[eq]) map[eq] = { eqKey:eq, eqName:projEqDisplay(eq), ops:[], meta:0, rec:0, hoje:0 };
     const m = map[eq];
-    m.meta += d.meta; m.rec += d.rec; m.hoje += d.hoje; m.nOps += 1;
+    m.ops.push(d);
+    m.meta += d.meta; m.rec += d.rec; m.hoje += d.hoje;
   });
   return Object.values(map).map(e=>{
     const diario   = e.meta>0 ? e.meta/duTotal : 0;
     const alcance  = e.hoje>0 ? (e.rec/e.hoje*100) : (e.meta>0 ? (e.rec/e.meta*100) : 0);
     const faltaSob = e.rec - e.hoje;
     const qi       = projOpQuartilInfo(alcance);
-    return { eqName:e.eqName, meta:e.meta, rec:e.rec, diario, hoje:e.hoje, faltaSob, alcance, qi, nOps:e.nOps };
-  })
-  .sort((a,b)=>b.rec-a.rec)
-  .map((d,i)=>({...d, rank:i+1}));
+    e.ops.sort((a,b)=>b.rec-a.rec);
+    return { ...e, diario, alcance, faltaSob, qi, nOps:e.ops.length };
+  }).sort((a,b)=>b.rec-a.rec);
 }
 
 function projRowLabel(d){
-  return d.op ? d.op.name.replace(/_/g,' ') : (d.eqName||'').replace('COFEN ','').replace(' 2° TURNO',' 2°T');
+  return d.op ? d.op.name.replace(/_/g,' ') : d.eqName;
 }
 function projRowSub(d){
-  return d.op ? (d.op.eq||'').replace('COFEN ','').replace(' 2° TURNO',' 2°T') : `${d.nOps} operador${d.nOps!==1?'es':''}`;
+  return d.op ? projEqDisplay(d.op.eq) : `${d.nOps} operador${d.nOps!==1?'es':''}`;
 }
 
 let projViewMode = 'operador';
@@ -15045,7 +15050,7 @@ function projSetViewMode(mode, el){
     b.style.color = on ? '#fff' : 'rgba(255,255,255,.6)';
   });
   const lbl = document.getElementById('proj-col-label');
-  if(lbl) lbl.textContent = mode==='equipe' ? 'Equipe' : 'Operador';
+  if(lbl) lbl.textContent = mode==='equipe' ? 'Operador' : 'Operador';
   // Reset filtro de quartil pro "Todos" ao trocar de visão
   document.querySelectorAll('.proj-flt').forEach(b=>{
     const isAll = b.dataset.flt==='all';
@@ -15057,7 +15062,7 @@ function projSetViewMode(mode, el){
 }
 
 function projOpRenderCurrentView(){
-  const data = projViewMode==='equipe' ? projOpBuildEquipes() : _projAllData;
+  const data = _projAllData; // resumo/pizza/destaques sempre no nível de operador
 
   // Quartil counts
   const qCounts={q1:0,q2:0,q3:0,q4:0};
@@ -15099,7 +15104,7 @@ function projOpRenderCurrentView(){
         responsive:false,cutout:'50%',
         plugins:{
           legend:{display:false},
-          tooltip:{callbacks:{label(c){const v=c.parsed;return ` ${v} ${projViewMode==='equipe'?'equipes':'ops'} (${(v/total*100).toFixed(0)}%)`;}}}
+          tooltip:{callbacks:{label(c){const v=c.parsed;return ` ${v} ops (${(v/total*100).toFixed(0)}%)`;}}}
         },
         animation:{duration:500}
       }
@@ -15156,14 +15161,12 @@ function projOpRenderCurrentView(){
   if(gerEl){
     const acima=qCounts.q1+qCounts.q2;
     const critico=qCounts.q4;
-    const unidade = projViewMode==='equipe' ? 'equipe' : 'operador';
-    const unidadeS = projViewMode==='equipe' ? 'equipes' : 'operadores';
     gerEl.innerHTML=`
-      ✅ <b style="color:#4ADE80">${qCounts.q1}</b> ${unidadeS} já superaram 100% da meta projetada.<br>
+      ✅ <b style="color:#4ADE80">${qCounts.q1}</b> operadores já superaram 100% da meta projetada.<br>
       📊 <b style="color:#67E8F9">${acima}</b> (${(acima/total*100).toFixed(0)}%) estão no 1º ou 2º quartil.<br>
       ⚠️ <b style="color:#FCD34D">${qCounts.q3}</b> no 3º quartil precisam de atenção.<br>
-      🔴 <b style="color:#FCA5A5">${critico}</b> ${unidade}${critico!==1?(projViewMode==='equipe'?'s':'es'):''} em situação crítica.<br>
-      📈 <b style="color:#fff">${total}</b> ${unidadeS} no total.`;
+      🔴 <b style="color:#FCA5A5">${critico}</b> operador${critico!==1?'es':''} em situação crítica.<br>
+      📈 <b style="color:#fff">${total}</b> operadores no total.`;
   }
 
   // Render list (default all)
@@ -15176,22 +15179,7 @@ function projOpRenderList(flt){
   const footerEl=document.getElementById('proj-op-footer');
   if(!listEl) return;
 
-  const srcData = projViewMode==='equipe' ? projOpBuildEquipes() : _projAllData;
-  const filtered=flt==='all'?srcData:srcData.filter(d=>d.qi.q===flt);
-
-  if(filtered.length===0){
-    const totalOps = srcData.length;
-    const unidadeVazia = projViewMode==='equipe' ? 'equipe' : 'operador';
-    listEl.innerHTML=`<div style="padding:40px;text-align:center;color:var(--g500);font-size:13px;font-weight:700">
-      ${totalOps===0
-        ? '⚠️ Nenhum operador encontrado. Importe o relatório na aba <b>Importar Relatório</b> e clique em Atualizar.'
-        : `Nenhuma ${unidadeVazia} neste quartil`}
-    </div>`;
-    if(footerEl) footerEl.innerHTML='';
-    return;
-  }
-
-  listEl.innerHTML=filtered.map((d,idx)=>{
+  const _rowHtml = (d,idx)=>{
     const isPos=d.faltaSob>=0;
     const rowBg=idx%2===0?'var(--w)':'var(--g50)';
     const rowHighlight=d.rank<=3?d.rank===1?'#D1FAE5':d.rank===2?'#DBEAFE':'#FEF3C7':rowBg;
@@ -15216,18 +15204,68 @@ function projOpRenderList(flt){
           background:${d.qi.bg};color:${d.qi.text};letter-spacing:.4px;white-space:nowrap">${d.qi.label}</span>
       </div>
     </div>`;
-  }).join('');
+  };
 
-  // Footer
+  let visivel = []; // lista de operadores efetivamente exibidos (para o rodapé)
+
+  if(projViewMode==='equipe'){
+    const groups = projOpBuildEquipeGroups()
+      .map(g=>({...g, opsF: flt==='all' ? g.ops : g.ops.filter(d=>d.qi.q===flt)}))
+      .filter(g=>g.opsF.length>0);
+
+    if(groups.length===0){
+      listEl.innerHTML=`<div style="padding:40px;text-align:center;color:var(--g500);font-size:13px;font-weight:700">
+        ${_projAllData.length===0
+          ? '⚠️ Nenhum operador encontrado. Importe o relatório na aba <b>Importar Relatório</b> e clique em Atualizar.'
+          : 'Nenhum operador neste quartil'}
+      </div>`;
+      if(footerEl) footerEl.innerHTML='';
+      return;
+    }
+
+    listEl.innerHTML = groups.map(g=>{
+      visivel = visivel.concat(g.opsF);
+      const header = `<div style="display:grid;grid-template-columns:36px 1fr 100px 110px 95px 110px 110px 90px 90px;
+        gap:6px;padding:9px 14px;align-items:center;background:#123B2B;border-top:2px solid rgba(255,255,255,.1)">
+        <span></span>
+        <div style="font-weight:900;font-size:12px;color:#fff;letter-spacing:.3px">${g.eqName}
+          <span style="font-weight:600;color:rgba(255,255,255,.55);font-size:10px"> · ${g.nOps} operador${g.nOps!==1?'es':''}</span></div>
+        <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:rgba(255,255,255,.7);text-align:right">${g.meta>0?fR2(g.meta):'—'}</span>
+        <span style="font-family:Bebas Neue,sans-serif;font-size:13px;color:#fff;text-align:right;font-weight:800">${fR2(g.rec)}</span>
+        <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:rgba(255,255,255,.5);text-align:right">${g.diario>0?fR2(g.diario):'—'}</span>
+        <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:#7DD3FC;text-align:right">${g.hoje>0?fR2(g.hoje):'—'}</span>
+        <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:${g.faltaSob>=0?'#4ADE80':'#FCA5A5'};text-align:right">${g.faltaSob>=0?'+':''}${fR2(g.faltaSob)}</span>
+        <span style="font-family:Bebas Neue,sans-serif;font-size:14px;color:${g.qi.color};text-align:right;font-weight:800">${g.alcance.toFixed(2)}%</span>
+        <div style="text-align:center"><span style="display:inline-block;padding:2px 7px;border-radius:100px;font-size:8px;font-weight:800;
+          background:${g.qi.bg};color:${g.qi.text};white-space:nowrap">${g.qi.label}</span></div>
+      </div>`;
+      const rows = g.opsF.map((d,idx)=>_rowHtml(d,idx)).join('');
+      return header + rows;
+    }).join('');
+  } else {
+    visivel = flt==='all' ? _projAllData : _projAllData.filter(d=>d.qi.q===flt);
+    if(visivel.length===0){
+      listEl.innerHTML=`<div style="padding:40px;text-align:center;color:var(--g500);font-size:13px;font-weight:700">
+        ${_projAllData.length===0
+          ? '⚠️ Nenhum operador encontrado. Importe o relatório na aba <b>Importar Relatório</b> e clique em Atualizar.'
+          : 'Nenhum operador neste quartil'}
+      </div>`;
+      if(footerEl) footerEl.innerHTML='';
+      return;
+    }
+    listEl.innerHTML = visivel.map((d,idx)=>_rowHtml(d,idx)).join('');
+  }
+
+  // Footer — total dos operadores efetivamente visíveis na tela
   if(footerEl){
-    const totRec=filtered.reduce((s,d)=>s+d.rec,0);
-    const totMeta=filtered.reduce((s,d)=>s+d.meta,0);
-    const totHoje=filtered.reduce((s,d)=>s+d.hoje,0);
-    const totFS=filtered.reduce((s,d)=>s+d.faltaSob,0);
+    const totRec=visivel.reduce((s,d)=>s+d.rec,0);
+    const totMeta=visivel.reduce((s,d)=>s+d.meta,0);
+    const totHoje=visivel.reduce((s,d)=>s+d.hoje,0);
+    const totFS=visivel.reduce((s,d)=>s+d.faltaSob,0);
     const totAlc=totHoje>0?(totRec/totHoje*100):0;
     footerEl.innerHTML=`
       <span></span>
-      <span style="font-weight:900;font-size:11px;color:#fff">💰 TOTAL (${filtered.length})</span>
+      <span style="font-weight:900;font-size:11px;color:#fff">💰 TOTAL (${visivel.length})</span>
       <span style="font-family:Bebas Neue,sans-serif;font-size:12px;color:#FCD34D;text-align:right">${fR2(totMeta)}</span>
       <span style="font-family:Bebas Neue,sans-serif;font-size:14px;color:#4ADE80;text-align:right">${fR2(totRec)}</span>
       <span></span>
