@@ -1420,40 +1420,40 @@ select.ev-inp{cursor:pointer}
   <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start">
 
     <!-- TABLE SECTION -->
-    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden">
+    <div style="background:linear-gradient(180deg,#0D3D2B,#123B2B 40%,#0D3D2B);border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden">
       <!-- Filter bar -->
-      <div style="padding:12px 16px;background:var(--g50);border-bottom:1px solid var(--g200);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <span style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase">Filtrar:</span>
+      <div style="padding:12px 16px;background:rgba(0,0,0,.15);border-bottom:1px solid rgba(255,255,255,.08);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase">Filtrar:</span>
         <button class="proj-ano-flt on" data-flt="all" onclick="projAnoFiltrar('all',this)"
           style="padding:5px 12px;border-radius:100px;border:none;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:var(--pp);color:#fff">🏆 Todos</button>
         <button class="proj-ano-flt" data-flt="q1" onclick="projAnoFiltrar('q1',this)"
-          style="padding:5px 12px;border-radius:100px;border:1.5px solid var(--ok);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:transparent;color:var(--ok)">🟢 1º Quartil</button>
+          style="padding:5px 12px;border-radius:100px;border:1.5px solid #4ADE80;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:transparent;color:#4ADE80">🟢 1º Quartil</button>
         <button class="proj-ano-flt" data-flt="q2" onclick="projAnoFiltrar('q2',this)"
-          style="padding:5px 12px;border-radius:100px;border:1.5px solid var(--info);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:transparent;color:var(--info)">🔵 2º Quartil</button>
+          style="padding:5px 12px;border-radius:100px;border:1.5px solid #67E8F9;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:transparent;color:#67E8F9">🔵 2º Quartil</button>
         <button class="proj-ano-flt" data-flt="q3" onclick="projAnoFiltrar('q3',this)"
-          style="padding:5px 12px;border-radius:100px;border:1.5px solid var(--warn);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:transparent;color:var(--warn)">🟡 3º Quartil</button>
+          style="padding:5px 12px;border-radius:100px;border:1.5px solid #FCD34D;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:transparent;color:#FCD34D">🟡 3º Quartil</button>
         <button class="proj-ano-flt" data-flt="q4" onclick="projAnoFiltrar('q4',this)"
-          style="padding:5px 12px;border-radius:100px;border:1.5px solid var(--danger);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:transparent;color:var(--danger)">🔴 4º Quartil</button>
+          style="padding:5px 12px;border-radius:100px;border:1.5px solid #F87171;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:transparent;color:#F87171">🔴 4º Quartil</button>
       </div>
       <!-- Filter bar: equipe -->
-      <div style="padding:10px 16px;background:var(--g50);border-bottom:1px solid var(--g200);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <span style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase">Equipe:</span>
+      <div style="padding:10px 16px;background:rgba(0,0,0,.15);border-bottom:1px solid rgba(255,255,255,.08);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase">Equipe:</span>
         <div style="display:flex;gap:6px;flex-wrap:wrap" id="proj-ano-eq-btns"></div>
       </div>
       <!-- Table header -->
-      <div style="display:grid;grid-template-columns:1fr 130px 130px 110px 90px 130px;gap:6px;padding:9px 16px;background:#123B2B;align-items:center" id="proj-ano-thead">
-        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.6px;text-transform:uppercase" id="proj-ano-col-label">Operador</span>
-        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.6px;text-transform:uppercase;text-align:right">Recebido</span>
-        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.6px;text-transform:uppercase;text-align:right">Total HO</span>
-        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.6px;text-transform:uppercase;text-align:right">Meta</span>
-        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.6px;text-transform:uppercase;text-align:right">%</span>
-        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.6px;text-transform:uppercase;text-align:right">Falta/Sobra</span>
+      <div style="display:grid;grid-template-columns:1fr 130px 130px 110px 90px 130px;gap:6px;padding:9px 16px;background:rgba(0,0,0,.2);align-items:center;border-bottom:1px solid rgba(255,255,255,.08)" id="proj-ano-thead">
+        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:.6px;text-transform:uppercase" id="proj-ano-col-label">Operador</span>
+        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:.6px;text-transform:uppercase;text-align:right">Recebido</span>
+        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:.6px;text-transform:uppercase;text-align:right">Total HO</span>
+        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:.6px;text-transform:uppercase;text-align:right">Meta</span>
+        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:.6px;text-transform:uppercase;text-align:right">%</span>
+        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:.6px;text-transform:uppercase;text-align:right">Falta/Sobra</span>
       </div>
       <!-- Table body -->
       <div id="proj-ano-list" style="max-height:calc(100vh - 420px);overflow-y:auto"></div>
       <!-- Footer totals -->
       <div id="proj-ano-footer" style="display:grid;grid-template-columns:1fr 130px 130px 110px 90px 130px;gap:6px;
-        padding:11px 16px;background:#0D3D2B;align-items:center"></div>
+        padding:11px 16px;background:rgba(0,0,0,.25);align-items:center;border-top:1px solid rgba(255,255,255,.1)"></div>
     </div>
 
     <!-- RIGHT COLUMN: Chart + Stats -->
@@ -15182,11 +15182,29 @@ let projAnoFiltroEquipe = 'TODAS';
 let _projAnoPieChart = null;
 
 function projAnoQuartilInfo(pct){
-  if(pct===null || pct===undefined) return {q:'sem', color:'#9CA3AF', bg:'#F3F4F6', text:'#6B7280', label:'—'};
-  if(pct>=1)    return {q:'q1', color:'#00A86B', bg:'#E6F7F1', text:'#00A86B', label:'1º Quartil'};
-  if(pct>=0.8)  return {q:'q2', color:'#3B82F6', bg:'#EFF6FF', text:'#3B82F6', label:'2º Quartil'};
-  if(pct>=0.57) return {q:'q3', color:'#F59E0B', bg:'#FFFBEB', text:'#F59E0B', label:'3º Quartil'};
-  return          {q:'q4', color:'#EF4444', bg:'#FEF2F2', text:'#EF4444', label:'4º Quartil'};
+  if(pct===null || pct===undefined) return {q:'sem', color:'#9CA3AF', bg:'#F3F4F6', text:'#6B7280', darkBg:'rgba(156,163,175,.15)', label:'—'};
+  if(pct>=1)    return {q:'q1', color:'#4ADE80', bg:'#E6F7F1', text:'#00A86B', darkBg:'rgba(74,222,128,.18)', label:'1º Quartil'};
+  if(pct>=0.8)  return {q:'q2', color:'#67E8F9', bg:'#EFF6FF', text:'#3B82F6', darkBg:'rgba(103,232,249,.15)', label:'2º Quartil'};
+  if(pct>=0.57) return {q:'q3', color:'#FCD34D', bg:'#FFFBEB', text:'#B45309', darkBg:'rgba(252,211,77,.15)', label:'3º Quartil'};
+  return          {q:'q4', color:'#F87171', bg:'#FEF2F2', text:'#EF4444', darkBg:'rgba(248,113,113,.15)', label:'4º Quartil'};
+}
+
+// Cor por equipe (mesma lógica de cor usada no painel Metas & Projeções HO)
+const PROJ_ANO_EQ_COLOR = {
+  'Birigui Bruna':'#4776E6', 'Marília Stephanie':'#00A86B', 'Laysa Lopes 2°T':'#F7971E',
+  'Katia':'#8B5CF6', 'Digital':'#f953c6', 'Líderes':'#64748B', 'Liderança':'#0EA5E9',
+  'Ouvidoria/Suporte':'#14B8A6', 'Sem Equipe':'#9CA3AF',
+};
+function projAnoAvatarHtml(nome, eq, size){
+  size = size || 32;
+  const cor = PROJ_ANO_EQ_COLOR[eq] || '#64748B';
+  const foto = (typeof photoGet==='function') ? photoGet(nome) : null;
+  const iniciais = (typeof ini==='function') ? ini(nome) : nome.slice(0,2).toUpperCase();
+  return `<div style="width:${size}px;height:${size}px;border-radius:9px;flex-shrink:0;overflow:hidden;
+    background:${cor};display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.15)">
+    ${foto ? `<img src="${foto}" style="width:100%;height:100%;object-fit:cover">`
+           : `<span style="font-weight:900;font-size:${Math.round(size*0.38)}px;color:#fff;font-family:'Bebas Neue',sans-serif">${iniciais}</span>`}
+  </div>`;
 }
 
 function projAnoInitBtns(){
@@ -15228,7 +15246,7 @@ function projAnoFiltrar(flt, el){
     const isOn = b.dataset.flt===flt;
     b.classList.toggle('on', isOn);
     b.style.background = isOn ? 'var(--pp)' : 'transparent';
-    b.style.color = isOn ? '#fff' : (b.dataset.flt==='q1'?'var(--ok)':b.dataset.flt==='q2'?'var(--info)':b.dataset.flt==='q3'?'var(--warn)':b.dataset.flt==='q4'?'var(--danger)':'var(--g700)');
+    b.style.color = isOn ? '#fff' : (b.dataset.flt==='q1'?'#4ADE80':b.dataset.flt==='q2'?'#67E8F9':b.dataset.flt==='q3'?'#FCD34D':b.dataset.flt==='q4'?'#F87171':'rgba(255,255,255,.6)');
   });
   projAnoRenderLista();
 }
@@ -15240,13 +15258,14 @@ function projAnoRenderEquipeBtns(){
   const equipes = Array.from(new Set(ops.map(o=>o.eq))).sort();
   if(!equipes.includes(projAnoFiltroEquipe)) projAnoFiltroEquipe = 'TODAS';
   let html = `<button class="proj-ano-eqbtn${projAnoFiltroEquipe==='TODAS'?' on':''}" data-eq="TODAS" onclick="projAnoFiltrarEquipe('TODAS',this)"
-    style="padding:5px 12px;border-radius:100px;border:none;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;
-    background:${projAnoFiltroEquipe==='TODAS'?'var(--pp)':'var(--g200)'};color:${projAnoFiltroEquipe==='TODAS'?'#fff':'var(--g700)'}">Todas</button>`;
+    style="padding:5px 12px;border-radius:100px;border:1.5px solid rgba(255,255,255,.25);cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;
+    background:${projAnoFiltroEquipe==='TODAS'?'rgba(255,255,255,.18)':'transparent'};color:#fff">Todas</button>`;
   equipes.forEach(eq=>{
     const on = projAnoFiltroEquipe===eq;
+    const cor = PROJ_ANO_EQ_COLOR[eq] || '#64748B';
     html += `<button class="proj-ano-eqbtn${on?' on':''}" data-eq="${eq}" onclick="projAnoFiltrarEquipe('${eq}',this)"
-      style="padding:5px 12px;border-radius:100px;border:none;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;
-      background:${on?'var(--pp)':'var(--g200)'};color:${on?'#fff':'var(--g700)'}">${eq}</button>`;
+      style="padding:5px 12px;border-radius:100px;border:1.5px solid ${cor};cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;
+      background:${on?cor:'transparent'};color:${on?'#fff':cor}">${eq}</button>`;
   });
   wrap.innerHTML = html;
 }
@@ -15255,9 +15274,15 @@ function projAnoFiltrarEquipe(eq, el){
   projAnoFiltroEquipe = eq;
   document.querySelectorAll('.proj-ano-eqbtn').forEach(b=>{
     const on = b.dataset.eq===eq;
+    const cor = b.dataset.eq==='TODAS' ? null : (PROJ_ANO_EQ_COLOR[b.dataset.eq] || '#64748B');
     b.classList.toggle('on', on);
-    b.style.background = on ? 'var(--pp)' : 'var(--g200)';
-    b.style.color = on ? '#fff' : 'var(--g700)';
+    if(cor){
+      b.style.background = on ? cor : 'transparent';
+      b.style.color = on ? '#fff' : cor;
+    } else {
+      b.style.background = on ? 'rgba(255,255,255,.18)' : 'transparent';
+      b.style.color = '#fff';
+    }
   });
   projAnoRenderLista();
 }
@@ -15372,23 +15397,28 @@ function projAnoRenderLista(){
   const footerEl = document.getElementById('proj-ano-footer');
   if(!listEl) return;
 
-  const rowHtml = (label, sub, rec, ho, meta, pct, falta, idx, destaque)=>{
+  const rowHtml = (nome, label, sub, eq, rec, ho, meta, pct, falta, idx, destaque)=>{
     const qi = projAnoQuartilInfo(pct);
-    const rowBg = destaque ? '#123B2B' : (idx%2===0 ? 'var(--w)' : 'var(--g50)');
-    const txtMain = destaque ? '#fff' : 'var(--g900)';
-    const txtSub  = destaque ? 'rgba(255,255,255,.6)' : 'var(--g500)';
+    const rowBg = destaque ? 'rgba(255,255,255,.06)' : (idx%2===0 ? 'rgba(255,255,255,.02)' : 'transparent');
+    const barW = pct!==null ? Math.min(100, pct*100).toFixed(1) : 0;
     return `<div style="display:grid;grid-template-columns:1fr 130px 130px 110px 90px 130px;gap:6px;
-      padding:${destaque?'9px 16px':'8px 16px'};${destaque?'':'border-bottom:1px solid var(--g200);'}align-items:center;background:${rowBg}">
-      <div style="min-width:0">
-        <div style="font-weight:800;font-size:${destaque?'11px':'12px'};color:${txtMain};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}
-          ${!destaque?`<span style="font-weight:700;font-size:8px;padding:2px 6px;border-radius:100px;background:${qi.bg};color:${qi.text};margin-left:6px;white-space:nowrap">${qi.label}</span>`:''}</div>
-        <div style="font-size:9px;color:${txtSub};font-weight:600">${sub}</div>
+      padding:${destaque?'10px 16px':'8px 16px'};${destaque?'':'border-bottom:1px solid rgba(255,255,255,.06);'}align-items:center;background:${rowBg};transition:background .15s"
+      onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='${rowBg}'">
+      <div style="display:flex;align-items:center;gap:9px;min-width:0">
+        ${projAnoAvatarHtml(nome, eq, destaque?30:28)}
+        <div style="min-width:0">
+          <div style="font-weight:800;font-size:${destaque?'11px':'12px'};color:${destaque?'#fff':'rgba(255,255,255,.9)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}
+            ${!destaque?`<span style="font-weight:700;font-size:8px;padding:2px 6px;border-radius:100px;background:${qi.darkBg};color:${qi.color};margin-left:6px;white-space:nowrap">${qi.label}</span>`:''}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.4);font-weight:600;margin-top:2px">${sub}</div>
+          ${pct!==null?`<div style="background:rgba(255,255,255,.1);border-radius:100px;height:3px;overflow:hidden;width:${destaque?'110px':'90px'};margin-top:4px">
+            <div style="height:100%;border-radius:100px;background:${qi.color};width:${barW}%"></div></div>`:''}
+        </div>
       </div>
-      <span style="font-family:Bebas Neue,sans-serif;font-size:12px;color:${destaque?'#FCD34D':'var(--g700)'};text-align:right">${fR2(rec)}</span>
-      <span style="font-family:Bebas Neue,sans-serif;font-size:${destaque?'13px':'14px'};color:${destaque?'#4ADE80':'var(--g900)'};text-align:right;font-weight:800">${fR2(ho)}</span>
-      <span style="font-family:Bebas Neue,sans-serif;font-size:12px;color:${destaque?'rgba(255,255,255,.7)':'var(--g700)'};text-align:right">${meta!==null?fR2(meta):'—'}</span>
-      <span style="font-family:Bebas Neue,sans-serif;font-size:${destaque?'13px':'14px'};color:${destaque?'#fff':qi.color};text-align:right;font-weight:800">${pct!==null?(pct*100).toFixed(1)+'%':'—'}</span>
-      <span style="font-family:Bebas Neue,sans-serif;font-size:12px;color:${falta===null?(destaque?'rgba(255,255,255,.5)':'var(--g500)'):falta>=0?(destaque?'#4ADE80':'var(--ok)'):(destaque?'#FCA5A5':'var(--danger)')};text-align:right">
+      <span style="font-family:Bebas Neue,sans-serif;font-size:12px;color:#FCD34D;text-align:right">${fR2(rec)}</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:${destaque?'14px':'15px'};color:#4ADE80;text-align:right;font-weight:800">${fR2(ho)}</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:12px;color:rgba(255,255,255,.55);text-align:right">${meta!==null?fR2(meta):'—'}</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:${destaque?'13px':'14px'};color:${qi.color};text-align:right;font-weight:800">${pct!==null?(pct*100).toFixed(1)+'%':'—'}</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:12px;color:${falta===null?'rgba(255,255,255,.4)':falta>=0?'#4ADE80':'#F87171'};text-align:right">
         ${falta===null?'—':(falta>=0?'+':'')+fR2(falta)}</span>
     </div>`;
   };
@@ -15410,8 +15440,8 @@ function projAnoRenderLista(){
 
     listEl.innerHTML = groups.map(g=>{
       visivel = visivel.concat(g.opsF);
-      const header = rowHtml(g.eq, `${g.nOps} operador${g.nOps!==1?'es':''}`, g.rec, g.ho, g.meta, g.pct, g.falta, 0, true);
-      const rows = g.opsF.map((o,idx)=>rowHtml(o.nome.replace(/_/g,' '), g.eq, o.rec, o.ho, o.meta, o.pct, o.falta, idx, false)).join('');
+      const header = rowHtml(g.eq, g.eq, `${g.nOps} operador${g.nOps!==1?'es':''}`, g.eq, g.rec, g.ho, g.meta, g.pct, g.falta, 0, true);
+      const rows = g.opsF.map((o,idx)=>rowHtml(o.nome, o.nome.replace(/_/g,' '), g.eq, g.eq, o.rec, o.ho, o.meta, o.pct, o.falta, idx, false)).join('');
       return header + rows;
     }).join('');
   } else {
@@ -15424,7 +15454,7 @@ function projAnoRenderLista(){
       if(footerEl) footerEl.innerHTML='';
       return;
     }
-    listEl.innerHTML = visivel.map((o,idx)=>rowHtml(o.nome.replace(/_/g,' '), o.eq, o.rec, o.ho, o.meta, o.pct, o.falta, idx, false)).join('');
+    listEl.innerHTML = visivel.map((o,idx)=>rowHtml(o.nome, o.nome.replace(/_/g,' '), o.eq, o.eq, o.rec, o.ho, o.meta, o.pct, o.falta, idx, false)).join('');
   }
 
   if(footerEl){
@@ -15999,11 +16029,11 @@ function renderEqMetasTable(){
 
   const ORDER = ['COFEN BIRIGUI BRUNA','COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO','COFEN KATIA'];
   const EQ_LABELS = {
-    'COFEN BIRIGUI BRUNA'     : 'COFEN BIRIGUI BRUNA',
-    'COFEN MARILIA BRENDA'    : 'COFEN MARILIA BRENDA',
-    'COFEN STEPHANIE 2° TURNO': 'COFEN STEPHANIE 2° TURNO',
-    'COFEN DIGITAL'           : 'EQUIPE COFEN DIGITAL',
-    'COFEN KATIA'             : 'EQUIPE COFEN KATIA',
+    'COFEN BIRIGUI BRUNA'     : 'Birigui Bruna',
+    'COFEN MARILIA BRENDA'    : 'Marília Stephanie',
+    'COFEN STEPHANIE 2° TURNO': 'Laysa Lopes 2°T',
+    'COFEN DIGITAL'           : 'Digital',
+    'COFEN KATIA'             : 'Katia',
   };
 
   let rows = '';
