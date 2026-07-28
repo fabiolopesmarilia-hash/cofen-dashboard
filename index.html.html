@@ -3386,6 +3386,26 @@ function initHero(){
   renderHoProjTable();
 }
 
+// ── HO de Junho no mesmo DU — calculado do Histórico real (HIST_DADOS.Junho),
+// que já tem o recebido diário por operador vindo do import. Substituiu as
+// variáveis antigas CMP_HO_JUNHO_DU / CMP_JUNHO_DU, que na prática guardavam
+// dados de outro mês (nomes ficaram desatualizados de uma virada de mês pra outra
+// e nunca foram corrigidos, dando número errado no comparativo).
+const CMP_JUNHO_DU_DIAS = [1,2,3,4,5,8,9,10,11,12,15,16,17,18,19,22,23,24,25,26,29,30];
+function projGetHoJunhoNoDU(duN){
+  try{
+    const hist = (typeof HIST_DADOS!=='undefined') ? HIST_DADOS['Junho'] : null;
+    if(!hist || !Array.isArray(hist.rows) || !hist.rows.length) return 0;
+    const diaCal = CMP_JUNHO_DU_DIAS[duN-1];
+    if(!diaCal) return 0;
+    let totalRec = 0;
+    hist.rows.forEach(row=>{
+      for(let d=0; d<diaCal; d++){ totalRec += (row.d[d]||0); }
+    });
+    return Math.round(totalRec * 0.2496 * 100) / 100;
+  }catch(e){ return 0; }
+}
+
 // ── PROJEÇÃO HO TOTAL — dois cenários de meta ──
 function renderHoProjTable(){
   const tbody = document.getElementById('ho-proj-tbody');
@@ -3421,11 +3441,8 @@ function renderHoProjTable(){
     const pctBorder= acima ? 'rgba(74,222,128,.5)'  : quase ? 'rgba(252,211,77,.5)'  : 'rgba(248,113,113,.5)';
     const rowBg    = i%2===0 ? 'rgba(255,255,255,.04)' : 'rgba(0,0,0,.15)';
 
-    // Maio no mesmo DU — usa CMP_HO_JUNHO_DU (HO real, recalculado do arquivo Empresa).
-    // Fallback para a estimativa antiga (rec total × 0.25) se ainda não houver dados reais importados.
-    const hoJunhoDU   = (typeof CMP_HO_JUNHO_DU !== 'undefined' && CMP_HO_JUNHO_DU[duPass])
-                        ? CMP_HO_JUNHO_DU[duPass]
-                        : (CMP_JUNHO_DU[duPass] || 0) * 0.25;
+    // Junho no mesmo DU — calculado ao vivo a partir do Histórico real (HIST_DADOS.Junho).
+    const hoJunhoDU   = projGetHoJunhoNoDU(duPass);
     const vsJunho     = hoAtual - hoJunhoDU;
     const vsJunhoColor  = vsJunho >= 0 ? '#4ADE80' : '#F87171';
     const vsJunhoPrefix = vsJunho >= 0 ? '+' : '';
@@ -8611,6 +8628,18 @@ function importApply(){
   if(typeof cmpAtualizarCumul==='function') cmpAtualizarCumul();
   if(typeof cmpBuildTableGeral==='function') cmpBuildTableGeral();
 
+  // Sincroniza o total (rec/ho) já importado de cada operador pro Firebase — sem isso,
+  // só o computador que importou fica com o valor novo; os outros continuam com o total
+  // antigo (do último import feito ali) mesmo com o Sync ligado, porque nada empurrava
+  // esse valor base, só o "recebido hoje" avulso.
+  if(fbDb && fbRoom){
+    try{
+      const opBase = {};
+      ALL.forEach(op=>{ opBase[op.name] = {rec: op.rec, ho: op.ho}; });
+      fbDb.ref(fbRoom+'/op_base').set(opBase);
+    }catch(e){}
+  }
+
   toast(`✅ Importado! ${updated} ops atualizados${autoCriados>0?' · '+autoCriados+' novo(s) criado(s)':''} · dia zerado · Total: ${fRK(totalImportado)}`);
 
   // Atualizar CMP_OPS_DEDUP.abril com valores importados (mês atual)
@@ -9525,7 +9554,7 @@ function tvSetMode(mode, btnEl){
   if(btnEl){ btnEl.style.background='rgba(255,255,255,.18)'; btnEl.style.color='#fff'; }
   // Atualiza label
   const lbl = document.getElementById('tv-mode-label');
-  if(lbl) lbl.textContent = mode==='geral' ? 'RANKING GERAL' : mode==='bb' ? 'BRUNA + STEPHANIE' : mode==='bs' ? 'STEPHANIE + LAYSA LOPES' : mode==='COFEN BIRIGUI BRUNA' ? 'BRUNA + DIGITAL + ELITE' : mode==='COFEN KATIA' ? 'EQUIPE KATIA' : (EQ[mode]?.sh||mode).toUpperCase();
+  if(lbl) lbl.textContent = mode==='geral' ? 'RANKING GERAL' : mode==='bb' ? 'BRUNA + STEPHANIE' : mode==='bs' ? 'STEPHANIE + LAYSA LOPES' : mode==='bsk' ? 'STEPHANIE + LAYSA + KATIA' : mode==='COFEN BIRIGUI BRUNA' ? 'BRUNA + DIGITAL + ELITE' : mode==='COFEN KATIA' ? 'EQUIPE KATIA' : (EQ[mode]?.sh||mode).toUpperCase();
 
   // Reconstrói lista e reinicia
   tvBuildList();
@@ -9559,6 +9588,8 @@ function tvBuildList(){
     ops = base.filter(o=>['COFEN BIRIGUI BRUNA','COFEN MARILIA BRENDA'].includes(o.eq)).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
   } else if(tvMode==='bs'){
     ops = base.filter(o=>['COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO'].includes(o.eq)).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
+  } else if(tvMode==='bsk'){
+    ops = base.filter(o=>['COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO','COFEN KATIA'].includes(o.eq)).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
   } else {
     ops = base.filter(o=>o.eq===tvMode).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
   }
@@ -10271,6 +10302,7 @@ function fbSyncModalClose_auto(){
 
 function syncDisconnect(){
   if(fbListeners.rd)        { fbDb?.ref(fbRoom+'/rd').off(); }
+  if(fbListeners.op_base)   { fbDb?.ref(fbRoom+'/op_base').off(); }
   if(fbListeners.rd_hist)   { fbDb?.ref(fbRoom+'/rd_hist').off(); }
   if(fbListeners.op_tipos)  { fbDb?.ref(fbRoom+'/op_tipos').off(); }
   if(fbListeners.overrides) { fbDb?.ref(fbRoom+'/overrides').off(); }
@@ -10389,6 +10421,31 @@ function fbStartListening(){
     });
     fbListeners.op_acordos = true;
   }
+
+  // ── Base importada (rec/ho) de cada operador — sincroniza o resultado do import
+  // entre computadores, sem precisar reimportar o mesmo relatório em cada um ──
+  fbDb.ref(fbRoom+'/op_base').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    let changed = false;
+    D.equipes.forEach(eq=>{
+      eq.ops.forEach(op=>{
+        const r = remote[op.name];
+        if(r && (op.rec !== r.rec || op.ho !== r.ho)){
+          op.rec = r.rec; op.ho = r.ho;
+          changed = true;
+        }
+      });
+    });
+    if(changed){
+      rebuildAll();
+      refreshAll();
+      if(typeof cmpAtualizarCumul==='function') cmpAtualizarCumul();
+      if(typeof projOpRender==='function') projOpRender();
+      pulseSyncDot();
+    }
+  });
+  fbListeners.op_base = true;
 
   // ── Recebimento do dia (rd) ──
   fbDb.ref(fbRoom+'/rd').on('value', snap=>{
@@ -12804,6 +12861,11 @@ setInterval(()=>{
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
         font-weight:800;font-size:11px;background:rgba(255,255,255,.18);color:#fff;letter-spacing:.5px;transition:all .2s">
         🏙️⭐ Stephanie + Laysa Lopes
+      </button>
+      <button id="tv-btn-bsk" onclick="tvSetMode('bsk',this)"
+        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
+        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
+        🏙️⭐💜 Stephanie + Laysa + Katia
       </button>
       <button id="tv-btn-COFEN_BIRIGUI_BRUNA" onclick="tvSetMode('COFEN BIRIGUI BRUNA',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
