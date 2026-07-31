@@ -301,6 +301,46 @@ select.ev-inp{cursor:pointer}
 .photo-upload-btn{padding:5px 12px;border-radius:var(--rm);border:1.5px dashed var(--g300);background:var(--g50);color:var(--g500);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap}
 .photo-upload-btn:hover{border-color:var(--pp);color:var(--pp);background:var(--ppl)}
 
+/* ─ TV MODE ─ */
+#tv-overlay{position:fixed;inset:0;z-index:9000;background:#0a1610;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif;overflow:hidden}
+#tv-overlay::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(ellipse 75% 65% at 15% 50%,rgba(0,156,59,.18) 0%,transparent 100%),
+  radial-gradient(ellipse 65% 70% at 85% 50%,rgba(0,39,118,.16) 0%,transparent 100%),
+  radial-gradient(ellipse 50% 35% at 50% 5%,rgba(255,223,0,.04) 0%,transparent 100%),
+  radial-gradient(ellipse 85% 45% at 50% 100%,rgba(0,100,30,.28) 0%,transparent 100%);
+  pointer-events:none;z-index:0}
+#tv-overlay::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;opacity:.3}
+#tv-card,#tv-overlay .tv-header,#tv-overlay .tv-progress,#tv-overlay .tv-nav,#tv-overlay>div:last-of-type{position:relative;z-index:2}
+#tv-overlay.on{display:flex}
+/* ─ TV PAGE (iframe container) ─ */
+#pg-tv{display:none}
+#pg-tv.on{display:flex;flex-direction:column}
+#tv-iframe{width:100%;border:none;display:block;height:calc(100vh - 58px)}
+.tv-header{position:absolute;top:0;left:0;right:0;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(10,22,16,.9),transparent)}
+.tv-brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:rgba(255,255,255,.28)}
+.tv-clock{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:#FFDF00;text-shadow:0 0 24px rgba(255,223,0,.5)}
+.tv-close{position:absolute;top:12px;right:18px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.4);color:rgba(255,255,255,.4);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:11}
+.tv-close:hover{background:rgba(200,30,30,.5);color:#fff;border-color:rgba(255,60,60,.5);transform:scale(1.08)}
+.tv-card{width:100%;flex:1;min-height:0;padding:0;animation:tvIn .5s cubic-bezier(.22,1,.36,1)}
+@keyframes tvIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+.tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;border:4px solid rgba(255,255,255,.15);flex-shrink:0}
+.tv-photo-placeholder{width:140px;height:140px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:50px;color:#fff;flex-shrink:0;border:4px solid rgba(255,255,255,.1)}
+.tv-name{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:2px;color:#fff;line-height:1}
+.tv-eq{font-size:14px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+.tv-kpi{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px 20px;text-align:center}
+.tv-kpi-l{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.tv-kpi-v{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.5px;line-height:1}
+.tv-progress{position:absolute;bottom:46px;left:0;right:0;height:3px;background:rgba(255,255,255,.06);z-index:10;overflow:hidden}
+.tv-progress-fill{height:100%;transition:width linear;background:linear-gradient(90deg,#002776,#009C3B 30%,#FFDF00 60%,#009C3B 80%,#002776)}
+.tv-nav{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:5px;z-index:10}
+.tv-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.16);transition:all .3s;cursor:pointer}
+.tv-dot.on{width:18px;border-radius:3px;background:#FFDF00;box-shadow:0 0 10px rgba(255,223,0,.6)}
+.tv-ag-row{display:flex;justify-content:space-between;font-size:13px;font-weight:700;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.tv-fb-badge{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.tv-fb-done{background:rgba(74,222,128,.15);border:1.5px solid rgba(74,222,128,.5);color:#4ADE80}
+.tv-fb-pending{background:rgba(252,211,77,.12);border:1.5px dashed rgba(252,211,77,.45);color:#FCD34D}
+
+
 /* ─ SYNC PANEL ─ */
 .sync-modal{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);
   display:none;align-items:center;justify-content:center}
@@ -474,6 +514,7 @@ select.ev-inp{cursor:pointer}
       onmouseover="this.style.borderColor='var(--pp)';this.style.color='var(--pp)'"
       onmouseout="this.style.borderColor='var(--g200)';this.style.color='var(--g700)'">⬇️ CSV</button>
     <button onclick="syncModalOpen()" style="padding:7px 14px;border-radius:var(--rm);border:none;cursor:pointer;background:var(--w);color:var(--pp);border:1.5px solid rgba(0,168,107,.3);font-family:Nunito,sans-serif;font-weight:800;font-size:12px;transition:all .2s" id="sync-topbtn" onmouseover="this.style.background='var(--ppl)'" onmouseout="this.style.background='var(--w)'">🔗 Sync</button>
+    <button onclick="tvStart()" style="padding:7px 14px;border-radius:var(--rm);border:none;cursor:pointer;background:linear-gradient(135deg,#7C3AED,#4F46E5);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;transition:all .2s" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''">📺 TV</button>
     <div id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:#4ADE80;flex-shrink:0;transition:all .3s" title="Sincronizado"></div>
     <div style="text-align:right"><div id="clk">00:00:00</div><div id="dt"></div></div>
   </div>
@@ -502,6 +543,7 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('comparativo',this)">📊 Comparativo Mês</div>
   <div class="tab"     onclick="go('inadimpl',this)">🚨 Inadimplência</div>
   <div class="tab"     onclick="go('metas',this)">🎯 Metas 2026</div>
+  <div class="tab"     onclick="go('tv',this);tvEnter()" style="background:linear-gradient(135deg,#001a0a,#003d1a);color:#FFDF00;font-weight:900;border-left:2px solid #FFDF00">📺 MODO TV</div>
 
 </div>
 
@@ -9615,6 +9657,28 @@ function tvPrev(){
   tvShowCurrent();
 }
 
+// Keyboard controls for TV
+document.addEventListener('keydown', e=>{
+  if(!document.getElementById('tv-overlay')?.classList.contains('on')) return;
+  if(e.key==='Escape') tvStop();
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') tvNext();
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') tvPrev();
+  if(e.key===' '){ e.preventDefault(); tvTogglePause(); }
+  // Teclas 0-4 para trocar modo
+  if(e.key==='1'){ document.getElementById('tv-btn-bs')?.click(); }
+  if(e.key==='2'){ document.getElementById('tv-btn-COFEN_BIRIGUI_BRUNA')?.click(); }
+  
+});
+
+// Update TV clock every second
+setInterval(()=>{
+  if(document.getElementById('tv-overlay')?.classList.contains('on')){
+    const now=new Date();
+    const el=document.getElementById('tv-clock-display');
+    if(el) el.textContent=[now.getHours(),now.getMinutes(),now.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
+  }
+},1000);
+
 function tvBuildDots(){
   const dotsEl = document.getElementById('tv-dots');
   if(!dotsEl) return;
@@ -12827,6 +12891,81 @@ setInterval(()=>{
 }, 30000);
 
 </script>
+
+<!-- TV MODE OVERLAY -->
+<div id="tv-overlay">
+  <!-- Faixa decorativa Brasil no topo -->
+  <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#002776 0%,#009C3B 33%,#FFDF00 66%,#009C3B 80%,#002776 100%);z-index:10"></div>
+  <div class="tv-header">
+    <div class="tv-brand" style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:22px">🇧🇷</span>
+      <span>COB COFEN · DASHBOARD</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div id="tv-mode-label" style="font-family:'Bebas Neue',sans-serif;font-size:16px;
+        color:#FFDF00;letter-spacing:2px;text-transform:uppercase"></div>
+      <div>
+        <div id="tv-clock-display" class="tv-clock" style="color:#FFDF00"></div>
+        <div id="tv-date-display" style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:rgba(255,255,255,.28);margin-top:-4px"></div>
+      </div>
+    </div>
+  </div>
+  <button class="tv-close" onclick="tvStop()">✕</button>
+
+  <!-- Área de conteúdo — preenchida pelo JS -->
+  <div id="tv-card" class="tv-card"></div>
+
+  <div class="tv-progress" style="background:rgba(0,39,118,.4)"><div id="tv-bar" class="tv-progress-fill" style="background:linear-gradient(90deg,#009C3B,#FFDF00,#009C3B)"></div></div>
+  <div class="tv-nav" id="tv-dots"></div>
+  <!-- Faixa decorativa Brasil na base -->
+  <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#002776 0%,#009C3B 33%,#FFDF00 66%,#009C3B 80%,#002776 100%);z-index:10"></div>
+
+  <!-- Controles -->
+  <div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center">
+    <!-- Seletor de modo -->
+    <div style="display:flex;gap:4px;background:rgba(255,255,255,.08);border-radius:var(--rm);padding:3px">
+      <button id="tv-btn-bs" onclick="tvSetMode('bs',this)"
+        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
+        font-weight:800;font-size:11px;background:rgba(255,255,255,.18);color:#fff;letter-spacing:.5px;transition:all .2s">
+        🏙️⭐ Stephanie + Laysa Lopes
+      </button>
+      <button id="tv-btn-bsk" onclick="tvSetMode('bsk',this)"
+        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
+        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
+        🏙️⭐💜 Stephanie + Laysa + Katia
+      </button>
+      <button id="tv-btn-COFEN_BIRIGUI_BRUNA" onclick="tvSetMode('COFEN BIRIGUI BRUNA',this)"
+        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
+        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
+        💙 Bruna + Digital + Elite
+      </button>
+      <button id="tv-btn-COFEN_KATIA" onclick="tvSetMode('COFEN KATIA',this)"
+        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
+        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
+        💜 Katia
+      </button>
+      <button id="tv-btn-COFEN_PAGUEPLAY" onclick="tvSetMode('COFEN PAGUEPLAY',this)"
+        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
+        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
+        🩷 Pagueplay
+      </button>
+    </div>
+    <!-- Nav -->
+    <button onclick="tvPrev()"
+      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.2);
+      background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);font-family:Nunito,sans-serif;
+      font-weight:700;font-size:12px;cursor:pointer">◀</button>
+    <button id="tv-pause-btn" onclick="tvTogglePause()"
+      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.2);
+      background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);font-family:Nunito,sans-serif;
+      font-weight:700;font-size:12px;cursor:pointer">⏸ Pausar</button>
+    <button onclick="tvNext()"
+      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.2);
+      background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);font-family:Nunito,sans-serif;
+      font-weight:700;font-size:12px;cursor:pointer">▶</button>
+  </div>
+</div>
+
 
 <!-- SYNC CONFIG MODAL -->
 <div id="sync-modal" class="sync-modal">
@@ -16879,4 +17018,31 @@ function addRemoveLider(eq){
   });
 })();
 
+
+// ── MODO TV ──
+function tvEnter(){
+  const pg = document.getElementById('pg-tv');
+  if(!pg) return;
+  if(!pg._tvReady){
+    pg._tvReady = true;
+    const iframe = document.getElementById('tv-iframe');
+    if(iframe && !iframe.src.startsWith('blob')){
+      try{
+        const blob = new Blob([document.documentElement.outerHTML], {type:'text/html'});
+        iframe.src = URL.createObjectURL(blob);
+      }catch(e){}
+    }
+  }
+}
 </script>
+
+<!-- ══ PÁGINA MODO TV ══ -->
+<div class="page" id="pg-tv" style="padding:0;margin:0;background:#001a0a">
+<style>
+#pg-tv{display:none}
+#pg-tv.on{display:flex;flex-direction:column}
+#tv-iframe{width:100%;border:none;display:block;height:calc(100vh - 58px)}
+</style>
+  <iframe id="tv-iframe" style="width:100%;border:none;display:block;height:calc(100vh - 58px)" allowfullscreen></iframe>
+</div><!-- /pg-tv -->
+
