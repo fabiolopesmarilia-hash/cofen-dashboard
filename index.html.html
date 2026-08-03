@@ -10641,10 +10641,19 @@ function fbStartListening(){
     const remTotal = parseFloat(remote.total)||0;
     const remMeta  = parseFloat(remote.meta)||META_DEFAULT;
 
-    // Evitar loop: só aplicar se diferente do local atual
+    // Evitar loop: só aplicar se algo realmente mudou (total, meta OU algum estado do COREN —
+    // antes só olhava total/meta e saía cedo demais, ignorando o COREN silenciosamente)
     const localTotal = parseFloat(localStorage.getItem('cofen_total'))||0;
     const localMeta  = parseFloat(localStorage.getItem('cofen_meta'))||META_DEFAULT;
-    if(remTotal === localTotal && remMeta === localMeta) return;
+    const _corenSiglas = ['mt','pi','ma','ce','sp','rj','mg','rs','pr','ba','go','pe','sc','am','pb'];
+    const corenMudou = _corenSiglas.some(st=>{
+      const stUp = st.toUpperCase();
+      if(typeof remote[stUp]!=='number' && typeof remote[st]!=='number') return false;
+      const remV = typeof remote[stUp]==='number' ? remote[stUp] : remote[st];
+      const localV = parseFloat(localStorage.getItem('cofen_coren_'+st))||0;
+      return remV !== localV;
+    });
+    if(remTotal === localTotal && remMeta === localMeta && !corenMudou) return;
 
     // Trava de sanidade: nunca aceitar um total/meta vindo do Firebase que seja
     // absurdamente maior que o que as equipes já somam neste mês (ex: total do
