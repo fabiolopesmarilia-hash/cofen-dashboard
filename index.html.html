@@ -10367,6 +10367,7 @@ async function syncConnect(){
     toast('✅ Sync ativado! Sala: '+room);
 
     fbStartListening();
+    fbApplyPendingMonthlyWipe();
     fbSyncModalClose_auto();
   } catch(err){
     syncSetStatus('error','❌ Erro: '+err.message);
@@ -11101,6 +11102,7 @@ async function fbAutoConnect(){
     const btn = document.getElementById('sync-topbtn');
     if(btn) btn.textContent='🔄 Sync...';
     fbStartListening();
+    fbApplyPendingMonthlyWipe();
     if(btn){ btn.textContent='🟢 Sync'; btn.style.color='var(--pp)'; btn.style.background='var(--ppl)'; }
     console.log('✅ Firebase conectado automaticamente — Sala: '+room);
   } catch(e){
@@ -11969,6 +11971,12 @@ restoreImportBadges();
     localStorage.removeItem(prevMonthKey);
     // Registrar que reset foi feito
     localStorage.setItem('cofen_last_reset_month', thisMonth);
+    // Marca que o Firebase (fonte compartilhada entre todos os links/dispositivos)
+    // também precisa ser limpo assim que a conexão de sync abrir — sem isso, o
+    // listener do op_base reaplica o valor antigo (do mês anterior) por cima do
+    // reset local segundos depois, e é por isso que "alguns operadores" continuam
+    // aparecendo com o total de julho mesmo após o dia 1º.
+    localStorage.setItem('cofen_pending_remote_wipe', thisMonth);
     console.log('[COFEN] Reset mensal automático executado para '+thisMonth);
     // Reconstrói estado limpo
     D = JSON.parse(JSON.stringify(ORIG));
@@ -11977,6 +11985,41 @@ restoreImportBadges();
     setTimeout(()=>{ toast('🔄 Reset mensal automático — Bem-vindo a '+['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][now.getMonth()]+'!'); }, 1500);
   }
 })();
+
+// ══════════════════════════════════════════
+// FIX 4 — PROPAGA O RESET MENSAL PARA O FIREBASE (todos os links/telas)
+// O reset local (FIX 3 acima) só limpa o navegador do dispositivo que estava
+// aberto na virada do mês. Qualquer outro link/TV/computador conectado à mesma
+// sala continua puxando do Firebase o "op_base" e "overrides" do mês anterior,
+// fazendo alguns operadores aparecerem com o recebimento antigo (ex.: julho)
+// mesmo em agosto. Esta função roda assim que o Sync conecta e limpa a sala
+// compartilhada uma única vez por mês, garantindo o MESMO valor (zerado) e a
+// MESMA meta/projeção pra todo mundo que estiver com o Modo TV ou dashboard aberto.
+// ══════════════════════════════════════════
+function fbApplyPendingMonthlyWipe(){
+  try{
+    const pending = localStorage.getItem('cofen_pending_remote_wipe');
+    if(!pending) return;
+    if(!fbDb || !fbRoom) return; // tenta de novo na próxima conexão
+    const now = new Date();
+    const thisMonth = now.getFullYear() + '_' + (now.getMonth()+1);
+    if(pending !== thisMonth){
+      // flag de um mês diferente (ex.: sobrou de um reset anterior) — descarta
+      localStorage.removeItem('cofen_pending_remote_wipe');
+      return;
+    }
+    // Zera as bases compartilhadas no Firebase pra ninguém puxar valor do mês anterior
+    fbDb.ref(fbRoom+'/op_base').remove();
+    fbDb.ref(fbRoom+'/overrides').remove();
+    fbDb.ref(fbRoom+'/op_acordos').remove();
+    fbDb.ref(fbRoom+'/feedback').remove();
+    // Mantém a meta (objetivo) mas zera o total realizado, e propaga pra todo mundo
+    const metaAtual = parseFloat(localStorage.getItem('cofen_meta')||META_DEFAULT);
+    fbDb.ref(fbRoom+'/meta').set({total:0, meta:metaAtual});
+    localStorage.removeItem('cofen_pending_remote_wipe');
+    console.log('[COFEN] Reset mensal propagado para o Firebase (sala '+fbRoom+') — '+thisMonth);
+  }catch(e){ console.warn('Falha ao propagar reset mensal pro Firebase:', e); }
+}
 
 // ══════════════════════════════════════════
 // FIX 2 — FEEDBACK MENSAL POR OPERADOR
