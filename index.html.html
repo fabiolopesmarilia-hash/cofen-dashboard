@@ -4024,14 +4024,21 @@ function _updateHojeCard(){
   // Breakdown por equipe
   const byEq = {};
   let _matchedTotal = 0;
+  const _allOpNames = new Set();
   (D.equipes||[]).forEach(eq=>{
     let soma = 0;
-    (eq.ops||[]).forEach(op=>{ soma += parseFloat(saved[op.name]||0); });
+    (eq.ops||[]).forEach(op=>{ soma += parseFloat(saved[op.name]||0); _allOpNames.add(op.name); });
     if(soma > 0) byEq[eq.name] = soma;
     _matchedTotal += soma;
   });
-  // Sobra que não bateu com nenhum operador atual (nome renomeado/removido/movido)
-  const _naoIdentificado = totalHoje - _matchedTotal;
+  // Lista os nomes salvos em "hoje" que não batem com nenhum operador atual
+  // (renomeado, removido, movido de equipe, ou erro de digitação no import).
+  // Antes isso só aparecia como um valor agregado — agora mostra o nome exato
+  // pra dar pra achar e corrigir na hora.
+  const _naoIdentificados = Object.keys(saved)
+    .filter(nm => !_allOpNames.has(nm) && (parseFloat(saved[nm])||0) > 0)
+    .map(nm => ({nome: nm, valor: parseFloat(saved[nm])||0}));
+  const _naoIdentificado = _naoIdentificados.reduce((s,x)=>s+x.valor, 0);
 
   const hoHoje = totalHoje * 0.2496;
   const hoje   = new Date();
@@ -4050,7 +4057,7 @@ function _updateHojeCard(){
 
   if(eqEl){
     const entries = Object.entries(byEq);
-    if(entries.length === 0){
+    if(entries.length === 0 && _naoIdentificados.length === 0){
       eqEl.innerHTML = '<span style="font-size:10px;color:rgba(255,255,255,.25)">sem lançamentos hoje</span>';
     } else {
       // Buscar também valor de ontem por equipe para exibir comparativo
@@ -4077,14 +4084,17 @@ function _updateHojeCard(){
           ${diffStr}
         </div>`;
       }).join('')
-      // Mostra o que não bateu com nenhum operador atual (nome renomeado/removido/movido)
-      // — sem isso, essa diferença ficava invisível e o total do card não batia com
-      // o total da aba Recebimento do Dia sem nenhuma pista do porquê.
-      + (Math.abs(_naoIdentificado) > 0.01 ? `<div style="display:flex;flex-direction:column;background:rgba(248,113,113,.08);border:1px dashed rgba(248,113,113,.4);border-radius:8px;padding:5px 10px;min-width:120px">
-          <span style="font-size:9px;font-weight:800;color:#F87171;letter-spacing:.5px;margin-bottom:2px">⚠️ Não identificado</span>
-          <span style="font-size:12px;font-weight:900;color:#F87171;line-height:1;margin-top:2px">${fRK(_naoIdentificado)}</span>
-          <span style="font-size:8px;color:rgba(255,255,255,.35);margin-top:2px">nome não bate com nenhum operador atual — confira em Recebimento do Dia</span>
-        </div>` : '');
+      // Mostra CADA lançamento cujo nome não bateu com nenhum operador atual —
+      // antes só dava o valor total "sumido"; agora dá o nome exato pra achar
+      // e corrigir em Recebimento do Dia (renomear, mover ou remover o registro).
+      + _naoIdentificados.map(x => `<div style="display:flex;flex-direction:column;background:rgba(248,113,113,.08);border:1px dashed rgba(248,113,113,.4);border-radius:8px;padding:5px 10px;min-width:120px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:2px">
+            <span style="font-size:9px;font-weight:800;color:#F87171;letter-spacing:.5px">⚠️ ${x.nome.replace(/_/g,' ')}</span>
+            <span onclick="rdRemoverNaoIdentificado('${x.nome.replace(/'/g,"\\'")}')" title="Remover este lançamento" style="cursor:pointer;font-size:11px;color:rgba(248,113,113,.6);font-weight:900;line-height:1">✕</span>
+          </div>
+          <span style="font-size:12px;font-weight:900;color:#F87171;line-height:1;margin-top:2px">${fRK(x.valor)}</span>
+          <span style="font-size:8px;color:rgba(255,255,255,.35);margin-top:2px">não bate com nenhum operador atual</span>
+        </div>`).join('');
     }
   }
 }
@@ -10984,6 +10994,21 @@ function rdSetSaved(map){
     syncBroadcast('rd_update', JSON.stringify(map));
     fbUpdateRD(map);
   }
+}
+
+// Remove um lançamento de "hoje" cujo nome não bate com nenhum operador atual
+// (aparece no card "HOJE — ATÉ O MOMENTO" como ⚠️ não identificado). Sem isso
+// não tinha como tirar esse registro pela tela — só editando o localStorage
+// na mão — já que ele não aparece na lista normal da aba Recebimento do Dia.
+function rdRemoverNaoIdentificado(nome){
+  if(!confirm('Remover o lançamento de hoje de "'+nome.replace(/_/g,' ')+'"?\nEsse nome não bate com nenhum operador atual.')) return;
+  const map = rdGetSaved();
+  delete map[nome];
+  rdSetSaved(map);
+  rdUpdateKPIs();
+  if(typeof rdRender==='function') rdRender();
+  if(typeof tvRefresh==='function') tvRefresh();
+  toast('🗑️ Lançamento de "'+nome.replace(/_/g,' ')+'" removido!');
 }
 
 // applyOps — lê editor, atualiza D.equipes e sincroniza Firebase
