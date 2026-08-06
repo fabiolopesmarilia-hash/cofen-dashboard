@@ -6451,9 +6451,12 @@ const RD_META_EQ = {
 function rdGetSaved(){
   let saved;
   try{ saved = JSON.parse(localStorage.getItem(rdTodayKey())||'{}'); }catch(e){ return {}; }
-  // Trava de sanidade: descarta "hoje" absurdamente maior que o normal do operador —
-  // cobre o caso de operador novo cujo acumulado inteiro (de vários dias) ficou
-  // registrado como se fosse tudo de um único dia, antes dessa trava existir.
+  // Trava de sanidade: ANTES apagava silenciosamente o "hoje" quando parecia
+  // grande demais pra média do operador (pensada pra cobrir um bug antigo de
+  // import). O problema é que isso também apagava lançamentos manuais 100%
+  // legítimos (um dia de recebimento realmente grande), sem avisar ninguém —
+  // o valor simplesmente sumia de todas as telas. Agora só avisa no console,
+  // nunca descarta o valor que foi lançado.
   try{
     if(typeof D !== 'undefined' && D.equipes){
       const _allOps = D.equipes.flatMap(e=>e.ops||[]);
@@ -6465,7 +6468,7 @@ function rdGetSaved(){
         const diasComValor = Object.values(op.daily||{}).filter(x=>x>0);
         const media = diasComValor.length>0 ? diasComValor.reduce((s,x)=>s+x,0)/diasComValor.length : 0;
         const teto = Math.max(media*8, (op.rec||0)*0.35, 15000);
-        if(v > teto) delete saved[opName];
+        if(v > teto) console.warn('[rdGetSaved] valor de hoje acima do teto esperado (mantido):', opName, v, 'teto:', teto);
       });
     }
   }catch(e){}
