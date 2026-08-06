@@ -3436,8 +3436,8 @@ function renderHoProjTable(){
   const projecao = hoAtual / duPass * duTotal;
 
   const cenarios = [
-    { label:'Meta R$ 1.400.000', valor: 1400000 },
-    { label:'Meta R$ 1.800.000', valor: 1800000 },
+    { label:'Meta R$ 1.200.000', valor: 1200000 },
+    { label:'Meta R$ 1.000.000', valor: 1000000 },
   ];
 
   const fR2 = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -3850,7 +3850,7 @@ function renderPPProjecao(){
 }
 
 function _buildMetasHtml(val, compact){
-  const META_STEP = 120000; // cada meta = R$120K (Meta1=120K, Meta2=240K, Meta3=360K, Meta4=480K)
+  const META_STEP = 75000; // cada meta = R$75K (Meta1=75K, Meta2=150K, Meta3=225K, Meta4=300K)
   const metas   = Math.floor(val / META_STEP);
   const prog    = val % META_STEP;
   const pct     = (prog / META_STEP * 100);
@@ -3870,7 +3870,7 @@ function _buildMetasHtml(val, compact){
       background:${bat?c+'22':'rgba(255,255,255,.04)'};opacity:${bat?1:0.4}">
       <span style="font-size:${fs}">${bat?'🏆':'🔒'}</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:${bat?c:'rgba(255,255,255,.3)'};letter-spacing:.5px">
-        META ${i} · R$${(i*120).toFixed(0)}K</span>
+        META ${i} · R$${(i*75).toFixed(0)}K</span>
     </div>`;
   }
   if(val < proxima){
@@ -3878,7 +3878,7 @@ function _buildMetasHtml(val, compact){
       border-radius:100px;border:1.5px dashed rgba(255,255,255,.25);background:rgba(255,255,255,.04)">
       <span style="font-size:${fs}">🎯</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:rgba(255,255,255,.4);letter-spacing:.5px">
-        META ${metas+1} · R$${((metas+1)*120).toFixed(0)}K</span>
+        META ${metas+1} · R$${((metas+1)*75).toFixed(0)}K</span>
     </div>`;
   }
   // Atualiza o destaque de "falta" no topo (se existir)
@@ -3887,7 +3887,7 @@ function _buildMetasHtml(val, compact){
   if(faltaEl && val>0){
     faltaEl.textContent = fR(falta);
     faltaEl.style.color='#00E5FF';
-    if(faltaLbl) faltaLbl.textContent = 'para o objetivo de R$'+((metas+1)*120)+'K';
+    if(faltaLbl) faltaLbl.textContent = 'para o objetivo de R$'+((metas+1)*75)+'K';
   }
   return `
     <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:7px">${badgesHtml}</div>
@@ -6348,14 +6348,6 @@ function refreshAll(){
   if(typeof _updateOntemCard==='function') _updateOntemCard();
   // ── Atualiza Projeção dos Operadores se ativa ──
   if(document.getElementById('pg-proj-op')?.classList.contains('on')) projOpRender();
-  // ── Atualiza o Modo TV em tempo real ──
-  // Sem isso, se a TV ficar aberta na tela (o caso normal, já que ela roda o dia
-  // inteiro num monitor/TV dedicada), os valores do ranking ficavam "congelados"
-  // no instante em que a TV foi aberta — mesmo depois de importar um relatório
-  // novo ou receber uma sincronização de outro computador. Chamar aqui garante que
-  // TODO caminho que já chama refreshAll() (import manual, sync do Firebase, +Add
-  // do dia, etc.) também atualiza a TV automaticamente, sem precisar recarregar a página.
-  if(typeof tvRefresh==='function') tvRefresh();
 }
 
 // ── TOAST ──
@@ -6451,12 +6443,9 @@ const RD_META_EQ = {
 function rdGetSaved(){
   let saved;
   try{ saved = JSON.parse(localStorage.getItem(rdTodayKey())||'{}'); }catch(e){ return {}; }
-  // Trava de sanidade: ANTES apagava silenciosamente o "hoje" quando parecia
-  // grande demais pra média do operador (pensada pra cobrir um bug antigo de
-  // import). O problema é que isso também apagava lançamentos manuais 100%
-  // legítimos (um dia de recebimento realmente grande), sem avisar ninguém —
-  // o valor simplesmente sumia de todas as telas. Agora só avisa no console,
-  // nunca descarta o valor que foi lançado.
+  // Trava de sanidade: descarta "hoje" absurdamente maior que o normal do operador —
+  // cobre o caso de operador novo cujo acumulado inteiro (de vários dias) ficou
+  // registrado como se fosse tudo de um único dia, antes dessa trava existir.
   try{
     if(typeof D !== 'undefined' && D.equipes){
       const _allOps = D.equipes.flatMap(e=>e.ops||[]);
@@ -6468,7 +6457,7 @@ function rdGetSaved(){
         const diasComValor = Object.values(op.daily||{}).filter(x=>x>0);
         const media = diasComValor.length>0 ? diasComValor.reduce((s,x)=>s+x,0)/diasComValor.length : 0;
         const teto = Math.max(media*8, (op.rec||0)*0.35, 15000);
-        if(v > teto) console.warn('[rdGetSaved] valor de hoje acima do teto esperado (mantido):', opName, v, 'teto:', teto);
+        if(v > teto) delete saved[opName];
       });
     }
   }catch(e){}
@@ -16273,11 +16262,11 @@ function renderEqMetasTable(){
     // A tabela agora opera sobre HO (25%), então a meta HO = meta_rec * 0.25
     // Meta HO por equipe (valores diretos em HO)
     const META_HO = {
-      'COFEN BIRIGUI BRUNA'     : 360000,
-      'COFEN MARILIA BRENDA'    : 125000,
-      'COFEN STEPHANIE 2° TURNO': 125000,
+      'COFEN BIRIGUI BRUNA'     : 300000,
+      'COFEN MARILIA BRENDA'    : 150000,
+      'COFEN STEPHANIE 2° TURNO': 150000,
       'COFEN DIGITAL'           : 37500,
-      'COFEN KATIA'             : 125000,
+      'COFEN KATIA'             : 40000,
     };
     const metaEq = META_HO[eqName] || (META_EQ_DEFAULT * 0.25);
 
