@@ -868,7 +868,7 @@ select.ev-inp{cursor:pointer}
         </div>
         <div class="ep-group">
           <label class="ep-label">🎯 Meta 1 — Total Recebido (R$)</label>
-          <input class="ep-input" type="number" id="inp-meta" value="1000000" step="1000" min="0" oninput="liveCalc()">
+          <input class="ep-input" type="number" id="inp-meta" value="1400000" step="1000" min="0" oninput="liveCalc()">
         </div>
         <button class="btn-calc" onclick="applyTotal()">⚡ Aplicar e Recalcular</button>
         <button class="btn-outline" onclick="resetTotal()">↩ Resetar</button>
@@ -2898,7 +2898,7 @@ function getFeriados(){
 function setFeriados(arr){localStorage.setItem('cofen_feriados',JSON.stringify(arr));syncPush('cofen_feriados');}
 
 // ─ Config ─
-const META_DEFAULT = 1000000;
+const META_DEFAULT = 1400000;
 let meta            = parseFloat(localStorage.getItem('cofen_meta')         || META_DEFAULT);
 let overrideTotalRec= parseFloat(localStorage.getItem('cofen_total')        || '0');
 
@@ -3850,7 +3850,7 @@ function renderPPProjecao(){
 }
 
 function _buildMetasHtml(val, compact){
-  const META_STEP = 75000; // cada meta = R$75K (Meta1=75K, Meta2=150K, Meta3=225K, Meta4=300K)
+  const META_STEP = 120000; // cada meta = R$120K (Meta1=120K, Meta2=240K, Meta3=360K, Meta4=480K)
   const metas   = Math.floor(val / META_STEP);
   const prog    = val % META_STEP;
   const pct     = (prog / META_STEP * 100);
@@ -3870,7 +3870,7 @@ function _buildMetasHtml(val, compact){
       background:${bat?c+'22':'rgba(255,255,255,.04)'};opacity:${bat?1:0.4}">
       <span style="font-size:${fs}">${bat?'🏆':'🔒'}</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:${bat?c:'rgba(255,255,255,.3)'};letter-spacing:.5px">
-        META ${i} · R$${(i*75).toFixed(0)}K</span>
+        META ${i} · R$${(i*120).toFixed(0)}K</span>
     </div>`;
   }
   if(val < proxima){
@@ -3878,7 +3878,7 @@ function _buildMetasHtml(val, compact){
       border-radius:100px;border:1.5px dashed rgba(255,255,255,.25);background:rgba(255,255,255,.04)">
       <span style="font-size:${fs}">🎯</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:rgba(255,255,255,.4);letter-spacing:.5px">
-        META ${metas+1} · R$${((metas+1)*75).toFixed(0)}K</span>
+        META ${metas+1} · R$${((metas+1)*120).toFixed(0)}K</span>
     </div>`;
   }
   // Atualiza o destaque de "falta" no topo (se existir)
@@ -3887,7 +3887,7 @@ function _buildMetasHtml(val, compact){
   if(faltaEl && val>0){
     faltaEl.textContent = fR(falta);
     faltaEl.style.color='#00E5FF';
-    if(faltaLbl) faltaLbl.textContent = 'para o objetivo de R$'+((metas+1)*75)+'K';
+    if(faltaLbl) faltaLbl.textContent = 'para o objetivo de R$'+((metas+1)*120)+'K';
   }
   return `
     <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:7px">${badgesHtml}</div>
@@ -6348,6 +6348,14 @@ function refreshAll(){
   if(typeof _updateOntemCard==='function') _updateOntemCard();
   // ── Atualiza Projeção dos Operadores se ativa ──
   if(document.getElementById('pg-proj-op')?.classList.contains('on')) projOpRender();
+  // ── Atualiza o Modo TV em tempo real ──
+  // Sem isso, se a TV ficar aberta na tela (o caso normal, já que ela roda o dia
+  // inteiro num monitor/TV dedicada), os valores do ranking ficavam "congelados"
+  // no instante em que a TV foi aberta — mesmo depois de importar um relatório
+  // novo ou receber uma sincronização de outro computador. Chamar aqui garante que
+  // TODO caminho que já chama refreshAll() (import manual, sync do Firebase, +Add
+  // do dia, etc.) também atualiza a TV automaticamente, sem precisar recarregar a página.
+  if(typeof tvRefresh==='function') tvRefresh();
 }
 
 // ── TOAST ──
@@ -10367,7 +10375,6 @@ async function syncConnect(){
     toast('✅ Sync ativado! Sala: '+room);
 
     fbStartListening();
-    fbApplyPendingMonthlyWipe();
     fbSyncModalClose_auto();
   } catch(err){
     syncSetStatus('error','❌ Erro: '+err.message);
@@ -11102,7 +11109,6 @@ async function fbAutoConnect(){
     const btn = document.getElementById('sync-topbtn');
     if(btn) btn.textContent='🔄 Sync...';
     fbStartListening();
-    fbApplyPendingMonthlyWipe();
     if(btn){ btn.textContent='🟢 Sync'; btn.style.color='var(--pp)'; btn.style.background='var(--ppl)'; }
     console.log('✅ Firebase conectado automaticamente — Sala: '+room);
   } catch(e){
@@ -11971,12 +11977,6 @@ restoreImportBadges();
     localStorage.removeItem(prevMonthKey);
     // Registrar que reset foi feito
     localStorage.setItem('cofen_last_reset_month', thisMonth);
-    // Marca que o Firebase (fonte compartilhada entre todos os links/dispositivos)
-    // também precisa ser limpo assim que a conexão de sync abrir — sem isso, o
-    // listener do op_base reaplica o valor antigo (do mês anterior) por cima do
-    // reset local segundos depois, e é por isso que "alguns operadores" continuam
-    // aparecendo com o total de julho mesmo após o dia 1º.
-    localStorage.setItem('cofen_pending_remote_wipe', thisMonth);
     console.log('[COFEN] Reset mensal automático executado para '+thisMonth);
     // Reconstrói estado limpo
     D = JSON.parse(JSON.stringify(ORIG));
@@ -11985,41 +11985,6 @@ restoreImportBadges();
     setTimeout(()=>{ toast('🔄 Reset mensal automático — Bem-vindo a '+['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][now.getMonth()]+'!'); }, 1500);
   }
 })();
-
-// ══════════════════════════════════════════
-// FIX 4 — PROPAGA O RESET MENSAL PARA O FIREBASE (todos os links/telas)
-// O reset local (FIX 3 acima) só limpa o navegador do dispositivo que estava
-// aberto na virada do mês. Qualquer outro link/TV/computador conectado à mesma
-// sala continua puxando do Firebase o "op_base" e "overrides" do mês anterior,
-// fazendo alguns operadores aparecerem com o recebimento antigo (ex.: julho)
-// mesmo em agosto. Esta função roda assim que o Sync conecta e limpa a sala
-// compartilhada uma única vez por mês, garantindo o MESMO valor (zerado) e a
-// MESMA meta/projeção pra todo mundo que estiver com o Modo TV ou dashboard aberto.
-// ══════════════════════════════════════════
-function fbApplyPendingMonthlyWipe(){
-  try{
-    const pending = localStorage.getItem('cofen_pending_remote_wipe');
-    if(!pending) return;
-    if(!fbDb || !fbRoom) return; // tenta de novo na próxima conexão
-    const now = new Date();
-    const thisMonth = now.getFullYear() + '_' + (now.getMonth()+1);
-    if(pending !== thisMonth){
-      // flag de um mês diferente (ex.: sobrou de um reset anterior) — descarta
-      localStorage.removeItem('cofen_pending_remote_wipe');
-      return;
-    }
-    // Zera as bases compartilhadas no Firebase pra ninguém puxar valor do mês anterior
-    fbDb.ref(fbRoom+'/op_base').remove();
-    fbDb.ref(fbRoom+'/overrides').remove();
-    fbDb.ref(fbRoom+'/op_acordos').remove();
-    fbDb.ref(fbRoom+'/feedback').remove();
-    // Mantém a meta (objetivo) mas zera o total realizado, e propaga pra todo mundo
-    const metaAtual = parseFloat(localStorage.getItem('cofen_meta')||META_DEFAULT);
-    fbDb.ref(fbRoom+'/meta').set({total:0, meta:metaAtual});
-    localStorage.removeItem('cofen_pending_remote_wipe');
-    console.log('[COFEN] Reset mensal propagado para o Firebase (sala '+fbRoom+') — '+thisMonth);
-  }catch(e){ console.warn('Falha ao propagar reset mensal pro Firebase:', e); }
-}
 
 // ══════════════════════════════════════════
 // FIX 2 — FEEDBACK MENSAL POR OPERADOR
