@@ -8183,6 +8183,15 @@ function importParse(raw){
   // Mapa número do mês → nome usado no HISTÓRICO (só meses com aba na UI)
   const MES_NOME_POR_NUM = {1:'Janeiro',2:'Fevereiro',3:'Março',4:'Abril',5:'Maio',6:'Junho',7:'Julho',8:'Agosto'};
 
+  // Mês/ano reais de "hoje" — usados para não deixar relatórios que cobrem vários
+  // meses (ex.: rec_geral com janeiro a agosto) misturarem tudo no mesmo "dia do mês".
+  // Sem isso, um pagamento do dia 6/março e outro do dia 6/julho caem os dois em
+  // daily[6] como se fossem do mesmo dia — e o valor de "hoje" fica com lixo de
+  // meses antigos junto (ex.: R$0 recebido hoje virava R$4.958 por causa disso).
+  const _hojeReal = new Date();
+  const _mesAtualNum = _hojeReal.getMonth() + 1;
+  const _anoAtual    = _hojeReal.getFullYear();
+
   // Acumula por operador (nome raw do arquivo)
   const acc = {};
   for(let i=1; i<lines.length; i++){
@@ -8202,7 +8211,13 @@ function importParse(raw){
       const dp = extractDateParts(row[iDate]);
       const day = dp ? dp.day : null;
       if(day && day >= 1 && day <= 31){
-        acc[rawName].daily[day] = (acc[rawName].daily[day]||0) + recVal;
+        // Só entra no "daily" (usado pro cálculo de HOJE e gráfico do mês ativo)
+        // se a linha realmente for do mês/ano atual — evita misturar dia 6 de
+        // meses diferentes num relatório que cobre vários meses de uma vez.
+        const _ehMesAtual = dp.month === _mesAtualNum && dp.year === _anoAtual;
+        if(_ehMesAtual){
+          acc[rawName].daily[day] = (acc[rawName].daily[day]||0) + recVal;
+        }
         // Também guarda por mês (relatório pode trazer o ano inteiro numa importação só)
         const mesNomeLinha = dp.month ? MES_NOME_POR_NUM[dp.month] : null;
         if(mesNomeLinha){
