@@ -3436,8 +3436,8 @@ function renderHoProjTable(){
   const projecao = hoAtual / duPass * duTotal;
 
   const cenarios = [
-    { label:'Meta R$ 1.200.000', valor: 1200000 },
-    { label:'Meta R$ 1.000.000', valor: 1000000 },
+    { label:'Meta R$ 1.400.000', valor: 1400000 },
+    { label:'Meta R$ 1.800.000', valor: 1800000 },
   ];
 
   const fR2 = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -16273,11 +16273,11 @@ function renderEqMetasTable(){
     // A tabela agora opera sobre HO (25%), então a meta HO = meta_rec * 0.25
     // Meta HO por equipe (valores diretos em HO)
     const META_HO = {
-      'COFEN BIRIGUI BRUNA'     : 300000,
-      'COFEN MARILIA BRENDA'    : 150000,
-      'COFEN STEPHANIE 2° TURNO': 150000,
+      'COFEN BIRIGUI BRUNA'     : 360000,
+      'COFEN MARILIA BRENDA'    : 125000,
+      'COFEN STEPHANIE 2° TURNO': 125000,
       'COFEN DIGITAL'           : 37500,
-      'COFEN KATIA'             : 40000,
+      'COFEN KATIA'             : 125000,
     };
     const metaEq = META_HO[eqName] || (META_EQ_DEFAULT * 0.25);
 
