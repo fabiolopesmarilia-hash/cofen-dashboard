@@ -3849,6 +3849,24 @@ function renderPPProjecao(){
   </div>`;
 }
 
+function hoObjetivoGet(){
+  const v = parseFloat(localStorage.getItem('cofen_objetivo_ho'));
+  return (v && v > 0) ? v : 130000;
+}
+function hoObjetivoSet(v){
+  localStorage.setItem('cofen_objetivo_ho', String(v));
+  if(typeof fbPush === 'function') fbPush('objetivo_ho', v);
+}
+function hoObjetivoEditar(){
+  const atual = hoObjetivoGet();
+  const raw = prompt('Objetivo de HO deste mês (R$):', atual.toFixed(2).replace('.', ','));
+  if(raw === null) return;
+  const limpo = raw.replace(/\./g,'').replace(',', '.').replace(/[^0-9.]/g,'');
+  const novo = parseFloat(limpo);
+  if(!novo || novo <= 0){ alert('Valor inválido.'); return; }
+  hoObjetivoSet(novo);
+  if(typeof renderPpMetas === 'function') renderPpMetas();
+}
 function _buildMetasHtml(val, compact){
   const META_STEP = 120000; // cada meta = R$120K (Meta1=120K, Meta2=240K, Meta3=360K, Meta4=480K)
   const metas   = Math.floor(val / META_STEP);
@@ -3889,8 +3907,23 @@ function _buildMetasHtml(val, compact){
     faltaEl.style.color='#00E5FF';
     if(faltaLbl) faltaLbl.textContent = 'para o objetivo de R$'+((metas+1)*120)+'K';
   }
+  const hoObjetivo = hoObjetivoGet();
+  const hoAtual = val * 0.2496;
+  const hoPct = hoObjetivo > 0 ? Math.min(100, (hoAtual/hoObjetivo*100)) : 0;
+  const hoColor = hoAtual >= hoObjetivo ? '#4DB848' : '#00E5FF';
   return `
     <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:7px">${badgesHtml}</div>
+    <div style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px 10px">
+      <div style="display:flex;flex-direction:column">
+        <span style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.5px;text-transform:uppercase">Objetivo HO do mês</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${hoColor};letter-spacing:.5px">
+          ${fR(hoAtual)} <span style="font-size:11px;color:rgba(255,255,255,.35)">/ ${fR(hoObjetivo)} (${hoPct.toFixed(0)}%)</span></span>
+      </div>
+      <span onclick="hoObjetivoEditar()" title="Editar objetivo de HO manualmente"
+        style="cursor:pointer;font-size:13px;padding:5px 9px;border-radius:6px;border:1px solid rgba(0,229,255,.35);
+        background:rgba(0,229,255,.1);color:#00E5FF">✏️ Editar</span>
+    </div>
     <div style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
       <span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:1px;text-transform:uppercase">
         Progresso Meta ${metas+1}</span>
@@ -4013,32 +4046,12 @@ function _updateHojeCard(){
   if(typeof rdGetSaved !== 'function') return;
   const saved = rdGetSaved();
 
-  // Total de hoje = SEMPRE a soma de TODOS os lançamentos salvos (igual ao total
-  // que aparece na aba Recebimento do Dia). Antes esse total só somava operadores
-  // achados em D.equipes — se um lançamento tivesse nome de operador renomeado,
-  // movido de equipe ou removido, ele sumia daqui mas continuava contando na aba
-  // Recebimento do Dia, fazendo os dois totais não baterem.
+  // Total de hoje = soma direta de TODOS os lançamentos salvos, sem tentar
+  // casar nome de operador com D.equipes. Casar nome dava problema toda vez
+  // que um operador mudava de grafia, saía da equipe ou era removido —
+  // agora é só o valor bruto do dia, do jeito que está em Recebimento do Dia.
   let totalHoje = 0;
   Object.values(saved).forEach(v=>{ totalHoje += parseFloat(v)||0; });
-
-  // Breakdown por equipe
-  const byEq = {};
-  let _matchedTotal = 0;
-  const _allOpNames = new Set();
-  (D.equipes||[]).forEach(eq=>{
-    let soma = 0;
-    (eq.ops||[]).forEach(op=>{ soma += parseFloat(saved[op.name]||0); _allOpNames.add(op.name); });
-    if(soma > 0) byEq[eq.name] = soma;
-    _matchedTotal += soma;
-  });
-  // Lista os nomes salvos em "hoje" que não batem com nenhum operador atual
-  // (renomeado, removido, movido de equipe, ou erro de digitação no import).
-  // Antes isso só aparecia como um valor agregado — agora mostra o nome exato
-  // pra dar pra achar e corrigir na hora.
-  const _naoIdentificados = Object.keys(saved)
-    .filter(nm => !_allOpNames.has(nm) && (parseFloat(saved[nm])||0) > 0)
-    .map(nm => ({nome: nm, valor: parseFloat(saved[nm])||0}));
-  const _naoIdentificado = _naoIdentificados.reduce((s,x)=>s+x.valor, 0);
 
   const hoHoje = totalHoje * 0.2496;
   const hoje   = new Date();
@@ -4055,48 +4068,7 @@ function _updateHojeCard(){
     ? 'Recebido em ' + diaStr + ' até o momento'
     : 'nenhum lançamento ainda hoje';
 
-  if(eqEl){
-    const entries = Object.entries(byEq);
-    if(entries.length === 0 && _naoIdentificados.length === 0){
-      eqEl.innerHTML = '<span style="font-size:10px;color:rgba(255,255,255,.25)">sem lançamentos hoje</span>';
-    } else {
-      // Buscar também valor de ontem por equipe para exibir comparativo
-      const dow    = hoje.getDay();
-      const diaHj  = hoje.getDate();
-      let ontemDay = (dow===1) ? diaHj-3 : (dow===0) ? diaHj-2 : diaHj-1;
-      if(ontemDay < 1) ontemDay = 1;
-
-      eqEl.innerHTML = entries.map(([eqName, valHoje])=>{
-        const cfg = EQ[eqName] || {c:'#aaa', sh: eqName, ico:'👥'};
-        const pct = totalHoje > 0 ? (valHoje/totalHoje*100).toFixed(0) : 0;
-        // Ontem desta equipe
-        let valOntem = 0;
-        const eq = (D.equipes||[]).find(e=>e.name===eqName);
-        if(eq) (eq.ops||[]).forEach(op=>{ valOntem += parseFloat((op.daily||{})[ontemDay]||0); });
-        const diff = valHoje - valOntem;
-        const diffColor = diff >= 0 ? '#4ADE80' : '#F87171';
-        const diffSign  = diff >= 0 ? '▲' : '▼';
-        const diffStr   = valOntem > 0 ? `<span style="font-size:9px;color:${diffColor};margin-top:2px">${diffSign} vs ontem: ${fRK(Math.abs(diff))}</span>` : '';
-        return `<div style="display:flex;flex-direction:column;background:rgba(255,255,255,.05);border:1px solid rgba(74,222,128,.12);border-radius:8px;padding:5px 10px;min-width:90px">
-          <span style="font-size:9px;font-weight:800;color:${cfg.c};letter-spacing:.5px;margin-bottom:2px">${cfg.ico||''} ${cfg.sh||eqName}</span>
-          <span style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">Ontem: ${valOntem > 0 ? fRK(valOntem) : '—'}</span>
-          <span style="font-size:12px;font-weight:900;color:#4ADE80;line-height:1;margin-top:2px">Hoje: ${fRK(valHoje)}</span>
-          ${diffStr}
-        </div>`;
-      }).join('')
-      // Mostra CADA lançamento cujo nome não bateu com nenhum operador atual —
-      // antes só dava o valor total "sumido"; agora dá o nome exato pra achar
-      // e corrigir em Recebimento do Dia (renomear, mover ou remover o registro).
-      + _naoIdentificados.map(x => `<div style="display:flex;flex-direction:column;background:rgba(248,113,113,.08);border:1px dashed rgba(248,113,113,.4);border-radius:8px;padding:5px 10px;min-width:120px">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:2px">
-            <span style="font-size:9px;font-weight:800;color:#F87171;letter-spacing:.5px">⚠️ ${x.nome.replace(/_/g,' ')}</span>
-            <span onclick="rdRemoverNaoIdentificado('${x.nome.replace(/'/g,"\\'")}')" title="Remover este lançamento" style="cursor:pointer;font-size:11px;color:rgba(248,113,113,.6);font-weight:900;line-height:1">✕</span>
-          </div>
-          <span style="font-size:12px;font-weight:900;color:#F87171;line-height:1;margin-top:2px">${fRK(x.valor)}</span>
-          <span style="font-size:8px;color:rgba(255,255,255,.35);margin-top:2px">não bate com nenhum operador atual</span>
-        </div>`).join('');
-    }
-  }
+  if(eqEl) eqEl.innerHTML = '';
 }
 
 function renderPpMetas(){
@@ -8517,7 +8489,8 @@ function importApply(){
     if(!ovNovos.novos) ovNovos.novos = [];
     importParsed.missing.forEach(m=>{
       const opName = m.rawName.trim().replace(/\s+/g,'_');
-      if(ALL.find(o=>o.name===opName)) return; // já existe (evita duplicar em reimportação)
+      const opNameNorm = opName.toUpperCase().replace(/[^A-Z0-9]/g,'');
+      if(ALL.find(o=>o.name.toUpperCase().replace(/[^A-Z0-9]/g,'')===opNameNorm)) return; // já existe (evita duplicar por causa de maiúscula/minúscula)
       const targetEq = m.eq || 'COFEN PAGUEPLAY';
       let eqObj = D.equipes.find(e=>e.name===targetEq);
       if(!eqObj){ eqObj = {name:targetEq, rec:0, ho:0, n_op:0, acordos:0, ops:[]}; D.equipes.push(eqObj); }
