@@ -302,40 +302,40 @@ select.ev-inp{cursor:pointer}
 .photo-upload-btn:hover{border-color:var(--pp);color:var(--pp);background:var(--ppl)}
 
 /* ─ TV MODE ─ */
-#tv-overlay{position:fixed;inset:0;z-index:9000;background:#0a1610;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif;overflow:hidden}
+#tv-overlay{position:fixed;inset:0;z-index:9000;background:#F1F8F4;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif;overflow:hidden}
 #tv-overlay::before{content:"";position:absolute;inset:0;background:
-  radial-gradient(ellipse 75% 65% at 15% 50%,rgba(0,156,59,.18) 0%,transparent 100%),
-  radial-gradient(ellipse 65% 70% at 85% 50%,rgba(0,39,118,.16) 0%,transparent 100%),
-  radial-gradient(ellipse 50% 35% at 50% 5%,rgba(255,223,0,.04) 0%,transparent 100%),
-  radial-gradient(ellipse 85% 45% at 50% 100%,rgba(0,100,30,.28) 0%,transparent 100%);
+  radial-gradient(ellipse 75% 65% at 15% 50%,rgba(0,156,59,.12) 0%,transparent 100%),
+  radial-gradient(ellipse 65% 70% at 85% 50%,rgba(0,39,118,.09) 0%,transparent 100%),
+  radial-gradient(ellipse 50% 35% at 50% 5%,rgba(255,223,0,.10) 0%,transparent 100%),
+  radial-gradient(ellipse 85% 45% at 50% 100%,rgba(0,100,30,.12) 0%,transparent 100%);
   pointer-events:none;z-index:0}
-#tv-overlay::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;opacity:.3}
+#tv-overlay::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(15,35,25,.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;opacity:.3}
 #tv-card,#tv-overlay .tv-header,#tv-overlay .tv-progress,#tv-overlay .tv-nav,#tv-overlay>div:last-of-type{position:relative;z-index:2}
 #tv-overlay.on{display:flex}
 /* ─ TV PAGE (iframe container) ─ */
 #pg-tv{display:none}
 #pg-tv.on{display:flex;flex-direction:column}
 #tv-iframe{width:100%;border:none;display:block;height:calc(100vh - 58px)}
-.tv-header{position:absolute;top:0;left:0;right:0;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(10,22,16,.9),transparent)}
-.tv-brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:rgba(255,255,255,.28)}
+.tv-header{position:absolute;top:0;left:0;right:0;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(241,248,244,.94),transparent)}
+.tv-brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:rgba(15,35,25,.28)}
 .tv-clock{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:#FFDF00;text-shadow:0 0 24px rgba(255,223,0,.5)}
-.tv-close{position:absolute;top:12px;right:18px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.4);color:rgba(255,255,255,.4);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:11}
-.tv-close:hover{background:rgba(200,30,30,.5);color:#fff;border-color:rgba(255,60,60,.5);transform:scale(1.08)}
+.tv-close{position:absolute;top:12px;right:18px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(15,35,25,.15);background:rgba(0,0,0,.4);color:rgba(15,35,25,.4);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:11}
+.tv-close:hover{background:rgba(200,30,30,.5);color:#122018;border-color:rgba(255,60,60,.5);transform:scale(1.08)}
 .tv-card{width:100%;flex:1;min-height:0;padding:0;animation:tvIn .5s cubic-bezier(.22,1,.36,1)}
 @keyframes tvIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
-.tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;border:4px solid rgba(255,255,255,.15);flex-shrink:0}
-.tv-photo-placeholder{width:140px;height:140px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:50px;color:#fff;flex-shrink:0;border:4px solid rgba(255,255,255,.1)}
-.tv-name{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:2px;color:#fff;line-height:1}
-.tv-eq{font-size:14px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
-.tv-kpi{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px 20px;text-align:center}
-.tv-kpi-l{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;border:4px solid rgba(15,35,25,.15);flex-shrink:0}
+.tv-photo-placeholder{width:140px;height:140px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:50px;color:#122018;flex-shrink:0;border:4px solid rgba(15,35,25,.1)}
+.tv-name{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:2px;color:#122018;line-height:1}
+.tv-eq{font-size:14px;font-weight:700;color:rgba(15,35,25,.5);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+.tv-kpi{background:rgba(15,35,25,.06);border:1px solid rgba(15,35,25,.08);border-radius:14px;padding:16px 20px;text-align:center}
+.tv-kpi-l{font-size:10px;font-weight:700;color:rgba(15,35,25,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
 .tv-kpi-v{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.5px;line-height:1}
-.tv-progress{position:absolute;bottom:46px;left:0;right:0;height:3px;background:rgba(255,255,255,.06);z-index:10;overflow:hidden}
+.tv-progress{position:absolute;bottom:46px;left:0;right:0;height:3px;background:rgba(15,35,25,.06);z-index:10;overflow:hidden}
 .tv-progress-fill{height:100%;transition:width linear;background:linear-gradient(90deg,#002776,#009C3B 30%,#FFDF00 60%,#009C3B 80%,#002776)}
 .tv-nav{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:5px;z-index:10}
-.tv-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.16);transition:all .3s;cursor:pointer}
+.tv-dot{width:6px;height:6px;border-radius:50%;background:rgba(15,35,25,.16);transition:all .3s;cursor:pointer}
 .tv-dot.on{width:18px;border-radius:3px;background:#FFDF00;box-shadow:0 0 10px rgba(255,223,0,.6)}
-.tv-ag-row{display:flex;justify-content:space-between;font-size:13px;font-weight:700;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.tv-ag-row{display:flex;justify-content:space-between;font-size:13px;font-weight:700;padding:4px 0;border-bottom:1px solid rgba(15,35,25,.06)}
 .tv-fb-badge{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
 .tv-fb-done{background:rgba(74,222,128,.15);border:1.5px solid rgba(74,222,128,.5);color:#4ADE80}
 .tv-fb-pending{background:rgba(252,211,77,.12);border:1.5px dashed rgba(252,211,77,.45);color:#FCD34D}
@@ -9824,7 +9824,7 @@ function tvShowMetaSlide(slide){
     return `<div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1">
       <div style="font-size:${fs};line-height:1;filter:drop-shadow(0 0 20px ${col}66)">${medals[ri]}</div>
       <div style="width:164px;height:${ht};border-radius:18px;overflow:hidden;border:3px solid ${col}77;box-shadow:0 0 40px ${col}33,0 8px 32px rgba(0,0,0,.6)">${photoHtml}</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:#fff;letter-spacing:1.5px;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.8)">${op.name.replace(/_/g,' ').toUpperCase()}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:#122018;letter-spacing:1.5px;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.8)">${op.name.replace(/_/g,' ').toUpperCase()}</div>
       <div style="font-size:10px;color:${cfg.c};font-weight:800;letter-spacing:1px">${cfg.ico} ${cfg.sh}</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${col};letter-spacing:.5px">${fR(tvGetRec(op))}</div>
       ${gapLbl(op)}
@@ -9837,7 +9837,7 @@ function tvShowMetaSlide(slide){
       <div style="position:absolute;top:18px;left:24px;font-size:22px;opacity:.18">⭐⭐⭐</div>
       <div style="position:absolute;top:18px;right:24px;font-size:22px;opacity:.18">⭐⭐⭐</div>
       <div style="text-align:center;position:relative;z-index:2">
-        <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:5px;text-transform:uppercase;margin-bottom:4px">${subtitulo}</div>
+        <div style="font-size:11px;font-weight:800;color:rgba(15,35,25,.3);letter-spacing:5px;text-transform:uppercase;margin-bottom:4px">${subtitulo}</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:6px;color:${accentColor};text-shadow:0 0 40px ${accentColor}55">${titulo}</div>
       </div>
       <div style="display:flex;gap:24px;align-items:flex-end;width:100%;max-width:940px;justify-content:center;position:relative;z-index:2">
@@ -9845,7 +9845,7 @@ function tvShowMetaSlide(slide){
       </div>
       <div style="position:absolute;bottom:32px;left:0;right:0;height:4px;background:linear-gradient(90deg,#002776,#009C3B 33%,#FFDF00 66%,#009C3B 80%,#002776)"></div>
       <div style="position:absolute;bottom:0;left:0;right:0;height:28px;display:flex;align-items:center;justify-content:center">
-        <span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.2);letter-spacing:4px">🇧🇷 COB COFEN · AGOSTO 2026 · ${isBS?'BRENDA + STEPHANIE':'BRUNA'} 🇧🇷</span>
+        <span style="font-size:10px;font-weight:800;color:rgba(15,35,25,.2);letter-spacing:4px">🇧🇷 COB COFEN · AGOSTO 2026 · ${isBS?'BRENDA + STEPHANIE':'BRUNA'} 🇧🇷</span>
       </div>
     </div>
   `;
@@ -9885,13 +9885,13 @@ function tvShow(idx){
   const posExib  = isEqMode ? pos : posGlobal;
   const medals   = {1:'🥇',2:'🥈',3:'🥉'};
   const posLabel = medals[posExib] || `${posExib}°`;
-  const posColor = posExib===1?'#FFD700':posExib===2?'#C0C0C0':posExib===3?'#CD7F32':posExib<=10?cfg.c:'rgba(255,255,255,.5)';
+  const posColor = posExib===1?'#FFD700':posExib===2?'#C0C0C0':posExib===3?'#CD7F32':posExib<=10?cfg.c:'rgba(15,35,25,.5)';
   const posGlow  = posExib<=3?`0 0 60px ${posColor}88`:'none';
 
   // Badge adicional: posição global (só no modo equipe)
   const posGlobalBadge = isEqMode
-    ? `<div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:100px;
-        padding:3px 10px;font-size:10px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.5px">
+    ? `<div style="background:rgba(15,35,25,.08);border:1px solid rgba(15,35,25,.15);border-radius:100px;
+        padding:3px 10px;font-size:10px;font-weight:700;color:rgba(15,35,25,.6);letter-spacing:.5px">
         🌐 ${posGlobal}° geral
        </div>`
     : '';
@@ -9960,7 +9960,7 @@ function tvShow(idx){
       <!-- FOTO ESQUERDA -->
       <div style="width:44%;flex-shrink:0;position:relative;overflow:hidden">
         ${photoHtml}
-        <div style="position:absolute;inset:0;background:linear-gradient(to right,transparent 55%,#003d1a 100%);pointer-events:none"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(to right,transparent 55%,#F1F8F4 100%);pointer-events:none"></div>
 
         <!-- Posição grande -->
         <div style="position:absolute;bottom:88px;left:26px">
@@ -9979,7 +9979,7 @@ function tvShow(idx){
 
         <!-- Contador operadores no modo -->
         <div style="position:absolute;bottom:60px;left:26px;font-size:10px;font-weight:700;
-          color:rgba(255,255,255,.35);letter-spacing:1px">
+          color:rgba(15,35,25,.35);letter-spacing:1px">
           ${pos} / ${tvList.length} ${bbMode?'Bruna+Stephanie':isEqMode?'na equipe':'no ranking'}
         </div>
       </div>
@@ -9993,7 +9993,7 @@ function tvShow(idx){
           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:nowrap;overflow:hidden">
             <div style="display:flex;align-items:baseline;gap:16px;flex:1;min-width:0;overflow:hidden">
               <div style="font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:2px;
-                color:#fff;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">
+                color:#122018;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">
                 ${op.name.replace(/_/g,' ').toUpperCase()}
               </div>
               ${(()=>{
@@ -10021,27 +10021,27 @@ function tvShow(idx){
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
           <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);
               border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">💰 Total Real</div>
+            <div style="font-size:8px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">💰 Total Real</div>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;line-height:1">${fR(tvGetRec(op))}</div>
           </div>
           <div style="background:rgba(103,232,249,.1);border:1px solid rgba(103,232,249,.25);
               border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 HO (25%)</div>
+            <div style="font-size:8px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 HO (25%)</div>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#67E8F9;line-height:1">${fR(op.ho)}</div>
           </div>
-          <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+          <div style="background:rgba(15,35,25,.05);border:1px solid rgba(15,35,25,.1);
               border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">📋 Acordos</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;line-height:1">${op.acordos||0}</div>
+            <div style="font-size:8px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">📋 Acordos</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#122018;line-height:1">${op.acordos||0}</div>
           </div>
           ${temEfic
             ? `<div style="background:${efC}18;border:1px solid ${efC}33;border-radius:12px;padding:12px;text-align:center">
-                <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚡ Efic. Pgto</div>
+                <div style="font-size:8px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚡ Efic. Pgto</div>
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${efC};line-height:1">${efPct}%</div>
-                <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px">${pagos}/${gerados} venc.</div>
+                <div style="font-size:9px;color:rgba(15,35,25,.3);margin-top:2px">${pagos}/${gerados} venc.</div>
                </div>`
             : `<div style="background:rgba(252,211,77,.08);border:1px solid rgba(252,211,77,.2);border-radius:12px;padding:12px;text-align:center">
-                <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎫 Ticket Médio</div>
+                <div style="font-size:8px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎫 Ticket Médio</div>
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FCD34D;line-height:1">${(op.acordos||0)>0?fRK(tvGetRec(op)/(op.acordos||1)):'—'}</div>
                </div>`
           }
@@ -10071,10 +10071,10 @@ function tvShow(idx){
               const pct = total>0?(v/total*100).toFixed(0):0;
               return `<div style="background:${cor}12;border:1px solid ${cor}35;border-radius:12px;padding:11px 14px;position:relative;overflow:hidden">
                 <div style="position:absolute;top:-10px;right:-6px;font-size:38px;opacity:.08">${ico}</div>
-                <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">${ico} ${nm}</div>
+                <div style="font-size:8px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">${ico} ${nm}</div>
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${cor};line-height:1;letter-spacing:.5px">${fR(v)}</div>
                 <div style="display:flex;align-items:center;gap:6px;margin-top:5px">
-                  <div style="flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden">
+                  <div style="flex:1;height:3px;background:rgba(15,35,25,.08);border-radius:100px;overflow:hidden">
                     <div style="height:100%;width:${pct}%;background:${cor};border-radius:100px"></div>
                   </div>
                   <span style="font-size:9px;color:${cor};font-weight:800">${pct}%</span>
@@ -10116,10 +10116,10 @@ function tvShow(idx){
           const diaCalendario = duAtual > 0 ? (CMP_JULHO_DU_DIAS[duAtual-1] || '?') : '?';
 
           return `<div style="background:${bg};border:1px solid ${bd};border-radius:10px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase">📊 vs Abril (até ${duAtual}° DU — dia ${diaCalendario})</div>
+            <div style="font-size:9px;font-weight:700;color:rgba(15,35,25,.4);letter-spacing:1.5px;text-transform:uppercase">📊 vs Abril (até ${duAtual}° DU — dia ${diaCalendario})</div>
             <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:11px;color:rgba(255,255,255,.4)">Abril/${duAtual}DU: <b style="color:rgba(255,255,255,.7)">${fR(abrilOpDu)}</b></span>
-              <span style="font-size:11px;color:rgba(255,255,255,.4)">Maio: <b style="color:#4ADE80">${fR(maioOp)}</b></span>
+              <span style="font-size:11px;color:rgba(15,35,25,.4)">Abril/${duAtual}DU: <b style="color:rgba(15,35,25,.7)">${fR(abrilOpDu)}</b></span>
+              <span style="font-size:11px;color:rgba(15,35,25,.4)">Maio: <b style="color:#4ADE80">${fR(maioOp)}</b></span>
               <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:${col};letter-spacing:.5px">${icon} ${Math.abs(pct)}%</span>
               <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${col}">${diff >= 0 ? '+' : '-'}${fR(Math.abs(diff))}</span>
             </div>
@@ -10127,14 +10127,14 @@ function tvShow(idx){
         })()}
 
         <!-- RECEBIMENTO POR DIA — 31 dias com cor de meta -->
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px">
+        <div style="background:rgba(15,35,25,.04);border:1px solid rgba(15,35,25,.08);border-radius:12px;padding:12px 14px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase">📊 Recebimento por Dia — ${String(mesRef+1).padStart(2,'0')}/${anoRef}</div>
+            <div style="font-size:9px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase">📊 Recebimento por Dia — ${String(mesRef+1).padStart(2,'0')}/${anoRef}</div>
             <div style="display:flex;gap:7px;align-items:center">
-              <span style="font-size:8px;color:rgba(255,255,255,.3)">Meta/Dia R$4k:</span>
+              <span style="font-size:8px;color:rgba(15,35,25,.3)">Meta/Dia R$4k:</span>
               ${['#22C55E','#38BDF8','#FCD34D','#F87171'].map((col,i)=>{
                 const labels=['≥4k','3k-4k','2k-3k','<2k'];
-                return '<div style="display:flex;align-items:center;gap:2px"><div style="width:7px;height:7px;border-radius:1px;background:'+col+'"></div><span style="font-size:8px;color:rgba(255,255,255,.4)">'+labels[i]+'</span></div>';
+                return '<div style="display:flex;align-items:center;gap:2px"><div style="width:7px;height:7px;border-radius:1px;background:'+col+'"></div><span style="font-size:8px;color:rgba(15,35,25,.4)">'+labels[i]+'</span></div>';
               }).join('')}
             </div>
           </div>
@@ -10145,16 +10145,16 @@ function tvShow(idx){
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
 
           <!-- Ranking (vizinhos no modo atual) -->
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+          <div style="background:rgba(15,35,25,.04);border:1px solid rgba(15,35,25,.08);
               border-radius:12px;padding:11px 13px">
-            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);
+            <div style="font-size:9px;font-weight:700;color:rgba(15,35,25,.35);
               letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">
               🏆 ${tvMode==='bb'?'Bruna + Stephanie':tvMode==='bs'?'Stephanie + Katia':tvMode==='COFEN BIRIGUI BRUNA'?'Bruna + Digital + Elite':isEqMode?'Ranking da Equipe':'Ranking Geral'}
             </div>
             ${prev?`<div style="display:flex;justify-content:space-between;padding:4px 7px;
-                border-radius:6px;background:rgba(255,255,255,.04);margin-bottom:4px">
-              <span style="font-size:10px;color:rgba(255,255,255,.3)">${idx}° ${prev.name.replace(/_/g,' ')}</span>
-              <span style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700">${fRK(tvGetRec(prev))}</span>
+                border-radius:6px;background:rgba(15,35,25,.04);margin-bottom:4px">
+              <span style="font-size:10px;color:rgba(15,35,25,.3)">${idx}° ${prev.name.replace(/_/g,' ')}</span>
+              <span style="font-size:10px;color:rgba(15,35,25,.35);font-weight:700">${fRK(tvGetRec(prev))}</span>
             </div>`:''}
             <div style="display:flex;justify-content:space-between;align-items:center;
                 padding:6px 9px;border-radius:8px;background:${cfg.c}22;border:1px solid ${cfg.c}55;margin-bottom:4px">
@@ -10165,18 +10165,18 @@ function tvShow(idx){
               </div>
             </div>
             ${next?`<div style="display:flex;justify-content:space-between;padding:4px 7px;
-                border-radius:6px;background:rgba(255,255,255,.04)">
-              <span style="font-size:10px;color:rgba(255,255,255,.3)">${idx+2}° ${next.name.replace(/_/g,' ')}</span>
-              <span style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700">${fRK(tvGetRec(next))}</span>
+                border-radius:6px;background:rgba(15,35,25,.04)">
+              <span style="font-size:10px;color:rgba(15,35,25,.3)">${idx+2}° ${next.name.replace(/_/g,' ')}</span>
+              <span style="font-size:10px;color:rgba(15,35,25,.35);font-weight:700">${fRK(tvGetRec(next))}</span>
             </div>`:''}
           </div>
 
           <!-- Agendamentos TODOS -->
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+          <div style="background:rgba(15,35,25,.04);border:1px solid rgba(15,35,25,.08);
               border-radius:12px;padding:11px 13px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase">📅 Agendamentos</div>
-              ${agTotal>0?`<div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#67E8F9">${agTotal}<span style="font-size:9px;color:rgba(255,255,255,.3);font-weight:700"> ac.</span></div>`:''}
+              <div style="font-size:9px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase">📅 Agendamentos</div>
+              ${agTotal>0?`<div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#67E8F9">${agTotal}<span style="font-size:9px;color:rgba(15,35,25,.3);font-weight:700"> ac.</span></div>`:''}
             </div>
             ${agEntries.length>0
               ? `<div style="display:flex;flex-direction:column;gap:4px;max-height:130px;overflow-y:auto">
@@ -10187,54 +10187,54 @@ function tvShow(idx){
                     const isF=dDt>hoje;
                     const ds2=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][d2.getDay()];
                     const df2=d2.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
-                    const bg2=isH?'rgba(74,222,128,.15)':isF?'rgba(103,232,249,.08)':'rgba(255,255,255,.03)';
-                    const bd2=isH?'rgba(74,222,128,.4)':isF?'rgba(103,232,249,.2)':'rgba(255,255,255,.07)';
-                    const c2=isH?'#4ADE80':isF?'#67E8F9':'rgba(255,255,255,.4)';
+                    const bg2=isH?'rgba(74,222,128,.15)':isF?'rgba(103,232,249,.08)':'rgba(15,35,25,.03)';
+                    const bd2=isH?'rgba(74,222,128,.4)':isF?'rgba(103,232,249,.2)':'rgba(15,35,25,.07)';
+                    const c2=isH?'#4ADE80':isF?'#67E8F9':'rgba(15,35,25,.4)';
                     const tag=isH?'<span style="font-size:7px;font-weight:800;background:#4ADE8033;color:#4ADE80;border-radius:3px;padding:1px 4px">HOJE</span>'
-                              :!isF?'<span style="font-size:8px;color:rgba(255,255,255,.25)">passado</span>':'';
+                              :!isF?'<span style="font-size:8px;color:rgba(15,35,25,.25)">passado</span>':'';
                     return `<div style="display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;
                         padding:5px 8px;border-radius:7px;background:${bg2};border:1px solid ${bd2}">
                       <div>
                         <div style="display:flex;align-items:center;gap:4px">
-                          <span style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,.85)">${df2}</span>
-                          <span style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4)">${ds2}</span>
+                          <span style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(15,35,25,.85)">${df2}</span>
+                          <span style="font-size:9px;font-weight:700;color:rgba(15,35,25,.4)">${ds2}</span>
                           ${tag}
                         </div>
                       </div>
                       <div style="text-align:right">
                         <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${c2};line-height:1">${n}</div>
-                        <div style="font-size:8px;color:rgba(255,255,255,.3)">ac.</div>
+                        <div style="font-size:8px;color:rgba(15,35,25,.3)">ac.</div>
                       </div>
                     </div>`;
                   }).join('')}
                 </div>`
-              : `<div style="font-size:11px;color:rgba(255,255,255,.2);font-style:italic">Sem agendamentos</div>`
+              : `<div style="font-size:11px;color:rgba(15,35,25,.2);font-style:italic">Sem agendamentos</div>`
             }
           </div>
 
           <!-- Formas de pagamento -->
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+          <div style="background:rgba(15,35,25,.04);border:1px solid rgba(15,35,25,.08);
               border-radius:12px;padding:11px 13px">
-            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💳 Formas de Pgto por Operador</div>
+            <div style="font-size:9px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💳 Formas de Pgto por Operador</div>
             ${tiposAll.length>0
               ? tiposAll.map(([k,v])=>{
                   const pct=tiposTotal>0?Math.round(v/tiposTotal*100):0;
-                  const cor=tCores[k]||'rgba(255,255,255,.6)';
+                  const cor=tCores[k]||'rgba(15,35,25,.6)';
                   const nm=k.replace('NEGOCIAÇÃO','').replace('Padrão','').replace('DE CRÉDITO','').trim();
                   return `<div style="margin-bottom:7px">
                     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
-                      <span style="font-size:10px;color:rgba(255,255,255,.6)">${nm}</span>
+                      <span style="font-size:10px;color:rgba(15,35,25,.6)">${nm}</span>
                       <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:${cor};letter-spacing:.3px">${fR(v)}</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:5px">
-                      <div style="flex:1;height:4px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden">
+                      <div style="flex:1;height:4px;background:rgba(15,35,25,.08);border-radius:100px;overflow:hidden">
                         <div style="height:100%;width:${pct}%;background:${cor};border-radius:100px"></div>
                       </div>
                       <span style="font-size:9px;color:${cor};font-weight:800;min-width:28px;text-align:right">${pct}%</span>
                     </div>
                   </div>`;
                 }).join('')
-              : `<div style="font-size:11px;color:rgba(255,255,255,.2)">Sem dados</div>`
+              : `<div style="font-size:11px;color:rgba(15,35,25,.2)">Sem dados</div>`
             }
           </div>
 
