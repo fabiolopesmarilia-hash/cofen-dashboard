@@ -10027,8 +10027,24 @@ function tvShow(idx){
                   color:${pCor};line-height:1;white-space:nowrap;flex-shrink:0;
                   text-shadow:0 0 24px ${pCor}66">${proj.pct.toFixed(0)}%</div>`;
               })()}
+              ${(()=>{
+                const mesPassadoNome = 'Julho';
+                const mesPassadoRec = (PROJ_ANO_OPS_DADOS[mesPassadoNome]||[]).find(o=>o.nome===op.name)?.rec || 0;
+                if(mesPassadoRec<=0) return '';
+                const atual = tvGetRec(op);
+                const diff = atual - mesPassadoRec;
+                const superou = diff >= 0;
+                const cor = superou ? '#059669' : '#B45309';
+                const bg = superou ? 'rgba(74,222,128,.12)' : 'rgba(252,211,77,.1)';
+                const bd = superou ? 'rgba(74,222,128,.35)' : 'rgba(252,211,77,.3)';
+                return `<div style="background:${bg};border:1px solid ${bd};border-radius:10px;padding:6px 12px;flex-shrink:0">
+                  <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1px;text-transform:uppercase">📅 ${mesPassadoNome}</div>
+                  <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${cor};line-height:1.3">${fR(mesPassadoRec)}</div>
+                  <div style="font-size:9px;font-weight:700;color:${cor}">${superou?'✅ já superou +':'faltam '}${fR(Math.abs(diff))}</div>
+                </div>`;
+              })()}
             </div>
-            ${(()=>{ return ''; /* premiação removida a pedido do usuário */ })()}
+            <img src="https://pagueplay.com.br/build/images/logo-pagueplay.svg" style="height:64px;flex-shrink:0" alt="PaguePlay">
           </div>
           <div style="display:flex;gap:8px;align-items:center;margin-top:5px;flex-wrap:wrap">
             ${posGlobalBadge}
@@ -10051,10 +10067,10 @@ function tvShow(idx){
             <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 HO (25%)</div>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#0E7490;line-height:1">${fR(op.ho)}</div>
           </div>
-          <div style="background:#FFFFFF;border:1px solid rgba(26,46,34,0.62);
+          <div style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);
               border-radius:12px;padding:12px;text-align:center">
             <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">📋 Acordos</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#1A2E22;line-height:1">${op.acordos||0}</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#7C3AED;line-height:1">${op.acordos||0}</div>
           </div>
           ${temEfic
             ? `<div style="background:${efC}18;border:1px solid ${efC}33;border-radius:12px;padding:12px;text-align:center">
