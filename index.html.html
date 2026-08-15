@@ -302,14 +302,14 @@ select.ev-inp{cursor:pointer}
 .photo-upload-btn:hover{border-color:var(--pp);color:var(--pp);background:var(--ppl)}
 
 /* ─ TV MODE ─ */
-#tv-overlay{position:fixed;inset:0;z-index:9000;background:#F1F8F4;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif;overflow:hidden}
+#tv-overlay{position:fixed;inset:0;z-index:9000;background:#EAF7F1;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif;overflow:hidden}
 #tv-overlay::before{content:"";position:absolute;inset:0;background:
   radial-gradient(ellipse 75% 65% at 15% 50%,rgba(0,156,59,.12) 0%,transparent 100%),
   radial-gradient(ellipse 65% 70% at 85% 50%,rgba(0,39,118,.09) 0%,transparent 100%),
-  radial-gradient(ellipse 50% 35% at 50% 5%,rgba(255,223,0,.10) 0%,transparent 100%),
+  radial-gradient(ellipse 50% 35% at 50% 5%,rgba(0,168,107,.10) 0%,transparent 100%),
   radial-gradient(ellipse 85% 45% at 50% 100%,rgba(0,100,30,.12) 0%,transparent 100%);
   pointer-events:none;z-index:0}
-#tv-overlay::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(15,35,25,.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;opacity:.3}
+#tv-overlay::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(0,168,107,.18) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;opacity:.3}
 #tv-card,#tv-overlay .tv-header,#tv-overlay .tv-progress,#tv-overlay .tv-nav,#tv-overlay>div:last-of-type{position:relative;z-index:2}
 #tv-overlay.on{display:flex}
 /* ─ TV PAGE (iframe container) ─ */
@@ -317,28 +317,47 @@ select.ev-inp{cursor:pointer}
 #pg-tv.on{display:flex;flex-direction:column}
 #tv-iframe{width:100%;border:none;display:block;height:calc(100vh - 58px)}
 .tv-header{position:absolute;top:0;left:0;right:0;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(241,248,244,.94),transparent)}
-.tv-brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:rgba(15,35,25,.28)}
-.tv-clock{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:#FFDF00;text-shadow:0 0 24px rgba(255,223,0,.5)}
-.tv-close{position:absolute;top:12px;right:18px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(15,35,25,.15);background:rgba(0,0,0,.4);color:rgba(15,35,25,.4);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:11}
-.tv-close:hover{background:rgba(200,30,30,.5);color:#122018;border-color:rgba(255,60,60,.5);transform:scale(1.08)}
+.tv-brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:rgba(26,46,34,0.62)}
+.tv-clock{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:#00875A;text-shadow:0 0 24px rgba(0,168,107,.35)}
+.tv-close{position:absolute;top:12px;right:18px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(0,168,107,.3);background:#FFFFFF;color:#1A2E22;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:11;box-shadow:0 2px 8px rgba(0,168,107,.15)}
+.tv-close:hover{background:rgba(200,30,30,.5);color:#1A2E22;border-color:rgba(255,60,60,.5);transform:scale(1.08)}
 .tv-card{width:100%;flex:1;min-height:0;padding:0;animation:tvIn .5s cubic-bezier(.22,1,.36,1)}
 @keyframes tvIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
-.tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;border:4px solid rgba(15,35,25,.15);flex-shrink:0}
-.tv-photo-placeholder{width:140px;height:140px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:50px;color:#122018;flex-shrink:0;border:4px solid rgba(15,35,25,.1)}
-.tv-name{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:2px;color:#122018;line-height:1}
-.tv-eq{font-size:14px;font-weight:700;color:rgba(15,35,25,.5);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
-.tv-kpi{background:rgba(15,35,25,.06);border:1px solid rgba(15,35,25,.08);border-radius:14px;padding:16px 20px;text-align:center}
-.tv-kpi-l{font-size:10px;font-weight:700;color:rgba(15,35,25,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;border:4px solid rgba(0,168,107,.3);flex-shrink:0;box-shadow:0 8px 24px rgba(0,168,107,.18)}
+.tv-photo-placeholder{width:140px;height:140px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:50px;color:#1A2E22;flex-shrink:0;border:4px solid rgba(0,168,107,.3)}
+.tv-name{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:2px;color:#1A2E22;line-height:1}
+.tv-eq{font-size:14px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+.tv-kpi{background:#FFFFFF;border:1px solid rgba(0,168,107,.18);border-radius:14px;padding:16px 20px;text-align:center}
+.tv-kpi-l{font-size:10px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
 .tv-kpi-v{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.5px;line-height:1}
-.tv-progress{position:absolute;bottom:46px;left:0;right:0;height:3px;background:rgba(15,35,25,.06);z-index:10;overflow:hidden}
-.tv-progress-fill{height:100%;transition:width linear;background:linear-gradient(90deg,#002776,#009C3B 30%,#FFDF00 60%,#009C3B 80%,#002776)}
+.tv-progress{position:absolute;bottom:46px;left:0;right:0;height:3px;background:#FFFFFF;z-index:10;overflow:hidden}
+.tv-progress-fill{height:100%;transition:width linear;background:linear-gradient(90deg,#00A86B,#00C97F 30%,#00B8A9 60%,#00C97F 80%,#00A86B)}
 .tv-nav{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:5px;z-index:10}
-.tv-dot{width:6px;height:6px;border-radius:50%;background:rgba(15,35,25,.16);transition:all .3s;cursor:pointer}
-.tv-dot.on{width:18px;border-radius:3px;background:#FFDF00;box-shadow:0 0 10px rgba(255,223,0,.6)}
-.tv-ag-row{display:flex;justify-content:space-between;font-size:13px;font-weight:700;padding:4px 0;border-bottom:1px solid rgba(15,35,25,.06)}
+.tv-dot{width:6px;height:6px;border-radius:50%;background:rgba(26,46,34,0.62);transition:all .3s;cursor:pointer}
+.tv-dot.on{width:18px;border-radius:3px;background:#00A86B;box-shadow:0 0 10px rgba(0,168,107,.45)}
+.tv-ag-row{display:flex;justify-content:space-between;font-size:13px;font-weight:700;padding:4px 0;border-bottom:1px solid rgba(0,168,107,.18)}
 .tv-fb-badge{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
-.tv-fb-done{background:rgba(74,222,128,.15);border:1.5px solid rgba(74,222,128,.5);color:#4ADE80}
-.tv-fb-pending{background:rgba(252,211,77,.12);border:1.5px dashed rgba(252,211,77,.45);color:#FCD34D}
+.tv-fb-done{background:rgba(74,222,128,.15);border:1.5px solid rgba(74,222,128,.5);color:#059669}
+.tv-fb-pending{background:rgba(252,211,77,.12);border:1.5px dashed rgba(252,211,77,.45);color:#B45309}
+/* ─ TV MODE: movimento ─ */
+#tv-overlay::before{background-size:140% 140%;animation:tvBgDrift 16s ease-in-out infinite alternate}
+@keyframes tvBgDrift{0%{background-position:0% 0%}100%{background-position:100% 100%}}
+#tv-overlay::after{animation:tvDotsDrift 30s linear infinite}
+@keyframes tvDotsDrift{0%{background-position:0 0}100%{background-position:96px 96px}}
+.tv-clock{animation:tvPulseGlow 2.4s ease-in-out infinite}
+@keyframes tvPulseGlow{0%,100%{text-shadow:0 0 24px rgba(0,168,107,.35)}50%{text-shadow:0 0 40px rgba(0,168,107,.6)}}
+.tv-dot.on{animation:tvDotPulse 1.6s ease-in-out infinite}
+@keyframes tvDotPulse{0%,100%{box-shadow:0 0 10px rgba(0,168,107,.45)}50%{box-shadow:0 0 18px rgba(0,168,107,.75)}}
+.tv-progress-fill{background-size:200% 100%;animation:tvBarFlow 3s linear infinite}
+@keyframes tvBarFlow{0%{background-position:0% 0}100%{background-position:200% 0}}
+.tv-photo,.tv-photo-placeholder{animation:tvPhotoFloat 4s ease-in-out infinite}
+@keyframes tvPhotoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.tv-kpi{transition:transform .3s}
+.tv-kpi:hover{transform:translateY(-3px)}
+.tv-orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(2px);opacity:.5;z-index:0}
+@keyframes tvOrbFloat1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-40px) scale(1.15)}}
+@keyframes tvOrbFloat2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-35px,30px) scale(1.1)}}
+@keyframes tvOrbFloat3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,25px) scale(.9)}}
 
 
 /* ─ SYNC PANEL ─ */
@@ -9790,7 +9809,7 @@ function tvDailyBlock(op, melhorDia){
 function tvShowMetaSlide(slide){
   const card=document.getElementById('tv-card');
   const medals=['🥇','🥈','🥉'];
-  const mColors=['#FFD700','#C0C0C0','#CD7F32'];
+  const mColors=['#B8860B','#6B7280','#B45309'];
   const {top3, rankList} = slide;
   const isBS = slide._id==='slide_top3_bs';
   const titulo = isBS ? '🏙️ STEPHANIE + ⭐ KATIA' : '💙 EQUIPE BRUNA';
@@ -9798,13 +9817,13 @@ function tvShowMetaSlide(slide){
   const bgGrad = isBS
     ? 'linear-gradient(135deg,#0d1f0a 0%,#0a2e18 50%,#0a1a0d 100%)'
     : 'linear-gradient(135deg,#0a0d2e 0%,#0d1847 50%,#0a0d2e 100%)';
-  const accentColor = isBS ? '#FFDF00' : '#4776E6';
+  const accentColor = isBS ? '#00875A' : '#0284C7';
 
   function gapLbl(op){
     const i=rankList.findIndex(o=>o.name===op.name);
-    if(i<=0) return `<div style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.4);border-radius:100px;padding:4px 14px;font-size:11px;font-weight:800;color:#4ADE80;margin-top:4px">👑 LÍDER</div>`;
+    if(i<=0) return `<div style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.4);border-radius:100px;padding:4px 14px;font-size:11px;font-weight:800;color:#059669;margin-top:4px">👑 LÍDER</div>`;
     const diff=tvGetRec(rankList[i-1])-tvGetRec(op)+1;
-    return `<div style="background:rgba(252,165,165,.12);border:1px solid rgba(252,165,165,.35);border-radius:100px;padding:4px 14px;font-size:11px;font-weight:800;color:#FCA5A5;margin-top:4px">⬆️ falta ${fR(diff)} p/ subir</div>`;
+    return `<div style="background:rgba(252,165,165,.12);border:1px solid rgba(252,165,165,.35);border-radius:100px;padding:4px 14px;font-size:11px;font-weight:800;color:#DC2626;margin-top:4px">⬆️ falta ${fR(diff)} p/ subir</div>`;
   }
 
   const podiumOrder=[top3[1],top3[0],top3[2]];
@@ -9824,7 +9843,7 @@ function tvShowMetaSlide(slide){
     return `<div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1">
       <div style="font-size:${fs};line-height:1;filter:drop-shadow(0 0 20px ${col}66)">${medals[ri]}</div>
       <div style="width:164px;height:${ht};border-radius:18px;overflow:hidden;border:3px solid ${col}77;box-shadow:0 0 40px ${col}33,0 8px 32px rgba(0,0,0,.6)">${photoHtml}</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:#122018;letter-spacing:1.5px;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.8)">${op.name.replace(/_/g,' ').toUpperCase()}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:#1A2E22;letter-spacing:1.5px;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.8)">${op.name.replace(/_/g,' ').toUpperCase()}</div>
       <div style="font-size:10px;color:${cfg.c};font-weight:800;letter-spacing:1px">${cfg.ico} ${cfg.sh}</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${col};letter-spacing:.5px">${fR(tvGetRec(op))}</div>
       ${gapLbl(op)}
@@ -9833,19 +9852,21 @@ function tvShowMetaSlide(slide){
 
   card.innerHTML=`
     <div style="width:100%;height:100vh;overflow:hidden;position:relative;background:${bgGrad};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:50px 60px 60px">
-      <div style="position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#002776,#009C3B 33%,#FFDF00 66%,#009C3B 80%,#002776)"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#00A86B,#00C97F 33%,#00B8A9 66%,#00C97F 80%,#00A86B)"></div>
+      <div class="tv-orb" style="width:220px;height:220px;top:-40px;left:-40px;background:radial-gradient(circle,rgba(0,168,107,.25),transparent 70%);animation:tvOrbFloat1 8s ease-in-out infinite"></div>
+      <div class="tv-orb" style="width:180px;height:180px;bottom:-30px;right:-30px;background:radial-gradient(circle,rgba(0,184,169,.22),transparent 70%);animation:tvOrbFloat2 10s ease-in-out infinite"></div>
       <div style="position:absolute;top:18px;left:24px;font-size:22px;opacity:.18">⭐⭐⭐</div>
       <div style="position:absolute;top:18px;right:24px;font-size:22px;opacity:.18">⭐⭐⭐</div>
       <div style="text-align:center;position:relative;z-index:2">
-        <div style="font-size:11px;font-weight:800;color:rgba(15,35,25,.3);letter-spacing:5px;text-transform:uppercase;margin-bottom:4px">${subtitulo}</div>
+        <div style="font-size:11px;font-weight:800;color:rgba(26,46,34,0.62);letter-spacing:5px;text-transform:uppercase;margin-bottom:4px">${subtitulo}</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:6px;color:${accentColor};text-shadow:0 0 40px ${accentColor}55">${titulo}</div>
       </div>
       <div style="display:flex;gap:24px;align-items:flex-end;width:100%;max-width:940px;justify-content:center;position:relative;z-index:2">
         ${podioCols}
       </div>
-      <div style="position:absolute;bottom:32px;left:0;right:0;height:4px;background:linear-gradient(90deg,#002776,#009C3B 33%,#FFDF00 66%,#009C3B 80%,#002776)"></div>
+      <div style="position:absolute;bottom:32px;left:0;right:0;height:4px;background:linear-gradient(90deg,#00A86B,#00C97F 33%,#00B8A9 66%,#00C97F 80%,#00A86B)"></div>
       <div style="position:absolute;bottom:0;left:0;right:0;height:28px;display:flex;align-items:center;justify-content:center">
-        <span style="font-size:10px;font-weight:800;color:rgba(15,35,25,.2);letter-spacing:4px">🇧🇷 COB COFEN · AGOSTO 2026 · ${isBS?'BRENDA + STEPHANIE':'BRUNA'} 🇧🇷</span>
+        <span style="font-size:10px;font-weight:800;color:rgba(26,46,34,0.62);letter-spacing:4px">🇧🇷 COB COFEN · AGOSTO 2026 · ${isBS?'BRENDA + STEPHANIE':'BRUNA'} 🇧🇷</span>
       </div>
     </div>
   `;
@@ -9854,7 +9875,7 @@ function tvShowMetaSlide(slide){
   const bar=document.getElementById('tv-bar');
   if(bar){
     bar.style.transition='none'; bar.style.width='0%';
-    bar.style.background='linear-gradient(90deg,#002776,#009C3B,#FFDF00,#009C3B,#002776)';
+    bar.style.background='linear-gradient(90deg,#00A86B,#00C97F,#00B8A9,#00C97F,#00A86B)';
     setTimeout(()=>{ bar.style.transition=`width ${TV_INTERVAL}ms linear`; bar.style.width='100%'; },50);
   }
 }
@@ -9885,13 +9906,13 @@ function tvShow(idx){
   const posExib  = isEqMode ? pos : posGlobal;
   const medals   = {1:'🥇',2:'🥈',3:'🥉'};
   const posLabel = medals[posExib] || `${posExib}°`;
-  const posColor = posExib===1?'#FFD700':posExib===2?'#C0C0C0':posExib===3?'#CD7F32':posExib<=10?cfg.c:'rgba(15,35,25,.5)';
+  const posColor = posExib===1?'#B8860B':posExib===2?'#6B7280':posExib===3?'#B45309':posExib<=10?cfg.c:'rgba(26,46,34,0.62)';
   const posGlow  = posExib<=3?`0 0 60px ${posColor}88`:'none';
 
   // Badge adicional: posição global (só no modo equipe)
   const posGlobalBadge = isEqMode
-    ? `<div style="background:rgba(15,35,25,.08);border:1px solid rgba(15,35,25,.15);border-radius:100px;
-        padding:3px 10px;font-size:10px;font-weight:700;color:rgba(15,35,25,.6);letter-spacing:.5px">
+    ? `<div style="background:#FFFFFF;border:1px solid rgba(26,46,34,0.62);border-radius:100px;
+        padding:3px 10px;font-size:10px;font-weight:700;color:rgba(26,46,34,0.6);letter-spacing:.5px">
         🌐 ${posGlobal}° geral
        </div>`
     : '';
@@ -9899,7 +9920,7 @@ function tvShow(idx){
   // Tier
   const _tvRec    = tvGetRec(op);
   const tier      = _tvRec>=20000?'S-TIER':_tvRec>=10000?'A — ALTA':_tvRec>=5000?'B — BOA':'C — DEV';
-  const tierColor = _tvRec>=20000?'#4ADE80':_tvRec>=10000?'#67E8F9':_tvRec>=5000?'#FCD34D':'#FCA5A5';
+  const tierColor = _tvRec>=20000?'#059669':_tvRec>=10000?'#0E7490':_tvRec>=5000?'#B45309':'#DC2626';
 
   // Eficiência
   const gerados  = op.gerados  ||0;
@@ -9942,9 +9963,9 @@ function tvShow(idx){
   const tiposAll   = Object.entries(op.tipos||{}).sort((a,b)=>b[1]-a[1]);
   const tiposTotal = tiposAll.reduce((s,[,v])=>s+v,0);
   const tCores     = {
-    'PIX':'#4ADE80','Pix':'#4ADE80',
-    'CARTÃO DE CRÉDITO':'#67E8F9','Cartão Padrão':'#67E8F9','Cartão':'#67E8F9',
-    'BOLETO NEGOCIAÇÃO':'#FCD34D','Boleto':'#FCD34D'
+    'PIX':'#059669','Pix':'#059669',
+    'CARTÃO DE CRÉDITO':'#0E7490','Cartão Padrão':'#0E7490','Cartão':'#0E7490',
+    'BOLETO NEGOCIAÇÃO':'#B45309','Boleto':'#B45309'
   };
 
   // Vizinhos (dentro do modo atual)
@@ -9960,7 +9981,7 @@ function tvShow(idx){
       <!-- FOTO ESQUERDA -->
       <div style="width:44%;flex-shrink:0;position:relative;overflow:hidden">
         ${photoHtml}
-        <div style="position:absolute;inset:0;background:linear-gradient(to right,transparent 55%,#F1F8F4 100%);pointer-events:none"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(to right,transparent 55%,#EAF7F1 100%);pointer-events:none"></div>
 
         <!-- Posição grande -->
         <div style="position:absolute;bottom:88px;left:26px">
@@ -9979,7 +10000,7 @@ function tvShow(idx){
 
         <!-- Contador operadores no modo -->
         <div style="position:absolute;bottom:60px;left:26px;font-size:10px;font-weight:700;
-          color:rgba(15,35,25,.35);letter-spacing:1px">
+          color:rgba(26,46,34,0.62);letter-spacing:1px">
           ${pos} / ${tvList.length} ${bbMode?'Bruna+Stephanie':isEqMode?'na equipe':'no ranking'}
         </div>
       </div>
@@ -9993,14 +10014,14 @@ function tvShow(idx){
           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:nowrap;overflow:hidden">
             <div style="display:flex;align-items:baseline;gap:16px;flex:1;min-width:0;overflow:hidden">
               <div style="font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:2px;
-                color:#122018;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">
+                color:#1A2E22;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">
                 ${op.name.replace(/_/g,' ').toUpperCase()}
               </div>
               ${(()=>{
                 const metaInd = getMetaOp(op.name);
                 if(!metaInd||metaInd<=0) return '';
                 const proj = calcProjecao(tvGetRec(op), metaInd);
-                const pCor = proj.status==='ok'?'#4ADE80':proj.status==='info'?'#67E8F9':proj.status==='warn'?'#FCD34D':'#FCA5A5';
+                const pCor = proj.status==='ok'?'#059669':proj.status==='info'?'#0E7490':proj.status==='warn'?'#B45309':'#DC2626';
                 return `<div style="font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:2px;
                   color:${pCor};line-height:1;white-space:nowrap;flex-shrink:0;
                   text-shadow:0 0 24px ${pCor}66">${proj.pct.toFixed(0)}%</div>`;
@@ -10011,8 +10032,8 @@ function tvShow(idx){
           <div style="display:flex;gap:8px;align-items:center;margin-top:5px;flex-wrap:wrap">
             ${posGlobalBadge}
             ${(()=>{try{return !!feedbackGetAll()[op.name];}catch(e){return false;}})()
-              ? '<div style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.4);border-radius:100px;padding:3px 10px;font-size:10px;font-weight:800;color:#4ADE80">✅ Feedback OK</div>'
-              : '<div style="background:rgba(252,211,77,.1);border:1px solid rgba(252,211,77,.3);border-radius:100px;padding:3px 10px;font-size:10px;font-weight:800;color:#FCD34D">⏳ Feedback pendente</div>'
+              ? '<div style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.4);border-radius:100px;padding:3px 10px;font-size:10px;font-weight:800;color:#059669">✅ Feedback OK</div>'
+              : '<div style="background:rgba(252,211,77,.1);border:1px solid rgba(252,211,77,.3);border-radius:100px;padding:3px 10px;font-size:10px;font-weight:800;color:#B45309">⏳ Feedback pendente</div>'
             }
           </div>
         </div>
@@ -10021,28 +10042,28 @@ function tvShow(idx){
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
           <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);
               border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:8px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">💰 Total Real</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;line-height:1">${fR(tvGetRec(op))}</div>
+            <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">💰 Total Real</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#059669;line-height:1">${fR(tvGetRec(op))}</div>
           </div>
           <div style="background:rgba(103,232,249,.1);border:1px solid rgba(103,232,249,.25);
               border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:8px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 HO (25%)</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#67E8F9;line-height:1">${fR(op.ho)}</div>
+            <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 HO (25%)</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#0E7490;line-height:1">${fR(op.ho)}</div>
           </div>
-          <div style="background:rgba(15,35,25,.05);border:1px solid rgba(15,35,25,.1);
+          <div style="background:#FFFFFF;border:1px solid rgba(26,46,34,0.62);
               border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:8px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">📋 Acordos</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#122018;line-height:1">${op.acordos||0}</div>
+            <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">📋 Acordos</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#1A2E22;line-height:1">${op.acordos||0}</div>
           </div>
           ${temEfic
             ? `<div style="background:${efC}18;border:1px solid ${efC}33;border-radius:12px;padding:12px;text-align:center">
-                <div style="font-size:8px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚡ Efic. Pgto</div>
+                <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚡ Efic. Pgto</div>
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${efC};line-height:1">${efPct}%</div>
-                <div style="font-size:9px;color:rgba(15,35,25,.3);margin-top:2px">${pagos}/${gerados} venc.</div>
+                <div style="font-size:9px;color:rgba(26,46,34,0.62);margin-top:2px">${pagos}/${gerados} venc.</div>
                </div>`
             : `<div style="background:rgba(252,211,77,.08);border:1px solid rgba(252,211,77,.2);border-radius:12px;padding:12px;text-align:center">
-                <div style="font-size:8px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎫 Ticket Médio</div>
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FCD34D;line-height:1">${(op.acordos||0)>0?fRK(tvGetRec(op)/(op.acordos||1)):'—'}</div>
+                <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎫 Ticket Médio</div>
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#B45309;line-height:1">${(op.acordos||0)>0?fRK(tvGetRec(op)/(op.acordos||1)):'—'}</div>
                </div>`
           }
         </div>
@@ -10052,7 +10073,7 @@ function tvShow(idx){
           if(tiposAll.length === 0) return '';
           // Agrupa por categoria
           const grpMap = {'PIX':0,'CARTÃO':0,'BOLETO':0};
-          const grpCor = {'PIX':'#4ADE80','CARTÃO':'#67E8F9','BOLETO':'#FCD34D'};
+          const grpCor = {'PIX':'#059669','CARTÃO':'#0E7490','BOLETO':'#B45309'};
           const grpIco = {'PIX':'🟢','CARTÃO':'💳','BOLETO':'📄'};
           tiposAll.forEach(([k,v])=>{
             const kl = k.toUpperCase();
@@ -10071,10 +10092,10 @@ function tvShow(idx){
               const pct = total>0?(v/total*100).toFixed(0):0;
               return `<div style="background:${cor}12;border:1px solid ${cor}35;border-radius:12px;padding:11px 14px;position:relative;overflow:hidden">
                 <div style="position:absolute;top:-10px;right:-6px;font-size:38px;opacity:.08">${ico}</div>
-                <div style="font-size:8px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">${ico} ${nm}</div>
+                <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">${ico} ${nm}</div>
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${cor};line-height:1;letter-spacing:.5px">${fR(v)}</div>
                 <div style="display:flex;align-items:center;gap:6px;margin-top:5px">
-                  <div style="flex:1;height:3px;background:rgba(15,35,25,.08);border-radius:100px;overflow:hidden">
+                  <div style="flex:1;height:3px;background:#FFFFFF;border-radius:100px;overflow:hidden">
                     <div style="height:100%;width:${pct}%;background:${cor};border-radius:100px"></div>
                   </div>
                   <span style="font-size:9px;color:${cor};font-weight:800">${pct}%</span>
@@ -10109,17 +10130,17 @@ function tvShow(idx){
 
           const diff = maioOp - abrilOpDu;
           const pct  = abrilOpDu > 0 ? ((diff / abrilOpDu) * 100).toFixed(0) : 0;
-          const col  = diff >= 0 ? '#4ADE80' : '#FCA5A5';
+          const col  = diff >= 0 ? '#059669' : '#DC2626';
           const bg   = diff >= 0 ? 'rgba(74,222,128,.12)' : 'rgba(252,165,165,.12)';
           const bd   = diff >= 0 ? 'rgba(74,222,128,.35)' : 'rgba(252,165,165,.35)';
           const icon = diff >= 0 ? '▲' : '▼';
           const diaCalendario = duAtual > 0 ? (CMP_JULHO_DU_DIAS[duAtual-1] || '?') : '?';
 
           return `<div style="background:${bg};border:1px solid ${bd};border-radius:10px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-            <div style="font-size:9px;font-weight:700;color:rgba(15,35,25,.4);letter-spacing:1.5px;text-transform:uppercase">📊 vs Abril (até ${duAtual}° DU — dia ${diaCalendario})</div>
+            <div style="font-size:9px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase">📊 vs Abril (até ${duAtual}° DU — dia ${diaCalendario})</div>
             <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:11px;color:rgba(15,35,25,.4)">Abril/${duAtual}DU: <b style="color:rgba(15,35,25,.7)">${fR(abrilOpDu)}</b></span>
-              <span style="font-size:11px;color:rgba(15,35,25,.4)">Maio: <b style="color:#4ADE80">${fR(maioOp)}</b></span>
+              <span style="font-size:11px;color:rgba(26,46,34,0.62)">Abril/${duAtual}DU: <b style="color:rgba(26,46,34,0.7)">${fR(abrilOpDu)}</b></span>
+              <span style="font-size:11px;color:rgba(26,46,34,0.62)">Maio: <b style="color:#059669">${fR(maioOp)}</b></span>
               <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:${col};letter-spacing:.5px">${icon} ${Math.abs(pct)}%</span>
               <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${col}">${diff >= 0 ? '+' : '-'}${fR(Math.abs(diff))}</span>
             </div>
@@ -10127,14 +10148,14 @@ function tvShow(idx){
         })()}
 
         <!-- RECEBIMENTO POR DIA — 31 dias com cor de meta -->
-        <div style="background:rgba(15,35,25,.04);border:1px solid rgba(15,35,25,.08);border-radius:12px;padding:12px 14px">
+        <div style="background:#FFFFFF;border:1px solid rgba(0,168,107,.18);border-radius:12px;padding:12px 14px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <div style="font-size:9px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase">📊 Recebimento por Dia — ${String(mesRef+1).padStart(2,'0')}/${anoRef}</div>
+            <div style="font-size:9px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase">📊 Recebimento por Dia — ${String(mesRef+1).padStart(2,'0')}/${anoRef}</div>
             <div style="display:flex;gap:7px;align-items:center">
-              <span style="font-size:8px;color:rgba(15,35,25,.3)">Meta/Dia R$4k:</span>
-              ${['#22C55E','#38BDF8','#FCD34D','#F87171'].map((col,i)=>{
+              <span style="font-size:8px;color:rgba(26,46,34,0.62)">Meta/Dia R$4k:</span>
+              ${['#00A86B','#0284C7','#B45309','#DC2626'].map((col,i)=>{
                 const labels=['≥4k','3k-4k','2k-3k','<2k'];
-                return '<div style="display:flex;align-items:center;gap:2px"><div style="width:7px;height:7px;border-radius:1px;background:'+col+'"></div><span style="font-size:8px;color:rgba(15,35,25,.4)">'+labels[i]+'</span></div>';
+                return '<div style="display:flex;align-items:center;gap:2px"><div style="width:7px;height:7px;border-radius:1px;background:'+col+'"></div><span style="font-size:8px;color:rgba(26,46,34,0.62)">'+labels[i]+'</span></div>';
               }).join('')}
             </div>
           </div>
@@ -10145,38 +10166,38 @@ function tvShow(idx){
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
 
           <!-- Ranking (vizinhos no modo atual) -->
-          <div style="background:rgba(15,35,25,.04);border:1px solid rgba(15,35,25,.08);
+          <div style="background:#FFFFFF;border:1px solid rgba(0,168,107,.18);
               border-radius:12px;padding:11px 13px">
-            <div style="font-size:9px;font-weight:700;color:rgba(15,35,25,.35);
+            <div style="font-size:9px;font-weight:700;color:rgba(26,46,34,0.62);
               letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">
               🏆 ${tvMode==='bb'?'Bruna + Stephanie':tvMode==='bs'?'Stephanie + Katia':tvMode==='COFEN BIRIGUI BRUNA'?'Bruna + Digital + Elite':isEqMode?'Ranking da Equipe':'Ranking Geral'}
             </div>
             ${prev?`<div style="display:flex;justify-content:space-between;padding:4px 7px;
-                border-radius:6px;background:rgba(15,35,25,.04);margin-bottom:4px">
-              <span style="font-size:10px;color:rgba(15,35,25,.3)">${idx}° ${prev.name.replace(/_/g,' ')}</span>
-              <span style="font-size:10px;color:rgba(15,35,25,.35);font-weight:700">${fRK(tvGetRec(prev))}</span>
+                border-radius:6px;background:#FFFFFF;margin-bottom:4px">
+              <span style="font-size:10px;color:rgba(26,46,34,0.62)">${idx}° ${prev.name.replace(/_/g,' ')}</span>
+              <span style="font-size:10px;color:rgba(26,46,34,0.62);font-weight:700">${fRK(tvGetRec(prev))}</span>
             </div>`:''}
             <div style="display:flex;justify-content:space-between;align-items:center;
                 padding:6px 9px;border-radius:8px;background:${cfg.c}22;border:1px solid ${cfg.c}55;margin-bottom:4px">
               <span style="font-size:12px;color:${cfg.c};font-weight:800">${posLabel} VOCÊ</span>
               <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-size:13px;color:#4ADE80;font-weight:900">${fRK(tvGetRec(op))}</span>
+                <span style="font-size:13px;color:#059669;font-weight:900">${fRK(tvGetRec(op))}</span>
                 ${(()=>{ return ''; /* premiação removida a pedido do usuário */ })()}
               </div>
             </div>
             ${next?`<div style="display:flex;justify-content:space-between;padding:4px 7px;
-                border-radius:6px;background:rgba(15,35,25,.04)">
-              <span style="font-size:10px;color:rgba(15,35,25,.3)">${idx+2}° ${next.name.replace(/_/g,' ')}</span>
-              <span style="font-size:10px;color:rgba(15,35,25,.35);font-weight:700">${fRK(tvGetRec(next))}</span>
+                border-radius:6px;background:#FFFFFF">
+              <span style="font-size:10px;color:rgba(26,46,34,0.62)">${idx+2}° ${next.name.replace(/_/g,' ')}</span>
+              <span style="font-size:10px;color:rgba(26,46,34,0.62);font-weight:700">${fRK(tvGetRec(next))}</span>
             </div>`:''}
           </div>
 
           <!-- Agendamentos TODOS -->
-          <div style="background:rgba(15,35,25,.04);border:1px solid rgba(15,35,25,.08);
+          <div style="background:#FFFFFF;border:1px solid rgba(0,168,107,.18);
               border-radius:12px;padding:11px 13px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <div style="font-size:9px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase">📅 Agendamentos</div>
-              ${agTotal>0?`<div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#67E8F9">${agTotal}<span style="font-size:9px;color:rgba(15,35,25,.3);font-weight:700"> ac.</span></div>`:''}
+              <div style="font-size:9px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase">📅 Agendamentos</div>
+              ${agTotal>0?`<div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#0E7490">${agTotal}<span style="font-size:9px;color:rgba(26,46,34,0.62);font-weight:700"> ac.</span></div>`:''}
             </div>
             ${agEntries.length>0
               ? `<div style="display:flex;flex-direction:column;gap:4px;max-height:130px;overflow-y:auto">
@@ -10187,54 +10208,54 @@ function tvShow(idx){
                     const isF=dDt>hoje;
                     const ds2=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][d2.getDay()];
                     const df2=d2.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
-                    const bg2=isH?'rgba(74,222,128,.15)':isF?'rgba(103,232,249,.08)':'rgba(15,35,25,.03)';
-                    const bd2=isH?'rgba(74,222,128,.4)':isF?'rgba(103,232,249,.2)':'rgba(15,35,25,.07)';
-                    const c2=isH?'#4ADE80':isF?'#67E8F9':'rgba(15,35,25,.4)';
-                    const tag=isH?'<span style="font-size:7px;font-weight:800;background:#4ADE8033;color:#4ADE80;border-radius:3px;padding:1px 4px">HOJE</span>'
-                              :!isF?'<span style="font-size:8px;color:rgba(15,35,25,.25)">passado</span>':'';
+                    const bg2=isH?'rgba(74,222,128,.15)':isF?'rgba(103,232,249,.08)':'rgba(0,168,107,.18)';
+                    const bd2=isH?'rgba(74,222,128,.4)':isF?'rgba(103,232,249,.2)':'rgba(0,168,107,.18)';
+                    const c2=isH?'#059669':isF?'#0E7490':'rgba(26,46,34,0.62)';
+                    const tag=isH?'<span style="font-size:7px;font-weight:800;background:#05966933;color:#059669;border-radius:3px;padding:1px 4px">HOJE</span>'
+                              :!isF?'<span style="font-size:8px;color:rgba(26,46,34,0.62)">passado</span>':'';
                     return `<div style="display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;
                         padding:5px 8px;border-radius:7px;background:${bg2};border:1px solid ${bd2}">
                       <div>
                         <div style="display:flex;align-items:center;gap:4px">
-                          <span style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(15,35,25,.85)">${df2}</span>
-                          <span style="font-size:9px;font-weight:700;color:rgba(15,35,25,.4)">${ds2}</span>
+                          <span style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(26,46,34,0.85)">${df2}</span>
+                          <span style="font-size:9px;font-weight:700;color:rgba(26,46,34,0.62)">${ds2}</span>
                           ${tag}
                         </div>
                       </div>
                       <div style="text-align:right">
                         <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${c2};line-height:1">${n}</div>
-                        <div style="font-size:8px;color:rgba(15,35,25,.3)">ac.</div>
+                        <div style="font-size:8px;color:rgba(26,46,34,0.62)">ac.</div>
                       </div>
                     </div>`;
                   }).join('')}
                 </div>`
-              : `<div style="font-size:11px;color:rgba(15,35,25,.2);font-style:italic">Sem agendamentos</div>`
+              : `<div style="font-size:11px;color:rgba(26,46,34,0.62);font-style:italic">Sem agendamentos</div>`
             }
           </div>
 
           <!-- Formas de pagamento -->
-          <div style="background:rgba(15,35,25,.04);border:1px solid rgba(15,35,25,.08);
+          <div style="background:#FFFFFF;border:1px solid rgba(0,168,107,.18);
               border-radius:12px;padding:11px 13px">
-            <div style="font-size:9px;font-weight:700;color:rgba(15,35,25,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💳 Formas de Pgto por Operador</div>
+            <div style="font-size:9px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">💳 Formas de Pgto por Operador</div>
             ${tiposAll.length>0
               ? tiposAll.map(([k,v])=>{
                   const pct=tiposTotal>0?Math.round(v/tiposTotal*100):0;
-                  const cor=tCores[k]||'rgba(15,35,25,.6)';
+                  const cor=tCores[k]||'rgba(26,46,34,0.6)';
                   const nm=k.replace('NEGOCIAÇÃO','').replace('Padrão','').replace('DE CRÉDITO','').trim();
                   return `<div style="margin-bottom:7px">
                     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
-                      <span style="font-size:10px;color:rgba(15,35,25,.6)">${nm}</span>
+                      <span style="font-size:10px;color:rgba(26,46,34,0.6)">${nm}</span>
                       <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:${cor};letter-spacing:.3px">${fR(v)}</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:5px">
-                      <div style="flex:1;height:4px;background:rgba(15,35,25,.08);border-radius:100px;overflow:hidden">
+                      <div style="flex:1;height:4px;background:#FFFFFF;border-radius:100px;overflow:hidden">
                         <div style="height:100%;width:${pct}%;background:${cor};border-radius:100px"></div>
                       </div>
                       <span style="font-size:9px;color:${cor};font-weight:800;min-width:28px;text-align:right">${pct}%</span>
                     </div>
                   </div>`;
                 }).join('')
-              : `<div style="font-size:11px;color:rgba(15,35,25,.2)">Sem dados</div>`
+              : `<div style="font-size:11px;color:rgba(26,46,34,0.62)">Sem dados</div>`
             }
           </div>
 
@@ -10245,7 +10266,7 @@ function tvShow(idx){
   tvUpdateDots();
   const bar=document.getElementById('tv-bar');
   if(bar){
-    bar.style.transition='none'; bar.style.width='0%'; bar.style.background='linear-gradient(90deg,#009C3B,#FFDF00,#009C3B)';
+    bar.style.transition='none'; bar.style.width='0%'; bar.style.background='linear-gradient(90deg,#00A86B,#00C97F,#00B8A9)';
     setTimeout(()=>{ bar.style.transition=`width ${TV_INTERVAL}ms linear`; bar.style.width='100%'; },50);
   }
 }
@@ -10255,9 +10276,9 @@ function tvShow(idx){
 function pulseSyncDot(){
   const dot=document.getElementById('sync-dot');
   if(!dot) return;
-  dot.style.background='#FCD34D';
+  dot.style.background='#B45309';
   dot.style.transform='scale(1.8)';
-  setTimeout(()=>{dot.style.background='#4ADE80';dot.style.transform='scale(1)';},800);
+  setTimeout(()=>{dot.style.background='#059669';dot.style.transform='scale(1)';},800);
 }
 // ══════════════════════════════════════════
 // FIREBASE SYNC — TEMPO REAL MULTI-DISPOSITIVO
@@ -13018,8 +13039,12 @@ setInterval(()=>{
 
 <!-- TV MODE OVERLAY -->
 <div id="tv-overlay">
+  <!-- Orbes flutuantes (movimento de fundo) -->
+  <div class="tv-orb" style="width:260px;height:260px;top:8%;left:6%;background:radial-gradient(circle,rgba(0,168,107,.28),transparent 70%);animation:tvOrbFloat1 9s ease-in-out infinite"></div>
+  <div class="tv-orb" style="width:200px;height:200px;bottom:12%;right:8%;background:radial-gradient(circle,rgba(0,184,169,.26),transparent 70%);animation:tvOrbFloat2 11s ease-in-out infinite"></div>
+  <div class="tv-orb" style="width:150px;height:150px;top:45%;right:20%;background:radial-gradient(circle,rgba(0,201,127,.24),transparent 70%);animation:tvOrbFloat3 7s ease-in-out infinite"></div>
   <!-- Faixa decorativa Brasil no topo -->
-  <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#002776 0%,#009C3B 33%,#FFDF00 66%,#009C3B 80%,#002776 100%);z-index:10"></div>
+  <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#00A86B 0%,#00C97F 30%,#00B8A9 55%,#00C97F 75%,#00A86B 100%);z-index:10"></div>
   <div class="tv-header">
     <div class="tv-brand" style="display:flex;align-items:center;gap:10px">
       <span style="font-size:22px">🇧🇷</span>
@@ -13027,10 +13052,10 @@ setInterval(()=>{
     </div>
     <div style="display:flex;align-items:center;gap:16px">
       <div id="tv-mode-label" style="font-family:'Bebas Neue',sans-serif;font-size:16px;
-        color:#FFDF00;letter-spacing:2px;text-transform:uppercase"></div>
+        color:#00875A;letter-spacing:2px;text-transform:uppercase"></div>
       <div>
-        <div id="tv-clock-display" class="tv-clock" style="color:#FFDF00"></div>
-        <div id="tv-date-display" style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:rgba(255,255,255,.28);margin-top:-4px"></div>
+        <div id="tv-clock-display" class="tv-clock" style="color:#00875A"></div>
+        <div id="tv-date-display" style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:rgba(26,46,34,0.62);margin-top:-4px"></div>
       </div>
     </div>
   </div>
@@ -13039,53 +13064,53 @@ setInterval(()=>{
   <!-- Área de conteúdo — preenchida pelo JS -->
   <div id="tv-card" class="tv-card"></div>
 
-  <div class="tv-progress" style="background:rgba(0,39,118,.4)"><div id="tv-bar" class="tv-progress-fill" style="background:linear-gradient(90deg,#009C3B,#FFDF00,#009C3B)"></div></div>
+  <div class="tv-progress" style="background:rgba(0,168,107,.14)"><div id="tv-bar" class="tv-progress-fill" style="background:linear-gradient(90deg,#00A86B,#00C97F,#00B8A9,#00C97F,#00A86B)"></div></div>
   <div class="tv-nav" id="tv-dots"></div>
   <!-- Faixa decorativa Brasil na base -->
-  <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#002776 0%,#009C3B 33%,#FFDF00 66%,#009C3B 80%,#002776 100%);z-index:10"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00A86B 0%,#00C97F 30%,#00B8A9 55%,#00C97F 75%,#00A86B 100%);z-index:10"></div>
 
   <!-- Controles -->
   <div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center">
     <!-- Seletor de modo -->
-    <div style="display:flex;gap:4px;background:rgba(255,255,255,.08);border-radius:var(--rm);padding:3px">
+    <div style="display:flex;gap:4px;background:#FFFFFF;border-radius:var(--rm);padding:3px">
       <button id="tv-btn-bs" onclick="tvSetMode('bs',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:rgba(255,255,255,.18);color:#fff;letter-spacing:.5px;transition:all .2s">
+        font-weight:800;font-size:11px;background:rgba(0,168,107,.22);color:#1A2E22;letter-spacing:.5px;transition:all .2s">
         🏙️⭐ Stephanie + Katia
       </button>
       <button id="tv-btn-bsk" onclick="tvSetMode('bsk',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
+        font-weight:800;font-size:11px;background:transparent;color:rgba(26,46,34,0.62);letter-spacing:.5px;transition:all .2s">
         🏙️⭐💜 Stephanie + Katia + Laysa Lopes
       </button>
       <button id="tv-btn-COFEN_BIRIGUI_BRUNA" onclick="tvSetMode('COFEN BIRIGUI BRUNA',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
+        font-weight:800;font-size:11px;background:transparent;color:rgba(26,46,34,0.62);letter-spacing:.5px;transition:all .2s">
         💙 Bruna + Digital + Elite
       </button>
       <button id="tv-btn-COFEN_KATIA" onclick="tvSetMode('COFEN KATIA',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
+        font-weight:800;font-size:11px;background:transparent;color:rgba(26,46,34,0.62);letter-spacing:.5px;transition:all .2s">
         💜 Laysa Lopes
       </button>
       <button id="tv-btn-COFEN_PAGUEPLAY" onclick="tvSetMode('COFEN PAGUEPLAY',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:transparent;color:rgba(255,255,255,.5);letter-spacing:.5px;transition:all .2s">
+        font-weight:800;font-size:11px;background:transparent;color:rgba(26,46,34,0.62);letter-spacing:.5px;transition:all .2s">
         🩷 Pagueplay
       </button>
     </div>
     <!-- Nav -->
     <button onclick="tvPrev()"
-      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.2);
-      background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);font-family:Nunito,sans-serif;
+      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(0,168,107,.3);
+      background:#FFFFFF;color:#1A2E22;font-family:Nunito,sans-serif;
       font-weight:700;font-size:12px;cursor:pointer">◀</button>
     <button id="tv-pause-btn" onclick="tvTogglePause()"
-      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.2);
-      background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);font-family:Nunito,sans-serif;
+      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(0,168,107,.3);
+      background:#FFFFFF;color:#1A2E22;font-family:Nunito,sans-serif;
       font-weight:700;font-size:12px;cursor:pointer">⏸ Pausar</button>
     <button onclick="tvNext()"
-      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.2);
-      background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);font-family:Nunito,sans-serif;
+      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(0,168,107,.3);
+      background:#FFFFFF;color:#1A2E22;font-family:Nunito,sans-serif;
       font-weight:700;font-size:12px;cursor:pointer">▶</button>
   </div>
 </div>
@@ -17165,7 +17190,7 @@ function tvEnter(){
 </script>
 
 <!-- ══ PÁGINA MODO TV ══ -->
-<div class="page" id="pg-tv" style="padding:0;margin:0;background:#001a0a">
+<div class="page" id="pg-tv" style="padding:0;margin:0;background:#EAF7F1">
 <style>
 #pg-tv{display:none}
 #pg-tv.on{display:flex;flex-direction:column}
