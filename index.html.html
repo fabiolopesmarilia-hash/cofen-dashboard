@@ -559,6 +559,7 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('acordos',this)">🤝 Acordos</div>
   <div class="tab"     onclick="go('calend',this)">📆 Calendário</div>
   <div class="tab"     onclick="go('check',this)">✅ Checklist Líder</div>
+  <div class="tab"     onclick="go('campanhas',this);campFiltrar('todos');if(!document.getElementById('camp-data').value)document.getElementById('camp-data').value=new Date().toISOString().split('T')[0]">📢 Campanhas</div>
   <div class="tab"     onclick="go('comparativo',this)">📊 Comparativo Mês</div>
   <div class="tab"     onclick="go('inadimpl',this)">🚨 Inadimplência</div>
   <div class="tab"     onclick="go('metas',this)">🎯 Metas 2026</div>
@@ -10458,6 +10459,7 @@ function syncDisconnect(){
   if(fbListeners.gestao)    { fbDb?.ref(fbRoom+'/gestao').off(); }
   ['janeiro','fevereiro','março','abril','maio','junho','julho'].forEach(m=>{ if(fbListeners['hist_'+m]) fbDb?.ref(fbRoom+'/hist_'+m).off(); });
   if(fbListeners.acordos)   { fbDb?.ref(fbRoom+'/acordos').off(); }
+  if(fbListeners.campanhas) { fbDb?.ref(fbRoom+'/campanhas').off(); }
   fbListeners={};
   fbApp=null; fbDb=null; fbRoom=null;
   fbSaveCfg({});
@@ -10983,6 +10985,8 @@ function fbStartListening(){
 
   // ── Feedback mensal ──
   fbListenFeedback();
+  // ── Campanhas (SMS/E-mail/RCS/WhatsApp/CRM/IA...) ──
+  fbListenCampanhas();
 }
 
 // ── PUSH TO FIREBASE ──
@@ -12098,6 +12102,135 @@ function fbListenFeedback(){
     pulseSyncDot();
   });
   fbListeners.feedback = true;
+}
+
+// ══════════════════════════════════════════
+// CAMPANHAS — SMS/E-mail/RCS/WhatsApp/CRM/IA
+// ══════════════════════════════════════════
+let campanhasData = {};
+let campFiltroAtual = 'todos';
+
+function campFiltrar(periodo){
+  campFiltroAtual = periodo;
+  document.querySelectorAll('#camp-filtros button').forEach(b=>{
+    const on = b.id==='camp-f-'+periodo;
+    b.style.background = on ? 'var(--pp)' : 'var(--g50)';
+    b.style.color = on ? '#fff' : 'var(--g700)';
+    b.style.borderColor = on ? 'var(--pp)' : 'var(--g200)';
+  });
+  renderCampanhas();
+}
+
+function campNoPeriodo(dataStr, periodo){
+  if(!dataStr || periodo==='todos') return true;
+  const d = new Date(dataStr+'T00:00:00');
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  if(periodo==='dia') return d.getTime()===hoje.getTime();
+  if(periodo==='semana'){
+    const inicioSemana = new Date(hoje); inicioSemana.setDate(hoje.getDate()-hoje.getDay());
+    return d >= inicioSemana && d <= hoje;
+  }
+  if(periodo==='mes') return d.getFullYear()===hoje.getFullYear() && d.getMonth()===hoje.getMonth();
+  if(periodo==='ano') return d.getFullYear()===hoje.getFullYear();
+  return true;
+}
+
+function fbListenCampanhas(){
+  if(!fbDb||!fbRoom||fbListeners.campanhas) return;
+  fbDb.ref(fbRoom+'/campanhas').on('value', snap=>{
+    campanhasData = snap.val() || {};
+    renderCampanhas();
+    pulseSyncDot();
+  });
+  fbListeners.campanhas = true;
+}
+
+function campanhaSalvar(){
+  const data    = document.getElementById('camp-data').value;
+  const lider   = document.getElementById('camp-lider').value.trim();
+  const nome    = document.getElementById('camp-nome').value.trim();
+  const qtd     = parseInt(document.getElementById('camp-qtd').value) || 0;
+  const filtro  = document.getElementById('camp-filtro').value.trim();
+  const obs     = document.getElementById('camp-obs').value.trim();
+  const canais  = Array.from(document.querySelectorAll('#camp-canais input:checked')).map(c=>c.value);
+
+  if(!data || !lider || !nome || canais.length===0){
+    toast('⚠️ Preencha data, líder, nome da campanha e ao menos 1 canal');
+    return;
+  }
+
+  const id = 'c'+Date.now();
+  const registro = { data, lider, nome, qtd, filtro, obs, canais, criadoEm: Date.now() };
+
+  campanhasData[id] = registro;
+  campFiltrar(campFiltroAtual);
+
+  if(fbDb && fbRoom){ fbDb.ref(fbRoom+'/campanhas/'+id).set(registro).catch(e=>console.warn('FB campanhas err:',e)); }
+
+  document.getElementById('camp-lider').value = '';
+  document.getElementById('camp-nome').value = '';
+  document.getElementById('camp-qtd').value = '';
+  document.getElementById('camp-filtro').value = '';
+  document.getElementById('camp-obs').value = '';
+  document.querySelectorAll('#camp-canais input:checked').forEach(c=>c.checked=false);
+  toast('✅ Campanha registrada');
+}
+
+function campanhaDeletar(id){
+  if(!confirm('Excluir este registro de campanha?')) return;
+  delete campanhasData[id];
+  renderCampanhas();
+  if(fbDb && fbRoom){ fbDb.ref(fbRoom+'/campanhas/'+id).remove().catch(e=>console.warn('FB campanhas del err:',e)); }
+}
+
+function renderCampanhas(){
+  const tbody = document.getElementById('camp-tbody');
+  const empty = document.getElementById('camp-empty');
+  const resumo = document.getElementById('camp-resumo');
+  if(!tbody) return;
+  const entries = Object.entries(campanhasData)
+    .filter(([id,r])=>campNoPeriodo(r.data, campFiltroAtual))
+    .sort((a,b)=>(b[1].data||'').localeCompare(a[1].data||'') || (b[1].criadoEm||0)-(a[1].criadoEm||0));
+
+  // Resumo do período
+  if(resumo){
+    const totalQtd = entries.reduce((s,[,r])=>s+(r.qtd||0),0);
+    const porCanal = {};
+    entries.forEach(([,r])=>(r.canais||[]).forEach(c=>{ porCanal[c]=(porCanal[c]||0)+1; }));
+    const canaisTop = Object.entries(porCanal).sort((a,b)=>b[1]-a[1]).slice(0,4)
+      .map(([c,n])=>`<span style="background:rgba(0,168,107,.1);border:1px solid rgba(0,168,107,.3);border-radius:100px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--ppd)">${c}: ${n}</span>`).join('');
+    resumo.innerHTML = `
+      <div style="background:var(--g50);border-radius:var(--rm);padding:8px 14px">
+        <div style="font-size:9px;color:var(--g500);font-weight:700;text-transform:uppercase">Registros</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--g900)">${entries.length}</div>
+      </div>
+      <div style="background:var(--g50);border-radius:var(--rm);padding:8px 14px">
+        <div style="font-size:9px;color:var(--g500);font-weight:700;text-transform:uppercase">Qtd. Total Disparada</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--pp)">${totalQtd.toLocaleString('pt-BR')}</div>
+      </div>
+      ${canaisTop}`;
+  }
+
+  if(entries.length===0){
+    tbody.innerHTML='';
+    if(empty) empty.style.display='block';
+    return;
+  }
+  if(empty) empty.style.display='none';
+  tbody.innerHTML = entries.map(([id,r])=>{
+    const dataFmt = r.data ? r.data.split('-').reverse().join('/') : '—';
+    const canaisHtml = (r.canais||[]).map(c=>`<span style="background:rgba(0,168,107,.1);border:1px solid rgba(0,168,107,.3);border-radius:100px;padding:2px 8px;font-size:10px;font-weight:700;color:var(--ppd);white-space:nowrap;display:inline-block;margin:1px">${c}</span>`).join(' ');
+    return `<tr style="border-bottom:1px solid var(--g100)">
+      <td style="padding:8px;white-space:nowrap;font-weight:700;color:var(--g900)">${dataFmt}</td>
+      <td style="padding:8px;color:var(--g700)">${r.lider||'—'}</td>
+      <td style="padding:8px">${canaisHtml}</td>
+      <td style="padding:8px;color:var(--g900);font-weight:700">${r.nome||'—'}</td>
+      <td style="padding:8px;color:var(--g700)">${r.qtd||0}</td>
+      <td style="padding:8px;color:var(--g500)">${r.filtro||'—'}</td>
+      <td style="padding:8px;color:var(--g500);max-width:220px">${r.obs||'—'}</td>
+      <td style="padding:8px"><button onclick="campanhaDeletar('${id}')" style="border:none;background:none;color:#DC2626;cursor:pointer;font-size:14px" title="Excluir">🗑️</button></td>
+    </tr>`;
+  }).join('');
 }
 
 // ══════════════════════════════════════════
@@ -13309,6 +13442,96 @@ setInterval(()=>{
 
 
 <!-- ══════════ PAGE: CHECKLIST LÍDER ══════════ -->
+<div class="page" id="pg-campanhas">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,var(--ppd),#1B4332);border-radius:var(--rxl);padding:16px 22px">
+    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Controle de Disparos</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff">📢 CAMPANHAS — SMS · E-MAIL · RCS · WHATSAPP · CRM · IA</div>
+  </div>
+
+  <!-- Formulário -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px;box-shadow:var(--sh)">
+    <div style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px">+ Novo Registro</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px">
+      <div>
+        <label style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px">Data</label>
+        <input type="date" id="camp-data" style="width:100%;padding:9px 12px;border:1px solid var(--g200);border-radius:var(--rm);font-family:Nunito,sans-serif;font-size:13px;color:var(--g900)">
+      </div>
+      <div>
+        <label style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px">Líder</label>
+        <input type="text" id="camp-lider" placeholder="Nome do líder" style="width:100%;padding:9px 12px;border:1px solid var(--g200);border-radius:var(--rm);font-family:Nunito,sans-serif;font-size:13px;color:var(--g900)">
+      </div>
+      <div>
+        <label style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px">Nome da Campanha</label>
+        <input type="text" id="camp-nome" placeholder="Ex: Reforço vencidos 30d" style="width:100%;padding:9px 12px;border:1px solid var(--g200);border-radius:var(--rm);font-family:Nunito,sans-serif;font-size:13px;color:var(--g900)">
+      </div>
+      <div>
+        <label style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px">Quantidade</label>
+        <input type="number" id="camp-qtd" placeholder="0" min="0" style="width:100%;padding:9px 12px;border:1px solid var(--g200);border-radius:var(--rm);font-family:Nunito,sans-serif;font-size:13px;color:var(--g900)">
+      </div>
+      <div>
+        <label style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px">Filtro Utilizado</label>
+        <input type="text" id="camp-filtro" placeholder="Ex: inadimplentes 30-60 dias" style="width:100%;padding:9px 12px;border:1px solid var(--g200);border-radius:var(--rm);font-family:Nunito,sans-serif;font-size:13px;color:var(--g900)">
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Canal (múltipla escolha)</label>
+      <div id="camp-canais" style="display:flex;flex-wrap:wrap;gap:8px">
+        <label style="display:flex;align-items:center;gap:6px;background:var(--g100);border:1px solid var(--g200);border-radius:100px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--g700);cursor:pointer"><input type="checkbox" value="SMS" style="accent-color:var(--pp)"> SMS</label>
+        <label style="display:flex;align-items:center;gap:6px;background:var(--g100);border:1px solid var(--g200);border-radius:100px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--g700);cursor:pointer"><input type="checkbox" value="E-mail" style="accent-color:var(--pp)"> E-mail</label>
+        <label style="display:flex;align-items:center;gap:6px;background:var(--g100);border:1px solid var(--g200);border-radius:100px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--g700);cursor:pointer"><input type="checkbox" value="RCS" style="accent-color:var(--pp)"> RCS</label>
+        <label style="display:flex;align-items:center;gap:6px;background:var(--g100);border:1px solid var(--g200);border-radius:100px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--g700);cursor:pointer"><input type="checkbox" value="WhatsApp" style="accent-color:var(--pp)"> WhatsApp</label>
+        <label style="display:flex;align-items:center;gap:6px;background:var(--g100);border:1px solid var(--g200);border-radius:100px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--g700);cursor:pointer"><input type="checkbox" value="CRM" style="accent-color:var(--pp)"> CRM</label>
+        <label style="display:flex;align-items:center;gap:6px;background:var(--g100);border:1px solid var(--g200);border-radius:100px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--g700);cursor:pointer"><input type="checkbox" value="IA de Voz" style="accent-color:var(--pp)"> IA de Voz</label>
+        <label style="display:flex;align-items:center;gap:6px;background:var(--g100);border:1px solid var(--g200);border-radius:100px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--g700);cursor:pointer"><input type="checkbox" value="IA CPC" style="accent-color:var(--pp)"> IA CPC</label>
+        <label style="display:flex;align-items:center;gap:6px;background:var(--g100);border:1px solid var(--g200);border-radius:100px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--g700);cursor:pointer"><input type="checkbox" value="Eleven" style="accent-color:var(--pp)"> Eleven</label>
+        <label style="display:flex;align-items:center;gap:6px;background:var(--g100);border:1px solid var(--g200);border-radius:100px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--g700);cursor:pointer"><input type="checkbox" value="COB COFEN" style="accent-color:var(--pp)"> COB COFEN</label>
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px">Observação</label>
+      <textarea id="camp-obs" rows="2" placeholder="Observações sobre a campanha..." style="width:100%;padding:9px 12px;border:1px solid var(--g200);border-radius:var(--rm);font-family:Nunito,sans-serif;font-size:13px;color:var(--g900);resize:vertical"></textarea>
+    </div>
+    <button onclick="campanhaSalvar()" style="padding:10px 22px;border-radius:var(--rm);border:none;background:linear-gradient(90deg,var(--pp),var(--pp2));color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;cursor:pointer">+ Adicionar Registro</button>
+  </div>
+
+  <!-- Tabela de registros -->
+  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px;box-shadow:var(--sh)">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px">📋 Registros</div>
+      <div id="camp-filtros" style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="campFiltrar('dia')" id="camp-f-dia" style="padding:6px 14px;border-radius:100px;border:1px solid var(--g200);background:var(--g50);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">Hoje</button>
+        <button onclick="campFiltrar('semana')" id="camp-f-semana" style="padding:6px 14px;border-radius:100px;border:1px solid var(--g200);background:var(--g50);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">Semana</button>
+        <button onclick="campFiltrar('mes')" id="camp-f-mes" style="padding:6px 14px;border-radius:100px;border:1px solid var(--g200);background:var(--g50);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">Mês</button>
+        <button onclick="campFiltrar('ano')" id="camp-f-ano" style="padding:6px 14px;border-radius:100px;border:1px solid var(--g200);background:var(--g50);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">Ano</button>
+        <button onclick="campFiltrar('todos')" id="camp-f-todos" style="padding:6px 14px;border-radius:100px;border:1px solid var(--g200);background:var(--g50);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">Tudo</button>
+      </div>
+    </div>
+    <div id="camp-resumo" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px"></div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="border-bottom:2px solid var(--g200);text-align:left">
+            <th style="padding:8px;color:var(--g500);font-weight:800;text-transform:uppercase;font-size:10px">Data</th>
+            <th style="padding:8px;color:var(--g500);font-weight:800;text-transform:uppercase;font-size:10px">Líder</th>
+            <th style="padding:8px;color:var(--g500);font-weight:800;text-transform:uppercase;font-size:10px">Canais</th>
+            <th style="padding:8px;color:var(--g500);font-weight:800;text-transform:uppercase;font-size:10px">Campanha</th>
+            <th style="padding:8px;color:var(--g500);font-weight:800;text-transform:uppercase;font-size:10px">Qtd</th>
+            <th style="padding:8px;color:var(--g500);font-weight:800;text-transform:uppercase;font-size:10px">Filtro</th>
+            <th style="padding:8px;color:var(--g500);font-weight:800;text-transform:uppercase;font-size:10px">Obs</th>
+            <th style="padding:8px"></th>
+          </tr>
+        </thead>
+        <tbody id="camp-tbody"></tbody>
+      </table>
+      <div id="camp-empty" style="display:none;text-align:center;padding:30px;color:var(--g300);font-size:13px">Nenhum registro ainda. Adicione o primeiro acima ☝️</div>
+    </div>
+  </div>
+
+</div>
+
+
 <div class="page" id="pg-check">
 
   <!-- Header -->
@@ -16334,7 +16557,7 @@ function renderEqMetasTable(){
     'COFEN MARILIA BRENDA'    : 'Marília Stephanie',
     'COFEN STEPHANIE 2° TURNO': 'Katia 2°T',
     'COFEN DIGITAL'           : 'Digital',
-    'COFEN KATIA'             : 'Laysa Lopes',
+    'COFEN KATIA'             : 'Laysa/Stephanie',
   };
 
   let rows = '';
@@ -16448,6 +16671,23 @@ function renderEqMetasTable(){
   });
   tbody.innerHTML = rows || '<tr><td colspan="9" style="padding:14px;text-align:center;color:rgba(255,255,255,.3);font-size:11px">Nenhuma equipe encontrada</td></tr>';
 }
+// ── Correção: fotos dos líderes Katia/Laysa estavam trocadas
+//    (a troca de nomes das equipes não move as fotos, que ficam
+//    salvas pela chave interna). Roda 1x só e sincroniza via Firebase. ──
+function migrarFotoLiderKatiaLaysa(){
+  if(localStorage.getItem('cofen_lider_foto_swap_katia_laysa_v1')) return;
+  const all = photoGetAll();
+  const kKatia = 'LIDER_COFEN KATIA', kLaysa = 'LIDER_COFEN STEPHANIE 2° TURNO';
+  if(all[kKatia] || all[kLaysa]){
+    const tmp = all[kKatia];
+    if(all[kLaysa]) all[kKatia] = all[kLaysa]; else delete all[kKatia];
+    if(tmp) all[kLaysa] = tmp; else delete all[kLaysa];
+    localStorage.setItem('cofen_photos', JSON.stringify(all));
+    fbPush('photos', all);
+  }
+  localStorage.setItem('cofen_lider_foto_swap_katia_laysa_v1','1');
+}
+migrarFotoLiderKatiaLaysa();
 // Chamar na inicialização (após todos os dados estarem prontos)
 renderEqMetasTable();
 </script>
