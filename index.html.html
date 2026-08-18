@@ -16551,7 +16551,7 @@ function renderEqMetasTable(){
   const pctColor = p => p>=100?'#4ADE80':p>=70?'#67E8F9':p>=50?'#FCD34D':'#F87171';
   const pctBg    = p => p>=100?'rgba(74,222,128,.15)':p>=70?'rgba(103,232,249,.12)':p>=50?'rgba(252,211,77,.12)':'rgba(248,113,113,.12)';
 
-  const ORDER = ['COFEN BIRIGUI BRUNA','COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO','COFEN KATIA'];
+  const ORDER = ['COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN KATIA'];
   const EQ_LABELS = {
     'COFEN BIRIGUI BRUNA'     : 'Birigui Bruna',
     'COFEN MARILIA BRENDA'    : 'Marília Stephanie',
@@ -16617,19 +16617,32 @@ function renderEqMetasTable(){
     const liderPhoto = photoGet('LIDER_'+eqName);
     const liderLabel = (EQ_LABELS[eqName]||eqName).replace('EQUIPE ','').replace('COFEN ','').trim();
     const liderIni = liderLabel.charAt(0).toUpperCase();
+    // Equipe combinada Laysa/Stephanie neste mês: mostra as duas fotos lado a lado
+    const isCombo = eqName === 'COFEN KATIA';
+    const comboPhoto = isCombo ? photoGet('LIDER_COFEN MARILIA BRENDA') : null;
 
     rows += `<tr style="border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s"
       onmouseover="this.style.background='rgba(255,255,255,.04)'"
       onmouseout="this.style.background=''">
       <td style="padding:8px 12px">
         <div style="display:flex;align-items:center;gap:9px">
-          <div onclick="liderPhotoUpload('${eqName}')" title="Clique para adicionar/trocar a foto do líder"
-            style="width:34px;height:34px;border-radius:9px;flex-shrink:0;cursor:pointer;overflow:hidden;
-            background:${(EQ[eqName]&&EQ[eqName].c)||'#888'};display:flex;align-items:center;justify-content:center;
-            border:1.5px solid rgba(255,255,255,.15)">
-            ${liderPhoto
-              ? `<img src="${liderPhoto}" style="width:100%;height:100%;object-fit:cover">`
-              : `<span style="font-weight:900;font-size:13px;color:#fff;font-family:'Bebas Neue',sans-serif">${liderIni}</span>`}
+          <div style="display:flex;align-items:center;flex-shrink:0">
+            <div onclick="liderPhotoUpload('${eqName}')" title="Clique para adicionar/trocar a foto do líder (Laysa)"
+              style="width:34px;height:34px;border-radius:9px;cursor:pointer;overflow:hidden;
+              background:${(EQ[eqName]&&EQ[eqName].c)||'#888'};display:flex;align-items:center;justify-content:center;
+              border:1.5px solid rgba(255,255,255,.15);position:relative;z-index:1">
+              ${liderPhoto
+                ? `<img src="${liderPhoto}" style="width:100%;height:100%;object-fit:cover">`
+                : `<span style="font-weight:900;font-size:13px;color:#fff;font-family:'Bebas Neue',sans-serif">${liderIni}</span>`}
+            </div>
+            ${isCombo ? `<div onclick="liderPhotoUpload('COFEN MARILIA BRENDA')" title="Clique para adicionar/trocar a foto do líder (Stephanie)"
+              style="width:34px;height:34px;border-radius:9px;cursor:pointer;overflow:hidden;margin-left:-10px;
+              background:${(EQ['COFEN MARILIA BRENDA']&&EQ['COFEN MARILIA BRENDA'].c)||'#888'};display:flex;align-items:center;justify-content:center;
+              border:1.5px solid rgba(255,255,255,.15)">
+              ${comboPhoto
+                ? `<img src="${comboPhoto}" style="width:100%;height:100%;object-fit:cover">`
+                : `<span style="font-weight:900;font-size:13px;color:#fff;font-family:'Bebas Neue',sans-serif">S</span>`}
+            </div>` : ''}
           </div>
           <div>
             <div style="font-weight:800;font-size:11px;color:rgba(255,255,255,.85);margin-bottom:3px">${EQ_LABELS[eqName]||eqName}</div>
