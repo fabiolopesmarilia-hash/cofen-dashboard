@@ -9667,7 +9667,45 @@ function tvBuildList(){
   } else {
     ops = base.filter(o=>o.eq===tvMode).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
   }
-  tvList = [...ops];
+  // ── DESTAQUE DO DIA POR EQUIPE ──────────────────────────────────────
+  // Adiciona, ao FINAL da lista (sem alterar a ordem do ranking acima),
+  // um slide especial por equipe com quem teve o maior recebimento HOJE.
+  // Recalculado toda vez que a lista é montada (todo dia verifica de novo).
+  tvList = [...ops, ...tvBuildDailyHighlights()];
+}
+
+// Valor recebido pelo operador especificamente HOJE (dia do mês corrente)
+function tvGetTodayVal(op){
+  try{
+    const d = new Date().getDate();
+    return parseFloat((op.daily||{})[d]) || 0;
+  }catch(e){ return 0; }
+}
+
+// Monta 1 slide de "Destaque do Dia" por equipe (maior recebimento de hoje)
+// Restrito às 3 equipes usadas no Modo TV: Bruna, Katia e Laysa/Stephanie
+const TV_HIGHLIGHT_TEAMS = {
+  'COFEN BIRIGUI BRUNA':      'Birigui Bruna',
+  'COFEN STEPHANIE 2° TURNO': 'Katia 2°T',
+  'COFEN KATIA':              'Laysa/Stephanie'
+};
+function tvBuildDailyHighlights(){
+  let _removidos=[];
+  try{ _removidos=(gGetOverrides().removidos)||[]; }catch(e){}
+  const base = [...ALL].filter(o=>!_removidos.includes(o.name) && TV_HIGHLIGHT_TEAMS[o.eq]);
+  const byTeam={};
+  base.forEach(o=>{
+    const val = tvGetTodayVal(o);
+    if(val<=0) return; // só entra quem recebeu algo hoje
+    if(!byTeam[o.eq] || val > tvGetTodayVal(byTeam[o.eq])) byTeam[o.eq]=o;
+  });
+  return Object.keys(byTeam).map(eq=>({
+    _highlight: true,
+    name: 'DESTAQUE_DIA_'+eq,
+    op: byTeam[eq],
+    eq: eq,
+    valorHoje: tvGetTodayVal(byTeam[eq])
+  }));
 }
 
 // Atualiza TV ao vivo sem mudar de slide
@@ -9741,8 +9779,16 @@ document.addEventListener('keydown', e=>{
   // Teclas 0-4 para trocar modo
   if(e.key==='1'){ document.getElementById('tv-btn-bs')?.click(); }
   if(e.key==='2'){ document.getElementById('tv-btn-COFEN_BIRIGUI_BRUNA')?.click(); }
-  
+  // Tecla 9: pula direto pro(s) slide(s) de Destaque do Dia, pra testar sem esperar o ciclo inteiro
+  if(e.key==='9'){ tvGoToHighlights(); }
 });
+
+// Pula direto para o primeiro slide de "Destaque do Dia" da lista atual (tecla 9)
+function tvGoToHighlights(){
+  const i = tvList.findIndex(o=>o._highlight);
+  if(i<0){ toast('⚠️ Nenhum destaque do dia ainda (sem recebimento hoje registrado).'); return; }
+  tvGoTo(i);
+}
 
 // Update TV clock every second
 setInterval(()=>{
@@ -9780,6 +9826,16 @@ function tvShowCurrent(){
 function tvDailyBlock(op, melhorDia){
   var MT=4000;
   function cD(v){ return v>=MT?'#22C55E':v>=3000?'#38BDF8':v>=2000?'#FCD34D':v>0?'#F87171':'rgba(255,255,255,.07)'; }
+  // Carinha de acordo com a projeção do dia (meta = MT): feliz se bateu/passou,
+  // neutra se está no meio do caminho, triste se ficou longe da meta.
+  function cEmoji(v){
+    if(v<=0) return '';
+    if(v>=MT)      return '🤩';           // bateu ou superou a projeção
+    if(v>=MT*0.75) return '😄';           // muito perto da projeção
+    if(v>=MT*0.5)  return '🙂';           // no caminho
+    if(v>=MT*0.25) return '😐';           // longe da projeção
+    return '😟';                          // bem abaixo da projeção
+  }
   var a31=[], i; for(i=1;i<=31;i++) a31.push(i);
   var mxV=1; a31.forEach(function(d){ var v=op.daily[d]||0; if(v>mxV) mxV=v; });
   var dBat=0, dRec=0; a31.forEach(function(d){ var v=op.daily[d]||0; if(v>=MT) dBat++; if(v>0) dRec++; });
@@ -9792,9 +9848,11 @@ function tvDailyBlock(op, melhorDia){
     var isB=melhorDia&&v>0&&v===melhorDia[1];
     var isT=(d===tdD);
     var valLbl=v>0?(v/1000).toFixed(1)+'k':'';
+    var emo=cEmoji(v);
     var numColor=v>=MT?'#22C55E':v>0?col:'rgba(255,255,255,.2)';
     var numStyle='font-size:7px;font-weight:'+(v>0?'800':'400')+';color:'+numColor+';'+(isT?'text-decoration:underline;color:#00A86B;':'');
-    bars+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;min-width:0" title="Dia '+d+': '+fR(v)+'">'
+    bars+='<div style="display:flex;flex-direction:column;align-items:center;gap:1px;flex:1;min-width:0" title="Dia '+d+': '+fR(v)+(emo?' '+emo:'')+'">'
+      +'<div style="font-size:9px;line-height:1;height:11px">'+emo+'</div>'
       +'<div style="font-size:6px;font-weight:700;white-space:nowrap;color:'+col+'">'+valLbl+'</div>'
       +'<div style="width:100%;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;height:46px;display:flex;align-items:flex-end">'
       +'<div style="width:100%;height:'+h+'%;background:'+col+';border-radius:2px 2px 0 0;'+(isB?'box-shadow:0 0 8px '+col+'88;':'')+'"></div>'
@@ -9803,7 +9861,7 @@ function tvDailyBlock(op, melhorDia){
       +'</div>';
   });
   var medC=med>=MT?'#22C55E':med>=3000?'#38BDF8':med>=2000?'#FCD34D':'#F87171';
-  return '<div style="display:flex;gap:1px;align-items:flex-end;height:72px">'+bars+'</div>'
+  return '<div style="display:flex;gap:1px;align-items:flex-end;height:83px">'+bars+'</div>'
     +'<div style="display:flex;gap:8px;margin-top:7px">'
     +'<div style="flex:1;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);border-radius:8px;padding:6px 10px;text-align:center">'
     +'<div style="font-size:8px;font-weight:700;color:#22C55E;text-transform:uppercase;letter-spacing:.8px">Dias ≥ 4k</div>'
@@ -9893,9 +9951,85 @@ function tvShowMetaSlide(slide){
 }
 
 
+// ── SLIDE: DESTAQUE DO DIA DA EQUIPE ──────────────────────────────────
+function tvShowHighlightSlide(slide){
+  const card = document.getElementById('tv-card');
+  const op   = slide.op;
+  const eq   = slide.eq;
+  const cfg  = EQ[eq] || {c:'#00A86B',ico:'🏆',sh:eq};
+  const labelEq = TV_HIGHLIGHT_TEAMS[eq] || cfg.sh || eq;
+  const photo = photoGet(op.name);
+  const now  = new Date();
+  const dataStr = String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0');
+
+  const photoHtml = photo
+    ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover">`
+    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,${cfg.c}33,${cfg.c}0d)">
+         <span style="font-family:'Bebas Neue',sans-serif;font-size:150px;color:${cfg.c};opacity:.65">${ini(op.name)}</span>
+       </div>`;
+
+  card.innerHTML = `
+    <div style="width:100%;height:100vh;overflow:hidden;position:relative;
+        background:linear-gradient(135deg,#0a1f14 0%,#0d2e1c 55%,#0a1f14 100%);
+        display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+        padding:36px 60px;text-align:center">
+      <div style="position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#FFDF00,#00C97F 40%,#FFDF00 80%)"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#FFDF00,#00C97F 40%,#FFDF00 80%)"></div>
+      <div class="tv-orb" style="width:260px;height:260px;top:6%;left:4%;background:radial-gradient(circle,rgba(255,223,0,.22),transparent 70%);animation:tvOrbFloat1 8s ease-in-out infinite"></div>
+      <div class="tv-orb" style="width:220px;height:220px;bottom:8%;right:6%;background:radial-gradient(circle,rgba(0,168,107,.28),transparent 70%);animation:tvOrbFloat2 10s ease-in-out infinite"></div>
+
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:6px;color:#FFDF00;
+          text-shadow:0 0 30px rgba(255,223,0,.5);position:relative;z-index:2">
+        ⭐ DESTAQUE DO DIA — ${labelEq.toUpperCase()} ⭐
+      </div>
+
+      <div style="width:300px;height:300px;border-radius:28px;overflow:hidden;border:6px solid #FFDF00;
+          box-shadow:0 0 70px rgba(255,223,0,.45),0 12px 40px rgba(0,0,0,.5);position:relative;z-index:2">
+        ${photoHtml}
+      </div>
+
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:1.5px;color:#fff;
+          line-height:1;position:relative;z-index:2">
+        ${op.name.replace(/_/g,' ').toUpperCase()}
+      </div>
+      <div style="font-size:14px;font-weight:800;color:${cfg.c};letter-spacing:1.5px;position:relative;z-index:2">
+        ${cfg.ico||'🏆'} ${labelEq}
+      </div>
+
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,223,0,.35);border-radius:18px;
+          padding:14px 36px;position:relative;z-index:2">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">
+          Recebido hoje — ${dataStr}
+        </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:#4ADE80;letter-spacing:.5px">
+          ${fR(slide.valorHoje)}
+        </div>
+      </div>
+
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:1px;color:#FFDF00;
+          text-shadow:0 0 40px rgba(255,223,0,.55);line-height:1.15;position:relative;z-index:2">
+        🎉 PARABÉNS POR SER O<br>DESTAQUE DO DIA! 🎉
+      </div>
+    </div>
+  `;
+
+  tvUpdateDots();
+  const bar = document.getElementById('tv-bar');
+  if(bar){
+    bar.style.transition='none'; bar.style.width='0%';
+    bar.style.background='linear-gradient(90deg,#FFDF00,#00C97F,#FFDF00)';
+    setTimeout(()=>{ bar.style.transition=`width ${TV_INTERVAL}ms linear`; bar.style.width='100%'; },50);
+  }
+  tvFireworks(true);
+}
+
 function tvShow(idx){
   const op  = tvList[idx];
   if(!op) return;
+
+  // Slide especial de "Destaque do Dia" da equipe — renderiza à parte
+  // e não interfere em nada do fluxo normal do ranking abaixo.
+  if(op._highlight){ tvShowHighlightSlide(op); return; }
 
   const pos = idx + 1;
   // posição GLOBAL (no ranking geral) — para mostrar ranking global mesmo em modo equipe
