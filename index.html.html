@@ -355,6 +355,16 @@ select.ev-inp{cursor:pointer}
 .tv-kpi{transition:transform .3s}
 .tv-kpi:hover{transform:translateY(-3px)}
 .tv-orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(2px);opacity:.5;z-index:0}
+@keyframes tvFxBurst{
+  0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
+  15%{opacity:1}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(.4)}
+}
+@keyframes tvFxFlash{
+  0%{opacity:0;transform:scale(0)}
+  40%{opacity:1;transform:scale(14)}
+  100%{opacity:0;transform:scale(20)}
+}
 @keyframes tvOrbFloat1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-40px) scale(1.15)}}
 @keyframes tvOrbFloat2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-35px,30px) scale(1.1)}}
 @keyframes tvOrbFloat3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,25px) scale(.9)}}
@@ -9919,6 +9929,15 @@ function tvShow(idx){
        </div>`
     : '';
 
+  // Últimos colocados da lista atual → carinha brava (motivação pra melhorar)
+  const isUltimo = tvList.length>=4 && pos > tvList.length-3;
+  const ultimoBadge = isUltimo
+    ? `<div style="background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.4);border-radius:100px;
+        padding:3px 10px;font-size:10px;font-weight:800;color:#DC2626;letter-spacing:.5px">
+        😠 PRECISA MELHORAR
+       </div>`
+    : '';
+
   // Tier
   const _tvRec    = tvGetRec(op);
   const tier      = _tvRec>=20000?'S-TIER':_tvRec>=10000?'A — ALTA':_tvRec>=5000?'B — BOA':'C — DEV';
@@ -9984,6 +10003,7 @@ function tvShow(idx){
       <div style="width:44%;flex-shrink:0;position:relative;overflow:hidden">
         ${photoHtml}
         <div style="position:absolute;inset:0;background:linear-gradient(to right,transparent 55%,#D3EDE0 100%);pointer-events:none"></div>
+        ${isUltimo ? `<div style="position:absolute;top:16px;right:16px;font-size:64px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.6));animation:tvPhotoFloat 4s ease-in-out infinite">😠</div>` : ''}
 
         <!-- Posição grande -->
         <div style="position:absolute;bottom:88px;left:26px">
@@ -10051,6 +10071,7 @@ function tvShow(idx){
           </div>
           <div style="display:flex;gap:8px;align-items:center;margin-top:5px;flex-wrap:wrap">
             ${posGlobalBadge}
+            ${ultimoBadge}
             ${(()=>{try{return !!feedbackGetAll()[op.name];}catch(e){return false;}})()
               ? '<div style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.4);border-radius:100px;padding:3px 10px;font-size:10px;font-weight:800;color:#059669">✅ Feedback OK</div>'
               : '<div style="background:rgba(252,211,77,.1);border:1px solid rgba(252,211,77,.3);border-radius:100px;padding:3px 10px;font-size:10px;font-weight:800;color:#B45309">⏳ Feedback pendente</div>'
@@ -10060,30 +10081,30 @@ function tvShow(idx){
 
         <!-- 4 KPIs -->
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-          <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);
+          <div style="background:linear-gradient(135deg,#00A86B,#00C97F);box-shadow:0 6px 20px rgba(0,168,107,.35);
               border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">💰 Total Real</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#059669;line-height:1">${fR(tvGetRec(op))}</div>
+            <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">💰 Total Real</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:23px;color:#fff;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.15)">${fR(tvGetRec(op))}</div>
           </div>
-          <div style="background:rgba(103,232,249,.1);border:1px solid rgba(103,232,249,.25);
+          <div style="background:linear-gradient(135deg,#0891B2,#22D3EE);box-shadow:0 6px 20px rgba(8,145,178,.35);
               border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 HO (25%)</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#0E7490;line-height:1">${fR(op.ho)}</div>
+            <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 HO (25%)</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:23px;color:#fff;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.15)">${fR(op.ho)}</div>
           </div>
-          <div style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);
+          <div style="background:linear-gradient(135deg,#7C3AED,#A78BFA);box-shadow:0 6px 20px rgba(124,58,237,.35);
               border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">📋 Acordos</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#7C3AED;line-height:1">${op.acordos||0}</div>
+            <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">📋 Acordos</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:23px;color:#fff;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.15)">${op.acordos||0}</div>
           </div>
           ${temEfic
-            ? `<div style="background:${efC}18;border:1px solid ${efC}33;border-radius:12px;padding:12px;text-align:center">
-                <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚡ Efic. Pgto</div>
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${efC};line-height:1">${efPct}%</div>
-                <div style="font-size:9px;color:rgba(26,46,34,0.62);margin-top:2px">${pagos}/${gerados} venc.</div>
+            ? `<div style="background:linear-gradient(135deg,${efC},${efC}CC);box-shadow:0 6px 20px ${efC}55;border-radius:12px;padding:12px;text-align:center">
+                <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚡ Efic. Pgto</div>
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:23px;color:#fff;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.15)">${efPct}%</div>
+                <div style="font-size:9px;color:rgba(255,255,255,.85);margin-top:2px">${pagos}/${gerados} venc.</div>
                </div>`
-            : `<div style="background:rgba(252,211,77,.08);border:1px solid rgba(252,211,77,.2);border-radius:12px;padding:12px;text-align:center">
-                <div style="font-size:8px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎫 Ticket Médio</div>
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#B45309;line-height:1">${(op.acordos||0)>0?fRK(tvGetRec(op)/(op.acordos||1)):'—'}</div>
+            : `<div style="background:linear-gradient(135deg,#D97706,#FBBF24);box-shadow:0 6px 20px rgba(217,119,6,.35);border-radius:12px;padding:12px;text-align:center">
+                <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎫 Ticket Médio</div>
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:23px;color:#fff;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.15)">${(op.acordos||0)>0?fRK(tvGetRec(op)/(op.acordos||1)):'—'}</div>
                </div>`
           }
         </div>
@@ -10289,6 +10310,56 @@ function tvShow(idx){
     bar.style.transition='none'; bar.style.width='0%'; bar.style.background='linear-gradient(90deg,#00A86B,#00C97F,#00B8A9)';
     setTimeout(()=>{ bar.style.transition=`width ${TV_INTERVAL}ms linear`; bar.style.width='100%'; },50);
   }
+  tvFireworks(true);
+}
+
+// ── Efeito de fogos/confete: dispara em todo card, mais intenso pro 1° lugar ──
+function tvFireworks(intenso){
+  const host = document.getElementById('tv-overlay');
+  if(!host) return;
+  const old = host.querySelector('.tv-fx-layer');
+  if(old) old.remove();
+  const layer = document.createElement('div');
+  layer.className = 'tv-fx-layer';
+  layer.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5';
+  host.appendChild(layer);
+
+  const cores = ['#00A86B','#00C97F','#00B8A9','#FFC700','#FF6B6B','#7C3AED','#0284C7','#FF1744','#FFEA00'];
+  // Várias explosões em pontos diferentes da tela, pra todo mundo — não só o 1°
+  const explosoes = intenso ? [[25,22],[75,20],[50,35],[15,45],[85,42]] : [[30,25],[70,25],[50,40]];
+  const particulasPorExplosao = intenso ? 45 : 32;
+
+  explosoes.forEach(([cx,cy],ei)=>{
+    for(let i=0;i<particulasPorExplosao;i++){
+      const p = document.createElement('div');
+      const cor = cores[Math.floor(Math.random()*cores.length)];
+      const tamanho = 6 + Math.random()*9;
+      const startX = cx + (Math.random()*10-5);
+      const startY = cy + (Math.random()*10-5);
+      const dx = (Math.random()*80-40);
+      const dy = 40 + Math.random()*50;
+      const rot = Math.random()*720-360;
+      const delay = ei*0.18 + Math.random()*0.3;
+      const dur = 1.4 + Math.random()*1.1;
+      const shape = Math.random()>0.5 ? '50%' : '3px';
+      p.style.cssText = `position:absolute;left:${startX}%;top:${startY}%;width:${tamanho}px;height:${tamanho}px;
+        background:${cor};border-radius:${shape};opacity:0;box-shadow:0 0 8px ${cor};
+        animation:tvFxBurst ${dur}s ease-out ${delay}s forwards;
+        --dx:${dx}vw;--dy:${dy}vh;--rot:${rot}deg`;
+      layer.appendChild(p);
+    }
+  });
+
+  const nFlashes = intenso ? 6 : 3;
+  for(let i=0;i<nFlashes;i++){
+    const flash = document.createElement('div');
+    const [fx,fy] = explosoes[i % explosoes.length];
+    flash.style.cssText = `position:absolute;left:${fx}%;top:${fy}%;width:10px;height:10px;border-radius:50%;
+      background:radial-gradient(circle,#fff,#FFC700 40%,transparent 70%);
+      animation:tvFxFlash 0.6s ease-out ${i*0.18}s forwards`;
+    layer.appendChild(flash);
+  }
+  setTimeout(()=>{ layer.remove(); }, 3200);
 }
 
 
