@@ -10330,13 +10330,10 @@ function tvShow(idx){
 
         <!-- NOME + badges -->
         <div style="position:relative">
-          <!-- Troféu de fundo com o TOP do ranking, em destaque atrás do nome -->
-          <div style="position:absolute;left:-22px;top:-46px;z-index:0;pointer-events:none;user-select:none;
-              font-size:220px;line-height:1;opacity:.32;filter:drop-shadow(0 6px 16px rgba(0,0,0,.18))">🏆</div>
-          <div style="position:absolute;left:6px;top:38px;z-index:0;pointer-events:none;user-select:none;
-              font-family:'Bebas Neue',sans-serif;font-size:44px;color:${posColor};opacity:.92;letter-spacing:2px;
-              transform:rotate(-8deg);text-shadow:0 2px 4px rgba(255,255,255,.6),0 0 30px ${posColor}55">TOP ${posExib}</div>
-          <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:nowrap;overflow:hidden">
+          <!-- Troféu grande de fundo, decorativo, atrás do nome -->
+          <div style="position:absolute;left:-30px;top:-70px;z-index:0;pointer-events:none;user-select:none;
+              font-size:230px;line-height:1;opacity:.4;filter:drop-shadow(0 6px 14px rgba(0,0,0,.2))">🏆</div>
+          <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:nowrap;overflow:hidden">
             <div style="display:flex;align-items:baseline;gap:16px;flex:1;min-width:0;overflow:hidden">
               <div style="font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:2px;
                 color:#1A2E22;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">
@@ -10373,6 +10370,11 @@ function tvShow(idx){
             </div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;margin-top:5px;flex-wrap:wrap">
+            <div style="background:linear-gradient(135deg,#F5C542,#D9A62A);border-radius:100px;padding:4px 14px 4px 10px;
+                display:flex;align-items:center;gap:6px;box-shadow:0 3px 10px rgba(217,166,42,.4)">
+              <span style="font-size:15px">🏆</span>
+              <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#4A3300;letter-spacing:1px">TOP ${posExib}</span>
+            </div>
             ${posGlobalBadge}
             ${ultimoBadge}
             ${(()=>{try{return !!feedbackGetAll()[op.name];}catch(e){return false;}})()
