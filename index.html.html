@@ -9723,17 +9723,12 @@ function tvProjEmojiFor(o){
   }catch(e){ return ''; }
 }
 
-// Dia de referência para "recebimento de hoje": se ainda não existe NENHUM
-// valor lançado para o dia corrente (comum de manhã, antes do relatório do
-// dia ser importado), usa o dia anterior automaticamente — evita mostrar
-// destaque/recebido "zerado" só porque o dia ainda não fechou.
+// Dia de referência para "recebimento de hoje": SEMPRE o dia anterior (ontem).
+// O dia corrente ainda está em aberto/sendo lançado ao longo do dia, então
+// não é confiável pra eleger o destaque — só o dia anterior já fechou.
 function tvGetRefDay(){
   const hoje = new Date().getDate();
-  try{
-    const temHoje = (ALL||[]).some(o => (parseFloat((o.daily||{})[hoje]) || 0) > 0);
-    if(!temHoje && hoje > 1) return hoje - 1;
-  }catch(e){}
-  return hoje;
+  return hoje > 1 ? hoje - 1 : hoje;
 }
 
 // Valor recebido pelo operador no dia de referência (ver tvGetRefDay)
@@ -17053,6 +17048,11 @@ function renderEqMetasTable(){
                 ? `<img src="${comboPhoto}" style="width:100%;height:100%;object-fit:cover">`
                 : `<span style="font-weight:900;font-size:13px;color:#fff;font-family:'Bebas Neue',sans-serif">S</span>`}
             </div>` : ''}
+            ${(eqName==='COFEN KATIA'||eqName==='COFEN STEPHANIE 2° TURNO') ? `<button onclick="event.stopPropagation();trocarFotoLiderKatiaLaysaManual()"
+              title="Trocar fotos Katia 2°T ⇄ Laysa/Stephanie (caso estejam invertidas)"
+              style="width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);
+              color:rgba(255,255,255,.6);font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+              margin-left:4px;flex-shrink:0;padding:0" onmouseover="this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">🔄</button>` : ''}
           </div>
           <div>
             <div style="font-weight:800;font-size:11px;color:rgba(255,255,255,.85);margin-bottom:3px">${EQ_LABELS[eqName]||eqName}</div>
@@ -17102,7 +17102,7 @@ function renderEqMetasTable(){
 //    (a troca de nomes das equipes não move as fotos, que ficam
 //    salvas pela chave interna). Roda 1x só e sincroniza via Firebase. ──
 function migrarFotoLiderKatiaLaysa(){
-  if(localStorage.getItem('cofen_lider_foto_swap_katia_laysa_v1')) return;
+  if(localStorage.getItem('cofen_lider_foto_swap_katia_laysa_v2')) return;
   const all = photoGetAll();
   const kKatia = 'LIDER_COFEN KATIA', kLaysa = 'LIDER_COFEN STEPHANIE 2° TURNO';
   if(all[kKatia] || all[kLaysa]){
@@ -17112,9 +17112,24 @@ function migrarFotoLiderKatiaLaysa(){
     localStorage.setItem('cofen_photos', JSON.stringify(all));
     fbPush('photos', all);
   }
-  localStorage.setItem('cofen_lider_foto_swap_katia_laysa_v1','1');
+  localStorage.setItem('cofen_lider_foto_swap_katia_laysa_v2','1');
+  if(typeof renderEqMetasTable==='function') renderEqMetasTable();
 }
 migrarFotoLiderKatiaLaysa();
+
+// Botão manual pra trocar as fotos dos líderes Katia 2°T ⇄ Laysa/Stephanie
+// a qualquer momento (caso alguém suba a foto no lugar errado de novo).
+function trocarFotoLiderKatiaLaysaManual(){
+  const all = photoGetAll();
+  const kKatia = 'LIDER_COFEN KATIA', kLaysa = 'LIDER_COFEN STEPHANIE 2° TURNO';
+  const tmp = all[kKatia];
+  if(all[kLaysa]) all[kKatia] = all[kLaysa]; else delete all[kKatia];
+  if(tmp) all[kLaysa] = tmp; else delete all[kLaysa];
+  localStorage.setItem('cofen_photos', JSON.stringify(all));
+  fbPush('photos', all);
+  if(typeof renderEqMetasTable==='function') renderEqMetasTable();
+  if(typeof toast==='function') toast('🔄 Fotos trocadas!');
+}
 // Chamar na inicialização (após todos os dados estarem prontos)
 renderEqMetasTable();
 </script>
