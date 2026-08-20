@@ -9723,11 +9723,22 @@ function tvProjEmojiFor(o){
   }catch(e){ return ''; }
 }
 
-// Dia de referência para "recebimento de hoje": SEMPRE o dia anterior (ontem).
-// O dia corrente ainda está em aberto/sendo lançado ao longo do dia, então
-// não é confiável pra eleger o destaque — só o dia anterior já fechou.
+// Dia de referência para "recebimento de hoje": o último dia FECHADO com
+// algum lançamento — nunca o dia corrente (que ainda está sendo lançado ao
+// longo do dia). Começa em ontem e, se ontem estiver zerado pra todo mundo
+// (fim de semana, feriado, dia sem baixa nenhuma), volta mais alguns dias
+// até achar o último dia que realmente teve recebimento — assim o Destaque
+// do Dia não aparece "zerado" numa segunda-feira só por causa do domingo.
 function tvGetRefDay(){
   const hoje = new Date().getDate();
+  for(let back=1; back<=7; back++){
+    const d = hoje - back;
+    if(d < 1) break;
+    try{
+      const temDado = (ALL||[]).some(o => (parseFloat((o.daily||{})[d]) || 0) > 0);
+      if(temDado) return d;
+    }catch(e){}
+  }
   return hoje > 1 ? hoje - 1 : hoje;
 }
 
@@ -10318,8 +10329,14 @@ function tvShow(idx){
           gap:10px;overflow-y:auto;min-width:0">
 
         <!-- NOME + badges -->
-        <div>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:nowrap;overflow:hidden">
+        <div style="position:relative">
+          <!-- Troféu de fundo com o TOP do ranking, em destaque atrás do nome -->
+          <div style="position:absolute;left:-22px;top:-46px;z-index:0;pointer-events:none;user-select:none;
+              font-size:220px;line-height:1;opacity:.32;filter:drop-shadow(0 6px 16px rgba(0,0,0,.18))">🏆</div>
+          <div style="position:absolute;left:6px;top:38px;z-index:0;pointer-events:none;user-select:none;
+              font-family:'Bebas Neue',sans-serif;font-size:44px;color:${posColor};opacity:.92;letter-spacing:2px;
+              transform:rotate(-8deg);text-shadow:0 2px 4px rgba(255,255,255,.6),0 0 30px ${posColor}55">TOP ${posExib}</div>
+          <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:nowrap;overflow:hidden">
             <div style="display:flex;align-items:baseline;gap:16px;flex:1;min-width:0;overflow:hidden">
               <div style="font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:2px;
                 color:#1A2E22;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">
