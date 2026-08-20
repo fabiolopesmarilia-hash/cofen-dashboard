@@ -737,6 +737,7 @@ select.ev-inp{cursor:pointer}
           <thead>
             <tr style="background:rgba(255,255,255,.06)">
               <th style="padding:7px 12px;text-align:left;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">LÍDERES</th>
+              <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#FFD166;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">RECEBIMENTO EQUIPE</th>
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#4ADE80;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">HO REC.</th>
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">META HO</th>
               <th style="padding:7px 12px;text-align:right;font-size:9px;font-weight:800;color:#67E8F9;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)">HO POR DIA</th>
@@ -748,7 +749,7 @@ select.ev-inp{cursor:pointer}
             </tr>
           </thead>
           <tbody id="eq-metas-tbody">
-            <tr><td colspan="8" style="padding:14px;text-align:center;color:rgba(255,255,255,.3);font-size:11px">⏳ Carregando...</td></tr>
+            <tr><td colspan="9" style="padding:14px;text-align:center;color:rgba(255,255,255,.3);font-size:11px">⏳ Carregando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -9722,10 +9723,23 @@ function tvProjEmojiFor(o){
   }catch(e){ return ''; }
 }
 
-// Valor recebido pelo operador especificamente HOJE (dia do mês corrente)
+// Dia de referência para "recebimento de hoje": se ainda não existe NENHUM
+// valor lançado para o dia corrente (comum de manhã, antes do relatório do
+// dia ser importado), usa o dia anterior automaticamente — evita mostrar
+// destaque/recebido "zerado" só porque o dia ainda não fechou.
+function tvGetRefDay(){
+  const hoje = new Date().getDate();
+  try{
+    const temHoje = (ALL||[]).some(o => (parseFloat((o.daily||{})[hoje]) || 0) > 0);
+    if(!temHoje && hoje > 1) return hoje - 1;
+  }catch(e){}
+  return hoje;
+}
+
+// Valor recebido pelo operador no dia de referência (ver tvGetRefDay)
 function tvGetTodayVal(op){
   try{
-    const d = new Date().getDate();
+    const d = tvGetRefDay();
     return parseFloat((op.daily||{})[d]) || 0;
   }catch(e){ return 0; }
 }
@@ -10008,7 +10022,7 @@ function tvShowHighlightSlide(slide){
   const labelEq = TV_HIGHLIGHT_TEAMS[eq] || cfg.sh || eq;
   const photo = photoGet(op.name);
   const now  = new Date();
-  const dataStr = String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0');
+  const dataStr = String(tvGetRefDay()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0');
 
   const photoHtml = photo
     ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover">`
@@ -10587,11 +10601,24 @@ function tvShow(idx){
     bar.style.transition='none'; bar.style.width='0%'; bar.style.background='linear-gradient(90deg,#00A86B,#00C97F,#00B8A9)';
     setTimeout(()=>{ bar.style.transition=`width ${TV_INTERVAL}ms linear`; bar.style.width='100%'; },50);
   }
-  tvFireworks(true);
+  tvFireworks(true, op);
+}
+
+// Escolhe o "kit" de emojis que sobe na tela conforme o desempenho do
+// operador — quanto melhor a projeção/recebimento, mais emojis e mais
+// animados (foguete, festa); quanto pior, menos emojis e mais "tristes".
+function tvEmojiSetForOp(op){
+  const rec = tvGetRec(op) || 0;
+  if(rec>=20000) return {emojis:['🚀','🤩','🎉','🏆','🔥','✨','💥','🥳'], qtd:16};
+  if(rec>=10000) return {emojis:['🙂','👏','✨','⭐','😄'],                qtd:9};
+  if(rec>=5000)  return {emojis:['😐','💪','👍'],                          qtd:5};
+  return                {emojis:['😟','🙁'],                              qtd:3};
 }
 
 // ── Efeito de fogos/confete: dispara em todo card, mais intenso pro 1° lugar ──
-function tvFireworks(intenso){
+// Se um operador (op) for informado, soma uma chuva de emojis subindo a
+// tela, escalada conforme o recebimento dele (ver tvEmojiSetForOp).
+function tvFireworks(intenso, op){
   const host = document.getElementById('tv-overlay');
   if(!host) return;
   const old = host.querySelector('.tv-fx-layer');
@@ -10636,7 +10663,30 @@ function tvFireworks(intenso){
       animation:tvFxFlash 0.6s ease-out ${i*0.18}s forwards`;
     layer.appendChild(flash);
   }
-  setTimeout(()=>{ layer.remove(); }, 3200);
+
+  // ── Chuva de emojis subindo, escalada pelo desempenho do operador ──
+  let riseMaxDur = 0;
+  if(op){
+    const kit = tvEmojiSetForOp(op);
+    for(let i=0;i<kit.qtd;i++){
+      const e = document.createElement('div');
+      const emo = kit.emojis[Math.floor(Math.random()*kit.emojis.length)];
+      const startX = 4 + Math.random()*92;
+      const dx = (Math.random()*30-15);
+      const rot = (Math.random()*60-30);
+      const delay = Math.random()*1.8;
+      const dur = 2.6 + Math.random()*1.8;
+      const tamanho = 20 + Math.random()*20;
+      riseMaxDur = Math.max(riseMaxDur, delay+dur);
+      e.textContent = emo;
+      e.style.cssText = `position:absolute;left:${startX}%;bottom:0;font-size:${tamanho}px;opacity:0;
+        animation:tvFxRise ${dur}s ease-in ${delay}s forwards;
+        --dx:${dx}vw;--rot:${rot}deg;filter:drop-shadow(0 0 6px rgba(0,0,0,.3))`;
+      layer.appendChild(e);
+    }
+  }
+
+  setTimeout(()=>{ layer.remove(); }, Math.max(3200, (riseMaxDur*1000)+400));
 }
 
 
@@ -16969,6 +17019,18 @@ function renderEqMetasTable(){
     const isCombo = eqName === 'COFEN KATIA';
     const comboPhoto = isCombo ? photoGet('LIDER_COFEN MARILIA BRENDA') : null;
 
+    // Recebimento TOTAL da equipe (Total Real, não só HO)
+    const recEquipe = eq.rec || 0;
+
+    // Recebido HOJE pela equipe inteira (soma do dia de todos os operadores).
+    // Usa o dia de referência (tvGetRefDay): se o dia corrente ainda não tem
+    // nada lançado (ex: de manhã, antes do relatório entrar), pega o dia anterior.
+    const recHoje = eq.ops.reduce((s,o)=>{
+      try{ return s + (typeof tvGetTodayVal==='function' ? tvGetTodayVal(o) : (parseFloat((o.daily||{})[new Date().getDate()])||0)); }
+      catch(e){ return s; }
+    },0);
+    const recHojeDiaLbl = (typeof tvGetRefDay==='function' ? String(tvGetRefDay()) : String(new Date().getDate())).padStart(2,'0');
+
     rows += `<tr style="border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s"
       onmouseover="this.style.background='rgba(255,255,255,.04)'"
       onmouseout="this.style.background=''">
@@ -16997,9 +17059,13 @@ function renderEqMetasTable(){
             <div style="background:rgba(255,255,255,.1);border-radius:100px;height:3px;overflow:hidden;width:90px">
               <div style="height:100%;border-radius:100px;background:${pc};width:${barW}%;transition:width 1s"></div>
             </div>
+            <div style="font-size:9px;color:${recHoje>0?'#4ADE80':'rgba(255,255,255,.3)'};font-weight:700;margin-top:3px;white-space:nowrap">
+              ${recHoje>0 ? '📅 Dia '+recHojeDiaLbl+': '+fR(recHoje) : '📅 Dia '+recHojeDiaLbl+': —'}
+            </div>
           </div>
         </div>
       </td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#FFD166">${fR(recEquipe)}</td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#4ADE80">${fR(rec)}</td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:rgba(255,255,255,.45)">${fR(metaEq)}</td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#67E8F9">
