@@ -5607,6 +5607,18 @@ function calcProjecao(rec, metaInd){
   return {pct, color, status, label, metaEsperada, falta, needDay};
 }
 
+// Carinha de acordo com o status da projeção de meta (calcProjecao).
+// Usada no Ranking principal e no Ranking do Modo TV.
+function projEmoji(status){
+  switch(status){
+    case 'ok':     return '🤩'; // bateu/projetando bater a meta
+    case 'info':   return '🙂'; // projeção boa, quase lá
+    case 'warn':   return '😐'; // atenção, no meio do caminho
+    case 'danger': return '😟'; // bem abaixo da meta
+    default:       return '';  // sem meta cadastrada
+  }
+}
+
 // ── RANKING ──
 let rkFilter='COFEN STEPHANIE 2° TURNO';
 function mkRanking(){
@@ -5667,7 +5679,7 @@ function mkRanking(){
         <div style="font-size:10px;color:var(--g500);font-weight:600">${projLabel}</div>` : `<div style="font-size:10px;color:var(--g300);font-weight:600">—</div>`}
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
-        ${metaInd>0 ? `<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${projCol};letter-spacing:.5px">${projPct.toFixed(0)}%</div>
+        ${metaInd>0 ? `<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${projCol};letter-spacing:.5px">${projEmoji(projData.status)} ${projPct.toFixed(0)}%</div>
         <div style="background:var(--g100);border-radius:100px;height:4px;width:60px;overflow:hidden">
           <div style="width:${Math.min(100,projPct)}%;height:100%;border-radius:100px;background:${projCol};transition:width 1s"></div>
         </div>` : `<div style="font-size:10px;color:var(--g300)">—</div>`}
@@ -5743,6 +5755,7 @@ function mkRankingDigital(){
         </div>
         <div>
           <div class="r-n" style="display:flex;align-items:center;gap:5px">
+            ${metaInd>0 ? `<span title="${projData.label}">${projEmoji(projData.status)}</span>` : ''}
             ${op.name.replace(/_/g,' ')}
             <button onclick="event.stopPropagation();feedbackToggle('${op.name.replace(/'/g,"\\'")}')"
               style="padding:1px 6px;border-radius:100px;font-size:9px;font-weight:800;${fbBtnStyle}transition:all .2s;flex-shrink:0;line-height:1.6">
@@ -5762,7 +5775,7 @@ function mkRankingDigital(){
         <div style="font-size:10px;color:var(--g500);font-weight:600">${projData.label}</div>`:`<div style="font-size:10px;color:var(--g300);font-weight:600">—</div>`}
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
-        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${projData.color};letter-spacing:.5px">${projData.pct.toFixed(0)}%</div>
+        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${projData.color};letter-spacing:.5px">${projEmoji(projData.status)} ${projData.pct.toFixed(0)}%</div>
         <div style="background:var(--g100);border-radius:100px;height:4px;width:60px;overflow:hidden">
           <div style="width:${Math.min(100,projData.pct)}%;height:100%;border-radius:100px;background:${projData.color};transition:width 1s"></div>
         </div>`:`<div style="font-size:10px;color:var(--g300)">—</div>`}
@@ -5852,6 +5865,7 @@ function _renderBBList(){
         </div>
         <div>
           <div class="r-n" style="display:flex;align-items:center;gap:5px">
+            ${metaInd>0 ? `<span title="${projData.label}">${projEmoji(projData.status)}</span>` : ''}
             ${op.name.replace(/_/g,' ')}
             <button onclick="event.stopPropagation();feedbackToggle('${op.name.replace(/'/g,"\\'")}')"
               style="padding:1px 6px;border-radius:100px;font-size:9px;font-weight:800;${fbBtnStyle}transition:all .2s;flex-shrink:0;line-height:1.6">
@@ -5871,7 +5885,7 @@ function _renderBBList(){
         <div style="font-size:10px;color:var(--g500);font-weight:600">${projData.label}</div>`:`<div style="font-size:10px;color:var(--g300)">—</div>`}
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
-        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${projData.color};letter-spacing:.5px">${projData.pct.toFixed(0)}%</div>
+        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${projData.color};letter-spacing:.5px">${projEmoji(projData.status)} ${projData.pct.toFixed(0)}%</div>
         <div style="background:var(--g100);border-radius:100px;height:4px;width:60px;overflow:hidden">
           <div style="width:${Math.min(100,projData.pct)}%;height:100%;border-radius:100px;background:${projData.color};transition:width 1s"></div>
         </div>`:`<div style="font-size:10px;color:var(--g300)">—</div>`}
@@ -5931,6 +5945,7 @@ function renderRankingBrend(){
         </div>
         <div>
           <div class="r-n" style="display:flex;align-items:center;gap:5px">
+            ${metaInd>0 ? `<span title="${projData.label}">${projEmoji(projData.status)}</span>` : ''}
             ${op.name.replace(/_/g,' ')}
             <button onclick="event.stopPropagation();feedbackToggle('${op.name.replace(/'/g,"\\'")}')"
               style="padding:1px 6px;border-radius:100px;font-size:9px;font-weight:800;${fbBtnStyle}transition:all .2s;flex-shrink:0;line-height:1.6">
@@ -5950,7 +5965,7 @@ function renderRankingBrend(){
         <div style="font-size:10px;color:var(--g500);font-weight:600">${projData.label}</div>`:`<div style="font-size:10px;color:var(--g300)">—</div>`}
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
-        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${projData.color};letter-spacing:.5px">${projData.pct.toFixed(0)}%</div>
+        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${projData.color};letter-spacing:.5px">${projEmoji(projData.status)} ${projData.pct.toFixed(0)}%</div>
         <div style="background:var(--g100);border-radius:100px;height:4px;width:60px;overflow:hidden">
           <div style="width:${Math.min(100,projData.pct)}%;height:100%;border-radius:100px;background:${projData.color};transition:width 1s"></div>
         </div>`:`<div style="font-size:10px;color:var(--g300)">—</div>`}
@@ -6010,6 +6025,7 @@ function renderRankingBrun(){
         </div>
         <div>
           <div class="r-n" style="display:flex;align-items:center;gap:5px">
+            ${metaInd>0 ? `<span title="${projData.label}">${projEmoji(projData.status)}</span>` : ''}
             ${op.name.replace(/_/g,' ')}
             <button onclick="event.stopPropagation();feedbackToggle('${op.name.replace(/'/g,"\\'")}')"
               style="padding:1px 6px;border-radius:100px;font-size:9px;font-weight:800;${fbBtnStyle}transition:all .2s;flex-shrink:0;line-height:1.6">
@@ -6029,7 +6045,7 @@ function renderRankingBrun(){
         <div style="font-size:10px;color:var(--g500);font-weight:600">${projData.label}</div>`:`<div style="font-size:10px;color:var(--g300)">—</div>`}
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
-        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${projData.color};letter-spacing:.5px">${projData.pct.toFixed(0)}%</div>
+        ${metaInd>0?`<div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${projData.color};letter-spacing:.5px">${projEmoji(projData.status)} ${projData.pct.toFixed(0)}%</div>
         <div style="background:var(--g100);border-radius:100px;height:4px;width:60px;overflow:hidden">
           <div style="width:${Math.min(100,projData.pct)}%;height:100%;border-radius:100px;background:${projData.color};transition:width 1s"></div>
         </div>`:`<div style="font-size:10px;color:var(--g300)">—</div>`}
@@ -9694,6 +9710,18 @@ function tvBuildList(){
   tvList = [...ops, ...tvBuildDailyHighlights()];
 }
 
+// Carinha de projeção de meta pra usar no bloco de Ranking do Modo TV
+// (mesma régua do Ranking principal: getMetaOp + calcProjecao)
+function tvProjEmojiFor(o){
+  try{
+    const m = getMetaOp(o.name);
+    if(!m || m<=0) return '';
+    const st = calcProjecao(tvGetRec(o), m).status;
+    const e = projEmoji(st);
+    return e ? e+' ' : '';
+  }catch(e){ return ''; }
+}
+
 // Valor recebido pelo operador especificamente HOJE (dia do mês corrente)
 function tvGetTodayVal(op){
   try{
@@ -10464,12 +10492,12 @@ function tvShow(idx){
             </div>
             ${prev?`<div style="display:flex;justify-content:space-between;padding:4px 7px;
                 border-radius:6px;background:#FFFFFF;margin-bottom:4px">
-              <span style="font-size:10px;color:rgba(26,46,34,0.62)">${idx}° ${prev.name.replace(/_/g,' ')}</span>
+              <span style="font-size:10px;color:rgba(26,46,34,0.62)">${tvProjEmojiFor(prev)}${idx}° ${prev.name.replace(/_/g,' ')}</span>
               <span style="font-size:10px;color:rgba(26,46,34,0.62);font-weight:700">${fRK(tvGetRec(prev))}</span>
             </div>`:''}
             <div style="display:flex;justify-content:space-between;align-items:center;
                 padding:6px 9px;border-radius:8px;background:${cfg.c}22;border:1px solid ${cfg.c}55;margin-bottom:4px">
-              <span style="font-size:12px;color:${cfg.c};font-weight:800">${posLabel} VOCÊ</span>
+              <span style="font-size:12px;color:${cfg.c};font-weight:800">${tvProjEmojiFor(op)}${posLabel} VOCÊ</span>
               <div style="display:flex;align-items:center;gap:8px">
                 <span style="font-size:13px;color:#059669;font-weight:900">${fRK(tvGetRec(op))}</span>
                 ${(()=>{ return ''; /* premiação removida a pedido do usuário */ })()}
@@ -10477,7 +10505,7 @@ function tvShow(idx){
             </div>
             ${next?`<div style="display:flex;justify-content:space-between;padding:4px 7px;
                 border-radius:6px;background:#FFFFFF">
-              <span style="font-size:10px;color:rgba(26,46,34,0.62)">${idx+2}° ${next.name.replace(/_/g,' ')}</span>
+              <span style="font-size:10px;color:rgba(26,46,34,0.62)">${tvProjEmojiFor(next)}${idx+2}° ${next.name.replace(/_/g,' ')}</span>
               <span style="font-size:10px;color:rgba(26,46,34,0.62);font-weight:700">${fRK(tvGetRec(next))}</span>
             </div>`:''}
           </div>
