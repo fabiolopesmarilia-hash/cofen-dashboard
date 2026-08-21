@@ -384,6 +384,126 @@ select.ev-inp{cursor:pointer}
 .trilha-f4 .tp:nth-child(3){grid-column:1;grid-row:3} .trilha-f4 .tp:nth-child(4){grid-column:3;grid-row:3}
 .trilha-token{transition:all .35s cubic-bezier(.34,1.56,.64,1);animation:trilhaHop .5s ease-in-out infinite}
 @keyframes trilhaHop{0%,100%{transform:translateY(0) scale(1.1)}50%{transform:translateY(-6px) scale(1.1)}}
+
+/* ─ TRILHA: pista profissional (trilha conectada, tiles com relevo 3D) ─ */
+.trilha-board-frame{background:
+    radial-gradient(ellipse at 30% 0%,rgba(255,255,255,.5),transparent 55%),
+    linear-gradient(160deg,#0F3D26,#0B2A1B 55%,#0F3D26);
+  border-radius:20px;padding:16px;box-shadow:inset 0 2px 12px rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.18);
+  position:relative;overflow:hidden;border:6px solid #6B4423}
+.trilha-board-frame::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.025) 0 2px,transparent 2px 16px)}
+.trilha-track{display:grid;grid-template-columns:repeat(6,1fr);gap:26px 8px;
+  position:relative;z-index:1;padding-top:8px}
+.trilha-tile{aspect-ratio:1;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;font-weight:800;transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s;overflow:visible}
+.trilha-tile .num-badge{position:absolute;top:3px;left:4px;font-family:'Bebas Neue',sans-serif;font-size:9px;
+  color:rgba(0,0,0,.28);letter-spacing:.5px}
+.trilha-tile.n{background:linear-gradient(160deg,#ffffff,#EAF2ED);border:1px solid #D2E0D8;color:var(--g500);
+  font-family:'Bebas Neue',sans-serif;font-size:17px;
+  box-shadow:0 3px 0 #C3D4CA,0 5px 8px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.7)}
+.trilha-tile.bonus{background:linear-gradient(160deg,#FFF6DC,#FFD65C);border:1.5px solid #E0A722;color:#7A5300;
+  box-shadow:0 3px 0 #C68A0E,0 6px 10px rgba(217,166,42,.35),inset 0 1px 0 rgba(255,255,255,.6);
+  animation:trilhaBonusGlow 2.2s ease-in-out infinite}
+@keyframes trilhaBonusGlow{0%,100%{box-shadow:0 3px 0 #C68A0E,0 6px 10px rgba(217,166,42,.35),inset 0 1px 0 rgba(255,255,255,.6)}
+  50%{box-shadow:0 3px 0 #C68A0E,0 6px 18px rgba(255,214,92,.75),inset 0 1px 0 rgba(255,255,255,.8)}}
+.trilha-tile.bonus .ic{font-size:22px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.15))}
+.trilha-tile.bonus .lbl{font-size:7px;letter-spacing:.5px;margin-top:1px;font-weight:900}
+.trilha-tile.start{background:linear-gradient(160deg,#E4FFF0,#7FE8B0);border:1.5px solid var(--pp);color:var(--ppd);
+  box-shadow:0 3px 0 #00875A,0 6px 10px rgba(0,168,107,.35),inset 0 1px 0 rgba(255,255,255,.6)}
+.trilha-tile.start .ic{font-size:20px}
+.trilha-tile.finish{background:
+    repeating-conic-gradient(#3A2E12 0% 25%,#FFD98A 0% 50%) 0 0/14px 14px,
+    linear-gradient(160deg,#FFD98A,#F0A93B);
+  background-blend-mode:overlay;border:2.5px solid #C97F0A;color:#3A2400;
+  box-shadow:0 4px 0 #8A5806,0 10px 20px rgba(217,140,10,.5),inset 0 1px 0 rgba(255,255,255,.5)}
+.trilha-tile.finish .ic{font-size:26px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+.trilha-tile.current{transform:scale(1.16) translateY(-2px);z-index:3;
+  border:2.5px solid #FFD166!important;
+  box-shadow:0 8px 0 rgba(0,0,0,.15),0 0 0 5px rgba(255,209,102,.35),0 10px 26px rgba(0,168,107,.55)!important;
+  animation:trilhaCurrentPulse 1.4s ease-in-out infinite}
+@keyframes trilhaCurrentPulse{0%,100%{box-shadow:0 8px 0 rgba(0,0,0,.15),0 0 0 5px rgba(255,209,102,.35),0 10px 26px rgba(0,168,107,.55)}
+  50%{box-shadow:0 8px 0 rgba(0,0,0,.15),0 0 0 9px rgba(255,209,102,.15),0 10px 30px rgba(0,168,107,.75)}}
+
+/* Setas de fluxo indicando o caminho da trilha (direção + curvas) */
+.trilha-tile .flow{position:absolute;font-size:11px;color:rgba(255,255,255,.85);z-index:2;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));pointer-events:none;font-weight:900}
+.trilha-tile .flow.r{right:-9px;top:50%;transform:translateY(-50%)}
+.trilha-tile .flow.l{left:-9px;top:50%;transform:translateY(-50%)}
+.trilha-tile .flow.d{bottom:-11px;left:50%;transform:translateX(-50%) rotate(90deg)}
+
+.trilha-piece{position:absolute;top:-26px;left:50%;transform:translateX(-50%);width:52px;height:52px;border-radius:50%;
+  overflow:hidden;border:4px solid #fff;box-shadow:0 8px 18px rgba(0,0,0,.45),0 0 0 3px var(--ppd);z-index:4;
+  animation:trilhaPieceBounce .6s ease-in-out infinite}
+.trilha-piece::after{content:'';position:absolute;left:50%;bottom:-11px;transform:translateX(-50%);
+  width:30px;height:8px;border-radius:50%;background:rgba(0,0,0,.28);filter:blur(1.5px);
+  animation:trilhaShadowPulse .6s ease-in-out infinite}
+@keyframes trilhaPieceBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-11px)}}
+@keyframes trilhaShadowPulse{0%,100%{opacity:.5;width:30px}50%{opacity:.25;width:18px}}
+.trilha-piece.hop{animation:trilhaPieceHop .26s ease-out}
+@keyframes trilhaPieceHop{0%{transform:translateX(-50%) translateY(0) scale(1)}
+  40%{transform:translateX(-50%) translateY(-26px) scale(1.1)}
+  100%{transform:translateX(-50%) translateY(0) scale(1)}}
+
+/* ─ Mini-dado compacto, pra caber junto do tabuleiro na mesma tela ─ */
+.trilha-dice-mini{transform:scale(.62);transform-origin:center top;margin-bottom:-38px}
+
+.trilha-badge-patente{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;
+  font-size:10px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+.trilha-badge-patente.bronze{background:linear-gradient(120deg,#E3A972,#B4772F);color:#3A2400;box-shadow:0 2px 6px rgba(180,119,47,.4)}
+.trilha-badge-patente.prata{background:linear-gradient(120deg,#E4EAF0,#B0BEC9);color:#2A2E33;box-shadow:0 2px 6px rgba(160,170,180,.4)}
+.trilha-badge-patente.ouro{background:linear-gradient(120deg,#FFE49E,#E0A722);color:#5C3D00;box-shadow:0 2px 8px rgba(224,167,34,.5);animation:trilhaPatenteGlow 2s ease-in-out infinite}
+.trilha-badge-patente.diamante{background:linear-gradient(120deg,#B4E7F5,#5DC6E8,#8ADCF0);color:#0B3A47;box-shadow:0 2px 10px rgba(93,198,232,.55);animation:trilhaPatenteGlow 1.6s ease-in-out infinite}
+.trilha-badge-patente.lendario{background:linear-gradient(120deg,#FF9EE0,#B673FF,#7CE0FF);color:#2B0B3A;box-shadow:0 2px 12px rgba(182,115,255,.6);animation:trilhaPatenteGlow 1.2s ease-in-out infinite}
+@keyframes trilhaPatenteGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25)}}
+
+/* ─ Texto flutuante a cada passo (juice) ─ */
+.trilha-float-txt{position:absolute;top:-30px;left:50%;transform:translateX(-50%);font-family:'Bebas Neue',sans-serif;
+  font-size:15px;font-weight:900;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.5);white-space:nowrap;z-index:6;
+  pointer-events:none;animation:trilhaFloatUp .9s ease-out forwards}
+@keyframes trilhaFloatUp{0%{opacity:0;transform:translateX(-50%) translateY(0) scale(.7)}
+  20%{opacity:1;transform:translateX(-50%) translateY(-10px) scale(1.15)}
+  100%{opacity:0;transform:translateX(-50%) translateY(-42px) scale(1)}}
+
+/* ─ Overlay de vitória em tela cheia ─ */
+.trilha-vitoria-overlay{position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at center,rgba(11,31,20,.88),rgba(0,0,0,.94));backdrop-filter:blur(3px)}
+.trilha-vitoria-overlay.on{display:flex;animation:trilhaVitoriaFadeIn .3s ease-out}
+@keyframes trilhaVitoriaFadeIn{0%{opacity:0}100%{opacity:1}}
+.trilha-vitoria-card{text-align:center;animation:trilhaVitoriaPop .55s cubic-bezier(.34,1.56,.64,1)}
+@keyframes trilhaVitoriaPop{0%{transform:scale(.3) rotate(-8deg);opacity:0}60%{transform:scale(1.08) rotate(2deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+.trilha-vitoria-troféu{font-size:120px;line-height:1;filter:drop-shadow(0 10px 30px rgba(255,209,102,.6));
+  animation:trilhaVitoriaTrofeuBounce 1s ease-in-out infinite}
+@keyframes trilhaVitoriaTrofeuBounce{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-16px) rotate(4deg)}}
+.trilha-vitoria-titulo{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:3px;color:#FFD166;
+  text-shadow:0 0 40px rgba(255,209,102,.7);margin-top:10px}
+.trilha-vitoria-nome{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1.5px;color:#fff;margin-top:6px}
+.trilha-vitoria-sub{font-size:14px;color:rgba(255,255,255,.7);font-weight:700;margin-top:8px}
+
+/* ─ Ranking: pódio pros 3 primeiros + lista pro resto ─ */
+.trilha-podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin-bottom:14px;padding:0 4px}
+.trilha-podium-item{display:flex;flex-direction:column;align-items:center;flex:1;max-width:120px}
+.trilha-podium-avatar{width:52px;height:52px;border-radius:50%;overflow:hidden;background:var(--pp);
+  display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.25);
+  margin-bottom:6px;position:relative;z-index:1}
+.trilha-podium-item.p1 .trilha-podium-avatar{width:66px;height:66px;border-color:#FFD166;box-shadow:0 6px 18px rgba(255,209,102,.5)}
+.trilha-podium-name{font-size:11px;font-weight:800;color:var(--g900);text-align:center;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;max-width:100%;margin-bottom:2px}
+.trilha-podium-val{font-size:10px;font-weight:700;color:var(--g500);margin-bottom:6px;text-align:center}
+.trilha-podium-bar{width:100%;border-radius:10px 10px 0 0;display:flex;align-items:flex-start;justify-content:center;
+  padding-top:6px;font-family:'Bebas Neue',sans-serif;color:#fff;box-shadow:inset 0 2px 6px rgba(255,255,255,.25)}
+.trilha-podium-item.p1 .trilha-podium-bar{height:74px;background:linear-gradient(160deg,#FFD166,#E0A722);font-size:22px}
+.trilha-podium-item.p2 .trilha-podium-bar{height:54px;background:linear-gradient(160deg,#C7D2DA,#9AA8B4);font-size:18px}
+.trilha-podium-item.p3 .trilha-podium-bar{height:38px;background:linear-gradient(160deg,#E3A972,#B4772F);font-size:18px}
+
+.trilha-rank-row{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid var(--g100)}
+.trilha-rank-row:last-child{border-bottom:none}
+.trilha-rank-pos{width:22px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--g500)}
+.trilha-rank-avatar{width:34px;height:34px;border-radius:9px;overflow:hidden;background:var(--pp);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.trilha-rank-bar{flex:1;background:var(--g100);border-radius:100px;height:7px;overflow:hidden;min-width:80px}
+.trilha-rank-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--pp),var(--pp2))}
+
+
 @keyframes tvFxBurst{
   0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
   15%{opacity:1}
@@ -12706,15 +12826,28 @@ function trilhaRender(){
   const est = trilhaGetEstado(trilhaOpAtual);
   const acordos = op.acordos || 0;
   const dadosDisp = Math.max(0, acordos + (est.bonusGanho||0) - (est.dadosUsados||0));
+  const pos = est.pos||0;
 
   document.getElementById('trilha-nome').textContent = op.name.replace(/_/g,' ').toUpperCase();
-  document.getElementById('trilha-voltas').textContent = (est.voltas||0) > 0 ? `🏆 ${est.voltas} volta(s) completa(s)` : 'Ainda na 1ª volta';
+  document.getElementById('trilha-voltas').textContent = (est.voltas||0) > 0 ? `🏆 ${est.voltas} volta(s) completa(s) · Casa ${pos}/${TRILHA_CASAS}` : `Casa ${pos}/${TRILHA_CASAS} · 1ª volta`;
   document.getElementById('trilha-acordos').textContent = acordos;
   document.getElementById('trilha-dados-disp').textContent = dadosDisp;
 
-  const avatar = document.getElementById('trilha-avatar');
+  const patente = trilhaGetPatente(est.voltas||0);
+  const patenteEl = document.getElementById('trilha-patente');
+  if(patenteEl){ patenteEl.className = 'trilha-badge-patente ' + patente.cls; patenteEl.textContent = patente.emoji+' '+patente.label; }
+
   const foto = photoGet(op.name);
-  avatar.innerHTML = foto ? `<img src="${foto}" style="width:100%;height:100%;object-fit:cover">` : `<span style="color:#fff;font-weight:900;font-family:'Bebas Neue',sans-serif;font-size:20px">${op.name.charAt(0).toUpperCase()}</span>`;
+  const fotoHtml = foto ? `<img src="${foto}" style="width:100%;height:100%;object-fit:cover">` : `<span style="color:#fff;font-weight:900;font-family:'Bebas Neue',sans-serif;font-size:22px">${op.name.charAt(0).toUpperCase()}</span>`;
+  document.getElementById('trilha-avatar').innerHTML = fotoHtml;
+
+  // Foto também no cabeçalho do jogo, em destaque
+  const headerAv = document.getElementById('trilha-header-avatar');
+  if(headerAv){ headerAv.style.display = 'flex'; headerAv.style.alignItems='center'; headerAv.style.justifyContent='center'; headerAv.innerHTML = fotoHtml; }
+
+  const pct = Math.round((pos/TRILHA_CASAS)*100);
+  document.getElementById('trilha-progresso-bar').style.width = pct+'%';
+  document.getElementById('trilha-progresso-label').textContent = pos>=TRILHA_CASAS ? 'Chegou na casa final! 🎉' : `${TRILHA_CASAS-pos} casa(s) até a chegada`;
 
   const btn = document.getElementById('trilha-btn-jogar');
   btn.disabled = dadosDisp<=0 || trilhaAnimando;
@@ -12722,33 +12855,199 @@ function trilhaRender(){
   btn.style.cursor = (dadosDisp<=0) ? 'not-allowed' : 'pointer';
   btn.textContent = dadosDisp<=0 ? '🔒 FECHE UM ACORDO PRA JOGAR' : '🎲 JOGAR DADO';
 
-  trilhaRenderBoard(est.pos||0);
-  trilhaRenderHistorico(est.historico||[]);
+  trilhaRenderBoard(pos, fotoHtml);
+  trilhaRenderHistorico(est.historico||[], fotoHtml);
+  trilhaRenderRanking();
 }
 
-function trilhaRenderBoard(posAtual){
+// Ordem "serpente": linha 1 esquerda→direita, linha 2 direita→esquerda, etc.
+function trilhaOrdemSerpente(){
+  const linhas = [[1,2,3,4,5,6],[12,11,10,9,8,7],[13,14,15,16,17,18],[24,23,22,21,20,19]];
+  return linhas.flat();
+}
+
+function trilhaRenderBoard(posAtual, fotoHtml){
   const board = document.getElementById('trilha-board');
+  const ordem = trilhaOrdemSerpente();
   let html = '';
-  for(let i=1;i<=TRILHA_CASAS;i++){
+  ordem.forEach(i=>{
     const isBonus = TRILHA_BONUS.includes(i);
     const isChegada = i===TRILHA_CASAS;
-    const isAtual = i===posAtual;
-    const bg = isAtual ? 'linear-gradient(135deg,var(--pp),var(--pp2))' : isChegada ? 'linear-gradient(135deg,#D97706,#FBBF24)' : isBonus ? 'rgba(0,168,107,.1)' : 'var(--g50)';
-    const cor = isAtual || isChegada ? '#fff' : isBonus ? 'var(--ppd)' : 'var(--g500)';
-    const borda = isAtual ? '2px solid var(--ppd)' : '1px solid var(--g200)';
-    const icone = isAtual ? '<span class="trilha-token">🚶</span>' : isChegada ? '🏆' : isBonus ? '🎁' : i;
-    html += `<div id="trilha-casa-${i}" style="aspect-ratio:1;border-radius:10px;background:${bg};border:${borda};display:flex;align-items:center;justify-content:center;
-      font-weight:800;font-size:${isAtual||isChegada||isBonus?'18px':'12px'};color:${cor};transition:all .3s;${isAtual?'transform:scale(1.12);box-shadow:0 4px 14px rgba(0,168,107,.4);z-index:2':''}">${icone}</div>`;
-  }
+    const isInicio = i===1;
+    const isAtual = i===posAtual || (posAtual===0 && isInicio);
+    let cls = 'trilha-tile n';
+    if(isChegada) cls = 'trilha-tile finish';
+    else if(isBonus) cls = 'trilha-tile bonus';
+    else if(isInicio) cls = 'trilha-tile start';
+    if(isAtual) cls += ' current';
+
+    const piece = isAtual ? `<div class="trilha-piece" id="trilha-piece-el">${fotoHtml}</div>` : '';
+    let conteudo;
+    if(isChegada) conteudo = `<span class="ic">🏆</span>`;
+    else if(isBonus) conteudo = `<span class="ic">🎁</span><span class="lbl">+1 DADO</span>`;
+    else if(isInicio) conteudo = `<span class="ic">🚩</span>`;
+    else conteudo = i;
+
+    // Seta de fluxo indicando o caminho pra próxima casa (direção da linha, ou descida na virada)
+    let flow = '';
+    if(!isChegada){
+      const row = Math.floor((i-1)/6);
+      const isRowEnd = (i % 6 === 0);
+      if(isRowEnd){ flow = `<span class="flow d">▸</span>`; }
+      else{ flow = row % 2 === 0 ? `<span class="flow r">▸</span>` : `<span class="flow l">◂</span>`; }
+    }
+
+    const numBadge = (!isChegada && !isInicio) ? `<span class="num-badge">${i}</span>` : '';
+    html += `<div class="${cls}" id="trilha-casa-${i}">${numBadge}${piece}${conteudo}${flow}</div>`;
+  });
   board.innerHTML = html;
 }
 
-function trilhaRenderHistorico(historico){
+function trilhaRenderHistorico(historico, fotoHtml){
   const el = document.getElementById('trilha-historico');
   if(!historico || historico.length===0){ el.textContent = 'Nenhuma jogada ainda.'; return; }
   el.innerHTML = historico.slice(-8).reverse().map(h=>
-    `<div style="padding:4px 0;border-bottom:1px solid var(--g100)">🎲 tirou <b style="color:var(--g900)">${h.dado}</b> — foi da casa ${h.de} pra ${h.para}${h.bonus?' <span style="color:var(--pp)">+1 dado bônus! 🎁</span>':''}${h.chegou?' <span style="color:#D97706">🏆 CHEGOU!</span>':''}</div>`
+    `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--g100)">
+      <div style="width:24px;height:24px;border-radius:7px;overflow:hidden;flex-shrink:0;background:var(--pp);display:flex;align-items:center;justify-content:center">${fotoHtml||''}</div>
+      <div style="flex:1;min-width:0">🎲 tirou <b style="color:var(--g900)">${h.dado}</b> — foi da casa ${h.de} pra ${h.para}${h.bonus?' <span style="color:var(--pp)">+1 dado bônus! 🎁</span>':''}${h.chegou?' <span style="color:#D97706">🏆 CHEGOU!</span>':''}</div>
+    </div>`
   ).join('');
+}
+
+function trilhaRenderRanking(){
+  const el = document.getElementById('trilha-ranking');
+  if(!el) return;
+  const lista = Object.entries(trilhaDataAll)
+    .map(([nome,est])=>({ nome, pos: est.pos||0, voltas: est.voltas||0 }))
+    .sort((a,b)=> (b.voltas-a.voltas) || (b.pos-a.pos));
+  if(lista.length===0){ el.innerHTML = '<div style="font-size:12px;color:var(--g400)">Ninguém jogou ainda — seja o primeiro!</div>'; return; }
+
+  const avatarHtml = (nome)=>{
+    const foto = photoGet(nome);
+    return foto ? `<img src="${foto}" style="width:100%;height:100%;object-fit:cover">` : `<span style="color:#fff;font-weight:900;font-size:13px">${nome.charAt(0).toUpperCase()}</span>`;
+  };
+  const casasLbl = (r)=> `${r.voltas>0?`${r.voltas}🏆 · `:''}${r.pos}/${TRILHA_CASAS}`;
+
+  const top3 = lista.slice(0,3);
+  const resto = lista.slice(3,8);
+
+  // ── Pódio (ordem visual: 2° - 1° - 3°) ──
+  let podiumHtml = '';
+  if(top3.length){
+    const ordemPodio = [top3[1], top3[0], top3[2]].filter(Boolean);
+    const classes = {0:'p2',1:'p1',2:'p3'};
+    podiumHtml = '<div class="trilha-podium">' + ordemPodio.map((r,idx)=>{
+      if(!r) return '';
+      const cls = idx===0 ? 'p2' : idx===1 ? 'p1' : 'p3';
+      const medal = cls==='p1' ? '🥇' : cls==='p2' ? '🥈' : '🥉';
+      const destaque = r.nome===trilhaOpAtual;
+      const pat = trilhaGetPatente(r.voltas);
+      return `<div class="trilha-podium-item ${cls}">
+        <div style="font-size:18px;margin-bottom:2px">${medal}</div>
+        <div class="trilha-podium-avatar" style="${destaque?'box-shadow:0 0 0 3px var(--pp),0 4px 12px rgba(0,168,107,.4)':''}">${avatarHtml(r.nome)}</div>
+        <div class="trilha-podium-name">${r.nome.replace(/_/g,' ')}</div>
+        <div class="trilha-badge-patente ${pat.cls}" style="font-size:8px;padding:2px 7px;margin-bottom:3px">${pat.emoji} ${pat.label}</div>
+        <div class="trilha-podium-val">${casasLbl(r)}</div>
+        <div class="trilha-podium-bar">${idx===1?'1°':idx===0?'2°':'3°'}</div>
+      </div>`;
+    }).join('') + '</div>';
+  }
+
+  // ── Lista do 4° em diante ──
+  const listaHtml = resto.map((r,i)=>{
+    const pct = Math.round((r.pos/TRILHA_CASAS)*100);
+    const destaque = r.nome===trilhaOpAtual;
+    const pat = trilhaGetPatente(r.voltas);
+    return `<div class="trilha-rank-row" style="${destaque?'background:rgba(0,168,107,.06);border-radius:8px':''}">
+      <div class="trilha-rank-pos">${i+4}</div>
+      <div class="trilha-rank-avatar">${avatarHtml(r.nome)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:800;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.nome.replace(/_/g,' ')} <span class="trilha-badge-patente ${pat.cls}" style="font-size:7px;padding:1px 6px;vertical-align:middle">${pat.emoji}</span></div>
+        <div class="trilha-rank-bar"><div class="trilha-rank-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div style="font-size:11px;font-weight:800;color:var(--g500);white-space:nowrap">${casasLbl(r)}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = podiumHtml + listaHtml;
+}
+
+// Zera a trilha do jogador atual e começa do zero (com confirmação)
+function trilhaZerar(){
+  if(!trilhaOpAtual || trilhaAnimando) return;
+  const nome = trilhaOpAtual.replace(/_/g,' ');
+  if(!confirm(`Tem certeza que quer zerar a trilha de ${nome}?\n\nIsso apaga a posição, as voltas e o histórico de jogadas. Essa ação não pode ser desfeita.`)) return;
+
+  const est = { pos:0, dadosUsados:0, bonusGanho:0, voltas:0, historico:[] };
+  trilhaDataAll[trilhaOpAtual] = est;
+  if(fbDb && fbRoom){ fbDb.ref(fbRoom+'/trilha/'+trilhaOpAtual).set(est).catch(e=>console.warn('FB trilha err:',e)); }
+
+  const resEl = document.getElementById('trilha-resultado');
+  if(resEl){ resEl.textContent = '🔄 Trilha zerada — começando do zero!'; resEl.style.color = '#fff'; }
+
+  trilhaRender();
+  if(typeof toast==='function') toast('🔄 Trilha zerada! Bora começar de novo 🎲');
+}
+
+// Patente do jogador, conforme voltas completas (dá senso de progressão/status)
+function trilhaGetPatente(voltas){
+  if(voltas>=10) return {cls:'lendario', label:'Lendário', emoji:'👑'};
+  if(voltas>=6)  return {cls:'diamante', label:'Diamante', emoji:'💎'};
+  if(voltas>=3)  return {cls:'ouro',     label:'Ouro',     emoji:'🥇'};
+  if(voltas>=1)  return {cls:'prata',    label:'Prata',    emoji:'🥈'};
+  return              {cls:'bronze',   label:'Bronze',   emoji:'🥉'};
+}
+
+// ── Sons do jogo, gerados na hora via Web Audio (sem precisar de arquivo) ──
+let trilhaAudioCtx = null;
+function trilhaAudio(){
+  if(!trilhaAudioCtx){ try{ trilhaAudioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } }
+  if(trilhaAudioCtx.state==='suspended') trilhaAudioCtx.resume();
+  return trilhaAudioCtx;
+}
+function trilhaBeep(freq, dur, tipo, vol, delay){
+  const ctx = trilhaAudio();
+  if(!ctx) return;
+  const t0 = ctx.currentTime + (delay||0);
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = tipo||'sine';
+  osc.frequency.setValueAtTime(freq, t0);
+  gain.gain.setValueAtTime(0, t0);
+  gain.gain.linearRampToValueAtTime(vol||0.12, t0+0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0+dur);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(t0); osc.stop(t0+dur+0.02);
+}
+function trilhaSomPasso(){ trilhaBeep(520, 0.09, 'square', 0.08); }
+function trilhaSomBonus(){ trilhaBeep(660,0.12,'triangle',0.14); trilhaBeep(880,0.16,'triangle',0.12,0.1); }
+function trilhaSomDado(){ for(let i=0;i<4;i++) trilhaBeep(300+Math.random()*200, 0.06, 'square', 0.05, i*0.09); }
+function trilhaSomVitoria(){
+  [523,659,784,1047].forEach((f,i)=> trilhaBeep(f, 0.35, 'triangle', 0.16, i*0.14));
+}
+
+// Mostra um texto flutuante saindo de cima da peça (juice visual a cada passo)
+function trilhaFloatText(txt, cor){
+  const piece = document.getElementById('trilha-piece-el');
+  if(!piece) return;
+  const el = document.createElement('div');
+  el.className = 'trilha-float-txt';
+  el.textContent = txt;
+  if(cor) el.style.color = cor;
+  piece.appendChild(el);
+  setTimeout(()=>el.remove(), 950);
+}
+
+// Tela de vitória em destaque (volta completa)
+function trilhaMostrarVitoria(nome, voltas){
+  const overlay = document.getElementById('trilha-vitoria-overlay');
+  if(!overlay) return;
+  document.getElementById('trilha-vitoria-nome').textContent = nome.replace(/_/g,' ').toUpperCase();
+  const patente = trilhaGetPatente(voltas);
+  document.getElementById('trilha-vitoria-sub').textContent = `${voltas}ª volta completa · Patente ${patente.emoji} ${patente.label}`;
+  overlay.classList.add('on');
+  trilhaSomVitoria();
+  setTimeout(()=>{ overlay.classList.remove('on'); }, 3200);
 }
 
 function trilhaJogar(){
@@ -12764,6 +13063,10 @@ function trilhaJogar(){
   const cube = document.getElementById('trilha-dice-cube');
   const btn = document.getElementById('trilha-btn-jogar');
   btn.disabled = true;
+  trilhaSomDado();
+
+  const foto = photoGet(op.name);
+  const fotoHtml = foto ? `<img src="${foto}" style="width:100%;height:100%;object-fit:cover">` : `<span style="color:#fff;font-weight:900;font-family:'Bebas Neue',sans-serif;font-size:16px">${op.name.charAt(0).toUpperCase()}</span>`;
 
   const resultado = 1 + Math.floor(Math.random()*6);
   const faceRot = {1:{x:0,y:0}, 6:{x:0,y:180}, 2:{x:0,y:-90}, 5:{x:0,y:90}, 3:{x:-90,y:0}, 4:{x:90,y:0}};
@@ -12774,34 +13077,92 @@ function trilhaJogar(){
 
   setTimeout(()=>{
       const de = est.pos||0;
-      let para = de + resultado;
+      let paraFinal = de + resultado;
       let bonus = false, chegou = false, voltas = est.voltas||0;
-      if(para >= TRILHA_CASAS){
+      if(paraFinal >= TRILHA_CASAS){
         chegou = true;
         voltas += 1;
-        para = 0;
-      } else if(TRILHA_BONUS.includes(para)){
+      } else if(TRILHA_BONUS.includes(paraFinal)){
         bonus = true;
       }
+      // posição final normalizada (0 se completou a volta)
+      const paraNormalizado = chegou ? 0 : paraFinal;
 
-      est.pos = para;
-      est.dadosUsados = (est.dadosUsados||0) + 1;
-      est.bonusGanho = (est.bonusGanho||0) + (bonus?1:0);
-      est.voltas = voltas;
-      est.historico = [...(est.historico||[]), {de, para, dado:resultado, bonus, chegou, ts:Date.now()}];
-
-      trilhaDataAll[trilhaOpAtual] = est;
-      if(fbDb && fbRoom){ fbDb.ref(fbRoom+'/trilha/'+trilhaOpAtual).set(est).catch(e=>console.warn('FB trilha err:',e)); }
-
+      // ── Peça anda casa por casa até o destino, com um pulinho a cada passo ──
+      const HOP_MS = 260;
+      let passo = de;
       const resEl = document.getElementById('trilha-resultado');
-      resEl.textContent = chegou ? `🏆 CHEGOU NA CASA FINAL! Deu uma volta completa e recomeçou 🎉`
-        : bonus ? `🎁 Caiu na casa bônus — ganhou +1 dado extra!`
-        : `Andou ${resultado} casa(s), da ${de} pra ${para}`;
-      resEl.style.color = chegou ? '#FBBF24' : bonus ? '#4ADE80' : '#fff';
+      resEl.textContent = `🎲 Tirou ${resultado} — andando...`;
+      resEl.style.color = '#fff';
 
-      trilhaAnimando = false;
-      trilhaRender();
+      function darPasso(){
+        passo++;
+        const chegouNesteStep = passo >= TRILHA_CASAS;
+        const posExibida = chegouNesteStep ? TRILHA_CASAS : passo;
+        trilhaRenderBoard(posExibida, fotoHtml);
+        const pieceEl = document.getElementById('trilha-piece-el');
+        if(pieceEl){ pieceEl.classList.add('hop'); }
+        trilhaSomPasso();
+        trilhaFloatText(chegouNesteStep ? '🏆' : (TRILHA_BONUS.includes(posExibida) ? '🎁' : '+1'), chegouNesteStep ? '#FFD166' : null);
+
+        if(passo < paraFinal && !chegouNesteStep){
+          setTimeout(darPasso, HOP_MS);
+        } else {
+          // chegou no destino — grava o estado e finaliza
+          est.pos = paraNormalizado;
+          est.dadosUsados = (est.dadosUsados||0) + 1;
+          est.bonusGanho = (est.bonusGanho||0) + (bonus?1:0);
+          est.voltas = voltas;
+          est.historico = [...(est.historico||[]), {de, para: paraNormalizado, dado:resultado, bonus, chegou, ts:Date.now()}];
+
+          trilhaDataAll[trilhaOpAtual] = est;
+          if(fbDb && fbRoom){ fbDb.ref(fbRoom+'/trilha/'+trilhaOpAtual).set(est).catch(e=>console.warn('FB trilha err:',e)); }
+          if(bonus) trilhaSomBonus();
+
+          resEl.textContent = chegou ? `🏆 CHEGOU NA CASA FINAL! Deu uma volta completa e recomeçou 🎉`
+            : bonus ? `🎁 Caiu na casa bônus — ganhou +1 dado extra!`
+            : `Andou ${resultado} casa(s), da ${de} pra ${paraNormalizado}`;
+          resEl.style.color = chegou ? '#FBBF24' : bonus ? '#4ADE80' : '#fff';
+
+          trilhaAnimando = false;
+          trilhaRender();
+          if(chegou){ trilhaComemorar(); trilhaMostrarVitoria(trilhaOpAtual, voltas); }
+        }
+      }
+      setTimeout(darPasso, 120);
   }, 1450);
+}
+
+// Confete + fogos ao chegar na casa final (reaproveita as keyframes do Modo TV)
+function trilhaComemorar(){
+  const host = document.getElementById('pg-trilha');
+  if(!host) return;
+  const old = host.querySelector('.tv-fx-layer');
+  if(old) old.remove();
+  const layer = document.createElement('div');
+  layer.className = 'tv-fx-layer';
+  layer.style.cssText = 'position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:9999';
+  document.body.appendChild(layer);
+  const cores = ['#00A86B','#00C97F','#00B8A9','#FFC700','#FF6B6B','#7C3AED','#0284C7'];
+  for(let i=0;i<70;i++){
+    const p = document.createElement('div');
+    const cor = cores[Math.floor(Math.random()*cores.length)];
+    const tamanho = 6 + Math.random()*9;
+    const startX = 50 + (Math.random()*30-15);
+    const startY = 30 + Math.random()*15;
+    const dx = (Math.random()*80-40);
+    const dy = 40 + Math.random()*50;
+    const rot = Math.random()*720-360;
+    const delay = Math.random()*0.4;
+    const dur = 1.5 + Math.random()*1;
+    const shape = Math.random()>0.5 ? '50%' : '3px';
+    p.style.cssText = `position:absolute;left:${startX}%;top:${startY}%;width:${tamanho}px;height:${tamanho}px;
+      background:${cor};border-radius:${shape};opacity:0;box-shadow:0 0 8px ${cor};
+      animation:tvFxBurst ${dur}s ease-out ${delay}s forwards;
+      --dx:${dx}vw;--dy:${dy}vh;--rot:${rot}deg`;
+    layer.appendChild(p);
+  }
+  setTimeout(()=>{ layer.remove(); }, 3000);
 }
 
 // ══════════════════════════════════════════
@@ -14215,10 +14576,29 @@ setInterval(()=>{
 <!-- ══════════ PAGE: CHECKLIST LÍDER ══════════ -->
 <div class="page" id="pg-trilha">
 
+  <!-- Overlay de vitória (tela cheia, bem impactante) -->
+  <div id="trilha-vitoria-overlay" class="trilha-vitoria-overlay">
+    <div class="trilha-vitoria-card">
+      <div class="trilha-vitoria-troféu">🏆</div>
+      <div class="trilha-vitoria-titulo">VOLTA COMPLETA!</div>
+      <div id="trilha-vitoria-nome" class="trilha-vitoria-nome"></div>
+      <div id="trilha-vitoria-sub" class="trilha-vitoria-sub"></div>
+    </div>
+  </div>
+
+
   <!-- Header -->
-  <div style="background:linear-gradient(135deg,var(--ppd),#1B4332);border-radius:var(--rxl);padding:16px 22px">
-    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Jogo de Desempenho</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff">🎲 TRILHA DO RECEBIMENTO — CADA ACORDO = 1 DADO</div>
+  <div style="background:linear-gradient(135deg,#0B1F14,#1B4332 60%,#00875A);border-radius:var(--rxl);padding:20px 24px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-30px;right:-20px;font-size:130px;opacity:.08;transform:rotate(-12deg)">🎲</div>
+    <div style="position:relative;z-index:1;display:flex;align-items:center;gap:16px">
+      <div id="trilha-header-avatar" style="display:none;width:56px;height:56px;border-radius:16px;overflow:hidden;flex-shrink:0;
+        border:3px solid rgba(255,255,255,.85);box-shadow:0 6px 16px rgba(0,0,0,.35);background:linear-gradient(135deg,var(--pp),var(--pp2))"></div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Jogo de Desempenho</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:#fff">🎲 TRILHA DO RECEBIMENTO</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Cada acordo fechado = 1 dado. Chegue na casa 24 e comece uma nova volta 🏆</div>
+      </div>
+    </div>
   </div>
 
   <!-- Seletor de colaborador -->
@@ -14230,52 +14610,78 @@ setInterval(()=>{
   </div>
 
   <!-- Card do jogador -->
-  <div id="trilha-jogador" style="display:none">
+  <div id="trilha-jogador" style="display:none;position:relative">
 
-    <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px;box-shadow:var(--sh);margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between">
-        <div style="display:flex;align-items:center;gap:12px">
-          <div id="trilha-avatar" style="width:52px;height:52px;border-radius:14px;overflow:hidden;background:var(--pp);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid var(--g200)"></div>
-          <div>
-            <div id="trilha-nome" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--g900);letter-spacing:1px"></div>
-            <div id="trilha-voltas" style="font-size:11px;color:var(--g500);font-weight:700"></div>
+    <!-- Header do jogador: avatar + progresso -->
+    <div style="background:linear-gradient(135deg,#fff,#F7FAF8);border:1px solid var(--g200);border-radius:var(--rl);padding:20px;box-shadow:var(--sh-md);margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div id="trilha-avatar" style="width:64px;height:64px;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,var(--pp),var(--pp2));display:flex;align-items:center;justify-content:center;flex-shrink:0;border:3px solid #fff;box-shadow:0 4px 16px rgba(0,168,107,.35)"></div>
+        <div style="flex:1;min-width:180px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div id="trilha-nome" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--g900);letter-spacing:1px;line-height:1.1"></div>
+            <div id="trilha-patente" class="trilha-badge-patente"></div>
           </div>
+          <div id="trilha-voltas" style="font-size:11px;color:var(--g500);font-weight:700;margin-bottom:6px"></div>
+          <div style="background:var(--g100);border-radius:100px;height:10px;overflow:hidden;position:relative">
+            <div id="trilha-progresso-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,var(--pp),var(--pp2));transition:width .6s cubic-bezier(.34,1.56,.64,1);width:0%"></div>
+          </div>
+          <div id="trilha-progresso-label" style="font-size:10px;color:var(--g500);font-weight:700;margin-top:3px"></div>
         </div>
         <div style="display:flex;gap:10px">
-          <div style="background:rgba(0,168,107,.1);border:1px solid rgba(0,168,107,.3);border-radius:12px;padding:8px 16px;text-align:center">
-            <div style="font-size:9px;font-weight:700;color:var(--g500);text-transform:uppercase">Acordos (mês)</div>
-            <div id="trilha-acordos" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--pp)">0</div>
+          <div style="background:rgba(0,168,107,.1);border:1px solid rgba(0,168,107,.3);border-radius:12px;padding:8px 16px;text-align:center;min-width:78px">
+            <div style="font-size:9px;font-weight:700;color:var(--g500);text-transform:uppercase">Acordos</div>
+            <div id="trilha-acordos" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--pp)">0</div>
           </div>
-          <div style="background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.3);border-radius:12px;padding:8px 16px;text-align:center">
-            <div style="font-size:9px;font-weight:700;color:var(--g500);text-transform:uppercase">Dados disponíveis</div>
-            <div id="trilha-dados-disp" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#D97706">0</div>
+          <div style="background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.3);border-radius:12px;padding:8px 16px;text-align:center;min-width:78px">
+            <div style="font-size:9px;font-weight:700;color:var(--g500);text-transform:uppercase">Dados</div>
+            <div id="trilha-dados-disp" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#D97706">0</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Dado 3D + Botão (topo) -->
-    <div style="background:linear-gradient(135deg,#0F2E1E,#1B4332);border-radius:var(--rl);padding:26px 18px;box-shadow:var(--sh-md);margin-bottom:16px;text-align:center">
-      <div class="trilha-dice-scene">
-        <div id="trilha-dice-cube" class="trilha-dice-cube">
-          <div class="trilha-face trilha-f1"><span class="tp"></span></div>
-          <div class="trilha-face trilha-f6"><span class="tp"></span><span class="tp"></span><span class="tp"></span><span class="tp"></span><span class="tp"></span><span class="tp"></span></div>
-          <div class="trilha-face trilha-f2"><span class="tp"></span><span class="tp"></span></div>
-          <div class="trilha-face trilha-f5"><span class="tp"></span><span class="tp"></span><span class="tp"></span><span class="tp"></span><span class="tp"></span></div>
-          <div class="trilha-face trilha-f3"><span class="tp"></span><span class="tp"></span><span class="tp"></span></div>
-          <div class="trilha-face trilha-f4"><span class="tp"></span><span class="tp"></span><span class="tp"></span><span class="tp"></span></div>
-        </div>
+    <!-- Dado + Tabuleiro juntos no mesmo card, pra ver os dois ao mesmo tempo -->
+    <div style="background:linear-gradient(180deg,#F7FAF8,#EFF5F1);border:1px solid var(--g200);border-radius:var(--rl);padding:20px;box-shadow:var(--sh);margin-bottom:16px">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:8px">
+        <div style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px">🏁 Sua Trilha</div>
+        <button onclick="trilhaZerar()" style="padding:6px 14px;border-radius:100px;border:1px solid var(--g200);background:#fff;
+          color:var(--g500);font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;transition:all .2s"
+          onmouseover="this.style.background='#FEF2F2';this.style.color='#DC2626';this.style.borderColor='#FCA5A5'"
+          onmouseout="this.style.background='#fff';this.style.color='var(--g500)';this.style.borderColor='var(--g200)'">🔄 Zerar e começar de novo</button>
       </div>
-      <button id="trilha-btn-jogar" onclick="trilhaJogar()" style="margin-top:18px;padding:14px 36px;border-radius:var(--rm);border:none;
-        background:linear-gradient(90deg,var(--pp),var(--pp2));color:#fff;font-family:Nunito,sans-serif;font-weight:900;
-        font-size:16px;cursor:pointer;box-shadow:0 6px 20px rgba(0,168,107,.4)">🎲 JOGAR DADO</button>
-      <div id="trilha-resultado" style="text-align:center;margin-top:12px;font-size:13px;font-weight:800;color:#fff;min-height:18px"></div>
+
+      <!-- Dado compacto: fica visível junto com o tabuleiro, sem precisar rolar a tela -->
+      <div style="background:radial-gradient(ellipse at center,#14532D 0%,#0B1F14 100%);border-radius:16px;padding:6px 18px 10px;
+          box-shadow:var(--sh-md);margin-bottom:10px;text-align:center;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0 2px,transparent 2px 14px);pointer-events:none"></div>
+        <div class="trilha-dice-mini">
+          <div class="trilha-dice-scene">
+            <div id="trilha-dice-cube" class="trilha-dice-cube">
+              <div class="trilha-face trilha-f1"><span class="tp"></span></div>
+              <div class="trilha-face trilha-f6"><span class="tp"></span><span class="tp"></span><span class="tp"></span><span class="tp"></span><span class="tp"></span><span class="tp"></span></div>
+              <div class="trilha-face trilha-f2"><span class="tp"></span><span class="tp"></span></div>
+              <div class="trilha-face trilha-f5"><span class="tp"></span><span class="tp"></span><span class="tp"></span><span class="tp"></span><span class="tp"></span></div>
+              <div class="trilha-face trilha-f3"><span class="tp"></span><span class="tp"></span><span class="tp"></span></div>
+              <div class="trilha-face trilha-f4"><span class="tp"></span><span class="tp"></span><span class="tp"></span><span class="tp"></span></div>
+            </div>
+          </div>
+        </div>
+        <button id="trilha-btn-jogar" onclick="trilhaJogar()" style="position:relative;z-index:1;margin-top:2px;padding:11px 32px;border-radius:100px;border:none;
+          background:linear-gradient(90deg,var(--pp),var(--pp2));color:#fff;font-family:Nunito,sans-serif;font-weight:900;
+          font-size:14px;cursor:pointer;box-shadow:0 8px 24px rgba(0,168,107,.5);letter-spacing:.5px">🎲 JOGAR DADO</button>
+        <div id="trilha-resultado" style="position:relative;z-index:1;text-align:center;margin-top:8px;font-size:12px;font-weight:800;color:#fff;min-height:16px"></div>
+      </div>
+
+      <div class="trilha-board-frame">
+        <div id="trilha-board" class="trilha-track"></div>
+      </div>
     </div>
 
-    <!-- Tabuleiro -->
+    <!-- Ranking geral entre todos -->
     <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px;box-shadow:var(--sh);margin-bottom:16px">
-      <div style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">🏁 Sua Trilha (24 casas)</div>
-      <div id="trilha-board" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px"></div>
+      <div style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">🏅 Ranking Geral da Trilha</div>
+      <div id="trilha-ranking"></div>
     </div>
 
     <!-- Histórico -->
@@ -14287,6 +14693,7 @@ setInterval(()=>{
   </div>
 
 </div>
+
 
 
 <div class="page" id="pg-fechamento">
