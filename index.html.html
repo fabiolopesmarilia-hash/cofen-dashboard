@@ -855,6 +855,87 @@ select.ev-inp{cursor:pointer}
     </div>
   </div>
 
+  <!-- ══ COMPARATIVO MENSAL — RECEBIMENTO PAGUE PLAY ATÉ O 15º DIA ÚTIL (Dt.Conciliação) ══ -->
+  <!-- Recalcula sozinho sempre que um arquivo "Importar Total Geral" (rec_total_geral) é importado -->
+  <div style="margin:14px 0 0;padding:16px 20px;background:linear-gradient(135deg,#0d1b2a 0%,#0a2540 100%);border-radius:14px;border:1px solid rgba(0,188,212,.2)">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <div style="font-size:9px;font-weight:800;color:rgba(0,229,255,.7);letter-spacing:2px;text-transform:uppercase">📊 COMPARATIVO MENSAL · PAGUE PLAY · ATÉ O 15º DIA ÚTIL (Dt.Conciliação)</div>
+      <div id="cmp15du-badge" style="font-size:9px;font-weight:700;color:rgba(255,255,255,.3);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:3px 10px">⏳ dados de exemplo — importe um arquivo para atualizar</div>
+    </div>
+    <div style="overflow-x:auto;border-radius:10px;border:1px solid rgba(255,255,255,.08)">
+      <table style="width:100%;border-collapse:collapse;font-family:Nunito,sans-serif;min-width:640px">
+        <thead>
+          <tr style="background:rgba(0,0,0,.4)">
+            <th style="padding:9px 14px;text-align:left;font-size:10px;font-weight:800;color:rgba(255,255,255,.6);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">MÊS</th>
+            <th style="padding:9px 14px;text-align:center;font-size:10px;font-weight:800;color:#67E8F9;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">15º D.U.</th>
+            <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#FFD166;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">SOMA ATÉ 15º D.U.</th>
+            <th style="padding:9px 14px;text-align:center;font-size:10px;font-weight:800;color:#C084FC;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">VAR. % VS. MÊS ANT.</th>
+            <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#4ADE80;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">TOTAL DO MÊS</th>
+          </tr>
+        </thead>
+        <tbody id="cmp15du-tbody">
+          <tr style="border-bottom:1px solid rgba(255,255,255,.06)">
+            <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">Jan/2026</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;color:rgba(255,255,255,.6);font-weight:700">22/01</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">R$ 7.080,89</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;font-weight:800;color:rgba(255,255,255,.35)">—</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">R$ 20.352,13</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,.06)">
+            <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">Fev/2026</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;color:rgba(255,255,255,.6);font-weight:700">24/02</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">R$ 24.544,02</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;font-weight:800;color:#4ADE80">▲ +246,6%</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">R$ 30.447,39</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,.06)">
+            <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">Mar/2026</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;color:rgba(255,255,255,.6);font-weight:700">20/03</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">R$ 64.025,10</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;font-weight:800;color:#4ADE80">▲ +160,9%</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">R$ 141.025,45</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,.06)">
+            <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">Abr/2026</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;color:rgba(255,255,255,.6);font-weight:700">23/04</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">R$ 235.866,22</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;font-weight:800;color:#4ADE80">▲ +268,4%</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">R$ 373.649,46</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,.06)">
+            <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">Mai/2026</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;color:rgba(255,255,255,.6);font-weight:700">22/05</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">R$ 311.135,57</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;font-weight:800;color:#4ADE80">▲ +31,9%</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">R$ 496.699,73</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,.06)">
+            <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">Jun/2026</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;color:rgba(255,255,255,.6);font-weight:700">22/06</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">R$ 528.169,45</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;font-weight:800;color:#4ADE80">▲ +69,8%</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">R$ 810.165,14</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,.06)">
+            <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">Jul/2026</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;color:rgba(255,255,255,.6);font-weight:700">21/07</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">R$ 687.622,98</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;font-weight:800;color:#4ADE80">▲ +30,2%</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">R$ 1.201.867,00</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">Ago/2026 ⚠️</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;color:rgba(255,255,255,.6);font-weight:700">21/08</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">R$ 794.072,31</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;font-weight:800;color:#4ADE80">▲ +15,5%</td>
+            <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">R$ 823.595,75*</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="cmp15du-nota" style="margin-top:8px;font-size:9.5px;color:rgba(255,255,255,.35);font-weight:600">*Valores de exemplo (calculados manualmente em 24/08/2026). 15º D.U. calculado com feriados nacionais + Carnaval + Corpus Christi. Importe um arquivo "Total Geral" para recalcular com dados reais.</div>
+  </div>
+
   <!-- ══ JS TABELA METAS — inicializa após dados prontos ══ -->
   <script>
   (function waitAndRender(){
@@ -4387,6 +4468,9 @@ function processarArquivoGeral(file){
   function _aoLer(txt){
     document.getElementById('txt-geral-modal').value = txt.slice(0,50000);
     previewGeral(txt);
+    // Comparativo 15º D.U. usa o TEXTO COMPLETO (txt), não o campo truncado em 50000 chars,
+    // pra não perder linhas em arquivos grandes.
+    atualizarComparativo15DU(txt);
     // Auto-aplicar após parse bem-sucedido
     if(_geralParsed && !_geralParsed.error){
       aplicarGeral();
@@ -4410,6 +4494,8 @@ function processarArquivoEmpresa(file){
     _lerXLS(file, txt => {
       document.getElementById('txt-empresa-modal').value = txt.slice(0,50000);
       previewEmpresa(txt);
+      // Comparativo 15º D.U. usa o TEXTO COMPLETO (txt), não o campo truncado.
+      atualizarComparativo15DU(txt);
     });
     return;
   }
@@ -4418,6 +4504,7 @@ function processarArquivoEmpresa(file){
     const txt = e.target.result;
     document.getElementById('txt-empresa-modal').value = txt.slice(0, 50000);
     previewEmpresa(txt);
+    atualizarComparativo15DU(txt);
   };
   reader.readAsText(file, 'latin1');
 }
@@ -4479,6 +4566,216 @@ function _parseNumFlex(str){
   const n = parseFloat(v);
   return isNaN(n) ? 0 : n;
 }
+
+// ══════════════════════════════════════════════════════════════
+// COMPARATIVO MENSAL — PAGUE PLAY ATÉ O 15º DIA ÚTIL (por Dt.Conciliação)
+// Recalcula automaticamente a partir do arquivo "Importar Total Geral"
+// (rec_total_geral, mesmo formato do rec_geral_ano usado nas análises).
+// IMPORTANTE: cada importação faz MERGE por mês — nunca apaga meses
+// anteriores, mesmo que o arquivo importado só tenha 1 mês (ex: só Agosto).
+// ══════════════════════════════════════════════════════════════
+const MESES_ABREV_PT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+// Base inicial (calculada manualmente em 24/08/2026) — usada apenas se ainda
+// não houver nada salvo no localStorage. A partir da primeira importação,
+// quem manda é o localStorage (mesclado a cada nova importação).
+const CMP15DU_BASE = [
+  {mesKey:'2026-01', mesLabel:'Jan/2026', d15Label:'22/01', soma15:7080.89,   totalMes:20352.13},
+  {mesKey:'2026-02', mesLabel:'Fev/2026', d15Label:'24/02', soma15:24544.02,  totalMes:30447.39},
+  {mesKey:'2026-03', mesLabel:'Mar/2026', d15Label:'20/03', soma15:64025.10,  totalMes:141025.45},
+  {mesKey:'2026-04', mesLabel:'Abr/2026', d15Label:'23/04', soma15:235866.22, totalMes:373649.46},
+  {mesKey:'2026-05', mesLabel:'Mai/2026', d15Label:'22/05', soma15:311135.57, totalMes:496699.73},
+  {mesKey:'2026-06', mesLabel:'Jun/2026', d15Label:'22/06', soma15:528169.45, totalMes:810165.14},
+  {mesKey:'2026-07', mesLabel:'Jul/2026', d15Label:'21/07', soma15:687622.98, totalMes:1201867.00},
+  {mesKey:'2026-08', mesLabel:'Ago/2026', d15Label:'21/08', soma15:794072.31, totalMes:823595.75},
+];
+
+// Retorna o dia (1-31) do 15º dia útil de um mês/ano, usando a lista de feriados do dashboard.
+function _du15DoMes(ano, mes, feriados){
+  const dim = new Date(ano, mes, 0).getDate();
+  let du = 0;
+  for(let d=1; d<=dim; d++){
+    const dt = new Date(ano, mes-1, d);
+    const dow = dt.getDay();
+    const iso = ano+'-'+String(mes).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    if(dow!==0 && dow!==6 && feriados.indexOf(iso)<0){
+      du++;
+      if(du===15) return d;
+    }
+  }
+  return null; // mês não tem 15 dias úteis (não deve acontecer em meses normais)
+}
+
+// Lê o CSV bruto (rec_total_geral) linha a linha e monta, por mês, a soma até o
+// 15º dia útil (via Dt.Conciliação, com fallback para Dt.Pagamento/Data) e o total do mês.
+function _calcularComparativo15DU(raw){
+  if(!raw || raw.trim().length < 20) return null;
+  const lines = raw.trim().split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length < 2) return null;
+  const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
+  const norm = s => s.trim().replace(/^"|"$/g,'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const headers = lines[0].split(sep).map(norm);
+  const col = cands => { for(const c of cands){ const i=headers.findIndex(h=>h.includes(c)); if(i>=0) return i; } return -1; };
+
+  const iConc = col(['dt.conciliacao','dt conciliacao','conciliacao']);
+  const iPag  = col(['dt.pagamento','dt pagamento','pagamento']);
+  const iBaixa= col(['dt.baixa','data baixa']);
+  const iData = col(['data']);
+  const iPP   = col(['pague play','pagueplay','24,96','24.96','pp (']);
+  const iRec  = col(['valor recebido','vlr recebido','recebido','valor rec']);
+
+  const iDate = iConc>=0 ? iConc : iPag>=0 ? iPag : iBaixa>=0 ? iBaixa : iData;
+  if(iDate < 0 || (iPP < 0 && iRec < 0)) return null;
+
+  const pData = s => {
+    if(!s) return null;
+    s = s.trim();
+    let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(m) return {y:+m[1], mo:+m[2], d:+m[3]};
+    m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if(m){
+      const a=+m[1], b=+m[2], y=+m[3];
+      if(a>12) return {y, mo:b, d:a};
+      if(b>12) return {y, mo:a, d:b};
+      return {y, mo:b, d:a}; // assume BR (dia/mes)
+    }
+    return null;
+  };
+
+  const feriados = typeof getFeriados==='function' ? getFeriados() : FERIADOS_BASE;
+  const d15Cache = {};
+  const getD15 = (y,mo) => {
+    const key = y+'-'+mo;
+    if(d15Cache[key]===undefined) d15Cache[key] = _du15DoMes(y, mo, feriados);
+    return d15Cache[key];
+  };
+
+  const porMes = {}; // "YYYY-MM" -> {ano,mes,total,ate15}
+  for(let i=1;i<lines.length;i++){
+    const cells = lines[i].split(sep).map(c=>c.trim().replace(/^"|"$/g,''));
+    if(cells.length <= iDate) continue;
+    const dp = pData(cells[iDate]);
+    if(!dp) continue;
+    const val = iPP>=0 ? _parseNumFlex(cells[iPP]) : _parseNumFlex(cells[iRec]);
+    if(!val) continue;
+
+    const mesKey = dp.y+'-'+String(dp.mo).padStart(2,'0');
+    if(!porMes[mesKey]) porMes[mesKey] = {ano:dp.y, mes:dp.mo, total:0, ate15:0};
+    porMes[mesKey].total += val;
+
+    const d15 = getD15(dp.y, dp.mo);
+    if(d15!==null && dp.d<=d15) porMes[mesKey].ate15 += val;
+  }
+
+  const chaves = Object.keys(porMes).sort();
+  if(!chaves.length) return null;
+
+  const resultado = chaves.map(k=>{
+    const m = porMes[k];
+    const d15 = getD15(m.ano, m.mes);
+    return {
+      mesKey: k,
+      mesLabel: MESES_ABREV_PT[m.mes-1]+'/'+m.ano,
+      d15Label: d15 ? String(d15).padStart(2,'0')+'/'+String(m.mes).padStart(2,'0') : '—',
+      soma15: Math.round(m.ate15*100)/100,
+      totalMes: Math.round(m.total*100)/100,
+    };
+  });
+
+  // variação % vs mês anterior (soma15)
+  resultado.forEach((r,i)=>{
+    if(i===0){ r.varPct = null; return; }
+    const prev = resultado[i-1].soma15;
+    r.varPct = prev>0 ? ((r.soma15-prev)/prev*100) : null;
+  });
+
+  return resultado;
+}
+
+// Renderiza a tabela #cmp15du-tbody a partir do array calculado por _calcularComparativo15DU
+function renderComparativo15DU(dados){
+  const tbody = document.getElementById('cmp15du-tbody');
+  const badge = document.getElementById('cmp15du-badge');
+  const nota  = document.getElementById('cmp15du-nota');
+  if(!tbody || !dados || !dados.length) return;
+
+  const fMoney = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const hoje = new Date();
+  const ultimaChave = dados[dados.length-1].mesKey;
+  const mesAtualKey = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
+
+  tbody.innerHTML = dados.map((r,i)=>{
+    const isLast = i===dados.length-1;
+    const parcial = r.mesKey===mesAtualKey; // mês corrente = total ainda incompleto
+    let varHtml = '<span style="color:rgba(255,255,255,.35);font-weight:800;font-size:11px">—</span>';
+    if(r.varPct!==null){
+      const up = r.varPct>=0;
+      varHtml = `<span style="color:${up?'#4ADE80':'#F87171'};font-weight:800;font-size:11px">${up?'▲ +':'▼ '}${r.varPct.toFixed(1).replace('.',',')}%</span>`;
+    }
+    return `<tr style="${isLast?'':'border-bottom:1px solid rgba(255,255,255,.06)'}">
+      <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">${r.mesLabel}${parcial?' ⚠️':''}</td>
+      <td style="padding:8px 14px;text-align:center;font-size:11px;color:rgba(255,255,255,.6);font-weight:700">${r.d15Label}</td>
+      <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">${fMoney(r.soma15)}</td>
+      <td style="padding:8px 14px;text-align:center">${varHtml}</td>
+      <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">${fMoney(r.totalMes)}${parcial?'*':''}</td>
+    </tr>`;
+  }).join('');
+
+  if(badge) badge.innerHTML = '✅ atualizado automaticamente';
+  if(nota)  nota.innerHTML = '*Mês corrente ainda incompleto (dados até '+hoje.toLocaleDateString('pt-BR')+'). 15º D.U. calculado com os feriados configurados no dashboard (⚙️ Configurar Feriados).';
+}
+
+// Carrega o histórico salvo (localStorage) ou, na primeira vez, a base fixa Jan-Ago.
+function _carregarHistoricoComparativo15DU(){
+  try{
+    const saved = localStorage.getItem('cofen_cmp15du');
+    if(saved){
+      const dados = JSON.parse(saved);
+      if(dados && dados.length) return dados;
+    }
+  }catch(e){}
+  return CMP15DU_BASE.slice(); // cópia da base
+}
+
+// Recalcula variação % (soma15 vs mês anterior) de um array já ordenado por mesKey
+function _recalcularVarPct(arr){
+  arr.forEach((r,i)=>{
+    if(i===0){ r.varPct = null; return; }
+    const prev = arr[i-1].soma15;
+    r.varPct = prev>0 ? ((r.soma15-prev)/prev*100) : null;
+  });
+  return arr;
+}
+
+// Recalcula a partir de um CSV bruto (rec_total_geral) e MESCLA com o histórico já salvo —
+// NUNCA apaga meses anteriores. Só sobrescreve/adiciona os meses presentes no arquivo importado.
+function atualizarComparativo15DU(raw){
+  try{
+    const novosDados = _calcularComparativo15DU(raw);
+    if(!novosDados) return false;
+
+    const historico = _carregarHistoricoComparativo15DU();
+    const mapa = {};
+    historico.forEach(r => { mapa[r.mesKey] = r; });
+    // Sobrescreve/adiciona apenas os meses que vieram no arquivo importado agora
+    novosDados.forEach(r => { mapa[r.mesKey] = {mesKey:r.mesKey, mesLabel:r.mesLabel, d15Label:r.d15Label, soma15:r.soma15, totalMes:r.totalMes}; });
+
+    const merged = Object.values(mapa).sort((a,b)=> a.mesKey.localeCompare(b.mesKey));
+    _recalcularVarPct(merged);
+
+    localStorage.setItem('cofen_cmp15du', JSON.stringify(merged));
+    renderComparativo15DU(merged);
+    return true;
+  }catch(e){ console.warn('Erro ao calcular comparativo 15º D.U.:', e); return false; }
+}
+
+// Ao carregar a página, sempre renderiza o histórico salvo (ou a base fixa, na primeira vez)
+(function _initComparativo15DU(){
+  try{
+    const dados = _recalcularVarPct(_carregarHistoricoComparativo15DU());
+    document.addEventListener('DOMContentLoaded', ()=>renderComparativo15DU(dados));
+  }catch(e){}
+})();
 
 // Vars globais para historico mensal (preenchidas ao importar)
 let _histMensalGeral   = {};  // { '2026-01': {rec, pp, corens:{PI,MA,MT,CE}} }
@@ -4873,6 +5170,9 @@ function aplicarGeral(){
   const result = _geralParsed || _parseImportCSV(raw);
   if(!result || result.error){ statusEl.textContent='❌ ' + (result?.error||'Erro ao processar'); statusEl.style.background='#FEF2F2'; statusEl.style.color='#991B1B'; return; }
 
+  // Comparativo 15º D.U. (caso o texto tenha sido colado direto, sem passar por processarArquivoGeral)
+  atualizarComparativo15DU(raw);
+
   // 1. Preencher campo Total Real
   const inpTotal = document.getElementById('inp-total');
   if(inpTotal){ inpTotal.value = result.totValorRec.toFixed(2); liveCalc(); }
@@ -5209,6 +5509,9 @@ function aplicarEmpresa(){
 
   const result = _empresaParsed || _parseImportCSV(raw);
   if(!result || result.error){ statusEl.textContent='❌ ' + (result?.error||'Erro ao processar'); statusEl.style.background='#FEF2F2'; statusEl.style.color='#991B1B'; return; }
+
+  // Comparativo 15º D.U. (caso o texto tenha sido colado direto, sem passar por processarArquivoEmpresa)
+  atualizarComparativo15DU(raw);
 
   // Valor a usar: PaguePay se disponível, senão Valor Recebido
   const ppVal = result.totPP > 0 ? result.totPP : result.totValorRec;
