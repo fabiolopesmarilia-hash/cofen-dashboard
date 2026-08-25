@@ -386,11 +386,11 @@ select.ev-inp{cursor:pointer}
 @keyframes trilhaHop{0%,100%{transform:translateY(0) scale(1.1)}50%{transform:translateY(-6px) scale(1.1)}}
 
 /* ─ TRILHA: pista de corrida profissional ─ */
-.trilha-track{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));column-gap:5px;row-gap:34px;
+.trilha-track{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px;
   background:repeating-linear-gradient(135deg,#3A4A42 0 14px,#42534A 14px 28px);
-  border-radius:14px;padding:14px 14px 14px 14px;position:relative;max-width:620px;margin:26px auto 0;
+  border-radius:14px;padding:14px;position:relative;max-width:620px;margin:0 auto;
   box-shadow:inset 0 2px 10px rgba(0,0,0,.25)}
-.trilha-tile{aspect-ratio:1;width:100%;max-width:70px;justify-self:center;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+.trilha-tile{aspect-ratio:1;width:100%;max-width:64px;justify-self:center;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;
   position:relative;font-weight:800;transition:transform .25s,box-shadow .25s;overflow:visible}
 .trilha-tile.n{background:#fff;border:1px solid #DCE5DF;color:var(--g500);font-family:'Bebas Neue',sans-serif;font-size:12px;box-shadow:0 1px 3px rgba(0,0,0,.15)}
 .trilha-tile .ic{font-size:15px;line-height:1}
@@ -402,30 +402,17 @@ select.ev-inp{cursor:pointer}
 .trilha-tile.start{background:linear-gradient(160deg,#D6F5E4,#A9EBC7);border:1.5px solid var(--pp);color:var(--ppd)}
 .trilha-tile.finish{background:repeating-conic-gradient(#222 0% 25%,#fff 0% 50%) 50%/10px 10px;border:2px solid #C97F0A;box-shadow:0 4px 14px rgba(217,140,10,.5)}
 .trilha-tile.finish .ic{font-size:19px;filter:drop-shadow(0 1px 2px rgba(255,255,255,.9))}
-.trilha-tile.current{transform:scale(1.16);box-shadow:0 8px 22px rgba(0,168,107,.6);z-index:5;border:2px solid var(--ppd)!important}
-.trilha-tile.occupied{box-shadow:0 3px 10px rgba(0,0,0,.2);z-index:2;border:1.5px solid var(--pp)}
-.trilha-piece{position:absolute;top:-26px;left:50%;transform:translateX(-50%);display:flex;align-items:flex-end;
-  justify-content:center;z-index:6;max-width:96px}
-.trilha-piece-avatar{position:relative;width:32px;height:32px;border-radius:50%;overflow:hidden;background:var(--pp);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2.5px solid #fff;
-  box-shadow:0 4px 10px rgba(0,0,0,.4);margin-left:-11px;animation:trilhaPieceBounce .6s ease-in-out infinite}
-.trilha-piece-avatar:first-child{margin-left:0}
-.trilha-piece-avatar img{width:100%;height:100%;object-fit:cover}
-.trilha-piece-avatar.voce{border-color:#FCD34D;box-shadow:0 4px 12px rgba(252,211,77,.7);z-index:2}
-.trilha-piece.solo .trilha-piece-avatar{width:44px;height:44px;border-width:3px}
-.trilha-piece-name{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);background:var(--ppd);color:#fff;
-  font-size:7px;font-weight:800;padding:1.5px 5px;border-radius:100px;white-space:nowrap;
-  box-shadow:0 2px 5px rgba(0,0,0,.35);letter-spacing:.2px;text-transform:uppercase}
-.trilha-piece-more{width:32px;height:32px;border-radius:50%;background:var(--g700);color:#fff;display:flex;
-  align-items:center;justify-content:center;font-size:10px;font-weight:900;border:2.5px solid #fff;margin-left:-11px;
-  box-shadow:0 4px 10px rgba(0,0,0,.4)}
-@keyframes trilhaPieceBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.trilha-tile.current{transform:scale(1.16);box-shadow:0 8px 22px rgba(0,168,107,.6);z-index:3;border:2px solid var(--ppd)!important}
+.trilha-piece{position:absolute;top:-16px;left:50%;transform:translateX(-50%);width:36px;height:36px;border-radius:50%;
+  overflow:hidden;border:2.5px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.4);z-index:4;
+  animation:trilhaPieceBounce .6s ease-in-out infinite}
+@keyframes trilhaPieceBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-7px)}}
 .trilha-legenda{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px;font-size:10px;font-weight:700;color:var(--g500)}
 .trilha-legenda span{display:inline-flex;align-items:center;gap:4px}
 .trilha-rank-row{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid var(--g100)}
 .trilha-rank-row:last-child{border-bottom:none}
 .trilha-rank-pos{width:22px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--g500)}
-.trilha-rank-avatar{width:46px;height:46px;border-radius:12px;overflow:hidden;background:var(--pp);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.trilha-rank-avatar{width:34px;height:34px;border-radius:9px;overflow:hidden;background:var(--pp);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .trilha-rank-bar{flex:1;background:var(--g100);border-radius:100px;height:7px;overflow:hidden;min-width:80px}
 .trilha-rank-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--pp),var(--pp2))}
 
@@ -4643,14 +4630,25 @@ function _calcularComparativo15DU(raw){
   const pData = s => {
     if(!s) return null;
     s = s.trim();
+    // ISO: AAAA-MM-DD (com ou sem horário junto, ex: "2026-08-04 00:00:00")
     let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if(m) return {y:+m[1], mo:+m[2], d:+m[3]};
-    m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    // Ano com 4 dígitos: DD/MM/AAAA ou MM/DD/AAAA
+    m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if(m){
       const a=+m[1], b=+m[2], y=+m[3];
       if(a>12) return {y, mo:b, d:a};
       if(b>12) return {y, mo:a, d:b};
       return {y, mo:b, d:a}; // assume BR (dia/mes)
+    }
+    // Ano com 2 dígitos — formato que o navegador gera ao ler .xls/.xlsx (SheetJS sem cellDates),
+    // ex: "8/13/26" = 13/ago/2026. Vem como MÊS/DIA/ANO.
+    m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
+    if(m){
+      const a=+m[1], b=+m[2], yy=+m[3];
+      const y = yy<70 ? 2000+yy : 1900+yy;
+      if(a>12) return {y, mo:b, d:a};   // primeiro valor >12 só pode ser dia → é D/M/YY
+      return {y, mo:a, d:b};            // padrão do SheetJS: M/D/YY (mês primeiro)
     }
     return null;
   };
@@ -4663,12 +4661,19 @@ function _calcularComparativo15DU(raw){
     return d15Cache[key];
   };
 
+  // Ignora linhas datadas de HOJE (dia calendário atual) — só entram no comparativo a partir do
+  // fechamento de amanhã, quando deixam de ser "hoje". Evita contar dados parciais/em andamento
+  // misturados no arquivo do fechamento do dia útil anterior.
+  const _hoje = new Date();
+  const hjY = _hoje.getFullYear(), hjM = _hoje.getMonth()+1, hjD = _hoje.getDate();
+
   const porMes = {}; // "YYYY-MM" -> {ano,mes,total,ate15}
   for(let i=1;i<lines.length;i++){
     const cells = lines[i].split(sep).map(c=>c.trim().replace(/^"|"$/g,''));
     if(cells.length <= iDate) continue;
     const dp = pData(cells[iDate]);
     if(!dp) continue;
+    if(dp.y===hjY && dp.mo===hjM && dp.d===hjD) continue; // dados de hoje: aguarda o fechamento de amanhã
     const val = iPP>=0 ? _parseNumFlex(cells[iPP]) : _parseNumFlex(cells[iRec]);
     if(!val) continue;
 
@@ -13073,51 +13078,26 @@ function campanhaDeletar(id){
 // ══════════════════════════════════════════
 // TRILHA DO RECEBIMENTO — jogo de tabuleiro
 // ══════════════════════════════════════════
-const TRILHA_CASAS = 32;
-const TRILHA_BONUS = [4,12,20,28];      // 🎁 +1 dado
-const TRILHA_SORTE = [7,17,25];         // 🍀 avança 2 casas
-const TRILHA_AZAR  = [9,21,30];         // ⚡ volta 2 casas
-const TRILHA_DESAFIO = [3,10,14,19,23,27,31];  // 🎯 desafio (só motivacional, sem efeito na casa)
+const TRILHA_CASAS = 24;
+const TRILHA_BONUS = [4,12,20];      // 🎁 +1 dado
+const TRILHA_SORTE = [7,17];         // 🍀 avança 2 casas
+const TRILHA_AZAR  = [9,21];         // ⚡ volta 2 casas
+const TRILHA_DESAFIO = [14];         // 🎯 desafio (só motivacional, sem efeito na casa)
 const TRILHA_DESAFIOS_TXT = [
   'Ligue pro cliente mais difícil da semana 📞',
   'Manda um áudio motivacional pro grupo do time 🎤',
   'Feche 1 acordo nos próximos 30 minutos ⏱️',
   'Elogie um colega de equipe agora 🙌',
-  'Bate a meta do dia antes do almoço 🍽️',
-  'Ajude um colega a resolver uma negociação difícil 🤝',
-  'Grave um vídeo curto contando uma dica de negociação 🎥',
-  'Ligue pro cliente mais antigo em aberto 📆',
-  'Proponha 3 acordos em até 1 hora ⚡',
-  'Compartilhe sua melhor abordagem no grupo do time 💬',
-  'Revise sua carteira e reative 2 contatos parados 🔁',
-  'Desafie um colega pra ver quem fecha mais acordo hoje 🏁',
-  'Mande um agradecimento pra alguém que te ajudou 🙏',
-  'Fature em dobro na próxima hora 💰',
-  'Escolha uma música pra tocar na sala e dá o play 🎶',
-  'Poste no grupo o motivo de você estar jogando a trilha hoje ✍️',
-  'Chame o líder pra fechar um acordo junto com você 👥',
-  'Anote 1 objeção comum e como você vai contornar ela 📝'
+  'Bate a meta do dia antes do almoço 🍽️'
 ];
 let trilhaDataAll = {};
 let trilhaOpAtual = null;
 let trilhaAnimando = false;
-// Nomes zerados há pouco tempo — protege contra o Firebase mandar de volta
-// um "eco" atrasado com os dados antigos logo depois do zerar.
-let trilhaRecemZerados = new Set();
 
 function fbListenTrilha(){
   if(!fbDb||!fbRoom||fbListeners.trilha) return;
   fbDb.ref(fbRoom+'/trilha').on('value', snap=>{
-    const dados = snap.val() || {};
-    // se algum nome que acabamos de zerar reaparecer num eco atrasado do servidor,
-    // ignora e reforça a remoção de novo — não deixa ele "ressuscitar" na tela
-    trilhaRecemZerados.forEach(nome=>{
-      if(dados[nome]){
-        delete dados[nome];
-        fbDb.ref(fbRoom+'/trilha/'+nome).remove().catch(e=>console.warn('FB trilha re-zerar err:',e));
-      }
-    });
-    trilhaDataAll = dados;
+    trilhaDataAll = snap.val() || {};
     if(trilhaOpAtual) trilhaRender();
   });
   fbListeners.trilha = true;
@@ -13136,74 +13116,31 @@ function trilhaGetEstado(opName){
   return trilhaDataAll[opName] || { pos:0, dadosUsados:0, bonusGanho:0, voltas:0, historico:[] };
 }
 
-async function trilhaZerarTodos(){
-  const nomes = Object.keys(trilhaDataAll);
-  const nJogadores = nomes.length;
+function trilhaZerarTodos(){
+  const nJogadores = Object.keys(trilhaDataAll).length;
   if(nJogadores===0){ toast('Ninguém jogou ainda — nada pra zerar.'); return; }
 
   if(!confirm(`⚠️ ISSO VAI ZERAR A TRILHA DE TODOS OS ${nJogadores} JOGADORES QUE JÁ JOGARAM.\n\nCasas, voltas e histórico de todo mundo somem. Essa ação não pode ser desfeita.\n\nTem certeza?`)) return;
   if(!confirm('Confirma DE NOVO: zerar o jogo inteiro pra todo mundo?')) return;
 
-  if(!fbDb || !fbRoom){
-    // sem conexão com o Firebase — só zera localmente neste aparelho
-    trilhaDataAll = {};
-    trilhaRender();
-    toast('⚠️ Zerado só neste aparelho — sem conexão com o servidor, os outros ainda vão ver o quadro antigo.');
-    return;
-  }
+  trilhaDataAll = {};
+  if(fbDb && fbRoom){ fbDb.ref(fbRoom+'/trilha').remove().catch(e=>console.warn('FB trilha zerar todos err:',e)); }
 
-  toast('⏳ Zerando '+nJogadores+' jogador(es)...');
-  nomes.forEach(nome=>trilhaRecemZerados.add(nome));
-
-  // Apaga cada jogador individualmente (o mesmo caminho que o botão ZERAR de 1 pessoa usa).
-  // Em alguns projetos Firebase as regras só liberam apagar nó-a-nó, não o grupo inteiro de uma vez.
-  const resultados = await Promise.allSettled(
-    nomes.map(nome => fbDb.ref(fbRoom+'/trilha/'+nome).remove())
-  );
-  const falhas = resultados.filter(r=>r.status==='rejected');
-
-  // Remove localmente só quem realmente foi confirmado no servidor
-  resultados.forEach((r,idx)=>{ if(r.status==='fulfilled') delete trilhaDataAll[nomes[idx]]; });
   trilhaRender();
-  // mantém a proteção por um tempinho pra segurar ecos atrasados do servidor
-  setTimeout(()=>{ nomes.forEach(nome=>trilhaRecemZerados.delete(nome)); }, 8000);
-
-  if(falhas.length===0){
-    toast('🔄 Trilha zerada pra todo mundo — começando do zero!');
-  } else if(falhas.length < nJogadores){
-    console.warn('FB trilha zerar todos — falhas parciais:', falhas);
-    toast('⚠️ '+(nJogadores-falhas.length)+' de '+nJogadores+' zerados. '+falhas.length+' falharam — clique em ZERAR TODOS de novo.');
-  } else {
-    console.warn('FB trilha zerar todos — falhou tudo:', falhas);
-    toast('❌ Não consegui zerar ninguém no servidor (sem permissão ou sem internet). Tenta de novo.');
-  }
+  toast('🔄 Trilha zerada pra todo mundo — começando do zero!');
 }
 
-async function trilhaZerar(){
+function trilhaZerar(){
   if(!trilhaOpAtual) return;
   const nomeExib = trilhaOpAtual.replace(/_/g,' ');
-  if(!confirm(`Zerar o progresso de ${nomeExib} na trilha? Vai sair do tabuleiro, perde as voltas e o histórico. Essa ação não pode ser desfeita.`)) return;
+  if(!confirm(`Zerar o progresso de ${nomeExib} na trilha? Vai voltar pra casa 0, perde as voltas e o histórico. Essa ação não pode ser desfeita.`)) return;
 
-  if(!fbDb || !fbRoom){
-    delete trilhaDataAll[trilhaOpAtual];
-    trilhaRender();
-    toast('⚠️ Zerado só neste aparelho — sem conexão com o servidor.');
-    return;
-  }
+  const estZerado = { pos:0, dadosUsados:0, bonusGanho:0, voltas:0, historico:[] };
+  trilhaDataAll[trilhaOpAtual] = estZerado;
+  if(fbDb && fbRoom){ fbDb.ref(fbRoom+'/trilha/'+trilhaOpAtual).set(estZerado).catch(e=>console.warn('FB trilha zerar err:',e)); }
 
-  const nome = trilhaOpAtual;
-  trilhaRecemZerados.add(nome);
-  try{
-    await fbDb.ref(fbRoom+'/trilha/'+nome).remove();
-    delete trilhaDataAll[nome];
-    trilhaRender();
-    toast('🔄 Jogo zerado — sua ficha saiu do tabuleiro até jogar de novo!');
-    setTimeout(()=>trilhaRecemZerados.delete(nome), 8000);
-  }catch(e){
-    trilhaRecemZerados.delete(nome);
-    console.warn('FB trilha zerar err:', e);
-    toast('❌ Não consegui zerar no servidor (sem permissão ou sem internet). Tenta de novo.');
-  }
+  trilhaRender();
+  toast('🔄 Jogo zerado — começando do zero!');
 }
 
 function trilhaCarregar(){
@@ -13243,45 +13180,20 @@ function trilhaRender(){
   btn.style.cursor = (dadosDisp<=0) ? 'not-allowed' : 'pointer';
   btn.textContent = dadosDisp<=0 ? '🔒 FECHE UM ACORDO PRA JOGAR' : '🎲 JOGAR DADO';
 
-  trilhaRenderBoard();
+  trilhaRenderBoard(pos, fotoHtml);
   trilhaRenderHistorico(est.historico||[]);
   trilhaRenderRanking();
 }
 
 // Ordem "serpente": linha 1 esquerda→direita, linha 2 direita→esquerda, etc. (8 colunas)
 function trilhaOrdemSerpente(){
-  const linhas = [
-    [1,2,3,4,5,6,7,8],
-    [16,15,14,13,12,11,10,9],
-    [17,18,19,20,21,22,23,24],
-    [32,31,30,29,28,27,26,25]
-  ];
+  const linhas = [[1,2,3,4,5,6,7,8],[16,15,14,13,12,11,10,9],[17,18,19,20,21,22,23,24]];
   return linhas.flat();
 }
 
-// Retorna, para cada casa, a lista de nomes de jogadores que estão nela agora.
-// Só entra quem realmente já jogou pelo menos 1 dado — depois de "zerar", o jogador
-// some do tabuleiro até jogar de novo.
-function trilhaJogadoresPorCasa(){
-  const mapa = {};
-  Object.keys(trilhaDataAll).forEach(nome=>{
-    const est = trilhaDataAll[nome];
-    const jaJogou = (est.dadosUsados||0) > 0 || (est.historico && est.historico.length > 0);
-    if(!jaJogou) return;
-    const pos = est.pos||0;
-    const casa = pos===0 ? 1 : pos;
-    if(!mapa[casa]) mapa[casa] = [];
-    // jogador atual sempre aparece primeiro na casa
-    if(nome===trilhaOpAtual) mapa[casa].unshift(nome);
-    else mapa[casa].push(nome);
-  });
-  return mapa;
-}
-
-function trilhaRenderBoard(){
+function trilhaRenderBoard(posAtual, fotoHtml){
   const board = document.getElementById('trilha-board');
   const ordem = trilhaOrdemSerpente();
-  const porCasa = trilhaJogadoresPorCasa();
   let html = '';
   ordem.forEach(i=>{
     const isBonus = TRILHA_BONUS.includes(i);
@@ -13290,7 +13202,7 @@ function trilhaRenderBoard(){
     const isDesafio = TRILHA_DESAFIO.includes(i);
     const isChegada = i===TRILHA_CASAS;
     const isInicio = i===1;
-    const jogadoresAqui = porCasa[i] || [];
+    const isAtual = i===posAtual || (posAtual===0 && isInicio);
     let cls = 'trilha-tile n';
     if(isChegada) cls = 'trilha-tile finish';
     else if(isBonus) cls = 'trilha-tile bonus';
@@ -13298,30 +13210,9 @@ function trilhaRenderBoard(){
     else if(isAzar) cls = 'trilha-tile azar';
     else if(isDesafio) cls = 'trilha-tile desafio';
     else if(isInicio) cls = 'trilha-tile start';
-    if(jogadoresAqui.includes(trilhaOpAtual)) cls += ' current';
-    else if(jogadoresAqui.length) cls += ' occupied';
+    if(isAtual) cls += ' current';
 
-    let piece = '';
-    if(jogadoresAqui.length){
-      const solo = jogadoresAqui.length===1;
-      const maxAv = 2;
-      const visiveis = jogadoresAqui.slice(0, maxAv);
-      const resto = jogadoresAqui.length - visiveis.length;
-      const avataresHtml = visiveis.map(nome=>{
-        const foto = photoGet(nome);
-        const isVoce = nome===trilhaOpAtual;
-        const img = foto
-          ? `<img src="${foto}">`
-          : `<span style="color:#fff;font-weight:900;font-family:'Bebas Neue',sans-serif;font-size:${solo?'18px':'13px'}">${nome.charAt(0).toUpperCase()}</span>`;
-        // nome só aparece escrito quando é 1 pessoa sozinha na casa — evita poluir quando lotado
-        const primeiroNome = nome.replace(/_/g,' ').split(' ')[0];
-        const tagNome = solo ? `<span class="trilha-piece-name">${primeiroNome}</span>` : '';
-        return `<div class="trilha-piece-avatar${isVoce?' voce':''}" title="${nome.replace(/_/g,' ')}">${img}${tagNome}</div>`;
-      }).join('');
-      const maisHtml = resto>0 ? `<div class="trilha-piece-more" title="+${resto} jogador(es) nesta casa">+${resto}</div>` : '';
-      piece = `<div class="trilha-piece${solo?' solo':''}">${avataresHtml}${maisHtml}</div>`;
-    }
-
+    const piece = isAtual ? `<div class="trilha-piece">${fotoHtml}</div>` : '';
     let conteudo;
     if(isChegada) conteudo = `<span class="ic">🏆</span>`;
     else if(isBonus) conteudo = `<span class="ic">🎁</span><span class="lbl">+1 DADO</span>`;
@@ -13386,10 +13277,6 @@ function trilhaJogar(){
   const acordos = op.acordos || 0;
   const dadosDisp = Math.max(0, acordos + (est.bonusGanho||0) - (est.dadosUsados||0));
   if(dadosDisp<=0) return;
-
-  // se ele tinha acabado de zerar e resolveu jogar de novo, tira da proteção —
-  // essa jogada é de verdade, não pode ser tratada como "eco" e apagada
-  trilhaRecemZerados.delete(trilhaOpAtual);
 
   trilhaAnimando = true;
   const cube = document.getElementById('trilha-dice-cube');
@@ -14896,7 +14783,7 @@ setInterval(()=>{
     <div style="position:relative;z-index:1">
       <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Jogo de Desempenho</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:#fff">🎲 TRILHA DO RECEBIMENTO</div>
-      <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Cada acordo fechado = 1 dado. Chegue na casa 32 e comece uma nova volta 🏆</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Cada acordo fechado = 1 dado. Chegue na casa 24 e comece uma nova volta 🏆</div>
     </div>
   </div>
 
