@@ -4589,6 +4589,18 @@ const CMP15DU_BASE = [
   {mesKey:'2026-07', mesLabel:'Jul/2026', d15Label:'21/07', soma15:687622.98, totalMes:1201867.00},
   {mesKey:'2026-08', mesLabel:'Ago/2026', d15Label:'21/08', soma15:794072.31, totalMes:823595.75},
 ];
+// Se uma versão anterior deste dashboard já salvou no navegador um valor de Agosto vindo
+// do Histórico diário (fonte errada, já corrigido), essa limpeza garante que a base oficial
+// acima seja usada de novo em vez do número salvo por engano.
+(function _limparCmp15duEmLocalStorageSeVierDoHistorico(){
+  try{
+    const saved = JSON.parse(localStorage.getItem('cofen_cmp15du')||'null');
+    if(saved && Array.isArray(saved)){
+      const ago = saved.find(r=>r.mesKey==='2026-08');
+      if(ago && ago.duN){ localStorage.removeItem('cofen_cmp15du'); }
+    }
+  }catch(e){}
+})();
 
 // Retorna o dia (1-31) do Nº dia útil de um mês/ano, usando a lista de feriados do dashboard.
 // Se o mês não tiver N dias úteis (raro, só em meses muito curtos), usa o último dia do mês.
@@ -4772,17 +4784,17 @@ function renderComparativo15DU(dados, duAlvo){
     </tr>`;
   }).join('');
 
-  // Atualiza os textos do cabeçalho/coluna: meses fechados ficam fixos no 15º D.U. oficial
-  // (conciliação); só o mês corrente mostra o dia útil de hoje, que avança sozinho todo dia.
+  // Título/coluna sempre "15º D.U." — esta tabela só atualiza importando o arquivo de
+  // conciliação de verdade (não é ligada ao import diário operacional).
   const tituloEl = document.getElementById('cmp15du-titulo');
-  if(tituloEl) tituloEl.textContent = `📊 COMPARATIVO MENSAL · PAGUE PLAY · MESES FECHADOS NO 15º D.U. (OFICIAL) · MÊS ATUAL NO ${n}º D.U. (HOJE)`;
+  if(tituloEl) tituloEl.textContent = `📊 COMPARATIVO MENSAL · PAGUE PLAY · ATÉ O 15º DIA ÚTIL (Dt.Conciliação)`;
   const thDU = document.getElementById('cmp15du-th-du');
-  if(thDU) thDU.textContent = `DIA ÚTIL`;
+  if(thDU) thDU.textContent = `15º D.U.`;
   const thSoma = document.getElementById('cmp15du-th-soma');
-  if(thSoma) thSoma.textContent = `SOMA ATÉ O DIA ÚTIL`;
+  if(thSoma) thSoma.textContent = `SOMA ATÉ 15º D.U.`;
 
   if(badge) badge.innerHTML = '✅ atualizado automaticamente';
-  if(nota)  nota.innerHTML = `*Mês corrente ainda incompleto (dados até ${hoje.toLocaleDateString('pt-BR')}). Meses fechados ficam travados no valor oficial de conciliação (15º D.U.) — nunca mudam depois de fechados. Só o mês atual avança o dia útil sozinho, todo dia (hoje = ${n}º D.U.).`;
+  if(nota)  nota.innerHTML = `*Mês corrente ainda incompleto (dados até ${hoje.toLocaleDateString('pt-BR')}). 15º D.U. calculado com os feriados configurados no dashboard (⚙️ Configurar Feriados). Para atualizar, importe o arquivo de conciliação (Importar Geral/Importar Empresa) — este comparativo é independente do import diário operacional.`;
 }
 
 // Carrega o histórico salvo (localStorage) ou, na primeira vez, a base fixa Jan-Ago.
@@ -4901,7 +4913,11 @@ function atualizarComparativo15DUdeHistorico(){
     const dados = _recalcularVarPct(_carregarHistoricoComparativo15DU());
     document.addEventListener('DOMContentLoaded', ()=>{
       renderComparativo15DU(dados);
-      if(typeof atualizarComparativo15DUdeHistorico==='function') atualizarComparativo15DUdeHistorico();
+      // NOTA: NÃO recalcula mais a partir do Histórico diário (HIST_DADOS) — aquele dado mede
+      // a operação (Total Real dos operadores), que é diferente do "Pague Play" desta tabela
+      // (vem de um arquivo de conciliação financeira mais amplo). Misturar as duas fontes
+      // já gerou números errados aqui antes. Esta tabela só atualiza importando o arquivo
+      // de conciliação de verdade (botão Importar Geral/Importar Empresa).
     });
   }catch(e){}
 })();
@@ -9279,7 +9295,6 @@ function importApply(){
       if(fbDb && fbRoom){ try{ fbDb.ref(fbRoom+'/hist_'+mesNome.toLowerCase()).set(histInfo.rows); }catch(e){} }
     });
     if(typeof histRender==='function' && typeof histMesAtual!=='undefined' && _mesesNoRelatorio.has(histMesAtual)) histRender();
-    if(typeof atualizarComparativo15DUdeHistorico==='function') atualizarComparativo15DUdeHistorico();
   }
 
   // ── 5. Forçar atualização completa de tudo que mostra "hoje" e totais ──
@@ -11851,7 +11866,6 @@ function fbStartListening(){
         localStorage.setItem('cofen_hist_dados_'+chaveFb, JSON.stringify(remote));
         if(typeof HIST_DADOS!=='undefined') HIST_DADOS[mesNomeFb] = {dias:_diasPorMesFb[mesNomeFb], rows:remote};
         if(typeof histRender==='function' && typeof histMesAtual!=='undefined' && histMesAtual===mesNomeFb) histRender();
-        if(typeof atualizarComparativo15DUdeHistorico==='function') atualizarComparativo15DUdeHistorico();
         pulseSyncDot();
       });
       fbListeners['hist_'+chaveFb] = true;
