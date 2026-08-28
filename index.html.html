@@ -4770,15 +4770,21 @@ function renderComparativo15DU(dados, duAlvo){
   tbody.innerHTML = dados.map((r,i)=>{
     const isLast = i===dados.length-1;
     const parcial = r.mesKey===mesAtualKey; // mês corrente = total ainda incompleto
+    // No mês em andamento, mostra "até hoje" (mesmo valor do Total do Mês, que já é
+    // a soma de tudo que foi importado até agora) em vez do corte fixo do 15º D.U.
+    const diaLabel = parcial ? 'HOJE' : r.d15Label;
+    const somaExibida = parcial ? r.totalMes : r.soma15;
     let varHtml = '<span style="color:rgba(255,255,255,.35);font-weight:800;font-size:11px">—</span>';
-    if(r.varPct!==null){
+    if(parcial){
+      varHtml = '<span style="color:rgba(255,193,7,.8);font-weight:800;font-size:10px">EM ANDAMENTO</span>';
+    } else if(r.varPct!==null){
       const up = r.varPct>=0;
       varHtml = `<span style="color:${up?'#4ADE80':'#F87171'};font-weight:800;font-size:11px">${up?'▲ +':'▼ '}${r.varPct.toFixed(1).replace('.',',')}%</span>`;
     }
     return `<tr style="${isLast?'':'border-bottom:1px solid rgba(255,255,255,.06)'}">
       <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">${r.mesLabel}${parcial?' ⚠️':''}</td>
-      <td style="padding:8px 14px;text-align:center;font-size:11px;color:rgba(255,255,255,.6);font-weight:700">${r.d15Label}</td>
-      <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">${fMoney(r.soma15)}</td>
+      <td style="padding:8px 14px;text-align:center;font-size:11px;color:${parcial?'#67E8F9':'rgba(255,255,255,.6)'};font-weight:700">${diaLabel}</td>
+      <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">${fMoney(somaExibida)}</td>
       <td style="padding:8px 14px;text-align:center">${varHtml}</td>
       <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">${fMoney(r.totalMes)}${parcial?'*':''}</td>
     </tr>`;
@@ -4794,7 +4800,7 @@ function renderComparativo15DU(dados, duAlvo){
   if(thSoma) thSoma.textContent = `SOMA ATÉ 15º D.U.`;
 
   if(badge) badge.innerHTML = '✅ atualizado automaticamente';
-  if(nota)  nota.innerHTML = `*Mês corrente ainda incompleto (dados até ${hoje.toLocaleDateString('pt-BR')}). 15º D.U. calculado com os feriados configurados no dashboard (⚙️ Configurar Feriados). Para atualizar, importe o arquivo de conciliação (Importar Geral/Importar Empresa) — este comparativo é independente do import diário operacional.`;
+  if(nota)  nota.innerHTML = `*Mês corrente ainda incompleto (dados até ${hoje.toLocaleDateString('pt-BR')}). No mês em andamento, a coluna "soma" mostra o total até hoje (não trava mais no 15º D.U.) — meses fechados continuam comparando sempre no 15º D.U. oficial. 15º D.U. calculado com os feriados configurados no dashboard (⚙️ Configurar Feriados). Para atualizar, importe o arquivo de conciliação (Importar Geral/Importar Empresa).`;
 }
 
 // Carrega o histórico salvo (localStorage) ou, na primeira vez, a base fixa Jan-Ago.
