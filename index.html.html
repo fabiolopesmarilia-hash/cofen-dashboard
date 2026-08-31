@@ -4576,9 +4576,7 @@ function _parseNumFlex(str){
 // ══════════════════════════════════════════════════════════════
 const MESES_ABREV_PT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
-// Base inicial (calculada manualmente em 24/08/2026) — usada apenas se ainda
-// não houver nada salvo no localStorage. A partir da primeira importação,
-// quem manda é o localStorage (mesclado a cada nova importação).
+// Base inicial (calculada manualmente em 24/08/2026) — mantida como fallback histórico.
 const CMP15DU_BASE = [
   {mesKey:'2026-01', mesLabel:'Jan/2026', d15Label:'22/01', soma15:7080.89,   totalMes:20352.13},
   {mesKey:'2026-02', mesLabel:'Fev/2026', d15Label:'24/02', soma15:24544.02,  totalMes:30447.39},
@@ -4587,20 +4585,64 @@ const CMP15DU_BASE = [
   {mesKey:'2026-05', mesLabel:'Mai/2026', d15Label:'22/05', soma15:311135.57, totalMes:496699.73},
   {mesKey:'2026-06', mesLabel:'Jun/2026', d15Label:'22/06', soma15:528169.45, totalMes:810165.14},
   {mesKey:'2026-07', mesLabel:'Jul/2026', d15Label:'21/07', soma15:687622.98, totalMes:1201867.00},
-  {mesKey:'2026-08', mesLabel:'Ago/2026', d15Label:'21/08', soma15:794072.31, totalMes:823595.75},
+  {mesKey:'2026-08', mesLabel:'Ago/2026', d15Label:'27/08', soma15:1000135.88, totalMes:1010069.40},
 ];
-// Se uma versão anterior deste dashboard já salvou no navegador um valor de Agosto vindo
-// do Histórico diário (fonte errada, já corrigido), essa limpeza garante que a base oficial
-// acima seja usada de novo em vez do número salvo por engano.
-(function _limparCmp15duEmLocalStorageSeVierDoHistorico(){
-  try{
-    const saved = JSON.parse(localStorage.getItem('cofen_cmp15du')||'null');
-    if(saved && Array.isArray(saved)){
-      const ago = saved.find(r=>r.mesKey==='2026-08');
-      if(ago && ago.duN){ localStorage.removeItem('cofen_cmp15du'); }
-    }
-  }catch(e){}
+
+// ── Dado diário REAL de "Pague Play" por dia do mês, extraído do arquivo de conciliação
+// (rec_conciliação_geral.xls, coluna Dt.Conciliação) — importado em 28/08/2026.
+// Cada array tem 1 posição por dia do mês (índice 0 = dia 1). Com isso, o dashboard calcula
+// sozinho "soma até o Nº dia útil" pra QUALQUER dia, em TODOS os meses, sem precisar de
+// nenhum arquivo novo — só quando um mês novo precisar ser adicionado/atualizado.
+// Pra atualizar só o mês corrente no futuro: manda só o relatório desse mês, sem precisar
+// reenviar os meses anteriores (eles ficam salvos aqui pra sempre).
+const CMP_CONCILIACAO_DIAS = {
+"2026-01":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,34.05,0.0,0.0,410.0,105.03,424.73,152.36,566.38,0.0,0.0,522.92,1620.27,1626.42,1618.73,2066.74,0.0,0.0,1595.33,1623.76,1663.83,1760.95,4560.63,0.0],
+"2026-02":[0.0,3183.43,986.1,1600.37,1076.62,1919.62,0.0,0.0,2245.2,1042.7,2386.36,1635.28,1487.39,0.0,0.0,0.0,0.0,1110.9,1174.96,1591.9,0.0,0.0,1859.87,1243.32,1379.15,731.07,3793.15,0.0],
+"2026-03":[0.0,4615.26,4783.95,2675.83,3279.94,5080.07,0.0,0.0,5948.49,7337.47,3829.91,4619.85,3682.42,0.0,0.0,4668.04,1955.49,2987.71,3206.99,5353.68,0.0,0.0,5690.23,3028.67,5837.27,9159.81,10984.79,0.0,0.0,21181.8,21117.78],
+"2026-04":[10407.67,5710.48,0.0,0.0,0.0,20065.59,13893.33,14121.59,19027.93,14904.71,0.0,0.0,16505.73,18095.18,15771.0,18430.75,20253.28,0.0,0.0,18372.23,0.0,13210.14,17096.61,19468.44,0.0,0.0,24819.81,23551.71,19538.65,50404.63],
+"2026-05":[0.0,0.0,0.0,35977.76,16786.52,18475.76,20124.47,22539.83,0.0,0.0,25547.81,22929.8,17208.37,17767.3,18675.96,0.0,0.0,25082.63,15653.66,18275.23,19829.28,16261.19,0.0,0.0,34289.05,26527.11,30297.97,35474.35,58975.68,0.0,0.0],
+"2026-06":[67824.88,28061.04,27756.62,0.0,21410.23,0.0,0.0,45637.21,31575.86,23898.59,27660.26,18735.16,0.0,0.0,53655.66,42221.23,28129.09,35011.44,29505.28,0.0,0.0,47581.07,26814.13,28396.08,36845.31,32684.62,0.0,0.0,58809.05,98446.5],
+"2026-07":[52169.4,41548.77,38486.71,0.0,0.0,61906.32,50817.2,44509.81,32912.42,45993.95,0.0,0.0,65852.06,27996.31,50050.13,39751.68,37251.96,0.0,0.0,58720.44,39655.82,40472.78,44605.33,52544.12,0.0,0.0,71526.67,49585.89,53245.87,83754.01,118534.95],
+"2026-08":[0.0,0.0,93564.47,49611.37,55493.83,55019.3,49907.11,0.0,0.0,78860.01,43797.04,39873.49,40942.56,39796.34,0.0,0.0,70234.31,43261.0,42269.81,47694.29,45204.91,0.0,0.0,62588.88,43819.87,43245.36,54951.93,9933.52,0.0,0.0,0.0]
+};
+
+(function _limparCacheAntigoCmp15du(){
+  // O cálculo agora é 100% derivado de CMP_CONCILIACAO_DIAS (dado diário real, embutido
+  // no código) — não depende mais de nada salvo no navegador. Remove qualquer cache antigo
+  // pra garantir que ninguém veja um número desatualizado de uma versão anterior.
+  try{ localStorage.removeItem('cofen_cmp15du'); }catch(e){}
 })();
+
+// Gera a tabela inteira (todos os meses) calculando, pra CADA mês, a soma até o dia útil
+// de HOJE — o mesmo corte pra todos, avançando sozinho um dia útil por vez, todo santo dia.
+// Fonte: CMP_CONCILIACAO_DIAS (dado diário real da conciliação, dia a dia).
+function _gerarComparativoCompleto(){
+  const feriados = typeof getFeriados==='function' ? getFeriados() : [];
+  const duAlvo = _duHojeNoMes(feriados);
+  const fonte = {...CMP_CONCILIACAO_DIAS, ...(typeof CMP_CONCILIACAO_DIAS_LIVE!=='undefined' ? CMP_CONCILIACAO_DIAS_LIVE : {})};
+  const chaves = Object.keys(fonte).sort();
+  const linhas = chaves.map(mesKey=>{
+    const [anoStr, mesStr] = mesKey.split('-');
+    const anoNum = parseInt(anoStr,10), mesNum = parseInt(mesStr,10);
+    const dias = fonte[mesKey];
+    const duDia = _duNDoMes(anoNum, mesNum, duAlvo, feriados) || dias.length;
+    let soma = 0, total = 0;
+    for(let i=0;i<dias.length;i++){
+      total += dias[i]||0;
+      if(i < duDia) soma += dias[i]||0;
+    }
+    return {
+      mesKey,
+      mesLabel: MESES_ABREV_PT[mesNum-1]+'/'+anoNum,
+      d15Label: String(duDia).padStart(2,'0')+'/'+String(mesNum).padStart(2,'0'),
+      soma15: Math.round(soma*100)/100,
+      totalMes: Math.round(total*100)/100,
+      duN: duAlvo
+    };
+  });
+  _recalcularVarPct(linhas);
+  return linhas;
+}
 
 // Retorna o dia (1-31) do Nº dia útil de um mês/ano, usando a lista de feriados do dashboard.
 // Se o mês não tiver N dias úteis (raro, só em meses muito curtos), usa o último dia do mês.
@@ -4764,52 +4806,57 @@ function renderComparativo15DU(dados, duAlvo){
 
   const fMoney = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const hoje = new Date();
-  const ultimaChave = dados[dados.length-1].mesKey;
   const mesAtualKey = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
 
   tbody.innerHTML = dados.map((r,i)=>{
     const isLast = i===dados.length-1;
-    const parcial = r.mesKey===mesAtualKey; // mês corrente = total ainda incompleto
-    // No mês em andamento, mostra "até hoje" (mesmo valor do Total do Mês, que já é
-    // a soma de tudo que foi importado até agora) em vez do corte fixo do 15º D.U.
-    const diaLabel = parcial ? 'HOJE' : r.d15Label;
-    const somaExibida = parcial ? r.totalMes : r.soma15;
+    const parcial = r.mesKey===mesAtualKey; // mês corrente = total ainda incompleto (mas a soma até o dia útil já é real e comparável)
     let varHtml = '<span style="color:rgba(255,255,255,.35);font-weight:800;font-size:11px">—</span>';
-    if(parcial){
-      varHtml = '<span style="color:rgba(255,193,7,.8);font-weight:800;font-size:10px">EM ANDAMENTO</span>';
-    } else if(r.varPct!==null){
+    if(r.varPct!==null){
       const up = r.varPct>=0;
       varHtml = `<span style="color:${up?'#4ADE80':'#F87171'};font-weight:800;font-size:11px">${up?'▲ +':'▼ '}${r.varPct.toFixed(1).replace('.',',')}%</span>`;
     }
     return `<tr style="${isLast?'':'border-bottom:1px solid rgba(255,255,255,.06)'}">
       <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">${r.mesLabel}${parcial?' ⚠️':''}</td>
-      <td style="padding:8px 14px;text-align:center;font-size:11px;color:${parcial?'#67E8F9':'rgba(255,255,255,.6)'};font-weight:700">${diaLabel}</td>
-      <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">${fMoney(somaExibida)}</td>
+      <td style="padding:8px 14px;text-align:center;font-size:11px;color:${parcial?'#67E8F9':'rgba(255,255,255,.6)'};font-weight:700">${r.d15Label}${parcial?' (hoje)':''}</td>
+      <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">${fMoney(r.soma15)}</td>
       <td style="padding:8px 14px;text-align:center">${varHtml}</td>
       <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">${fMoney(r.totalMes)}${parcial?'*':''}</td>
     </tr>`;
   }).join('');
 
-  // Título/coluna sempre "15º D.U." — esta tabela só atualiza importando o arquivo de
-  // conciliação de verdade (não é ligada ao import diário operacional).
+  // Título/coluna mostram o dia útil real de hoje — o mesmo corte é aplicado em TODOS
+  // os meses da tabela, e avança sozinho conforme os dias úteis passam.
   const tituloEl = document.getElementById('cmp15du-titulo');
-  if(tituloEl) tituloEl.textContent = `📊 COMPARATIVO MENSAL · PAGUE PLAY · ATÉ O 15º DIA ÚTIL (Dt.Conciliação)`;
+  if(tituloEl) tituloEl.textContent = `📊 COMPARATIVO MENSAL · PAGUE PLAY · ATÉ O ${n}º DIA ÚTIL (DE CADA MÊS)`;
   const thDU = document.getElementById('cmp15du-th-du');
-  if(thDU) thDU.textContent = `15º D.U.`;
+  if(thDU) thDU.textContent = `${n}º D.U.`;
   const thSoma = document.getElementById('cmp15du-th-soma');
-  if(thSoma) thSoma.textContent = `SOMA ATÉ 15º D.U.`;
+  if(thSoma) thSoma.textContent = `SOMA ATÉ ${n}º D.U.`;
 
   if(badge) badge.innerHTML = '✅ atualizado automaticamente';
-  if(nota)  nota.innerHTML = `*Mês corrente ainda incompleto (dados até ${hoje.toLocaleDateString('pt-BR')}). No mês em andamento, a coluna "soma" mostra o total até hoje (não trava mais no 15º D.U.) — meses fechados continuam comparando sempre no 15º D.U. oficial. 15º D.U. calculado com os feriados configurados no dashboard (⚙️ Configurar Feriados). Para atualizar, importe o arquivo de conciliação (Importar Geral/Importar Empresa).`;
+  if(nota)  nota.innerHTML = `*Mês corrente ainda incompleto (dados até ${hoje.toLocaleDateString('pt-BR')}). O corte é sempre o dia útil de HOJE (hoje = ${n}º D.U.) — avança um dia útil por vez, todo dia, aplicado igual em todos os meses, com dado real da conciliação. Pra adicionar um mês novo ou atualizar dias mais recentes, me manda o relatório de conciliação daquele mês.`;
 }
 
 // Carrega o histórico salvo (localStorage) ou, na primeira vez, a base fixa Jan-Ago.
 function _carregarHistoricoComparativo15DU(){
+  const baseAgosto = CMP15DU_BASE.find(r=>r.mesKey==='2026-08');
   try{
     const saved = localStorage.getItem('cofen_cmp15du');
     if(saved){
       const dados = JSON.parse(saved);
-      if(dados && dados.length) return dados;
+      if(dados && dados.length){
+        // O mês corrente (Agosto) sempre usa o valor mais novo embutido no código, nunca
+        // um cache antigo do navegador — assim, quando eu atualizo o dashboard com um novo
+        // arquivo de conciliação, o número aparece na hora, sem precisar limpar cache.
+        if(baseAgosto){
+          const idx = dados.findIndex(r=>r.mesKey==='2026-08');
+          if(idx>=0){
+            if(dados[idx].soma15!==baseAgosto.soma15 || dados[idx].totalMes!==baseAgosto.totalMes) dados[idx] = {...baseAgosto};
+          } else dados.push({...baseAgosto});
+        }
+        return dados;
+      }
     }
   }catch(e){}
   return CMP15DU_BASE.slice(); // cópia da base
@@ -4827,22 +4874,105 @@ function _recalcularVarPct(arr){
 
 // Recalcula a partir de um CSV bruto (rec_total_geral) e MESCLA com o histórico já salvo —
 // NUNCA apaga meses anteriores. Só sobrescreve/adiciona os meses presentes no arquivo importado.
+// Extrai o detalhe DIA A DIA (não só o corte fixo) do arquivo de conciliação — mesma
+// detecção de colunas usada em _calcularComparativo15DU, mas guarda cada dia separado.
+function _calcularDiasConciliacao(raw){
+  if(!raw || raw.trim().length < 20) return null;
+  const lines = raw.trim().split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length < 2) return null;
+  const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
+  const norm = s => s.trim().replace(/^"|"$/g,'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const headers = lines[0].split(sep).map(norm);
+  const col = cands => { for(const c of cands){ const i=headers.findIndex(h=>h.includes(c)); if(i>=0) return i; } return -1; };
+
+  const iConc = col(['dt.conciliacao','dt conciliacao','conciliacao']);
+  const iPag  = col(['dt.pagamento','dt pagamento','pagamento']);
+  const iBaixa= col(['dt.baixa','data baixa']);
+  const iData = col(['data']);
+  const iPP   = col(['pague play','pagueplay','24,96','24.96','pp (']);
+  const iRec  = col(['valor recebido','vlr recebido','recebido','valor rec']);
+
+  const iDate = iConc>=0 ? iConc : iPag>=0 ? iPag : iBaixa>=0 ? iBaixa : iData;
+  if(iDate < 0 || (iPP < 0 && iRec < 0)) return null;
+
+  const pData = s => {
+    if(!s) return null;
+    s = s.trim();
+    let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(m) return {y:+m[1], mo:+m[2], d:+m[3]};
+    m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if(m){ const a=+m[1], b=+m[2], y=+m[3]; if(a>12) return {y, mo:b, d:a}; if(b>12) return {y, mo:a, d:b}; return {y, mo:b, d:a}; }
+    m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
+    if(m){ const a=+m[1], b=+m[2], yy=+m[3]; const y = yy<70 ? 2000+yy : 1900+yy; if(a>12) return {y, mo:b, d:a}; return {y, mo:a, d:b}; }
+    return null;
+  };
+
+  const _hoje = new Date();
+  const hjY = _hoje.getFullYear(), hjM = _hoje.getMonth()+1, hjD = _hoje.getDate();
+
+  const porMes = {}; // "YYYY-MM" -> array de 1 posição por dia do mês
+  for(let i=1;i<lines.length;i++){
+    const cells = lines[i].split(sep).map(c=>c.trim().replace(/^"|"$/g,''));
+    if(cells.length <= iDate) continue;
+    const dp = pData(cells[iDate]);
+    if(!dp) continue;
+    if(dp.y===hjY && dp.mo===hjM && dp.d===hjD) continue; // hoje: aguarda o fechamento de amanhã
+    const val = iPP>=0 ? _parseNumFlex(cells[iPP]) : _parseNumFlex(cells[iRec]);
+    if(!val) continue;
+
+    const mesKey = dp.y+'-'+String(dp.mo).padStart(2,'0');
+    if(!porMes[mesKey]){
+      const dim = new Date(dp.y, dp.mo, 0).getDate();
+      porMes[mesKey] = new Array(dim).fill(0);
+    }
+    if(dp.d>=1 && dp.d<=porMes[mesKey].length) porMes[mesKey][dp.d-1] = Math.round((porMes[mesKey][dp.d-1]+val)*100)/100;
+  }
+
+  return Object.keys(porMes).length ? porMes : null;
+}
+
+// Guarda qualquer atualização feita pelos botões "Importar Geral"/"Importar Empresa" —
+// entra POR CIMA da base embutida (CMP_CONCILIACAO_DIAS), mês por mês. Sincroniza via
+// Firebase, então uma importação feita num computador aparece em todos os outros.
+let CMP_CONCILIACAO_DIAS_LIVE = {};
+(function _carregarConciliacaoLive(){
+  try{ const s = localStorage.getItem('cofen_cmp_dias'); if(s) CMP_CONCILIACAO_DIAS_LIVE = JSON.parse(s)||{}; }catch(e){}
+})();
+function fbListenConciliacaoDias(){
+  if(!fbDb||!fbRoom||fbListeners.cmpDias) return;
+  fbDb.ref(fbRoom+'/cmp_dias').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    CMP_CONCILIACAO_DIAS_LIVE = remote;
+    try{ localStorage.setItem('cofen_cmp_dias', JSON.stringify(remote)); }catch(e){}
+    if(typeof renderComparativo15DU==='function' && typeof _gerarComparativoCompleto==='function'){
+      renderComparativo15DU(_gerarComparativoCompleto());
+    }
+    if(typeof pulseSyncDot==='function') pulseSyncDot();
+  });
+  fbListeners.cmpDias = true;
+}
+
 function atualizarComparativo15DU(raw){
   try{
-    const novosDados = _calcularComparativo15DU(raw);
-    if(!novosDados) return false;
+    const novosDias = _calcularDiasConciliacao(raw);
+    if(!novosDias){
+      console.warn('Comparativo 15º D.U.: arquivo sem as colunas necessárias (Data/Dt.Conciliação + Pague Play/Valor Recebido) — não atualizado.');
+      if(typeof toast==='function') toast('⚠️ Esse arquivo não tem as colunas de data/valor que o Comparativo precisa — não foi atualizado.');
+      return false;
+    }
 
-    const historico = _carregarHistoricoComparativo15DU();
-    const mapa = {};
-    historico.forEach(r => { mapa[r.mesKey] = r; });
-    // Sobrescreve/adiciona apenas os meses que vieram no arquivo importado agora
-    novosDados.forEach(r => { mapa[r.mesKey] = {mesKey:r.mesKey, mesLabel:r.mesLabel, d15Label:r.d15Label, soma15:r.soma15, totalMes:r.totalMes}; });
+    // Sobrescreve, mês a mês, com o que veio no arquivo importado agora (o mês inteiro,
+    // já que o arquivo de conciliação sempre traz o histórico completo daquele mês).
+    Object.keys(novosDias).forEach(k => { CMP_CONCILIACAO_DIAS_LIVE[k] = novosDias[k]; });
 
-    const merged = Object.values(mapa).sort((a,b)=> a.mesKey.localeCompare(b.mesKey));
-    _recalcularVarPct(merged);
+    try{ localStorage.setItem('cofen_cmp_dias', JSON.stringify(CMP_CONCILIACAO_DIAS_LIVE)); }catch(e){}
+    if(typeof fbDb!=='undefined' && fbDb && typeof fbRoom!=='undefined' && fbRoom){
+      fbDb.ref(fbRoom+'/cmp_dias').set(CMP_CONCILIACAO_DIAS_LIVE).catch(e=>console.warn('FB cmp_dias err:',e));
+    }
 
-    localStorage.setItem('cofen_cmp15du', JSON.stringify(merged));
-    renderComparativo15DU(merged);
+    renderComparativo15DU(_gerarComparativoCompleto());
+    if(typeof toast==='function') toast('✅ Comparativo mensal atualizado com o arquivo importado');
     return true;
   }catch(e){ console.warn('Erro ao calcular comparativo 15º D.U.:', e); return false; }
 }
@@ -4916,14 +5046,12 @@ function atualizarComparativo15DUdeHistorico(){
 // Ao carregar a página, sempre renderiza o histórico salvo (ou a base fixa, na primeira vez)
 (function _initComparativo15DU(){
   try{
-    const dados = _recalcularVarPct(_carregarHistoricoComparativo15DU());
     document.addEventListener('DOMContentLoaded', ()=>{
-      renderComparativo15DU(dados);
-      // NOTA: NÃO recalcula mais a partir do Histórico diário (HIST_DADOS) — aquele dado mede
-      // a operação (Total Real dos operadores), que é diferente do "Pague Play" desta tabela
-      // (vem de um arquivo de conciliação financeira mais amplo). Misturar as duas fontes
-      // já gerou números errados aqui antes. Esta tabela só atualiza importando o arquivo
-      // de conciliação de verdade (botão Importar Geral/Importar Empresa).
+      renderComparativo15DU(_gerarComparativoCompleto());
+      // Agora calcula 100% a partir de CMP_CONCILIACAO_DIAS (dado diário real da conciliação,
+      // embutido no código) — o mesmo corte de dia útil se aplica a TODOS os meses, e avança
+      // sozinho, todo dia, sem precisar de nenhum arquivo novo. Só precisa me mandar um
+      // relatório de novo quando quiser adicionar/atualizar um mês específico.
     });
   }catch(e){}
 })();
@@ -11454,6 +11582,7 @@ function syncDisconnect(){
   if(fbListeners.campanhas) { fbDb?.ref(fbRoom+'/campanhas').off(); }
   if(fbListeners.historicoAnual) { fbDb?.ref(fbRoom+'/historicoAnual').off(); }
   if(fbListeners.trilha) { fbDb?.ref(fbRoom+'/trilha').off(); }
+  if(fbListeners.cmpDias) { fbDb?.ref(fbRoom+'/cmp_dias').off(); }
   fbListeners={};
   fbApp=null; fbDb=null; fbRoom=null;
   fbSaveCfg({});
@@ -11985,6 +12114,8 @@ function fbStartListening(){
   fbListenHistoricoAnual();
   // ── Trilha do Recebimento ──
   fbListenTrilha();
+  // ── Comparativo Mensal (Pague Play, dado diário de conciliação) ──
+  fbListenConciliacaoDias();
 }
 
 // ── PUSH TO FIREBASE ──
