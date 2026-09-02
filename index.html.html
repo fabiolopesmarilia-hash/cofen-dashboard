@@ -4109,8 +4109,20 @@ function renderPPProjecao(){
 
 function hoObjetivoGet(){
   const v = parseFloat(localStorage.getItem('cofen_objetivo_ho'));
-  return (v && v > 0) ? v : 130000;
+  return (v && v > 0) ? v : 150000;
 }
+// Migração 1x: o rótulo das metas mostrava sempre "R$120K" por um bug de exibição
+// (o cálculo real já usava o objetivo certo, só o texto ficava hardcoded). Corrigido
+// nesta versão — e o objetivo passa a ser R$150K por padrão a partir de agora.
+(function _migrarObjetivoHo150k(){
+  try{
+    if(!localStorage.getItem('cofen_objetivo_ho_v2')){
+      localStorage.setItem('cofen_objetivo_ho', '150000');
+      localStorage.setItem('cofen_objetivo_ho_v2', '1');
+      if(typeof fbPush === 'function') fbPush('objetivo_ho', 150000);
+    }
+  }catch(e){}
+})();
 function hoObjetivoSet(v){
   localStorage.setItem('cofen_objetivo_ho', String(v));
   if(typeof fbPush === 'function') fbPush('objetivo_ho', v);
@@ -4146,7 +4158,7 @@ function _buildMetasHtml(val, compact){
       background:${bat?c+'22':'rgba(255,255,255,.04)'};opacity:${bat?1:0.4}">
       <span style="font-size:${fs}">${bat?'🏆':'🔒'}</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:${bat?c:'rgba(255,255,255,.3)'};letter-spacing:.5px">
-        META ${i} · R$${(i*120).toFixed(0)}K</span>
+        META ${i} · R$${(i*META_STEP/1000).toFixed(0)}K</span>
     </div>`;
   }
   if(val < proxima){
@@ -4154,7 +4166,7 @@ function _buildMetasHtml(val, compact){
       border-radius:100px;border:1.5px dashed rgba(255,255,255,.25);background:rgba(255,255,255,.04)">
       <span style="font-size:${fs}">🎯</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:${fs};color:rgba(255,255,255,.4);letter-spacing:.5px">
-        META ${metas+1} · R$${((metas+1)*120).toFixed(0)}K</span>
+        META ${metas+1} · R$${((metas+1)*META_STEP/1000).toFixed(0)}K</span>
     </div>`;
   }
   // Atualiza o destaque de "falta" no topo (se existir)
