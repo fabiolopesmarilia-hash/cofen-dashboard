@@ -10475,11 +10475,13 @@ function tvGetTodayVal(op){
 }
 
 // Monta 1 slide de "Destaque do Dia" por equipe (maior recebimento de hoje)
-// Restrito às 3 equipes usadas no Modo TV: Bruna, Katia e Equipe Stephanie
+// Todas as equipes ativas no Modo TV: Bruna, Katia, Equipe Stephanie, Marília Stephanie e Letícia
 const TV_HIGHLIGHT_TEAMS = {
   'COFEN BIRIGUI BRUNA':      'Birigui Bruna',
   'COFEN STEPHANIE 2° TURNO': 'Katia 2°T',
-  'COFEN KATIA':              'Equipe Stephanie'
+  'COFEN KATIA':              'Equipe Stephanie',
+  'COFEN MARILIA BRENDA':     'Marília Stephanie',
+  'COFEN LETICIA':            'Equipe Letícia'
 };
 function tvBuildDailyHighlights(){
   let _removidos=[];
@@ -14963,6 +14965,11 @@ setInterval(()=>{
         font-weight:800;font-size:11px;background:transparent;color:rgba(26,46,34,0.62);letter-spacing:.5px;transition:all .2s">
         💜 Equipe Stephanie
       </button>
+      <button id="tv-btn-COFEN_LETICIA" onclick="tvSetMode('COFEN LETICIA',this)"
+        style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
+        font-weight:800;font-size:11px;background:transparent;color:rgba(26,46,34,0.62);letter-spacing:.5px;transition:all .2s">
+        🌿 Equipe Letícia
+      </button>
       <button id="tv-btn-COFEN_PAGUEPLAY" onclick="tvSetMode('COFEN PAGUEPLAY',this)"
         style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
         font-weight:800;font-size:11px;background:transparent;color:rgba(26,46,34,0.62);letter-spacing:.5px;transition:all .2s">
@@ -18503,7 +18510,7 @@ function renderEqMetasTable(){
   const pctColor = p => p>=100?'#4ADE80':p>=70?'#67E8F9':p>=50?'#FCD34D':'#F87171';
   const pctBg    = p => p>=100?'rgba(74,222,128,.15)':p>=70?'rgba(103,232,249,.12)':p>=50?'rgba(252,211,77,.12)':'rgba(248,113,113,.12)';
 
-  const ORDER = ['COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN KATIA','COFEN LETICIA'];
+  const ORDER = ['COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN KATIA','COFEN MARILIA BRENDA','COFEN LETICIA'];
   const EQ_LABELS = {
     'COFEN BIRIGUI BRUNA'     : 'Birigui Bruna',
     'COFEN MARILIA BRENDA'    : 'Marília Stephanie',
