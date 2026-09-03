@@ -9328,9 +9328,12 @@ function importApply(){
   if(fbDb && fbRoom) fbPush('extra_eq', {});
 
   // Zera campo .hoje de todos os operadores em memória
+  // Também zera o "daily" (recebimento por dia) de TODOS antes de reconstruir —
+  // sem isso, quem não aparece no relatório deste mês (recebeu R$0) ficava com
+  // os dias do mês passado ainda marcados no gráfico, como se fossem deste mês.
   D.equipes.forEach(eq=>{
     eq.hoje = 0;
-    eq.ops.forEach(op=>{ op.hoje = 0; });
+    eq.ops.forEach(op=>{ op.hoje = 0; op.daily = {}; });
   });
 
   // ── 2. Atualizar todos os operadores com dados do arquivo ──
@@ -9342,7 +9345,7 @@ function importApply(){
       opReal.rec = r.recImport;
       opReal.ho  = r.recImport * 0.25;
       if(r.acordos > 0) opReal.acordos = r.acordos;
-      if(r.daily && Object.keys(r.daily).length > 0) opReal.daily = r.daily;
+      if(r.daily) opReal.daily = r.daily;
       if(r.tipos  && Object.keys(r.tipos).length  > 0) opReal.tipos  = r.tipos;
       updated++;
     });
@@ -9514,10 +9517,10 @@ function importApply(){
     fbPush('overrides', {...ovFinal, _ts: Date.now()});
 
     // Sincronizar daily e tipos via rd_hist
+    // Inclui TODOS os operadores (não só quem apareceu no relatório) para que
+    // quem ficou zerado neste mês também zere nos outros dispositivos conectados.
     const dailyData = {};
-    importParsed.found.forEach(r=>{
-      if(r.daily && Object.keys(r.daily).length > 0) dailyData[r.opName] = r.daily;
-    });
+    D.equipes.forEach(eq=>eq.ops.forEach(op=>{ dailyData[op.name] = op.daily || {}; }));
     if(Object.keys(dailyData).length > 0) fbPush('rd_hist', dailyData);
     // Sincronizar tipos de pagamento via op_tipos
     const tiposData = {};
@@ -9534,10 +9537,15 @@ function importApply(){
       const savedOpHist = JSON.parse(localStorage.getItem('cofen_op_hist')||'{}');
       importParsed.found.forEach(r=>{
         if(!savedOpHist[r.opName]) savedOpHist[r.opName] = {};
-        if(r.daily && Object.keys(r.daily).length > 0) savedOpHist[r.opName].daily = r.daily;
         if(r.tipos && Object.keys(r.tipos).length > 0) savedOpHist[r.opName].tipos = r.tipos;
         if(r.acordos > 0) savedOpHist[r.opName].acordos = r.acordos;
       });
+      // Grava o daily de TODOS os operadores (inclusive zerados) — reflete o
+      // reset feito acima, evitando que dias do mês passado sobrevivam salvos.
+      D.equipes.forEach(eq=>eq.ops.forEach(op=>{
+        if(!savedOpHist[op.name]) savedOpHist[op.name] = {};
+        savedOpHist[op.name].daily = op.daily || {};
+      }));
       localStorage.setItem('cofen_op_hist', JSON.stringify(savedOpHist));
       // compatibilidade: manter cofen_daily_hist também
       const savedDaily = JSON.parse(localStorage.getItem('cofen_daily_hist')||'{}');
@@ -11179,29 +11187,35 @@ function tvShow(idx){
 
         <!-- BADGE COMPARATIVO MÊS ANTERIOR — DU a DU -->
         ${(()=>{
-          const opCmp = CMP_OPS_DEDUP.find(c=>c.nome===op.name);
-          if(!opCmp) return '';
-
-          // DU atual de Maio (quantos DUs já passaram)
+          // DU atual do mês corrente (quantos DUs já passaram em Agosto)
           const duAtual = DU.passou || 0;
 
-          // Valor do operador em Abril no mesmo DU proporcional
-          // CMP_JUNHO_DU contém o acumulado GERAL de Maio por DU
-          // Calculamos a fatia do operador proporcionalmente ao total de Maio
-          const abrilDuTotal = CMP_JUNHO_DU[duAtual] || 0;           // acumulado geral de Maio até este DU
-          const abrilDuMax   = CMP_JUNHO_DU[21] || CMP_JUNHO_DU[Object.keys(CMP_JUNHO_DU).map(Number).sort((a,b)=>b-a)[0]] || 1; // total de Maio encerrado (último DU)
-          // Proporção do operador no total de Maio
-          const propOp = abrilDuMax > 0 ? opCmp.marco / abrilDuMax : 0;
-          // Estimativa do valor deste operador em Abril até o DU atual
-          const abrilOpDu = abrilDuTotal * propOp;
+          // Valor REAL deste operador em Julho até o mesmo DU (dado real de
+          // Julho, salvo em CMP_OPS_DU_JULHO ao importar o relatório de Julho —
+          // antes esse comparativo usava uma ESTIMATIVA proporcional travada
+          // nos números de Maio/2026, e ficava rotulado "vs Abril" mesmo com
+          // o mês corrente já em Agosto/Setembro).
+          const _normCmp = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+          let julhoCumul = CMP_OPS_DU_JULHO[op.name];
+          if(!julhoCumul){
+            const _alvo = _normCmp(op.name);
+            const _k = Object.keys(CMP_OPS_DU_JULHO).find(k=>_normCmp(k)===_alvo);
+            if(_k) julhoCumul = CMP_OPS_DU_JULHO[_k];
+          }
+          if(!julhoCumul) return '';
 
-          // Valor atual de Maio deste operador (op.rec)
-          const maioOp = tvGetRec(op) || 0;
+          const _dus = Object.keys(julhoCumul).map(Number).sort((a,b)=>a-b);
+          const _ultimoDU = _dus[_dus.length-1];
+          // Se Agosto já passou de mais DUs do que Julho teve, compara com o total fechado de Julho
+          const julhoOpDu = julhoCumul[duAtual] ?? (_ultimoDU ? julhoCumul[_ultimoDU] : 0) ?? 0;
 
-          if(duAtual === 0 && maioOp === 0) return '';
+          // Valor atual do operador neste mês
+          const agostoOp = tvGetRec(op) || 0;
 
-          const diff = maioOp - abrilOpDu;
-          const pct  = abrilOpDu > 0 ? ((diff / abrilOpDu) * 100).toFixed(0) : 0;
+          if(duAtual === 0 && agostoOp === 0) return '';
+
+          const diff = agostoOp - julhoOpDu;
+          const pct  = julhoOpDu > 0 ? ((diff / julhoOpDu) * 100).toFixed(0) : 0;
           const col  = diff >= 0 ? '#059669' : '#DC2626';
           const bg   = diff >= 0 ? 'rgba(74,222,128,.12)' : 'rgba(252,165,165,.12)';
           const bd   = diff >= 0 ? 'rgba(74,222,128,.35)' : 'rgba(252,165,165,.35)';
@@ -11209,15 +11223,16 @@ function tvShow(idx){
           const diaCalendario = duAtual > 0 ? (CMP_JULHO_DU_DIAS[duAtual-1] || '?') : '?';
 
           return `<div style="background:${bg};border:1px solid ${bd};border-radius:10px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-            <div style="font-size:9px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase">📊 vs Abril (até ${duAtual}° DU — dia ${diaCalendario})</div>
+            <div style="font-size:9px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase">📊 vs Julho (até ${duAtual}° DU — dia ${diaCalendario})</div>
             <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:11px;color:rgba(26,46,34,0.62)">Abril/${duAtual}DU: <b style="color:rgba(26,46,34,0.7)">${fR(abrilOpDu)}</b></span>
-              <span style="font-size:11px;color:rgba(26,46,34,0.62)">Maio: <b style="color:#059669">${fR(maioOp)}</b></span>
+              <span style="font-size:11px;color:rgba(26,46,34,0.62)">Julho/${duAtual}DU: <b style="color:rgba(26,46,34,0.7)">${fR(julhoOpDu)}</b></span>
+              <span style="font-size:11px;color:rgba(26,46,34,0.62)">Agosto: <b style="color:#059669">${fR(agostoOp)}</b></span>
               <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:${col};letter-spacing:.5px">${icon} ${Math.abs(pct)}%</span>
               <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${col}">${diff >= 0 ? '+' : '-'}${fR(Math.abs(diff))}</span>
             </div>
           </div>`;
         })()}
+
 
         <!-- RECEBIMENTO POR DIA — 31 dias com cor de meta -->
         <div style="background:#FFFFFF;border:1px solid rgba(0,168,107,.18);border-radius:12px;padding:12px 14px">
