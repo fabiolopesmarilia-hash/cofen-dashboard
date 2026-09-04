@@ -3047,6 +3047,12 @@ const ORIG = {"global":{"total":76462.34,"pp":0,"coren":0,"cofen":0,"daily":{}},
 
 let D = JSON.parse(JSON.stringify(ORIG));
 
+// Flag: fica true quando o reset automático de mês (abaixo) realmente zerou
+// algo. O listener do Firebase (mais adiante) usa isso pra saber que precisa
+// sobrescrever o rd_hist remoto (que pode ainda estar com dado do mês passado
+// compartilhado entre os computadores) em vez de aceitar o dado velho de volta.
+let _mesResetadoAgora = false;
+
 // ── RESET AUTOMÁTICO DE MÊS ──
 // Os dados de D (acima) e os valores salvos em cofen_op_overrides refletem
 // a ÚLTIMA importação feita. Sem isso, ao virar o mês (ex.: virou setembro e
@@ -3073,6 +3079,7 @@ let D = JSON.parse(JSON.stringify(ORIG));
     localStorage.removeItem('cofen_op_overrides');
     localStorage.removeItem('cofen_base_rec');
     localStorage.setItem('cofen_mes_dados', _mesAnoReal);
+    _mesResetadoAgora = true;
   } catch(e){}
 })();
 
@@ -11707,6 +11714,18 @@ function fbStartListening(){
 
   fbDb.ref(fbRoom+'/rd_hist').on('value', snap=>{
     const remote = snap.val();
+    // O mês virou e o reset automático já zerou tudo localmente — mas o
+    // rd_hist remoto (compartilhado entre computadores) ainda pode estar
+    // com o "recebimento por dia" do mês passado salvo por outro import
+    // antigo. Em vez de aceitar esse dado velho de volta (o que trazia o
+    // valor do mês passado de novo pra quem tinha acabado de zerar), este
+    // computador assume a versão zerada como certa e sobrescreve o Firebase
+    // pra todo mundo — só roda 1x, na primeira vez que detecta o reset.
+    if(_mesResetadoAgora){
+      _mesResetadoAgora = false;
+      if(remote) fbPush('rd_hist', {});
+      return;
+    }
     if(!remote) return;
     let changed = false;
     Object.entries(remote).forEach(([nm,daily])=>{
