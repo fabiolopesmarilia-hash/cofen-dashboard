@@ -18575,6 +18575,43 @@ document.addEventListener('DOMContentLoaded', ()=>{
 </script>
 
 <script>
+// ── META HO POR EQUIPE — editável pelo usuário ──
+// Antes esses valores (500k, 130k, 125k, 12.5k...) só mudavam se alguém
+// editasse o código. Agora ficam salvos no navegador (e sincronizados via
+// Firebase) e dá pra editar clicando direto na coluna "Meta HO" da tabela.
+const META_HO_PADRAO = {
+  'COFEN BIRIGUI BRUNA'     : 500000,
+  'COFEN MARILIA BRENDA'    : 125000,
+  'COFEN STEPHANIE 2° TURNO': 130000,
+  'COFEN DIGITAL'           : 37500,
+  'COFEN KATIA'             : 130000,
+  'COFEN LETICIA'           : 12500,
+};
+function metaHoGetAll(){
+  try { return JSON.parse(localStorage.getItem('cofen_meta_ho_eq') || '{}'); }
+  catch(e){ return {}; }
+}
+function metaHoGet(eqName){
+  const ov = metaHoGetAll();
+  return (ov[eqName] !== undefined) ? ov[eqName] : (META_HO_PADRAO[eqName] || 112500);
+}
+function metaHoSet(eqName, valor){
+  const ov = metaHoGetAll();
+  ov[eqName] = valor;
+  localStorage.setItem('cofen_meta_ho_eq', JSON.stringify(ov));
+  if(typeof fbPush === 'function') fbPush('meta_ho_eq', ov);
+}
+function metaHoEditar(eqName, labelExib){
+  const atual = metaHoGet(eqName);
+  const raw = prompt('Meta HO deste mês para "'+labelExib+'" (R$):', atual.toFixed(2).replace('.', ','));
+  if(raw === null) return;
+  const limpo = raw.replace(/\./g,'').replace(',', '.').replace(/[^0-9.]/g,'');
+  const novo = parseFloat(limpo);
+  if(!novo || novo <= 0){ alert('Valor inválido.'); return; }
+  metaHoSet(eqName, novo);
+  if(typeof renderEqMetasTable === 'function') renderEqMetasTable();
+}
+
 // ══════════════════════════════════════════
 // TABELA METAS & PROJEÇÕES — EQUIPES JULHO
 // Declarada aqui (após D, DU, gGetMetas estarem disponíveis)
@@ -18625,18 +18662,7 @@ function renderEqMetasTable(){
     const eq = D.equipes.find(e => e.name === eqName);
     if(!eq) return;
 
-    // Meta da equipe em Total Real (usa metas configuradas ou padrão R$ 450k)
-    // A tabela agora opera sobre HO (25%), então a meta HO = meta_rec * 0.25
-    // Meta HO por equipe (valores diretos em HO)
-    const META_HO = {
-      'COFEN BIRIGUI BRUNA'     : 500000,
-      'COFEN MARILIA BRENDA'    : 125000,
-      'COFEN STEPHANIE 2° TURNO': 130000,
-      'COFEN DIGITAL'           : 37500,
-      'COFEN KATIA'             : 130000,
-      'COFEN LETICIA'           : 12500,
-    };
-    const metaEq = META_HO[eqName] || (META_EQ_DEFAULT * 0.25);
+    const metaEq = metaHoGet(eqName);
 
     const rec      = eq.ho || 0; // usa HO em vez de Total Real
 
@@ -18735,7 +18761,11 @@ function renderEqMetasTable(){
       </td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#FFD166">${fR(recEquipe)}</td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#4ADE80">${fR(rec)}</td>
-      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:rgba(255,255,255,.45)">${fR(metaEq)}</td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:rgba(255,255,255,.45)">
+        <span onclick="metaHoEditar('${eqName}','${(EQ_LABELS[eqName]||eqName).replace(/'/g,"\\'")}')"
+          title="Clique para editar a meta HO desta equipe"
+          style="cursor:pointer;border-bottom:1px dashed rgba(255,255,255,.3);padding-bottom:1px">${fR(metaEq)} ✏️</span>
+      </td>
       <td style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#67E8F9">
         ${fR(recDia)}
         <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">por dia útil (HO)</div>
