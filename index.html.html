@@ -11780,6 +11780,17 @@ function fbStartListening(){
   });
   fbListeners.op_tipos = true;
 
+  // ── Meta HO por equipe (meta_ho_eq) — editável na tabela Metas & Projeções ──
+  if(fbListeners.meta_ho_eq) { fbDb?.ref(fbRoom+'/meta_ho_eq').off(); }
+  fbDb.ref(fbRoom+'/meta_ho_eq').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    localStorage.setItem('cofen_meta_ho_eq', JSON.stringify(remote));
+    if(typeof renderEqMetasTable === 'function') renderEqMetasTable();
+    pulseSyncDot();
+  });
+  fbListeners.meta_ho_eq = true;
+
   // ── Acordos por operador (op_acordos) ──
   if(!fbListeners.op_acordos){
     fbDb.ref(fbRoom+'/op_acordos').on('value', snap=>{
