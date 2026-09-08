@@ -11841,6 +11841,17 @@ function fbStartListening(){
   });
   fbListeners.meta_ho_eq = true;
 
+  // ── Equipes ocultas na tabela de Metas HO (equipes_ocultas_ho) ──
+  if(fbListeners.equipes_ocultas_ho) { fbDb?.ref(fbRoom+'/equipes_ocultas_ho').off(); }
+  fbDb.ref(fbRoom+'/equipes_ocultas_ho').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    localStorage.setItem('cofen_equipes_ocultas_ho', JSON.stringify(remote));
+    if(typeof renderEqMetasTable === 'function') renderEqMetasTable();
+    pulseSyncDot();
+  });
+  fbListeners.equipes_ocultas_ho = true;
+
   // ── Acordos por operador (op_acordos) ──
   if(!fbListeners.op_acordos){
     fbDb.ref(fbRoom+'/op_acordos').on('value', snap=>{
@@ -18673,6 +18684,31 @@ function metaHoEditar(eqName, labelExib){
   if(typeof renderEqMetasTable === 'function') renderEqMetasTable();
 }
 
+// ── EXCLUIR / RESTAURAR EQUIPE DA TABELA ──
+// "Excluir" aqui é reversível (esconde da tabela) — não apaga os operadores
+// nem o histórico de ninguém, só tira a linha da visualização. Sincroniza
+// via Firebase pra sumir/reaparecer em todos os computadores.
+function equipesOcultasGetAll(){
+  try { return JSON.parse(localStorage.getItem('cofen_equipes_ocultas_ho') || '[]'); }
+  catch(e){ return []; }
+}
+function equipesOcultasSet(lista){
+  localStorage.setItem('cofen_equipes_ocultas_ho', JSON.stringify(lista));
+  if(typeof fbPush === 'function') fbPush('equipes_ocultas_ho', lista);
+}
+function equipeHoExcluir(eqName, labelExib){
+  if(!confirm('Remover "'+labelExib+'" da tabela de Metas & Projeções?\n\nIsso só esconde a linha — não apaga operadores nem histórico. Dá pra restaurar depois.')) return;
+  const lista = equipesOcultasGetAll();
+  if(!lista.includes(eqName)) lista.push(eqName);
+  equipesOcultasSet(lista);
+  if(typeof renderEqMetasTable === 'function') renderEqMetasTable();
+}
+function equipeHoRestaurar(eqName){
+  const lista = equipesOcultasGetAll().filter(n=>n!==eqName);
+  equipesOcultasSet(lista);
+  if(typeof renderEqMetasTable === 'function') renderEqMetasTable();
+}
+
 // ══════════════════════════════════════════
 // TABELA METAS & PROJEÇÕES — EQUIPES JULHO
 // Declarada aqui (após D, DU, gGetMetas estarem disponíveis)
@@ -18719,7 +18755,9 @@ function renderEqMetasTable(){
   };
 
   let rows = '';
+  const _ocultas = equipesOcultasGetAll();
   ORDER.forEach(eqName => {
+    if(_ocultas.includes(eqName)) return;
     const eq = D.equipes.find(e => e.name === eqName);
     if(!eq) return;
 
@@ -18808,6 +18846,11 @@ function renderEqMetasTable(){
               style="width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);
               color:rgba(255,255,255,.6);font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;
               margin-left:4px;flex-shrink:0;padding:0" onmouseover="this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">🔄</button>` : ''}
+            <button onclick="event.stopPropagation();equipeHoExcluir('${eqName}','${(EQ_LABELS[eqName]||eqName).replace(/'/g,"\\'")}')"
+              title="Remover esta equipe da tabela (reversível)"
+              style="width:18px;height:18px;border-radius:50%;border:1px solid rgba(248,113,113,.3);background:rgba(248,113,113,.08);
+              color:rgba(248,113,113,.75);font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+              margin-left:4px;flex-shrink:0;padding:0" onmouseover="this.style.background='rgba(248,113,113,.25)'" onmouseout="this.style.background='rgba(248,113,113,.08)'">🗑️</button>
           </div>
           <div>
             <div style="font-weight:800;font-size:11px;color:rgba(255,255,255,.85);margin-bottom:3px">${EQ_LABELS[eqName]||eqName}</div>
@@ -18856,6 +18899,20 @@ function renderEqMetasTable(){
     </tr>`;
   });
   tbody.innerHTML = rows || '<tr><td colspan="9" style="padding:14px;text-align:center;color:rgba(255,255,255,.3);font-size:11px">Nenhuma equipe encontrada</td></tr>';
+
+  // Rodapé: equipes ocultas, com botão pra restaurar
+  if(_ocultas.length > 0){
+    const restaurarHtml = _ocultas.map(nome=>`
+      <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border-radius:8px;padding:4px 10px;margin:2px">
+        <span style="font-size:10px;color:rgba(255,255,255,.5)">${EQ_LABELS[nome]||nome}</span>
+        <button onclick="equipeHoRestaurar('${nome}')" style="border:none;background:rgba(74,222,128,.15);color:#4ADE80;font-size:9px;
+          font-weight:800;border-radius:5px;padding:2px 7px;cursor:pointer">↩ restaurar</button>
+      </span>`).join('');
+    tbody.innerHTML += `<tr><td colspan="9" style="padding:10px 12px;background:rgba(0,0,0,.15)">
+      <div style="font-size:9px;color:rgba(255,255,255,.35);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Equipes ocultas desta tabela</div>
+      ${restaurarHtml}
+    </td></tr>`;
+  }
 }
 // ── Correção: fotos dos líderes Katia/Laysa estavam trocadas
 //    (a troca de nomes das equipes não move as fotos, que ficam
