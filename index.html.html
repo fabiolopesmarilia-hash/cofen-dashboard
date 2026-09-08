@@ -12588,6 +12588,17 @@ function fotosRenderGrid(){
       badge.style.cssText = 'position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);border-radius:100px;padding:2px 7px;font-size:9px;font-weight:700;color:#fff';
       badge.textContent = '\u2705 Foto';
       card.appendChild(badge);
+
+      const delBtn = document.createElement('button');
+      delBtn.style.cssText = 'position:absolute;top:6px;left:6px;width:22px;height:22px;border-radius:50%;border:none;'
+        + 'background:rgba(220,38,38,.85);color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2';
+      delBtn.textContent = '\ud83d\uddd1\ufe0f';
+      delBtn.title = 'Excluir foto de ' + op.name.replace(/_/g,' ');
+      delBtn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        fotosRemoverFoto(op.name);
+      });
+      card.appendChild(delBtn);
     }
 
     const lbl = document.createElement('div');
@@ -12601,6 +12612,18 @@ function fotosRenderGrid(){
 
     grid.appendChild(card);
   });
+}
+
+function fotosRemoverFoto(opName){
+  if(!confirm('Excluir a foto de ' + opName.replace(/_/g,' ') + '?\n\nVolta a mostrar as iniciais no lugar.')) return;
+  photoSet(opName, null);
+  fotosRenderGrid();
+  if(document.getElementById('pg-ranking')?.classList.contains('on')) mkRanking();
+  if(currentModalOp === opName){
+    const cfg = EQ[ALL.find(o=>o.name===opName)?.eq]||{c:'#888'};
+    renderModalPhoto(opName, cfg);
+  }
+  toast('🗑️ Foto removida de ' + opName.replace(/_/g,' '));
 }
 
 function fotosSelectOp(opName){
