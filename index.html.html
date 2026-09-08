@@ -3047,6 +3047,18 @@ const ORIG = {"global":{"total":76462.34,"pp":0,"coren":0,"cofen":0,"daily":{}},
 
 let D = JSON.parse(JSON.stringify(ORIG));
 
+// Garante que as 7 equipes canônicas da operação sempre existam em D.equipes,
+// mesmo com 0 operadores — sem isso, a equipe some de tabelas (Metas HO,
+// Modo TV etc.) sempre que ficar temporariamente vazia.
+(function _garantirEquipesCanonicas(){
+  const _canonicas = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA','COFEN PAGUEPLAY'];
+  _canonicas.forEach(nome=>{
+    if(!D.equipes.find(e=>e.name===nome)){
+      D.equipes.push({name:nome, rec:0, ho:0, n_op:0, acordos:0, ops:[], gerados:0, pagos:0, pendentes:0});
+    }
+  });
+})();
+
 // Flag: fica true quando o reset automático de mês (abaixo) realmente zerou
 // algo. O listener do Firebase (mais adiante) usa isso pra saber que precisa
 // sobrescrever o rd_hist remoto (que pode ainda estar com dado do mês passado
@@ -4690,6 +4702,38 @@ function _gerarComparativoCompleto(){
       duN: duAlvo
     };
   });
+
+  // ── Mês corrente: usa o HO (Pague Play) real já calculado a partir dos
+  // operadores importados (D.equipes), em vez do arquivo de conciliação
+  // separado — que só atualiza quando alguém importa manualmente esse
+  // arquivo específico e pode ficar desatualizado enquanto isso não acontece.
+  // O HO de cada operador já é a fatia da Pague Play (Recebido × 24,96%).
+  try{
+    const _hoje = new Date();
+    const _mesAtualKey = `${_hoje.getFullYear()}-${String(_hoje.getMonth()+1).padStart(2,'0')}`;
+    if(typeof D !== 'undefined' && D && D.equipes){
+      const _hoLiveTotal = D.equipes.reduce((s,eq)=>s + eq.ops.reduce((s2,o)=>s2+(o.ho||0),0), 0);
+      const _linhaAtual = linhas.find(l=>l.mesKey===_mesAtualKey);
+      if(_linhaAtual){
+        _linhaAtual.soma15   = Math.round(_hoLiveTotal*100)/100;
+        _linhaAtual.totalMes = Math.round(_hoLiveTotal*100)/100;
+      } else if(_hoLiveTotal > 0){
+        // Mês corrente ainda não tem nenhuma linha na fonte de conciliação — cria uma
+        const feriados2 = typeof getFeriados==='function' ? getFeriados() : [];
+        const duAlvo2 = _duHojeNoMes(feriados2);
+        linhas.push({
+          mesKey: _mesAtualKey,
+          mesLabel: MESES_ABREV_PT[_hoje.getMonth()]+'/'+_hoje.getFullYear(),
+          d15Label: String(_hoje.getDate()).padStart(2,'0')+'/'+String(_hoje.getMonth()+1).padStart(2,'0'),
+          soma15: Math.round(_hoLiveTotal*100)/100,
+          totalMes: Math.round(_hoLiveTotal*100)/100,
+          duN: duAlvo2
+        });
+        linhas.sort((a,b)=>a.mesKey.localeCompare(b.mesKey));
+      }
+    }
+  }catch(e){}
+
   _recalcularVarPct(linhas);
   return linhas;
 }
@@ -8554,8 +8598,12 @@ function mvApply(){
     e.acordos= e.ops.reduce((s,o)=>s+o.acordos,0);
   });
 
-  // Remove empty equipes
-  D.equipes = D.equipes.filter(e=>e.ops.length>0);
+  // Remove empty equipes — mas nunca as 7 equipes canônicas da operação
+  // (ex.: "COFEN KATIA"/Equipe Stephanie ficando com 0 operadores não pode
+  // sumir da tabela de metas e do resto do dashboard, que sempre espera essa
+  // chave existir mesmo zerada).
+  const _EQUIPES_CANONICAS = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA','COFEN PAGUEPLAY'];
+  D.equipes = D.equipes.filter(e=>e.ops.length>0 || _EQUIPES_CANONICAS.includes(e.name));
 
   // Persist move
   const ov = gGetOverrides();
@@ -8822,7 +8870,9 @@ function loadGestaoOverrides(){
         e.acordos=e.ops.reduce((s,o)=>s+o.acordos,0);
       });
     });
-    D.equipes=D.equipes.filter(e=>e.ops.length>0);
+    // Mesma proteção: nunca remover as equipes canônicas, só times avulsos vazios
+    const _EQUIPES_CANONICAS2 = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA','COFEN PAGUEPLAY'];
+    D.equipes=D.equipes.filter(e=>e.ops.length>0 || _EQUIPES_CANONICAS2.includes(e.name));
     rebuildAll();
   }
   // Re-apply novos
