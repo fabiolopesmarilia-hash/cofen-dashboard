@@ -4702,38 +4702,6 @@ function _gerarComparativoCompleto(){
       duN: duAlvo
     };
   });
-
-  // ── Mês corrente: usa o HO (Pague Play) real já calculado a partir dos
-  // operadores importados (D.equipes), em vez do arquivo de conciliação
-  // separado — que só atualiza quando alguém importa manualmente esse
-  // arquivo específico e pode ficar desatualizado enquanto isso não acontece.
-  // O HO de cada operador já é a fatia da Pague Play (Recebido × 24,96%).
-  try{
-    const _hoje = new Date();
-    const _mesAtualKey = `${_hoje.getFullYear()}-${String(_hoje.getMonth()+1).padStart(2,'0')}`;
-    if(typeof D !== 'undefined' && D && D.equipes){
-      const _hoLiveTotal = D.equipes.reduce((s,eq)=>s + eq.ops.reduce((s2,o)=>s2+(o.ho||0),0), 0);
-      const _linhaAtual = linhas.find(l=>l.mesKey===_mesAtualKey);
-      if(_linhaAtual){
-        _linhaAtual.soma15   = Math.round(_hoLiveTotal*100)/100;
-        _linhaAtual.totalMes = Math.round(_hoLiveTotal*100)/100;
-      } else if(_hoLiveTotal > 0){
-        // Mês corrente ainda não tem nenhuma linha na fonte de conciliação — cria uma
-        const feriados2 = typeof getFeriados==='function' ? getFeriados() : [];
-        const duAlvo2 = _duHojeNoMes(feriados2);
-        linhas.push({
-          mesKey: _mesAtualKey,
-          mesLabel: MESES_ABREV_PT[_hoje.getMonth()]+'/'+_hoje.getFullYear(),
-          d15Label: String(_hoje.getDate()).padStart(2,'0')+'/'+String(_hoje.getMonth()+1).padStart(2,'0'),
-          soma15: Math.round(_hoLiveTotal*100)/100,
-          totalMes: Math.round(_hoLiveTotal*100)/100,
-          duN: duAlvo2
-        });
-        linhas.sort((a,b)=>a.mesKey.localeCompare(b.mesKey));
-      }
-    }
-  }catch(e){}
-
   _recalcularVarPct(linhas);
   return linhas;
 }
