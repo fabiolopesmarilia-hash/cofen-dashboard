@@ -862,6 +862,9 @@ select.ev-inp{cursor:pointer}
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
       <div id="cmp15du-titulo" style="font-size:9px;font-weight:800;color:rgba(0,229,255,.7);letter-spacing:2px;text-transform:uppercase">📊 COMPARATIVO MENSAL · PAGUE PLAY · ATÉ O 15º DIA ÚTIL (Dt.Conciliação)</div>
       <div id="cmp15du-badge" style="font-size:9px;font-weight:700;color:rgba(255,255,255,.3);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:3px 10px">⏳ dados de exemplo — importe um arquivo para atualizar</div>
+      <button onclick="duCorteEditarPrompt()" title="Mudar o dia útil de corte de todos os meses"
+        style="font-size:9px;font-weight:800;color:#67E8F9;background:rgba(103,232,249,.1);border:1px solid rgba(103,232,249,.3);
+        border-radius:100px;padding:3px 10px;cursor:pointer">✏️ mudar dia útil de corte</button>
     </div>
     <div style="overflow-x:auto;border-radius:10px;border:1px solid rgba(255,255,255,.08)">
       <table style="width:100%;border-collapse:collapse;font-family:Nunito,sans-serif;min-width:640px">
@@ -4763,6 +4766,17 @@ function _duNDoMes(ano, mes, n, feriados){
 }
 // Quantos dias úteis já se passaram no mês ATUAL, contando até hoje (inclusive).
 function _duHojeNoMes(feriados){
+  // Permite fixar o corte num dia útil específico (ex.: sempre comparar até
+  // o 5° D.U. de cada mês) em vez de sempre usar o dia útil de HOJE.
+  // Sem override salvo, continua automático (avança sozinho todo dia).
+  try{
+    const _override = localStorage.getItem('cofen_du_corte_fixo');
+    if(_override !== null && _override !== ''){
+      const n = parseInt(_override, 10);
+      if(n > 0) return n;
+    }
+  }catch(e){}
+
   const hoje = new Date();
   const ano = hoje.getFullYear(), mes = hoje.getMonth()+1, diaHoje = hoje.getDate();
   let du = 0;
@@ -4774,6 +4788,40 @@ function _duHojeNoMes(feriados){
   }
   return Math.max(1, du);
 }
+// Fixa o corte da tabela "Comparativo Mensal" em um dia útil específico
+// (ex.: duCorteFixar(5) → todos os meses comparam até o 5° D.U.). Passar
+// null/0 volta ao automático (dia útil de hoje, avançando sozinho).
+function duCorteEditarPrompt(){
+  const atual = localStorage.getItem('cofen_du_corte_fixo') || '';
+  const raw = prompt('Comparar todos os meses até qual dia útil?\n\nDigite um número (ex.: 5) ou "auto" pra voltar a acompanhar o dia de hoje automaticamente.', atual || 'auto');
+  if(raw === null) return;
+  const limpo = raw.trim().toLowerCase();
+  if(limpo === 'auto' || limpo === ''){
+    duCorteFixar(null);
+    toast('✅ Comparativo voltou a acompanhar o dia útil de hoje automaticamente');
+    return;
+  }
+  const n = parseInt(limpo, 10);
+  if(!n || n<=0){ alert('Digite um número válido ou "auto".'); return; }
+  duCorteFixar(n);
+  toast('✅ Comparativo fixado até o '+n+'° dia útil de cada mês');
+}
+function duCorteFixar(n){
+  if(!n || n<=0){
+    localStorage.removeItem('cofen_du_corte_fixo');
+    if(typeof fbPush==='function') fbPush('du_corte_fixo', null);
+  } else {
+    localStorage.setItem('cofen_du_corte_fixo', String(n));
+    if(typeof fbPush==='function') fbPush('du_corte_fixo', n);
+  }
+  if(typeof renderComparativo15DU==='function' && typeof _gerarComparativoCompleto==='function'){
+    renderComparativo15DU(_gerarComparativoCompleto());
+  }
+}
+(function _duCorteFixoInicial(){
+  // Fixado em 5° D.U. a pedido — pra voltar ao automático, chame duCorteFixar(null) no console.
+  if(localStorage.getItem('cofen_du_corte_fixo')===null) localStorage.setItem('cofen_du_corte_fixo','5');
+})();
 // Mantido por compatibilidade (usado em outros pontos do dashboard) — 15º dia útil fixo.
 function _du15DoMes(ano, mes, feriados){
   const dim = new Date(ano, mes, 0).getDate();
@@ -12019,6 +12067,19 @@ function fbStartListening(){
     if(typeof tvCustomEquipes !== 'undefined') tvCustomEquipes = remote;
   });
   fbListeners.tv_equipes_custom = true;
+
+  // ── Dia útil de corte fixo do Comparativo Mensal ──
+  if(fbListeners.du_corte_fixo) { fbDb?.ref(fbRoom+'/du_corte_fixo').off(); }
+  fbDb.ref(fbRoom+'/du_corte_fixo').on('value', snap=>{
+    const remote = snap.val();
+    if(remote === null || remote === undefined) return;
+    localStorage.setItem('cofen_du_corte_fixo', remote ? String(remote) : '');
+    if(!remote) localStorage.removeItem('cofen_du_corte_fixo');
+    if(typeof renderComparativo15DU==='function' && typeof _gerarComparativoCompleto==='function'){
+      renderComparativo15DU(_gerarComparativoCompleto());
+    }
+  });
+  fbListeners.du_corte_fixo = true;
 
   // ── Acordos por operador (op_acordos) ──
   if(!fbListeners.op_acordos){
