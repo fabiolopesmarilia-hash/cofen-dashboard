@@ -10490,6 +10490,139 @@ const _rdSetSaved_orig = rdSetSaved;
 // MODO TV — Geral + por Equipe
 // ══════════════════════════════════════════
 let tvIdx=0, tvTimer=null, tvPaused=false, tvList=[], tvMode='geral';
+let tvCustomEquipes = []; // equipes selecionadas no modo "combinar equipes"
+
+// ── Equipes reais disponíveis pra combinar/ocultar no Modo TV ──
+const TV_EQUIPES_REAIS = {
+  'COFEN BIRIGUI BRUNA'     : '💙 Bruna',
+  'COFEN MARILIA BRENDA'    : '🏙️ Stephanie',
+  'COFEN STEPHANIE 2° TURNO': '⭐ Katia 2°T',
+  'COFEN KATIA'             : '💜 Equipe Stephanie',
+  'COFEN LETICIA'           : '🌿 Equipe Letícia',
+};
+
+// ── Botões ocultos do seletor do Modo TV (reversível) ──
+function tvBotoesOcultosGetAll(){
+  try { return JSON.parse(localStorage.getItem('cofen_tv_botoes_ocultos') || '[]'); }
+  catch(e){ return []; }
+}
+function tvBotoesOcultosSet(lista){
+  localStorage.setItem('cofen_tv_botoes_ocultos', JSON.stringify(lista));
+  if(typeof fbPush === 'function') fbPush('tv_botoes_ocultos', lista);
+}
+function tvBotaoOcultar(modeId, labelExib){
+  if(!confirm('Remover "'+labelExib+'" do seletor do Modo TV?\n\nSó esconde o botão — não apaga operadores nem histórico. Dá pra restaurar depois.')) return;
+  const lista = tvBotoesOcultosGetAll();
+  if(!lista.includes(modeId)) lista.push(modeId);
+  tvBotoesOcultosSet(lista);
+  tvRenderSeletor();
+}
+function tvBotaoRestaurar(modeId){
+  const lista = tvBotoesOcultosGetAll().filter(m=>m!==modeId);
+  tvBotoesOcultosSet(lista);
+  tvRenderSeletor();
+}
+
+// ── Combinar equipes (checkbox livre) ──
+function tvCustomGetAll(){
+  try { return JSON.parse(localStorage.getItem('cofen_tv_equipes_custom') || '[]'); }
+  catch(e){ return []; }
+}
+function tvCustomSalvar(lista){
+  localStorage.setItem('cofen_tv_equipes_custom', JSON.stringify(lista));
+  if(typeof fbPush === 'function') fbPush('tv_equipes_custom', lista);
+}
+function tvCustomToggle(eqName, checked){
+  let lista = tvCustomGetAll();
+  if(checked){ if(!lista.includes(eqName)) lista.push(eqName); }
+  else { lista = lista.filter(n=>n!==eqName); }
+  tvCustomSalvar(lista);
+  tvCustomEquipes = lista;
+}
+function tvCustomAbrirPainel(){
+  const atual = tvCustomGetAll();
+  const opcoes = Object.keys(TV_EQUIPES_REAIS).map(eqName=>{
+    const marcado = atual.includes(eqName) ? 'checked' : '';
+    return `<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;border-radius:8px" onmouseover="this.style.background='rgba(0,168,107,.08)'" onmouseout="this.style.background='transparent'">
+      <input type="checkbox" ${marcado} onchange="tvCustomToggle('${eqName}', this.checked)" style="width:16px;height:16px;cursor:pointer">
+      <span style="font-family:Nunito,sans-serif;font-weight:700;font-size:13px;color:#1A2E22">${TV_EQUIPES_REAIS[eqName]}</span>
+    </label>`;
+  }).join('');
+  const overlay = document.createElement('div');
+  overlay.id = 'tv-custom-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99999;display:flex;align-items:center;justify-content:center';
+  overlay.innerHTML = `
+    <div style="background:#FFFFFF;border-radius:16px;padding:20px;max-width:320px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.3)">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#1A2E22;letter-spacing:.5px;margin-bottom:4px">🧩 Combinar equipes</div>
+      <div style="font-size:11px;color:rgba(26,46,34,.55);margin-bottom:12px">Marque as equipes que quer juntar no ranking do Modo TV</div>
+      ${opcoes}
+      <button onclick="tvCustomAplicar()" style="width:100%;margin-top:14px;padding:10px;border:none;border-radius:10px;
+        background:#00A86B;color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;cursor:pointer">Aplicar</button>
+      <button onclick="document.getElementById('tv-custom-overlay').remove()" style="width:100%;margin-top:6px;padding:8px;border:none;border-radius:10px;
+        background:transparent;color:rgba(26,46,34,.5);font-family:Nunito,sans-serif;font-weight:700;font-size:12px;cursor:pointer">Cancelar</button>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+function tvCustomAplicar(){
+  tvCustomEquipes = tvCustomGetAll();
+  document.getElementById('tv-custom-overlay')?.remove();
+  if(tvCustomEquipes.length === 0){ toast('⚠️ Marque ao menos uma equipe'); return; }
+  tvSetMode('custom', null);
+  const lbl = document.getElementById('tv-mode-label');
+  if(lbl) lbl.textContent = tvCustomEquipes.map(n=>TV_EQUIPES_REAIS[n]||n).join(' + ').toUpperCase();
+}
+
+// ── Monta o seletor de equipes do Modo TV dinamicamente ──
+// Cada botão padrão (bs/bsk/individual) tem um X pra ocultar (reversível).
+// Botões ocultos ganham uma linha "restaurar" no fim. Tem também o botão
+// "🧩 Combinar" pra fazer qualquer junção de equipes na hora.
+function tvRenderSeletor(){
+  const cont = document.getElementById('tv-seletor-container');
+  if(!cont) return;
+  const ocultos = tvBotoesOcultosGetAll();
+  const BOTOES = [
+    {id:'bs',                        label:'🏙️⭐ Stephanie + Katia'},
+    {id:'bsk',                       label:'🏙️⭐💜 Stephanie + Katia + Equipe Stephanie'},
+    {id:'COFEN BIRIGUI BRUNA',       label:'💙 Bruna + Digital + Elite'},
+    {id:'COFEN KATIA',               label:'💜 Equipe Stephanie'},
+    {id:'COFEN LETICIA',             label:'🌿 Equipe Letícia'},
+    {id:'COFEN PAGUEPLAY',           label:'🩷 Pagueplay'},
+  ];
+  let html = '';
+  BOTOES.forEach(b=>{
+    if(ocultos.includes(b.id)) return;
+    const domId = 'tv-btn-' + b.id.replace(/[^a-zA-Z0-9]/g,'_');
+    const bg = (tvMode===b.id) ? 'rgba(0,168,107,.22)' : 'transparent';
+    html += `<span style="position:relative;display:inline-flex">
+      <button id="${domId}" onclick="tvSetMode('${b.id.replace(/'/g,"\\'")}',this)"
+        style="padding:6px 22px 6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
+        font-weight:800;font-size:11px;background:${bg};color:#000;letter-spacing:.5px;transition:all .2s">
+        ${b.label}
+      </button>
+      <button onclick="event.stopPropagation();tvBotaoOcultar('${b.id.replace(/'/g,"\\'")}','${b.label.replace(/'/g,"\\'")}')"
+        title="Ocultar este botão" style="position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;
+        border:none;background:rgba(0,0,0,.12);color:rgba(0,0,0,.5);font-size:8px;cursor:pointer;display:flex;
+        align-items:center;justify-content:center;padding:0">✕</button>
+    </span>`;
+  });
+  html += `<button onclick="tvCustomAbrirPainel()" style="padding:6px 14px;border-radius:9px;border:1px dashed rgba(0,168,107,.4);
+    cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:${tvMode==='custom'?'rgba(0,168,107,.22)':'transparent'};
+    color:#000;letter-spacing:.5px">🧩 Combinar</button>`;
+  cont.innerHTML = html;
+
+  if(ocultos.length > 0){
+    const restaurar = document.createElement('div');
+    restaurar.style.cssText = 'width:100%;display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:4px';
+    restaurar.innerHTML = ocultos.map(id=>{
+      const b = BOTOES.find(x=>x.id===id);
+      const label = b ? b.label.replace(/^[^\s]+\s/,'') : id;
+      return `<span style="font-size:9px;color:rgba(0,0,0,.4);background:rgba(0,0,0,.05);border-radius:6px;padding:2px 6px">
+        ${label} <button onclick="tvBotaoRestaurar('${id.replace(/'/g,"\\'")}')" style="border:none;background:none;color:#00A86B;font-weight:800;cursor:pointer;font-size:9px">↩</button>
+      </span>`;
+    }).join('');
+    cont.appendChild(restaurar);
+  }
+}
 const TV_INTERVAL = 9000;
 
 // Normaliza nome de equipe para id de botão
@@ -10515,6 +10648,7 @@ function tvSetMode(mode, btnEl){
   tvIdx=0;
   tvBuildDots();
   tvShowCurrent();
+  tvRenderSeletor();
 }
 
 // Retorna recebimento total do operador (base + lançamento manual do dia)
@@ -10549,6 +10683,8 @@ function tvBuildList(){
     ops = base.filter(o=>['COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO'].includes(o.eq)).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
   } else if(tvMode==='bsk'){
     ops = base.filter(o=>['COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO','COFEN KATIA'].includes(o.eq)).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
+  } else if(tvMode==='custom'){
+    ops = base.filter(o=>tvCustomEquipes.includes(o.eq)).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
   } else {
     ops = base.filter(o=>o.eq===tvMode).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
   }
@@ -10644,19 +10780,15 @@ function tvRefresh(){
 
 function tvStart(){
   tvMode = 'bs';
+  tvCustomEquipes = tvCustomGetAll();
   tvBuildList();
   if(tvList.length===0){ toast('⚠️ Nenhum operador para exibir!'); return; }
   tvIdx=0; tvPaused=false;
   document.getElementById('tv-overlay').classList.add('on');
   document.getElementById('tv-pause-btn').textContent='⏸ Pausar';
-  // Marca botão bs como ativo
-  const bsBtn = document.getElementById('tv-btn-bs');
-  document.querySelectorAll('[id^="tv-btn-"]').forEach(b=>{
-    b.style.background='transparent'; b.style.color='#000';
-  });
-  if(bsBtn){ bsBtn.style.background='rgba(0,168,107,.22)'; bsBtn.style.color='#000'; }
   const lbl=document.getElementById('tv-mode-label');
   if(lbl) lbl.textContent='STEPHANIE + KATIA';
+  tvRenderSeletor();
   tvBuildDots();
   tvShowCurrent();
 }
@@ -11210,7 +11342,17 @@ function tvShow(idx){
                   text-shadow:0 0 24px ${pCor}66">${proj.pct.toFixed(0)}%</div>`;
               })()}
               ${(()=>{
-                const mesPassadoNome = 'Julho';
+                // Mês anterior REAL, não mais travado em "Julho" — pega o mês
+                // civil anterior a hoje; se não houver dados salvos pra ele
+                // ainda (PROJ_ANO_OPS_DADOS), cai pro mês salvo mais recente.
+                const _mesesPtOp = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                const _hojeOp = new Date();
+                const _mesAnteriorReal = _mesesPtOp[(_hojeOp.getMonth()+11)%12];
+                let mesPassadoNome = _mesAnteriorReal;
+                if(!PROJ_ANO_OPS_DADOS[mesPassadoNome]){
+                  const _disponiveis = _mesesPtOp.filter(m=>PROJ_ANO_OPS_DADOS[m]);
+                  mesPassadoNome = _disponiveis[_disponiveis.length-1] || 'Julho';
+                }
                 const mesPassadoRec = (PROJ_ANO_OPS_DADOS[mesPassadoNome]||[]).find(o=>o.nome===op.name)?.rec || 0;
                 if(mesPassadoRec<=0) return '';
                 const atual = tvGetRec(op);
@@ -11858,6 +12000,25 @@ function fbStartListening(){
     pulseSyncDot();
   });
   fbListeners.equipes_ocultas_ho = true;
+
+  // ── Botões ocultos e combinação de equipes do Modo TV ──
+  if(fbListeners.tv_botoes_ocultos) { fbDb?.ref(fbRoom+'/tv_botoes_ocultos').off(); }
+  fbDb.ref(fbRoom+'/tv_botoes_ocultos').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    localStorage.setItem('cofen_tv_botoes_ocultos', JSON.stringify(remote));
+    if(typeof tvRenderSeletor === 'function') tvRenderSeletor();
+  });
+  fbListeners.tv_botoes_ocultos = true;
+
+  if(fbListeners.tv_equipes_custom) { fbDb?.ref(fbRoom+'/tv_equipes_custom').off(); }
+  fbDb.ref(fbRoom+'/tv_equipes_custom').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    localStorage.setItem('cofen_tv_equipes_custom', JSON.stringify(remote));
+    if(typeof tvCustomEquipes !== 'undefined') tvCustomEquipes = remote;
+  });
+  fbListeners.tv_equipes_custom = true;
 
   // ── Acordos por operador (op_acordos) ──
   if(!fbListeners.op_acordos){
@@ -15132,40 +15293,10 @@ setInterval(()=>{
   </div>
   <button class="tv-close" onclick="tvStop()">✕</button>
 
-  <!-- Seletor de equipe/ranking — no topo, abaixo do header -->
-  <div style="position:absolute;top:64px;left:50%;transform:translateX(-50%);z-index:5;
+  <!-- Seletor de equipe/ranking — no topo, abaixo do header. Preenchido por tvRenderSeletor() -->
+  <div id="tv-seletor-container" style="position:absolute;top:64px;left:50%;transform:translateX(-50%);z-index:5;
       display:flex;gap:4px;background:#FFFFFF;border-radius:var(--rm);padding:3px;
       flex-wrap:wrap;justify-content:center;max-width:94vw;box-shadow:0 2px 10px rgba(0,0,0,.12)">
-    <button id="tv-btn-bs" onclick="tvSetMode('bs',this)"
-      style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-      font-weight:800;font-size:11px;background:rgba(0,168,107,.22);color:#000;letter-spacing:.5px;transition:all .2s">
-      🏙️⭐ Stephanie + Katia
-    </button>
-    <button id="tv-btn-bsk" onclick="tvSetMode('bsk',this)"
-      style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-      font-weight:800;font-size:11px;background:transparent;color:#000;letter-spacing:.5px;transition:all .2s">
-      🏙️⭐💜 Stephanie + Katia + Equipe Stephanie
-    </button>
-    <button id="tv-btn-COFEN_BIRIGUI_BRUNA" onclick="tvSetMode('COFEN BIRIGUI BRUNA',this)"
-      style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-      font-weight:800;font-size:11px;background:transparent;color:#000;letter-spacing:.5px;transition:all .2s">
-      💙 Bruna + Digital + Elite
-    </button>
-    <button id="tv-btn-COFEN_KATIA" onclick="tvSetMode('COFEN KATIA',this)"
-      style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-      font-weight:800;font-size:11px;background:transparent;color:#000;letter-spacing:.5px;transition:all .2s">
-      💜 Equipe Stephanie
-    </button>
-    <button id="tv-btn-COFEN_LETICIA" onclick="tvSetMode('COFEN LETICIA',this)"
-      style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-      font-weight:800;font-size:11px;background:transparent;color:#000;letter-spacing:.5px;transition:all .2s">
-      🌿 Equipe Letícia
-    </button>
-    <button id="tv-btn-COFEN_PAGUEPLAY" onclick="tvSetMode('COFEN PAGUEPLAY',this)"
-      style="padding:6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-      font-weight:800;font-size:11px;background:transparent;color:#000;letter-spacing:.5px;transition:all .2s">
-      🩷 Pagueplay
-    </button>
   </div>
 
   <!-- Área de conteúdo — preenchida pelo JS -->
