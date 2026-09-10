@@ -4777,10 +4777,22 @@ function _duHojeNoMes(feriados){
     }
   }catch(e){}
 
+  // O relatório é sempre importado de manhã com o fechamento do DIA ANTERIOR
+  // (ex.: hoje é 10/09, mas o valor batido é de 09/09) — então o corte deve
+  // contar dias úteis até ONTEM, não até hoje. Se ontem caiu num fim de
+  // semana/feriado, a contagem naturalmente já reflete o último dia útil
+  // antes disso (o loop abaixo só soma em dias úteis de verdade).
   const hoje = new Date();
-  const ano = hoje.getFullYear(), mes = hoje.getMonth()+1, diaHoje = hoje.getDate();
+  const ontem = new Date(hoje);
+  ontem.setDate(hoje.getDate() - 1);
+  // Se ontem já foi mês passado (hoje é dia 1º), ainda não fechou nenhum dia
+  // útil do mês novo — evita contar dias úteis do mês anterior por engano.
+  if(ontem.getMonth() !== hoje.getMonth() || ontem.getFullYear() !== hoje.getFullYear()){
+    return 0;
+  }
+  const ano = ontem.getFullYear(), mes = ontem.getMonth()+1, diaRef = ontem.getDate();
   let du = 0;
-  for(let d=1; d<=diaHoje; d++){
+  for(let d=1; d<=diaRef; d++){
     const dt = new Date(ano, mes-1, d);
     const dow = dt.getDay();
     const iso = ano+'-'+String(mes).padStart(2,'0')+'-'+String(d).padStart(2,'0');
@@ -4969,12 +4981,10 @@ function renderComparativo15DU(dados, duAlvo){
   tbody.innerHTML = dados.map((r,i)=>{
     const isLast = i===dados.length-1;
     const parcial = r.mesKey===mesAtualKey; // mês corrente = total ainda incompleto (mas a soma até o dia útil já é real e comparável)
-    // "(hoje)" só deve aparecer quando a DATA do corte for realmente hoje —
-    // com o dia útil de corte fixado (ex.: sempre no 5° D.U.), a data do mês
-    // corrente pode cair num dia passado (ex.: corte é dia 8, hoje já é dia 9),
-    // e antes o rótulo "(hoje)" aparecia errado mesmo assim.
-    const hojeDDMM = String(hoje.getDate()).padStart(2,'0')+'/'+String(hoje.getMonth()+1).padStart(2,'0');
-    const ehDataDeHoje = parcial && r.d15Label === hojeDDMM;
+    // O corte automático agora é sempre de ONTEM (o relatório importado de
+    // manhã reflete o fechamento do dia anterior) — o rótulo acompanha isso.
+    const ontemDDMM = (()=>{ const o=new Date(hoje); o.setDate(hoje.getDate()-1); return String(o.getDate()).padStart(2,'0')+'/'+String(o.getMonth()+1).padStart(2,'0'); })();
+    const ehDataDeOntem = parcial && r.d15Label === ontemDDMM;
     let varHtml = '<span style="color:rgba(255,255,255,.35);font-weight:800;font-size:11px">—</span>';
     if(r.varPct!==null){
       const up = r.varPct>=0;
@@ -4982,7 +4992,7 @@ function renderComparativo15DU(dados, duAlvo){
     }
     return `<tr style="${isLast?'':'border-bottom:1px solid rgba(255,255,255,.06)'}">
       <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">${r.mesLabel}${parcial?' ⚠️':''}</td>
-      <td style="padding:8px 14px;text-align:center;font-size:11px;color:${parcial?'#67E8F9':'rgba(255,255,255,.6)'};font-weight:700">${r.d15Label}${ehDataDeHoje?' (hoje)':''}</td>
+      <td style="padding:8px 14px;text-align:center;font-size:11px;color:${parcial?'#67E8F9':'rgba(255,255,255,.6)'};font-weight:700">${r.d15Label}${ehDataDeOntem?' (dado de ontem)':''}</td>
       <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">${fMoney(r.soma15)}</td>
       <td style="padding:8px 14px;text-align:center">${varHtml}</td>
       <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">${fMoney(r.totalMes)}${parcial?'*':''}</td>
@@ -4999,7 +5009,7 @@ function renderComparativo15DU(dados, duAlvo){
   if(thSoma) thSoma.textContent = `SOMA ATÉ ${n}º D.U.`;
 
   if(badge) badge.innerHTML = '✅ atualizado automaticamente';
-  if(nota)  nota.innerHTML = `*Mês corrente ainda incompleto (dados até ${hoje.toLocaleDateString('pt-BR')}). O corte é sempre o dia útil de HOJE (hoje = ${n}º D.U.) — avança um dia útil por vez, todo dia, aplicado igual em todos os meses, com dado real da conciliação. Pra adicionar um mês novo ou atualizar dias mais recentes, me manda o relatório de conciliação daquele mês.`;
+  if(nota)  nota.innerHTML = `*Mês corrente ainda incompleto. O corte reflete o fechamento de ONTEM (${n}º dia útil) — o relatório importado de manhã é sempre do dia anterior, então o corte avança um dia útil por vez, sempre um dia atrás de hoje, aplicado igual em todos os meses, com dado real da conciliação. Pra adicionar um mês novo ou atualizar dias mais recentes, me manda o relatório de conciliação daquele mês.`;
 }
 
 // Carrega o histórico salvo (localStorage) ou, na primeira vez, a base fixa Jan-Ago.
