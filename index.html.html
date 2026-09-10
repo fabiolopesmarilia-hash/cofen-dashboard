@@ -4960,6 +4960,12 @@ function renderComparativo15DU(dados, duAlvo){
   tbody.innerHTML = dados.map((r,i)=>{
     const isLast = i===dados.length-1;
     const parcial = r.mesKey===mesAtualKey; // mês corrente = total ainda incompleto (mas a soma até o dia útil já é real e comparável)
+    // "(hoje)" só deve aparecer quando a DATA do corte for realmente hoje —
+    // com o dia útil de corte fixado (ex.: sempre no 5° D.U.), a data do mês
+    // corrente pode cair num dia passado (ex.: corte é dia 8, hoje já é dia 9),
+    // e antes o rótulo "(hoje)" aparecia errado mesmo assim.
+    const hojeDDMM = String(hoje.getDate()).padStart(2,'0')+'/'+String(hoje.getMonth()+1).padStart(2,'0');
+    const ehDataDeHoje = parcial && r.d15Label === hojeDDMM;
     let varHtml = '<span style="color:rgba(255,255,255,.35);font-weight:800;font-size:11px">—</span>';
     if(r.varPct!==null){
       const up = r.varPct>=0;
@@ -4967,7 +4973,7 @@ function renderComparativo15DU(dados, duAlvo){
     }
     return `<tr style="${isLast?'':'border-bottom:1px solid rgba(255,255,255,.06)'}">
       <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">${r.mesLabel}${parcial?' ⚠️':''}</td>
-      <td style="padding:8px 14px;text-align:center;font-size:11px;color:${parcial?'#67E8F9':'rgba(255,255,255,.6)'};font-weight:700">${r.d15Label}${parcial?' (hoje)':''}</td>
+      <td style="padding:8px 14px;text-align:center;font-size:11px;color:${parcial?'#67E8F9':'rgba(255,255,255,.6)'};font-weight:700">${r.d15Label}${ehDataDeHoje?' (hoje)':''}</td>
       <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">${fMoney(r.soma15)}</td>
       <td style="padding:8px 14px;text-align:center">${varHtml}</td>
       <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">${fMoney(r.totalMes)}${parcial?'*':''}</td>
