@@ -4818,9 +4818,18 @@ function duCorteFixar(n){
     renderComparativo15DU(_gerarComparativoCompleto());
   }
 }
-(function _duCorteFixoInicial(){
-  // Fixado em 5° D.U. a pedido — pra voltar ao automático, chame duCorteFixar(null) no console.
-  if(localStorage.getItem('cofen_du_corte_fixo')===null) localStorage.setItem('cofen_du_corte_fixo','5');
+let _duCorteResetPendente = false;
+(function _duCorteVoltarAutomatico(){
+  // O corte fixo em 5° D.U. era temporário — o pedido agora é o oposto:
+  // as datas devem avançar sozinhas todo dia (comportamento automático).
+  // Remove o valor fixo salvo (inclusive o '5' que ficou gravado no
+  // navegador de quem já tinha aberto a versão anterior). Marca a flag pra
+  // também limpar no Firebase assim que a conexão estiver pronta (aqui no
+  // boot o fbDb ainda não existe, então um fbPush direto não funcionaria).
+  if(localStorage.getItem('cofen_du_corte_fixo') !== null){
+    localStorage.removeItem('cofen_du_corte_fixo');
+    _duCorteResetPendente = true;
+  }
 })();
 // Mantido por compatibilidade (usado em outros pontos do dashboard) — 15º dia útil fixo.
 function _du15DoMes(ano, mes, feriados){
@@ -12078,6 +12087,13 @@ function fbStartListening(){
   if(fbListeners.du_corte_fixo) { fbDb?.ref(fbRoom+'/du_corte_fixo').off(); }
   fbDb.ref(fbRoom+'/du_corte_fixo').on('value', snap=>{
     const remote = snap.val();
+    // Reset pendente do corte fixo (ver _duCorteVoltarAutomatico no boot) —
+    // limpa o Firebase em vez de aceitar o valor antigo ('5') de volta.
+    if(_duCorteResetPendente){
+      _duCorteResetPendente = false;
+      if(remote) fbPush('du_corte_fixo', null);
+      return;
+    }
     if(remote === null || remote === undefined) return;
     localStorage.setItem('cofen_du_corte_fixo', remote ? String(remote) : '');
     if(!remote) localStorage.removeItem('cofen_du_corte_fixo');
