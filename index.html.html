@@ -12610,7 +12610,24 @@ function fbStartListening(){
 // ── PUSH TO FIREBASE ──
 function fbPush(path, data){
   if(!fbDb||!fbRoom) return;
-  fbDb.ref(fbRoom+'/'+path).set(data).catch(e=>console.warn('FB push err:',e));
+  fbDb.ref(fbRoom+'/'+path).set(data).catch(e=>{
+    console.warn('FB push err:',e);
+    toast('⚠️ Falha ao sincronizar (' + path + '). Veja o console (F12).');
+  });
+}
+// ── fbUpdatePhoto: .update() direto no nó 'photos', só a foto que mudou ──
+// Evita o bug clássico de sobrescrever fotos que outro computador acabou de
+// salvar: antes, cada foto nova mandava um fbPush('photos', <snapshot local
+// inteiro>), que fazia .set() e apagava do Firebase qualquer foto que outro
+// computador tivesse salvo e que este ainda não tivesse recebido de volta.
+// .update() faz merge no nó — não apaga as fotos dos outros operadores.
+function fbUpdatePhoto(opName, url){
+  if(!fbDb||!fbRoom) return;
+  fbDb.ref(fbRoom+'/photos').update({[opName]: (url===undefined ? null : url)})
+    .catch(e=>{
+      console.warn('FB update(photos) err:',e);
+      toast('⚠️ Foto salva neste computador, mas falhou ao sincronizar. Veja o console (F12).');
+    });
 }
 // ── fbUpdateRD: .update() direto — garante tempo real entre usuários ──
 function fbUpdateRD(map){
@@ -12745,7 +12762,7 @@ function photoSet(opName, url){
       }
     }
     syncBroadcast('photo_update', JSON.stringify(photoGetAll()));
-    fbPush('photos', photoGetAll());
+    fbUpdatePhoto(opName, finalUrl || null);
   }
   
   if(url){
@@ -13272,8 +13289,7 @@ function removerOpApply(){
   fbPush('overrides', {...ov, _ts: Date.now()});
   {if(typeof fbUpdateRD==='function') fbUpdateRD(rdGetSaved());}
   if(fbDb && fbRoom){
-    const allPhotos = JSON.parse(localStorage.getItem('cofen_photos')||'{}');
-    fbPush('photos', allPhotos);
+    fbUpdatePhoto(opName, null); // remove só a foto deste operador, sem sobrescrever as dos outros
     fbPush('metas_op', metasOp);
   }
 
@@ -19221,7 +19237,8 @@ function migrarFotoLiderKatiaLaysa(){
     if(all[kLaysa]) all[kKatia] = all[kLaysa]; else delete all[kKatia];
     if(tmp) all[kLaysa] = tmp; else delete all[kLaysa];
     localStorage.setItem('cofen_photos', JSON.stringify(all));
-    fbPush('photos', all);
+    fbUpdatePhoto(kKatia, all[kKatia]||null);
+    fbUpdatePhoto(kLaysa, all[kLaysa]||null);
   }
   localStorage.setItem('cofen_lider_foto_swap_katia_laysa_v2','1');
   if(typeof renderEqMetasTable==='function') renderEqMetasTable();
@@ -19237,7 +19254,8 @@ function trocarFotoLiderKatiaLaysaManual(){
   if(all[kLaysa]) all[kKatia] = all[kLaysa]; else delete all[kKatia];
   if(tmp) all[kLaysa] = tmp; else delete all[kLaysa];
   localStorage.setItem('cofen_photos', JSON.stringify(all));
-  fbPush('photos', all);
+  fbUpdatePhoto(kKatia, all[kKatia]||null);
+  fbUpdatePhoto(kLaysa, all[kLaysa]||null);
   if(typeof renderEqMetasTable==='function') renderEqMetasTable();
   if(typeof toast==='function') toast('🔄 Fotos trocadas!');
 }
