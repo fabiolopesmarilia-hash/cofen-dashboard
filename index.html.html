@@ -302,42 +302,42 @@ select.ev-inp{cursor:pointer}
 .photo-upload-btn:hover{border-color:var(--pp);color:var(--pp);background:var(--ppl)}
 
 /* ─ TV MODE ─ */
-#tv-overlay{position:fixed;inset:0;z-index:9000;background:#D3EDE0;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif;overflow:hidden}
+#tv-overlay{position:fixed;inset:0;z-index:9000;background:#DCEEF3;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif;overflow:hidden}
 #tv-overlay::before{content:"";position:absolute;inset:0;background:
-  radial-gradient(ellipse 75% 65% at 15% 50%,rgba(0,156,59,.12) 0%,transparent 100%),
-  radial-gradient(ellipse 65% 70% at 85% 50%,rgba(0,39,118,.09) 0%,transparent 100%),
-  radial-gradient(ellipse 50% 35% at 50% 5%,rgba(0,168,107,.10) 0%,transparent 100%),
-  radial-gradient(ellipse 85% 45% at 50% 100%,rgba(0,100,30,.12) 0%,transparent 100%);
+  radial-gradient(ellipse 75% 65% at 15% 50%,rgba(20,120,180,.14) 0%,transparent 100%),
+  radial-gradient(ellipse 65% 70% at 85% 50%,rgba(13,74,133,.10) 0%,transparent 100%),
+  radial-gradient(ellipse 50% 35% at 50% 5%,rgba(20,184,166,.12) 0%,transparent 100%),
+  radial-gradient(ellipse 85% 45% at 50% 100%,rgba(11,94,140,.12) 0%,transparent 100%);
   pointer-events:none;z-index:0}
-#tv-overlay::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(0,168,107,.18) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;opacity:.3}
+#tv-overlay::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(20,150,180,.18) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;opacity:.3}
 #tv-card,#tv-overlay .tv-header,#tv-overlay .tv-progress,#tv-overlay .tv-nav,#tv-overlay>div:last-of-type{position:relative;z-index:2}
 #tv-overlay.on{display:flex}
 /* ─ TV PAGE (iframe container) ─ */
 #pg-tv{display:none}
 #pg-tv.on{display:flex;flex-direction:column}
 #tv-iframe{width:100%;border:none;display:block;height:calc(100vh - 58px)}
-.tv-header{position:absolute;top:0;left:0;right:0;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(241,248,244,.94),transparent)}
-.tv-brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:rgba(26,46,34,0.62)}
-.tv-clock{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:#00875A;text-shadow:0 0 24px rgba(0,168,107,.35)}
-.tv-close{position:absolute;top:12px;right:18px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(0,168,107,.3);background:#FFFFFF;color:#1A2E22;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:11;box-shadow:0 2px 8px rgba(0,168,107,.15)}
+.tv-header{position:absolute;top:0;left:0;right:0;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(230,245,248,.94),transparent)}
+.tv-brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:rgba(13,50,74,0.68)}
+.tv-clock{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:#0B6FA8;text-shadow:0 0 24px rgba(20,150,180,.35)}
+.tv-close{position:absolute;top:12px;right:18px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(20,150,180,.3);background:#FFFFFF;color:#0D324A;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:11;box-shadow:0 2px 8px rgba(20,150,180,.15)}
 .tv-close:hover{background:rgba(200,30,30,.5);color:#1A2E22;border-color:rgba(255,60,60,.5);transform:scale(1.08)}
 .tv-card{width:100%;flex:1;min-height:0;padding:0;animation:tvIn .5s cubic-bezier(.22,1,.36,1)}
 @keyframes tvIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
-.tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;border:4px solid rgba(0,168,107,.3);flex-shrink:0;box-shadow:0 8px 24px rgba(0,168,107,.18)}
-.tv-photo-placeholder{width:140px;height:140px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:50px;color:#1A2E22;flex-shrink:0;border:4px solid rgba(0,168,107,.3)}
-.tv-name{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:2px;color:#1A2E22;line-height:1}
-.tv-eq{font-size:14px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
-.tv-kpi{background:#FFFFFF;border:1px solid rgba(0,168,107,.18);border-radius:14px;padding:16px 20px;text-align:center}
-.tv-kpi-l{font-size:10px;font-weight:700;color:rgba(26,46,34,0.62);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;border:4px solid rgba(20,150,180,.3);flex-shrink:0;box-shadow:0 8px 24px rgba(20,150,180,.18)}
+.tv-photo-placeholder{width:140px;height:140px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:50px;color:#0D324A;flex-shrink:0;border:4px solid rgba(20,150,180,.3)}
+.tv-name{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:2px;color:#0D324A;line-height:1}
+.tv-eq{font-size:14px;font-weight:700;color:rgba(13,50,74,0.68);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+.tv-kpi{background:#FFFFFF;border:1px solid rgba(20,150,180,.18);border-radius:14px;padding:16px 20px;text-align:center}
+.tv-kpi-l{font-size:10px;font-weight:700;color:rgba(13,50,74,0.68);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
 .tv-kpi-v{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.5px;line-height:1}
 .tv-progress{position:absolute;bottom:46px;left:0;right:0;height:3px;background:#FFFFFF;z-index:10;overflow:hidden}
-.tv-progress-fill{height:100%;transition:width linear;background:linear-gradient(90deg,#00A86B,#00C97F 30%,#00B8A9 60%,#00C97F 80%,#00A86B)}
+.tv-progress-fill{height:100%;transition:width linear;background:linear-gradient(90deg,#0B6FA8,#14B8A6 30%,#0EA5A8 60%,#14B8A6 80%,#0B6FA8)}
 .tv-nav{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:5px;z-index:10}
-.tv-dot{width:6px;height:6px;border-radius:50%;background:rgba(26,46,34,0.62);transition:all .3s;cursor:pointer}
-.tv-dot.on{width:18px;border-radius:3px;background:#00A86B;box-shadow:0 0 10px rgba(0,168,107,.45)}
-.tv-ag-row{display:flex;justify-content:space-between;font-size:13px;font-weight:700;padding:4px 0;border-bottom:1px solid rgba(0,168,107,.18)}
+.tv-dot{width:6px;height:6px;border-radius:50%;background:rgba(13,50,74,0.68);transition:all .3s;cursor:pointer}
+.tv-dot.on{width:18px;border-radius:3px;background:#0B6FA8;box-shadow:0 0 10px rgba(20,150,180,.45)}
+.tv-ag-row{display:flex;justify-content:space-between;font-size:13px;font-weight:700;padding:4px 0;border-bottom:1px solid rgba(20,150,180,.18)}
 .tv-fb-badge{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
-.tv-fb-done{background:rgba(74,222,128,.15);border:1.5px solid rgba(74,222,128,.5);color:#059669}
+.tv-fb-done{background:rgba(20,184,166,.15);border:1.5px solid rgba(20,184,166,.5);color:#0F766E}
 .tv-fb-pending{background:rgba(252,211,77,.12);border:1.5px dashed rgba(252,211,77,.45);color:#B45309}
 /* ─ TV MODE: movimento ─ */
 #tv-overlay::before{background-size:140% 140%;animation:tvBgDrift 16s ease-in-out infinite alternate}
@@ -345,9 +345,9 @@ select.ev-inp{cursor:pointer}
 #tv-overlay::after{animation:tvDotsDrift 30s linear infinite}
 @keyframes tvDotsDrift{0%{background-position:0 0}100%{background-position:96px 96px}}
 .tv-clock{animation:tvPulseGlow 2.4s ease-in-out infinite}
-@keyframes tvPulseGlow{0%,100%{text-shadow:0 0 24px rgba(0,168,107,.35)}50%{text-shadow:0 0 40px rgba(0,168,107,.6)}}
+@keyframes tvPulseGlow{0%,100%{text-shadow:0 0 24px rgba(20,150,180,.35)}50%{text-shadow:0 0 40px rgba(20,150,180,.6)}}
 .tv-dot.on{animation:tvDotPulse 1.6s ease-in-out infinite}
-@keyframes tvDotPulse{0%,100%{box-shadow:0 0 10px rgba(0,168,107,.45)}50%{box-shadow:0 0 18px rgba(0,168,107,.75)}}
+@keyframes tvDotPulse{0%,100%{box-shadow:0 0 10px rgba(20,150,180,.45)}50%{box-shadow:0 0 18px rgba(20,150,180,.75)}}
 .tv-progress-fill{background-size:200% 100%;animation:tvBarFlow 3s linear infinite}
 @keyframes tvBarFlow{0%{background-position:0% 0}100%{background-position:200% 0}}
 .tv-photo,.tv-photo-placeholder{animation:tvPhotoFloat 4s ease-in-out infinite}
@@ -3054,12 +3054,46 @@ let D = JSON.parse(JSON.stringify(ORIG));
 // mesmo com 0 operadores — sem isso, a equipe some de tabelas (Metas HO,
 // Modo TV etc.) sempre que ficar temporariamente vazia.
 (function _garantirEquipesCanonicas(){
-  const _canonicas = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA','COFEN PAGUEPLAY'];
+  const _canonicas = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA'];
   _canonicas.forEach(nome=>{
     if(!D.equipes.find(e=>e.name===nome)){
       D.equipes.push({name:nome, rec:0, ho:0, n_op:0, acordos:0, ops:[], gerados:0, pagos:0, pendentes:0});
     }
   });
+})();
+
+// Remove operadores "fantasma" criados por engano em imports antigos, quando
+// uma linha de rodapé/resumo do relatório (ex.: "Pague Play", "Total") foi
+// interpretada como se fosse um operador novo — inflava a equipe
+// COFEN PAGUEPLAY com dezenas de entradas repetidas de nome "paguepay".
+(function _limparOperadoresFantasma(){
+  const _nomesLixo = ['PAGUEPLAY','PAGUEPAY','PAGUEPLA','TOTAL','SUBTOTAL','GERAL','SOMA','COFEN'];
+  let removeu = false;
+  D.equipes.forEach(eq=>{
+    const antes = eq.ops.length;
+    eq.ops = eq.ops.filter(op=>{
+      const norm = (op.name||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+      return !_nomesLixo.includes(norm);
+    });
+    if(eq.ops.length !== antes){
+      removeu = true;
+      eq.rec = eq.ops.reduce((s,o)=>s+(o.rec||0),0);
+      eq.ho  = eq.ops.reduce((s,o)=>s+(o.ho||0),0);
+      eq.n_op = eq.ops.length;
+      eq.acordos = eq.ops.reduce((s,o)=>s+(o.acordos||0),0);
+    }
+  });
+  if(removeu){
+    // Persiste a limpeza também no localStorage/gestão pra não reaparecer no próximo load
+    try{
+      const ov = JSON.parse(localStorage.getItem('cofen_gestao_overrides')||'{}');
+      if(ov.novos) ov.novos = ov.novos.filter(n=>{
+        const norm = (n.name||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+        return !_nomesLixo.includes(norm);
+      });
+      localStorage.setItem('cofen_gestao_overrides', JSON.stringify(ov));
+    }catch(e){}
+  }
 })();
 
 // Flag: fica true quando o reset automático de mês (abaixo) realmente zerou
@@ -4270,7 +4304,7 @@ function _buildMetasHtml(val, compact){
     </div>`;
 }
 function _buildTeamsHtml(compact){
-  const MAIN = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA','COFEN PAGUEPLAY'];
+  const MAIN = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA'];
   const rows = MAIN.map(name=>{
     const eq  = D.equipes.find(e=>e.name===name);
     const cfg = EQ[name]||{c:'#888',sh:name};
@@ -8682,7 +8716,7 @@ function mvApply(){
   // (ex.: "COFEN KATIA"/Equipe Stephanie ficando com 0 operadores não pode
   // sumir da tabela de metas e do resto do dashboard, que sempre espera essa
   // chave existir mesmo zerada).
-  const _EQUIPES_CANONICAS = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA','COFEN PAGUEPLAY'];
+  const _EQUIPES_CANONICAS = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA'];
   D.equipes = D.equipes.filter(e=>e.ops.length>0 || _EQUIPES_CANONICAS.includes(e.name));
 
   // Persist move
@@ -8951,7 +8985,7 @@ function loadGestaoOverrides(){
       });
     });
     // Mesma proteção: nunca remover as equipes canônicas, só times avulsos vazios
-    const _EQUIPES_CANONICAS2 = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA','COFEN PAGUEPLAY'];
+    const _EQUIPES_CANONICAS2 = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA'];
     D.equipes=D.equipes.filter(e=>e.ops.length>0 || _EQUIPES_CANONICAS2.includes(e.name));
     rebuildAll();
   }
@@ -9455,6 +9489,13 @@ function importApply(){
       const opName = m.rawName.trim().replace(/\s+/g,'_');
       const opNameNorm = opName.toUpperCase().replace(/[^A-Z0-9]/g,'');
       if(ALL.find(o=>o.name.toUpperCase().replace(/[^A-Z0-9]/g,'')===opNameNorm)) return; // já existe (evita duplicar por causa de maiúscula/minúscula)
+      // Nomes-lixo: linhas de rodapé/cabeçalho/subtotal do arquivo que acabam
+      // sendo interpretadas como se fossem um operador novo (ex.: uma linha
+      // "Pague Play" de resumo virava um "operador" chamado paguepay, criado
+      // de novo a cada import — poluindo a equipe COFEN PAGUEPLAY com dezenas
+      // de entradas fantasma).
+      const _nomesLixo = ['PAGUEPLAY','PAGUEPAY','PAGUE PLAY','TOTAL','SUBTOTAL','GERAL','SOMA','COFEN','PAGUEPLA'];
+      if(_nomesLixo.includes(opNameNorm)) return;
       const targetEq = m.eq || 'COFEN PAGUEPLAY';
       let eqObj = D.equipes.find(e=>e.name===targetEq);
       if(!eqObj){ eqObj = {name:targetEq, rec:0, ho:0, n_op:0, acordos:0, ops:[]}; D.equipes.push(eqObj); }
@@ -10616,7 +10657,7 @@ function tvCustomAbrirPainel(){
   const atual = tvCustomGetAll();
   const opcoes = Object.keys(TV_EQUIPES_REAIS).map(eqName=>{
     const marcado = atual.includes(eqName) ? 'checked' : '';
-    return `<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;border-radius:8px" onmouseover="this.style.background='rgba(0,168,107,.08)'" onmouseout="this.style.background='transparent'">
+    return `<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;border-radius:8px" onmouseover="this.style.background='rgba(20,150,180,.08)'" onmouseout="this.style.background='transparent'">
       <input type="checkbox" ${marcado} onchange="tvCustomToggle('${eqName}', this.checked)" style="width:16px;height:16px;cursor:pointer">
       <span style="font-family:Nunito,sans-serif;font-weight:700;font-size:13px;color:#1A2E22">${TV_EQUIPES_REAIS[eqName]}</span>
     </label>`;
@@ -10630,7 +10671,7 @@ function tvCustomAbrirPainel(){
       <div style="font-size:11px;color:rgba(26,46,34,.55);margin-bottom:12px">Marque as equipes que quer juntar no ranking do Modo TV</div>
       ${opcoes}
       <button onclick="tvCustomAplicar()" style="width:100%;margin-top:14px;padding:10px;border:none;border-radius:10px;
-        background:#00A86B;color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;cursor:pointer">Aplicar</button>
+        background:#0B6FA8;color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;cursor:pointer">Aplicar</button>
       <button onclick="document.getElementById('tv-custom-overlay').remove()" style="width:100%;margin-top:6px;padding:8px;border:none;border-radius:10px;
         background:transparent;color:rgba(26,46,34,.5);font-family:Nunito,sans-serif;font-weight:700;font-size:12px;cursor:pointer">Cancelar</button>
     </div>`;
@@ -10665,7 +10706,7 @@ function tvRenderSeletor(){
   BOTOES.forEach(b=>{
     if(ocultos.includes(b.id)) return;
     const domId = 'tv-btn-' + b.id.replace(/[^a-zA-Z0-9]/g,'_');
-    const bg = (tvMode===b.id) ? 'rgba(0,168,107,.22)' : 'transparent';
+    const bg = (tvMode===b.id) ? 'rgba(20,150,180,.22)' : 'transparent';
     html += `<span style="position:relative;display:inline-flex">
       <button id="${domId}" onclick="tvSetMode('${b.id.replace(/'/g,"\\'")}',this)"
         style="padding:6px 22px 6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
@@ -10678,8 +10719,8 @@ function tvRenderSeletor(){
         align-items:center;justify-content:center;padding:0">✕</button>
     </span>`;
   });
-  html += `<button onclick="tvCustomAbrirPainel()" style="padding:6px 14px;border-radius:9px;border:1px dashed rgba(0,168,107,.4);
-    cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:${tvMode==='custom'?'rgba(0,168,107,.22)':'transparent'};
+  html += `<button onclick="tvCustomAbrirPainel()" style="padding:6px 14px;border-radius:9px;border:1px dashed rgba(20,150,180,.4);
+    cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:${tvMode==='custom'?'rgba(20,150,180,.22)':'transparent'};
     color:#000;letter-spacing:.5px">🧩 Combinar</button>`;
   cont.innerHTML = html;
 
@@ -10690,7 +10731,7 @@ function tvRenderSeletor(){
       const b = BOTOES.find(x=>x.id===id);
       const label = b ? b.label.replace(/^[^\s]+\s/,'') : id;
       return `<span style="font-size:9px;color:rgba(0,0,0,.4);background:rgba(0,0,0,.05);border-radius:6px;padding:2px 6px">
-        ${label} <button onclick="tvBotaoRestaurar('${id.replace(/'/g,"\\'")}')" style="border:none;background:none;color:#00A86B;font-weight:800;cursor:pointer;font-size:9px">↩</button>
+        ${label} <button onclick="tvBotaoRestaurar('${id.replace(/'/g,"\\'")}')" style="border:none;background:none;color:#0B6FA8;font-weight:800;cursor:pointer;font-size:9px">↩</button>
       </span>`;
     }).join('');
     cont.appendChild(restaurar);
@@ -10711,7 +10752,7 @@ function tvSetMode(mode, btnEl){
     b.style.background='transparent';
     b.style.color='#000';
   });
-  if(btnEl){ btnEl.style.background='rgba(0,168,107,.22)'; btnEl.style.color='#000'; }
+  if(btnEl){ btnEl.style.background='rgba(20,150,180,.22)'; btnEl.style.color='#000'; }
   // Atualiza label
   const lbl = document.getElementById('tv-mode-label');
   if(lbl) lbl.textContent = mode==='geral' ? 'RANKING GERAL' : mode==='bb' ? 'BRUNA + STEPHANIE' : mode==='bs' ? 'STEPHANIE + KATIA' : mode==='bsk' ? 'STEPHANIE + KATIA + EQUIPE STEPHANIE' : mode==='COFEN BIRIGUI BRUNA' ? 'BRUNA + DIGITAL + ELITE' : mode==='COFEN KATIA' ? 'EQUIPE STEPHANIE' : (EQ[mode]?.sh||mode).toUpperCase();
@@ -10973,7 +11014,7 @@ function tvDailyBlock(op, melhorDia){
     var valLbl=v>0?(v/1000).toFixed(1)+'k':'';
     var emo=cEmoji(v);
     var numColor=v>=MT?'#22C55E':v>0?col:'rgba(255,255,255,.2)';
-    var numStyle='font-size:7px;font-weight:'+(v>0?'800':'400')+';color:'+numColor+';'+(isT?'text-decoration:underline;color:#00A86B;':'');
+    var numStyle='font-size:7px;font-weight:'+(v>0?'800':'400')+';color:'+numColor+';'+(isT?'text-decoration:underline;color:#0B6FA8;':'');
     bars+='<div style="display:flex;flex-direction:column;align-items:center;gap:1px;flex:1;min-width:0" title="Dia '+d+': '+fR(v)+(emo?' '+emo:'')+'">'
       +'<div style="font-size:9px;line-height:1;height:11px">'+emo+'</div>'
       +'<div style="font-size:6px;font-weight:700;white-space:nowrap;color:'+col+'">'+valLbl+'</div>'
@@ -11045,8 +11086,8 @@ function tvShowMetaSlide(slide){
 
   card.innerHTML=`
     <div style="width:100%;height:100vh;overflow:hidden;position:relative;background:${bgGrad};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:50px 60px 60px">
-      <div style="position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#00A86B,#00C97F 33%,#00B8A9 66%,#00C97F 80%,#00A86B)"></div>
-      <div class="tv-orb" style="width:220px;height:220px;top:-40px;left:-40px;background:radial-gradient(circle,rgba(0,168,107,.25),transparent 70%);animation:tvOrbFloat1 8s ease-in-out infinite"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#0B6FA8,#14B8A6 33%,#0EA5A8 66%,#14B8A6 80%,#0B6FA8)"></div>
+      <div class="tv-orb" style="width:220px;height:220px;top:-40px;left:-40px;background:radial-gradient(circle,rgba(20,150,180,.25),transparent 70%);animation:tvOrbFloat1 8s ease-in-out infinite"></div>
       <div class="tv-orb" style="width:180px;height:180px;bottom:-30px;right:-30px;background:radial-gradient(circle,rgba(0,184,169,.22),transparent 70%);animation:tvOrbFloat2 10s ease-in-out infinite"></div>
       <div style="position:absolute;top:18px;left:24px;font-size:22px;opacity:.18">⭐⭐⭐</div>
       <div style="position:absolute;top:18px;right:24px;font-size:22px;opacity:.18">⭐⭐⭐</div>
@@ -11057,7 +11098,7 @@ function tvShowMetaSlide(slide){
       <div style="display:flex;gap:24px;align-items:flex-end;width:100%;max-width:940px;justify-content:center;position:relative;z-index:2">
         ${podioCols}
       </div>
-      <div style="position:absolute;bottom:32px;left:0;right:0;height:4px;background:linear-gradient(90deg,#00A86B,#00C97F 33%,#00B8A9 66%,#00C97F 80%,#00A86B)"></div>
+      <div style="position:absolute;bottom:32px;left:0;right:0;height:4px;background:linear-gradient(90deg,#0B6FA8,#14B8A6 33%,#0EA5A8 66%,#14B8A6 80%,#0B6FA8)"></div>
       <div style="position:absolute;bottom:0;left:0;right:0;height:28px;display:flex;align-items:center;justify-content:center">
         <span style="font-size:10px;font-weight:800;color:rgba(26,46,34,0.62);letter-spacing:4px;display:inline-flex;align-items:center;gap:6px"><img src="https://pagueplay.com.br/build/images/logo-pagueplay.svg" style="height:14px" alt="PaguePlay">COB COFEN · AGOSTO 2026 · ${isBS?'STEPHANIE + KATIA':'BRUNA'} &nbsp;🩺💉·🎧📞</span>
       </div>
@@ -11068,7 +11109,7 @@ function tvShowMetaSlide(slide){
   const bar=document.getElementById('tv-bar');
   if(bar){
     bar.style.transition='none'; bar.style.width='0%';
-    bar.style.background='linear-gradient(90deg,#00A86B,#00C97F,#00B8A9,#00C97F,#00A86B)';
+    bar.style.background='linear-gradient(90deg,#0B6FA8,#14B8A6,#0EA5A8,#14B8A6,#0B6FA8)';
     setTimeout(()=>{ bar.style.transition=`width ${TV_INTERVAL}ms linear`; bar.style.width='100%'; },50);
   }
 }
@@ -11079,7 +11120,7 @@ function tvShowHighlightSlide(slide){
   const card = document.getElementById('tv-card');
   const op   = slide.op;
   const eq   = slide.eq;
-  const cfg  = EQ[eq] || {c:'#00A86B',ico:'🏆',sh:eq};
+  const cfg  = EQ[eq] || {c:'#0B6FA8',ico:'🏆',sh:eq};
   const labelEq = TV_HIGHLIGHT_TEAMS[eq] || cfg.sh || eq;
   const photo = photoGet(op.name);
   const now  = new Date();
@@ -11096,10 +11137,10 @@ function tvShowHighlightSlide(slide){
         background:linear-gradient(135deg,#0a1f14 0%,#0d2e1c 55%,#0a1f14 100%);
         display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;
         padding:22px 60px 76px;text-align:center">
-      <div style="position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#FFDF00,#00C97F 40%,#FFDF00 80%)"></div>
-      <div style="position:absolute;bottom:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#FFDF00,#00C97F 40%,#FFDF00 80%)"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#FFDF00,#14B8A6 40%,#FFDF00 80%)"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#FFDF00,#14B8A6 40%,#FFDF00 80%)"></div>
       <div class="tv-orb" style="width:260px;height:260px;top:6%;left:4%;background:radial-gradient(circle,rgba(255,223,0,.22),transparent 70%);animation:tvOrbFloat1 8s ease-in-out infinite"></div>
-      <div class="tv-orb" style="width:220px;height:220px;bottom:8%;right:6%;background:radial-gradient(circle,rgba(0,168,107,.28),transparent 70%);animation:tvOrbFloat2 10s ease-in-out infinite"></div>
+      <div class="tv-orb" style="width:220px;height:220px;bottom:8%;right:6%;background:radial-gradient(circle,rgba(20,150,180,.28),transparent 70%);animation:tvOrbFloat2 10s ease-in-out infinite"></div>
 
       <!-- PARABÉNS bem no topo, longe da barra de navegação -->
       <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:1px;color:#FFDF00;
@@ -11142,7 +11183,7 @@ function tvShowHighlightSlide(slide){
   const bar = document.getElementById('tv-bar');
   if(bar){
     bar.style.transition='none'; bar.style.width='0%';
-    bar.style.background='linear-gradient(90deg,#FFDF00,#00C97F,#FFDF00)';
+    bar.style.background='linear-gradient(90deg,#FFDF00,#14B8A6,#FFDF00)';
     setTimeout(()=>{ bar.style.transition=`width ${TV_INTERVAL}ms linear`; bar.style.width='100%'; },50);
   }
   tvHighlightFX();
@@ -11163,7 +11204,7 @@ function tvHighlightFX(){
   layer.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:6';
   host.appendChild(layer);
 
-  const cores = ['#00A86B','#00C97F','#00B8A9','#FFC700','#FF6B6B','#7C3AED','#0284C7','#FF1744','#FFEA00','#FF9E00'];
+  const cores = ['#0B6FA8','#14B8A6','#0EA5A8','#FFC700','#FF6B6B','#7C3AED','#0284C7','#FF1744','#FFEA00','#FF9E00'];
   const emojisChuva = ['🎉','🎊','🥳','🚀','🔥','👏','✨','🏆','😄','🤩','💥','🎆'];
 
   // ── Ondas de "bombas" explodindo em vários pontos da tela ──
@@ -15365,11 +15406,11 @@ setInterval(()=>{
 <!-- TV MODE OVERLAY -->
 <div id="tv-overlay">
   <!-- Orbes flutuantes (movimento de fundo) -->
-  <div class="tv-orb" style="width:260px;height:260px;top:8%;left:6%;background:radial-gradient(circle,rgba(0,168,107,.28),transparent 70%);animation:tvOrbFloat1 9s ease-in-out infinite"></div>
-  <div class="tv-orb" style="width:200px;height:200px;bottom:12%;right:8%;background:radial-gradient(circle,rgba(0,184,169,.26),transparent 70%);animation:tvOrbFloat2 11s ease-in-out infinite"></div>
-  <div class="tv-orb" style="width:150px;height:150px;top:45%;right:20%;background:radial-gradient(circle,rgba(0,201,127,.24),transparent 70%);animation:tvOrbFloat3 7s ease-in-out infinite"></div>
+  <div class="tv-orb" style="width:260px;height:260px;top:8%;left:6%;background:radial-gradient(circle,rgba(20,150,180,.28),transparent 70%);animation:tvOrbFloat1 9s ease-in-out infinite"></div>
+  <div class="tv-orb" style="width:200px;height:200px;bottom:12%;right:8%;background:radial-gradient(circle,rgba(20,184,166,.26),transparent 70%);animation:tvOrbFloat2 11s ease-in-out infinite"></div>
+  <div class="tv-orb" style="width:150px;height:150px;top:45%;right:20%;background:radial-gradient(circle,rgba(14,165,168,.24),transparent 70%);animation:tvOrbFloat3 7s ease-in-out infinite"></div>
   <!-- Faixa decorativa Brasil no topo -->
-  <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#00A86B 0%,#00C97F 30%,#00B8A9 55%,#00C97F 75%,#00A86B 100%);z-index:10"></div>
+  <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#0B6FA8 0%,#14B8A6 30%,#0EA5A8 55%,#14B8A6 75%,#0B6FA8 100%);z-index:10"></div>
   <div class="tv-header">
     <div class="tv-brand" style="display:flex;align-items:center;gap:10px">
       <img src="https://pagueplay.com.br/build/images/logo-pagueplay.svg" style="height:26px" alt="PaguePlay">
@@ -15377,9 +15418,9 @@ setInterval(()=>{
     </div>
     <div style="display:flex;align-items:center;gap:16px">
       <div id="tv-mode-label" style="font-family:'Bebas Neue',sans-serif;font-size:16px;
-        color:#00875A;letter-spacing:2px;text-transform:uppercase"></div>
+        color:#0B6FA8;letter-spacing:2px;text-transform:uppercase"></div>
       <div>
-        <div id="tv-clock-display" class="tv-clock" style="color:#00875A"></div>
+        <div id="tv-clock-display" class="tv-clock" style="color:#0B6FA8"></div>
         <div id="tv-date-display" style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:rgba(26,46,34,0.62);margin-top:-4px"></div>
       </div>
     </div>
@@ -15395,24 +15436,24 @@ setInterval(()=>{
   <!-- Área de conteúdo — preenchida pelo JS -->
   <div id="tv-card" class="tv-card"></div>
 
-  <div class="tv-progress" style="background:rgba(0,168,107,.14)"><div id="tv-bar" class="tv-progress-fill" style="background:linear-gradient(90deg,#00A86B,#00C97F,#00B8A9,#00C97F,#00A86B)"></div></div>
+  <div class="tv-progress" style="background:rgba(20,150,180,.14)"><div id="tv-bar" class="tv-progress-fill" style="background:linear-gradient(90deg,#0B6FA8,#14B8A6,#0EA5A8,#14B8A6,#0B6FA8)"></div></div>
   <div class="tv-nav" id="tv-dots"></div>
   <!-- Faixa decorativa Brasil na base -->
-  <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00A86B 0%,#00C97F 30%,#00B8A9 55%,#00C97F 75%,#00A86B 100%);z-index:10"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#0B6FA8 0%,#14B8A6 30%,#0EA5A8 55%,#14B8A6 75%,#0B6FA8 100%);z-index:10"></div>
 
   <!-- Controles -->
   <div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center">
     <!-- Nav -->
     <button onclick="tvPrev()"
-      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(0,168,107,.3);
+      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(20,150,180,.3);
       background:#FFFFFF;color:#1A2E22;font-family:Nunito,sans-serif;
       font-weight:700;font-size:12px;cursor:pointer">◀</button>
     <button id="tv-pause-btn" onclick="tvTogglePause()"
-      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(0,168,107,.3);
+      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(20,150,180,.3);
       background:#FFFFFF;color:#1A2E22;font-family:Nunito,sans-serif;
       font-weight:700;font-size:12px;cursor:pointer">⏸ Pausar</button>
     <button onclick="tvNext()"
-      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(0,168,107,.3);
+      style="padding:7px 16px;border-radius:var(--rm);border:1px solid rgba(20,150,180,.3);
       background:#FFFFFF;color:#1A2E22;font-family:Nunito,sans-serif;
       font-weight:700;font-size:12px;cursor:pointer">▶</button>
   </div>
