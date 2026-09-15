@@ -12322,6 +12322,10 @@ function fbStartListening(){
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
     localStorage.setItem('cofen_photos', JSON.stringify({...local,...remote}));
     pulseSyncDot();
+    // Antes só atualizava a grade de Fotos e o Modo TV — quem estava em
+    // qualquer outra aba (Ranking, Equipes, etc.) só via a foto nova depois
+    // de recarregar a página inteira. Agora atualiza a tela toda.
+    if(typeof refreshAll==='function') refreshAll();
     if(typeof tvRefresh==='function') tvRefresh();
     if(document.getElementById('fotos-grid')) fotosRenderGrid();
   });
