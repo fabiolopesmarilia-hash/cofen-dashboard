@@ -4721,6 +4721,24 @@ const CMP_CONCILIACAO_DIAS = {
   // no código) — não depende mais de nada salvo no navegador. Remove qualquer cache antigo
   // pra garantir que ninguém veja um número desatualizado de uma versão anterior.
   try{ localStorage.removeItem('cofen_cmp15du'); }catch(e){}
+
+  // Limpa também qualquer entrada de import "ao vivo" (cofen_cmp_dias) que
+  // tenha sobrado de um mês que JÁ tem dado estático completo — essa
+  // sobreposição era o que encolhia o "Total do Mês" de meses fechados
+  // (ex.: Março virando R$5.898 em vez de R$141.025). Ver também o filtro
+  // em _gerarComparativoCompleto, que já ignora isso — isso aqui só limpa
+  // o armazenamento pra não ficar guardando lixo à toa.
+  try{
+    const live = JSON.parse(localStorage.getItem('cofen_cmp_dias')||'{}');
+    let mudou = false;
+    Object.keys(live).forEach(k=>{
+      if(CMP_CONCILIACAO_DIAS[k]){ delete live[k]; mudou = true; }
+    });
+    if(mudou){
+      localStorage.setItem('cofen_cmp_dias', JSON.stringify(live));
+      window._cmpDiasLimpezaPendente = true;
+    }
+  }catch(e){}
 })();
 
 // Gera a tabela inteira (todos os meses) calculando, pra CADA mês, a soma até o dia útil
@@ -4729,7 +4747,20 @@ const CMP_CONCILIACAO_DIAS = {
 function _gerarComparativoCompleto(){
   const feriados = typeof getFeriados==='function' ? getFeriados() : [];
   const duAlvo = _duHojeNoMes(feriados);
-  const fonte = {...CMP_CONCILIACAO_DIAS, ...(typeof CMP_CONCILIACAO_DIAS_LIVE!=='undefined' ? CMP_CONCILIACAO_DIAS_LIVE : {})};
+  // Os meses já fechados (CMP_CONCILIACAO_DIAS) são o dado definitivo e
+  // completo — nunca devem ser sobrescritos por um import "ao vivo" parcial
+  // (CMP_CONCILIACAO_DIAS_LIVE), que existe só pra preencher o mês corrente
+  // enquanto ele ainda não tem uma entrada fixa no estático. Sem essa
+  // proteção, um import incompleto de um mês fechado substituía o array
+  // inteiro daquele mês (correto, 28-31 dias) por um array menor, encolhendo
+  // o "Total do Mês" pra uma fração do valor real.
+  const liveApenasMesesNovos = {};
+  if(typeof CMP_CONCILIACAO_DIAS_LIVE !== 'undefined'){
+    Object.keys(CMP_CONCILIACAO_DIAS_LIVE).forEach(k=>{
+      if(!CMP_CONCILIACAO_DIAS[k]) liveApenasMesesNovos[k] = CMP_CONCILIACAO_DIAS_LIVE[k];
+    });
+  }
+  const fonte = {...CMP_CONCILIACAO_DIAS, ...liveApenasMesesNovos};
   const chaves = Object.keys(fonte).sort();
   const linhas = chaves.map(mesKey=>{
     const [anoStr, mesStr] = mesKey.split('-');
@@ -5150,9 +5181,21 @@ function fbListenConciliacaoDias(){
   if(!fbDb||!fbRoom||fbListeners.cmpDias) return;
   fbDb.ref(fbRoom+'/cmp_dias').on('value', snap=>{
     const remote = snap.val();
+    // Limpeza pendente (ver _limparCacheAntigoCmp15du) — meses fechados que
+    // já têm dado estático completo nunca devem vir do Firebase. Em vez de
+    // aceitar o remoto de volta (que pode estar poluído), empurra a versão
+    // já limpa daqui pra sobrescrever o Firebase pra todo mundo.
+    if(window._cmpDiasLimpezaPendente){
+      window._cmpDiasLimpezaPendente = false;
+      fbPush('cmp_dias', CMP_CONCILIACAO_DIAS_LIVE);
+      return;
+    }
     if(!remote) return;
-    CMP_CONCILIACAO_DIAS_LIVE = remote;
-    try{ localStorage.setItem('cofen_cmp_dias', JSON.stringify(remote)); }catch(e){}
+    // Nunca aceitar do Firebase um mês que já tem dado estático completo
+    const remoteFiltrado = {};
+    Object.keys(remote).forEach(k=>{ if(!CMP_CONCILIACAO_DIAS[k]) remoteFiltrado[k]=remote[k]; });
+    CMP_CONCILIACAO_DIAS_LIVE = remoteFiltrado;
+    try{ localStorage.setItem('cofen_cmp_dias', JSON.stringify(remoteFiltrado)); }catch(e){}
     if(typeof renderComparativo15DU==='function' && typeof _gerarComparativoCompleto==='function'){
       renderComparativo15DU(_gerarComparativoCompleto());
     }
