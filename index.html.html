@@ -302,52 +302,55 @@ select.ev-inp{cursor:pointer}
 .photo-upload-btn:hover{border-color:var(--pp);color:var(--pp);background:var(--ppl)}
 
 /* ─ TV MODE ─ */
-#tv-overlay{position:fixed;inset:0;z-index:9000;background:#DCEEF3;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif;overflow:hidden}
+#tv-overlay{position:fixed;inset:0;z-index:9000;background:#0A0E27;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:Nunito,sans-serif;overflow:hidden}
 #tv-overlay::before{content:"";position:absolute;inset:0;background:
-  radial-gradient(ellipse 75% 65% at 15% 50%,rgba(20,120,180,.14) 0%,transparent 100%),
-  radial-gradient(ellipse 65% 70% at 85% 50%,rgba(13,74,133,.10) 0%,transparent 100%),
-  radial-gradient(ellipse 50% 35% at 50% 5%,rgba(20,184,166,.12) 0%,transparent 100%),
-  radial-gradient(ellipse 85% 45% at 50% 100%,rgba(11,94,140,.12) 0%,transparent 100%);
+  radial-gradient(ellipse 70% 60% at 12% 20%,rgba(255,184,0,.16) 0%,transparent 100%),
+  radial-gradient(ellipse 60% 65% at 88% 15%,rgba(0,229,255,.14) 0%,transparent 100%),
+  radial-gradient(ellipse 55% 50% at 50% 100%,rgba(255,61,154,.16) 0%,transparent 100%),
+  radial-gradient(ellipse 80% 40% at 50% 50%,rgba(123,58,237,.10) 0%,transparent 100%);
   pointer-events:none;z-index:0}
-#tv-overlay::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(20,150,180,.18) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;opacity:.3}
+#tv-overlay::after{content:"";position:absolute;inset:0;background-image:
+  linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:56px 56px;pointer-events:none;z-index:0;opacity:.6}
 #tv-card,#tv-overlay .tv-header,#tv-overlay .tv-progress,#tv-overlay .tv-nav,#tv-overlay>div:last-of-type{position:relative;z-index:2}
 #tv-overlay.on{display:flex}
 /* ─ TV PAGE (iframe container) ─ */
 #pg-tv{display:none}
 #pg-tv.on{display:flex;flex-direction:column}
 #tv-iframe{width:100%;border:none;display:block;height:calc(100vh - 58px)}
-.tv-header{position:absolute;top:0;left:0;right:0;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(230,245,248,.94),transparent)}
-.tv-brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:rgba(13,50,74,0.68)}
-.tv-clock{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:#0B6FA8;text-shadow:0 0 24px rgba(20,150,180,.35)}
-.tv-close{position:absolute;top:12px;right:18px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(20,150,180,.3);background:#FFFFFF;color:#0D324A;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:11;box-shadow:0 2px 8px rgba(20,150,180,.15)}
-.tv-close:hover{background:rgba(200,30,30,.5);color:#1A2E22;border-color:rgba(255,60,60,.5);transform:scale(1.08)}
+.tv-header{position:absolute;top:0;left:0;right:0;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(10,14,39,.92),transparent)}
+.tv-brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:rgba(255,255,255,.55)}
+.tv-clock{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:#FFB800;text-shadow:0 0 24px rgba(255,184,0,.55)}
+.tv-close{position:absolute;top:12px;right:18px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);backdrop-filter:blur(8px);color:#fff;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:11}
+.tv-close:hover{background:rgba(255,61,90,.5);border-color:rgba(255,61,90,.6);transform:scale(1.08)}
 .tv-card{width:100%;flex:1;min-height:0;padding:0;animation:tvIn .5s cubic-bezier(.22,1,.36,1)}
-@keyframes tvIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
-.tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;border:4px solid rgba(20,150,180,.3);flex-shrink:0;box-shadow:0 8px 24px rgba(20,150,180,.18)}
-.tv-photo-placeholder{width:140px;height:140px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:50px;color:#0D324A;flex-shrink:0;border:4px solid rgba(20,150,180,.3)}
-.tv-name{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:2px;color:#0D324A;line-height:1}
-.tv-eq{font-size:14px;font-weight:700;color:rgba(13,50,74,0.68);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
-.tv-kpi{background:#FFFFFF;border:1px solid rgba(20,150,180,.18);border-radius:14px;padding:16px 20px;text-align:center}
-.tv-kpi-l{font-size:10px;font-weight:700;color:rgba(13,50,74,0.68);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
-.tv-kpi-v{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.5px;line-height:1}
-.tv-progress{position:absolute;bottom:46px;left:0;right:0;height:3px;background:#FFFFFF;z-index:10;overflow:hidden}
-.tv-progress-fill{height:100%;transition:width linear;background:linear-gradient(90deg,#0B6FA8,#14B8A6 30%,#0EA5A8 60%,#14B8A6 80%,#0B6FA8)}
+@keyframes tvIn{from{opacity:0;transform:translateX(40px) scale(.98)}to{opacity:1;transform:none}}
+.tv-photo{width:140px;height:140px;border-radius:20px;object-fit:cover;border:3px solid rgba(255,184,0,.55);flex-shrink:0;box-shadow:0 0 32px rgba(255,184,0,.25)}
+.tv-photo-placeholder{width:140px;height:140px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:50px;color:#fff;flex-shrink:0;border:3px solid rgba(255,184,0,.55);background:linear-gradient(135deg,rgba(255,184,0,.18),rgba(0,229,255,.12))}
+.tv-name{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:2px;color:#fff;line-height:1;text-shadow:0 0 30px rgba(255,255,255,.15)}
+.tv-eq{font-size:14px;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+.tv-kpi{background:rgba(255,255,255,.055);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px 20px;text-align:center}
+.tv-kpi-l{font-size:10px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.tv-kpi-v{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.5px;line-height:1;color:#fff}
+.tv-progress{position:absolute;bottom:46px;left:0;right:0;height:3px;background:rgba(255,255,255,.08);z-index:10;overflow:hidden}
+.tv-progress-fill{height:100%;transition:width linear;background:linear-gradient(90deg,#FFB800,#FF3D9A 35%,#00E5FF 65%,#FFB800)}
 .tv-nav{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:5px;z-index:10}
-.tv-dot{width:6px;height:6px;border-radius:50%;background:rgba(13,50,74,0.68);transition:all .3s;cursor:pointer}
-.tv-dot.on{width:18px;border-radius:3px;background:#0B6FA8;box-shadow:0 0 10px rgba(20,150,180,.45)}
-.tv-ag-row{display:flex;justify-content:space-between;font-size:13px;font-weight:700;padding:4px 0;border-bottom:1px solid rgba(20,150,180,.18)}
+.tv-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.28);transition:all .3s;cursor:pointer}
+.tv-dot.on{width:18px;border-radius:3px;background:#FFB800;box-shadow:0 0 10px rgba(255,184,0,.6)}
+.tv-ag-row{display:flex;justify-content:space-between;font-size:13px;font-weight:700;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.1);color:#fff}
 .tv-fb-badge{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
-.tv-fb-done{background:rgba(20,184,166,.15);border:1.5px solid rgba(20,184,166,.5);color:#0F766E}
-.tv-fb-pending{background:rgba(252,211,77,.12);border:1.5px dashed rgba(252,211,77,.45);color:#B45309}
+.tv-fb-done{background:rgba(0,229,255,.14);border:1.5px solid rgba(0,229,255,.5);color:#67E8F9}
+.tv-fb-pending{background:rgba(255,184,0,.12);border:1.5px dashed rgba(255,184,0,.5);color:#FFB800}
 /* ─ TV MODE: movimento ─ */
-#tv-overlay::before{background-size:140% 140%;animation:tvBgDrift 16s ease-in-out infinite alternate}
+#tv-overlay::before{background-size:150% 150%;animation:tvBgDrift 18s ease-in-out infinite alternate}
 @keyframes tvBgDrift{0%{background-position:0% 0%}100%{background-position:100% 100%}}
-#tv-overlay::after{animation:tvDotsDrift 30s linear infinite}
-@keyframes tvDotsDrift{0%{background-position:0 0}100%{background-position:96px 96px}}
+#tv-overlay::after{animation:tvDotsDrift 40s linear infinite}
+@keyframes tvDotsDrift{0%{background-position:0 0}100%{background-position:112px 112px}}
 .tv-clock{animation:tvPulseGlow 2.4s ease-in-out infinite}
-@keyframes tvPulseGlow{0%,100%{text-shadow:0 0 24px rgba(20,150,180,.35)}50%{text-shadow:0 0 40px rgba(20,150,180,.6)}}
+@keyframes tvPulseGlow{0%,100%{text-shadow:0 0 24px rgba(255,184,0,.5)}50%{text-shadow:0 0 44px rgba(255,184,0,.85)}}
 .tv-dot.on{animation:tvDotPulse 1.6s ease-in-out infinite}
-@keyframes tvDotPulse{0%,100%{box-shadow:0 0 10px rgba(20,150,180,.45)}50%{box-shadow:0 0 18px rgba(20,150,180,.75)}}
+@keyframes tvDotPulse{0%,100%{box-shadow:0 0 10px rgba(255,184,0,.5)}50%{box-shadow:0 0 20px rgba(255,184,0,.85)}}
 .tv-progress-fill{background-size:200% 100%;animation:tvBarFlow 3s linear infinite}
 @keyframes tvBarFlow{0%{background-position:0% 0}100%{background-position:200% 0}}
 .tv-photo,.tv-photo-placeholder{animation:tvPhotoFloat 4s ease-in-out infinite}
@@ -3049,6 +3052,20 @@ const ORIG = {"global":{"total":76462.34,"pp":0,"coren":0,"cofen":0,"daily":{}},
 })();
 
 let D = JSON.parse(JSON.stringify(ORIG));
+
+// CMP_OPS_DU_JULHO/CMP_OPS_DU_JUNHO precisam existir bem cedo no script —
+// são usadas dentro de tvShow() (Modo TV) e no import, e antes ficavam
+// declaradas lá embaixo (perto da linha 14600), causando
+// "ReferenceError: Cannot access 'CMP_OPS_DU_JULHO' before initialization"
+// sempre que o Modo TV tentava montar o comparativo "vs Julho" antes do
+// script terminar de carregar até aquele ponto.
+let CMP_OPS_DU_JULHO = {};
+let CMP_OPS_DU_JUNHO = {};
+(function _cmpFiltraFuturoBootstrap(){
+  // _cmpFiltraFuturo (function declaration, hoisted) já existe nesse ponto
+  try{ const _a=localStorage.getItem('cofen_ops_du_julho'); if(_a){ const _v=JSON.parse(_a); Object.keys(_v).forEach(op=>{ _v[op]=_cmpFiltraFuturo(_v[op]); }); CMP_OPS_DU_JULHO=_v; } }catch(e){}
+  try{ const _b=localStorage.getItem('cofen_ops_du_junho'); if(_b) CMP_OPS_DU_JUNHO=JSON.parse(_b); }catch(e){}
+})();
 
 // Garante que as 7 equipes canônicas da operação sempre existam em D.equipes,
 // mesmo com 0 operadores — sem isso, a equipe some de tabelas (Metas HO,
@@ -10648,6 +10665,7 @@ const _rdSetSaved_orig = rdSetSaved;
 // ══════════════════════════════════════════
 let tvIdx=0, tvTimer=null, tvPaused=false, tvList=[], tvMode='geral';
 let tvCustomEquipes = []; // equipes selecionadas no modo "combinar equipes"
+let tvSeletorAberto = false; // controla se o painel do seletor de equipe está aberto
 
 // ── Equipes reais disponíveis pra combinar/ocultar no Modo TV ──
 const TV_EQUIPES_REAIS = {
@@ -10730,9 +10748,18 @@ function tvCustomAplicar(){
 }
 
 // ── Monta o seletor de equipes do Modo TV dinamicamente ──
-// Cada botão padrão (bs/bsk/individual) tem um X pra ocultar (reversível).
-// Botões ocultos ganham uma linha "restaurar" no fim. Tem também o botão
-// "🧩 Combinar" pra fazer qualquer junção de equipes na hora.
+// Formato em botão único no canto (em vez de vários botões lado a lado):
+// clica, abre um painel com a lista de opções. Cada opção tem um X pra
+// ocultar (reversível). Opções ocultas ganham uma linha "restaurar" no fim.
+// Tem também a opção "🧩 Combinar equipes…" pra fazer qualquer junção na hora.
+function tvSeletorAlternar(){
+  tvSeletorAberto = !tvSeletorAberto;
+  tvRenderSeletor();
+}
+function tvSeletorFechar(){
+  tvSeletorAberto = false;
+  tvRenderSeletor();
+}
 function tvRenderSeletor(){
   const cont = document.getElementById('tv-seletor-container');
   if(!cont) return;
@@ -10745,40 +10772,58 @@ function tvRenderSeletor(){
     {id:'COFEN LETICIA',             label:'🌿 Equipe Letícia'},
     {id:'COFEN PAGUEPLAY',           label:'🩷 Pagueplay'},
   ];
-  let html = '';
-  BOTOES.forEach(b=>{
-    if(ocultos.includes(b.id)) return;
+  const visiveis = BOTOES.filter(b=>!ocultos.includes(b.id));
+
+  // Rótulo do botão principal: mostra a opção ativa no momento
+  const rotuloAtivo = tvMode==='custom'
+    ? (tvCustomEquipes.length ? '🧩 ' + tvCustomEquipes.map(n=>TV_EQUIPES_REAIS[n]||n).join(' + ') : '🧩 Combinar equipes')
+    : (visiveis.find(b=>b.id===tvMode)?.label || '🏆 Ranking Geral');
+
+  let opcoesHtml = visiveis.map(b=>{
     const domId = 'tv-btn-' + b.id.replace(/[^a-zA-Z0-9]/g,'_');
-    const bg = (tvMode===b.id) ? 'rgba(20,150,180,.22)' : 'transparent';
-    html += `<span style="position:relative;display:inline-flex">
-      <button id="${domId}" onclick="tvSetMode('${b.id.replace(/'/g,"\\'")}',this)"
-        style="padding:6px 22px 6px 14px;border-radius:9px;border:none;cursor:pointer;font-family:Nunito,sans-serif;
-        font-weight:800;font-size:11px;background:${bg};color:#000;letter-spacing:.5px;transition:all .2s">
-        ${b.label}
-      </button>
+    const ativo = (tvMode===b.id);
+    return `<div style="display:flex;align-items:center;gap:6px">
+      <button id="${domId}" onclick="tvSetMode('${b.id.replace(/'/g,"\\'")}',this);tvSeletorFechar();"
+        style="flex:1;text-align:left;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;
+        font-family:Nunito,sans-serif;font-weight:800;font-size:12px;white-space:normal;line-height:1.3;
+        background:${ativo?'rgba(20,150,180,.18)':'transparent'};color:#1A2E22">${b.label}</button>
       <button onclick="event.stopPropagation();tvBotaoOcultar('${b.id.replace(/'/g,"\\'")}','${b.label.replace(/'/g,"\\'")}')"
-        title="Ocultar este botão" style="position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;
-        border:none;background:rgba(0,0,0,.12);color:rgba(0,0,0,.5);font-size:8px;cursor:pointer;display:flex;
+        title="Ocultar esta opção" style="flex-shrink:0;width:20px;height:20px;border-radius:50%;
+        border:none;background:rgba(0,0,0,.08);color:rgba(0,0,0,.5);font-size:9px;cursor:pointer;display:flex;
         align-items:center;justify-content:center;padding:0">✕</button>
-    </span>`;
-  });
-  html += `<button onclick="tvCustomAbrirPainel()" style="padding:6px 14px;border-radius:9px;border:1px dashed rgba(20,150,180,.4);
-    cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;background:${tvMode==='custom'?'rgba(20,150,180,.22)':'transparent'};
-    color:#000;letter-spacing:.5px">🧩 Combinar</button>`;
-  cont.innerHTML = html;
+    </div>`;
+  }).join('');
 
   if(ocultos.length > 0){
-    const restaurar = document.createElement('div');
-    restaurar.style.cssText = 'width:100%;display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:4px';
-    restaurar.innerHTML = ocultos.map(id=>{
-      const b = BOTOES.find(x=>x.id===id);
-      const label = b ? b.label.replace(/^[^\s]+\s/,'') : id;
-      return `<span style="font-size:9px;color:rgba(0,0,0,.4);background:rgba(0,0,0,.05);border-radius:6px;padding:2px 6px">
-        ${label} <button onclick="tvBotaoRestaurar('${id.replace(/'/g,"\\'")}')" style="border:none;background:none;color:#0B6FA8;font-weight:800;cursor:pointer;font-size:9px">↩</button>
-      </span>`;
-    }).join('');
-    cont.appendChild(restaurar);
+    opcoesHtml += `<div style="display:flex;flex-wrap:wrap;gap:4px;padding:8px 2px 2px;margin-top:4px;border-top:1px solid rgba(0,0,0,.08)">
+      ${ocultos.map(id=>{
+        const b = BOTOES.find(x=>x.id===id);
+        const label = b ? b.label.replace(/^[^\s]+\s/,'') : id;
+        return `<span style="font-size:9px;color:rgba(0,0,0,.4);background:rgba(0,0,0,.05);border-radius:6px;padding:2px 6px">
+          ${label} <button onclick="tvBotaoRestaurar('${id.replace(/'/g,"\\'")}')" style="border:none;background:none;color:#0B6FA8;font-weight:800;cursor:pointer;font-size:9px">↩</button>
+        </span>`;
+      }).join('')}
+    </div>`;
   }
+
+  opcoesHtml += `<button onclick="tvSeletorFechar();tvCustomAbrirPainel();"
+    style="width:100%;margin-top:6px;padding:8px 10px;border-radius:8px;border:1px dashed rgba(20,150,180,.4);
+    cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;text-align:left;
+    background:${tvMode==='custom'?'rgba(20,150,180,.18)':'transparent'};color:#1A2E22">🧩 Combinar equipes…</button>`;
+
+  cont.innerHTML = `<div style="position:relative">
+    <button onclick="tvSeletorAlternar()" style="display:flex;align-items:center;gap:8px;padding:7px 14px;
+      border-radius:var(--rm);border:none;cursor:pointer;background:#FFFFFF;box-shadow:0 2px 10px rgba(0,0,0,.15);
+      font-family:Nunito,sans-serif;font-weight:800;font-size:11px;color:#1A2E22;letter-spacing:.3px;max-width:46vw">
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rotuloAtivo}</span>
+      <span style="font-size:9px;opacity:.6;flex-shrink:0">${tvSeletorAberto?'▲':'▼'}</span>
+    </button>
+    ${tvSeletorAberto ? `<div style="position:absolute;bottom:calc(100% + 8px);left:0;width:260px;max-width:80vw;
+      max-height:60vh;overflow-y:auto;background:#FFFFFF;border-radius:12px;padding:8px;
+      box-shadow:0 8px 30px rgba(0,0,0,.28);display:flex;flex-direction:column;gap:3px;z-index:20">
+      ${opcoesHtml}
+    </div>` : ''}
+  </div>`;
 }
 const TV_INTERVAL = 9000;
 
@@ -11025,7 +11070,22 @@ function tvUpdateDots(){
 
 function tvShowCurrent(){
   if(tvList.length===0) return;
-  tvShow(tvIdx);
+  try{
+    tvShow(tvIdx);
+  }catch(e){
+    // Mostra o erro direto na tela (sem precisar abrir o Console do
+    // navegador) — isso é só um diagnóstico temporário pra achar a causa
+    // do slide ficando em branco; depois de corrigido, dá pra remover.
+    const card = document.getElementById('tv-card');
+    if(card){
+      card.innerHTML = `<div style="padding:40px;color:#fff;font-family:monospace;font-size:14px;white-space:pre-wrap">
+        ⚠️ ERRO ao montar o slide (idx=${tvIdx}, modo=${tvMode}):<br><br>
+        ${(e && e.message || e)}<br><br>
+        ${(e && e.stack || '').toString().slice(0,800)}
+      </div>`;
+    }
+    console.error('tvShow falhou:', e);
+  }
   // Agenda próximo slide (funciona para operadores e slides de meta)
   tvSchedule();
 }
@@ -11120,7 +11180,7 @@ function tvShowMetaSlide(slide){
       <div style="font-size:${fs};line-height:1;filter:drop-shadow(0 0 20px ${col}66)">${medals[ri]}</div>
       <div style="width:164px;height:${ht};border-radius:18px;overflow:hidden;border:3px solid ${col}77;box-shadow:0 0 40px ${col}33,0 8px 32px rgba(0,0,0,.6)">${photoHtml}</div>
       <img src="https://pagueplay.com.br/build/images/logo-pagueplay.svg" style="height:16px" alt="PaguePlay">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:#1A2E22;letter-spacing:1.5px;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.8)">${op.name.replace(/_/g,' ').toUpperCase()}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:#FFFFFF;letter-spacing:1.5px;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.8)">${op.name.replace(/_/g,' ').toUpperCase()}</div>
       <div style="font-size:10px;color:${cfg.c};font-weight:800;letter-spacing:1px">${cfg.ico} ${cfg.sh}</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${col};letter-spacing:.5px">${fR(tvGetRec(op))}</div>
       ${gapLbl(op)}
@@ -11485,7 +11545,7 @@ function tvShow(idx){
                 const _fs = _len>=22?26:_len>=19?30:_len>=16?34:_len>=13?40:_len>=10?46:50;
                 const _ls = _len>=19?0.5:_len>=13?1:2;
                 return `<div style="font-family:'Bebas Neue',sans-serif;font-size:${_fs}px;letter-spacing:${_ls}px;
-                color:#1A2E22;line-height:1.05;white-space:normal;word-break:break-word;overflow-wrap:break-word;min-width:0;max-width:100%">
+                color:#FFFFFF;line-height:1.05;white-space:normal;word-break:break-word;overflow-wrap:break-word;min-width:0;max-width:100%;text-shadow:0 2px 16px rgba(0,0,0,.4)">
                 ${_nomeExib}
               </div>`;
               })()}
@@ -11546,12 +11606,12 @@ function tvShow(idx){
 
         <!-- 4 KPIs -->
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-          <div style="background:linear-gradient(135deg,#00A86B,#00C97F);box-shadow:0 6px 20px rgba(0,168,107,.35);
+          <div style="background:linear-gradient(135deg,#D9A62A,#FFB800);box-shadow:0 6px 20px rgba(255,184,0,.35);
               border-radius:12px;padding:12px;text-align:center">
             <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">💰 Total Real</div>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:23px;color:#fff;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.15)">${fR(tvGetRec(op))}</div>
           </div>
-          <div style="background:linear-gradient(135deg,#0891B2,#22D3EE);box-shadow:0 6px 20px rgba(8,145,178,.35);
+          <div style="background:linear-gradient(135deg,#00A0C4,#00E5FF);box-shadow:0 6px 20px rgba(0,229,255,.35);
               border-radius:12px;padding:12px;text-align:center">
             <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 HO (25%)</div>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:23px;color:#fff;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.15)">${fR(op.ho)}</div>
@@ -14610,12 +14670,8 @@ const _cmpSeen = new Set();
 CMP_OPS.forEach(o => { if(!_cmpSeen.has(o.nome)){ _cmpSeen.add(o.nome); CMP_OPS_DEDUP.push(o); } });
 
 // ── DU por operador: { NOME: { 1: acum, 2: acum, ... } } ──
-// CMP_OPS_DU_JULHO = acumulado por DU de Julho (atualiza ao importar XLS Julho)
-// CMP_OPS_DU_JUNHO = acumulado por DU de Junho (atualiza ao importar XLS Junho anterior)
-let CMP_OPS_DU_JULHO = {};
-let CMP_OPS_DU_JUNHO = {};
-try{ const _a=localStorage.getItem('cofen_ops_du_julho'); if(_a){ const _v=JSON.parse(_a); Object.keys(_v).forEach(op=>{ _v[op]=_cmpFiltraFuturo(_v[op]); }); CMP_OPS_DU_JULHO=_v; } }catch(e){}
-try{ const _b=localStorage.getItem('cofen_ops_du_junho'); if(_b) CMP_OPS_DU_JUNHO=JSON.parse(_b); }catch(e){}
+// CMP_OPS_DU_JULHO/CMP_OPS_DU_JUNHO agora são declaradas no topo do script
+// (perto de onde D é inicializado) — ver comentário lá explicando o motivo.
 
 let cmpCharts = {};
 let cmpSortField = 'diff';
@@ -15491,10 +15547,7 @@ setInterval(()=>{
   <button class="tv-close" onclick="tvStop()">✕</button>
 
   <!-- Seletor de equipe/ranking — no topo, abaixo do header. Preenchido por tvRenderSeletor() -->
-  <div id="tv-seletor-container" style="position:absolute;top:64px;left:50%;transform:translateX(-50%);z-index:5;
-      display:flex;gap:4px;background:#FFFFFF;border-radius:var(--rm);padding:3px;
-      flex-wrap:wrap;justify-content:center;max-width:94vw;box-shadow:0 2px 10px rgba(0,0,0,.12)">
-  </div>
+  <div id="tv-seletor-container" style="position:absolute;bottom:14px;left:14px;z-index:6;"></div>
 
   <!-- Área de conteúdo — preenchida pelo JS -->
   <div id="tv-card" class="tv-card"></div>
