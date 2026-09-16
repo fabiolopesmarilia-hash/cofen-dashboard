@@ -10832,22 +10832,19 @@ function tvSetMode(mode, btnEl){
   tvRenderSeletor();
 }
 
-// Retorna recebimento total do operador (base + lançamento manual do dia)
+// Retorna recebimento total do operador (SEMPRE o valor oficial do relatório importado)
 function tvGetRec(op){
   try{
-    // IMPORTANTE: NÃO soma o lançamento manual de "Recebimento do Dia" aqui.
+    // IMPORTANTE: NÃO soma o lançamento manual de "Recebimento do Dia" aqui,
+    // e NÃO usa mais a soma de op.daily como alternativa.
     // O fluxo real é: todo dia é importado um relatório novo e o Total Real
-    // deve ser EXATAMENTE o valor desse relatório — nunca relatório + extra
-    // por cima. Antes essa função somava rdGetSaved()[op.name] (o "hoje" da
-    // aba Recebimento do Dia) em cima de op.rec, e como esse mesmo dinheiro
-    // de hoje já vem dentro do relatório importado, o valor ficava contado
-    // duas vezes (ex.: Raissa Paloma aparecia com R$29.629,68 na TV sendo
-    // que o relatório oficial mostrava R$18.205,16).
-    // Se op.daily tem dados, soma todos os dias para obter o total real
-    // (Firebase atualiza op.daily mas não op.rec diretamente)
-    const dailyTotal = Object.values(op.daily||{}).reduce((s,v)=>s+(parseFloat(v)||0),0);
-    // Usa o maior entre op.rec e o total do daily (evita regressão se daily estiver incompleto)
-    return Math.max(op.rec||0, dailyTotal);
+    // deve ser EXATAMENTE o valor desse relatório (op.rec) — nunca relatório
+    // + extra por cima, e nunca a soma do daily, que pode ficar desatualizada
+    // ou duplicada em relação ao relatório oficial e inflar o Total Real
+    // (ex.: itallo_cardamoni aparecendo com R$42.470,18 na TV sendo que o
+    // relatório oficial mostrava R$28.189,37).
+    // op.rec é o valor correto: vem direto do relatório importado/override.
+    return op.rec||0;
   } catch(e){ return op.rec||0; }
 }
 
