@@ -6097,6 +6097,14 @@ function aplicarEmpresa(){
   localStorage.setItem('cofen_hist_empresa', JSON.stringify(_histMensalEmpresa));syncPush('cofen_hist_empresa');
   renderResumoEditor();
 
+  // O "Comparativo Mensal" usa ppEmpresaAbril pro mês corrente (pra bater
+  // sempre com o card "Coluna do Arquivo Empresa" acima) — sem isso, ele só
+  // atualizava na próxima vez que a página fosse recarregada, ficando com
+  // um valor desatualizado logo depois de importar um arquivo novo.
+  if(typeof renderComparativo15DU==='function' && typeof _gerarComparativoCompleto==='function'){
+    renderComparativo15DU(_gerarComparativoCompleto());
+  }
+
   setTimeout(() => fecharModalEmpresa(), 2000);
 }
 // ── FIM IMPORTAR ──────────────────────────────────────────────
@@ -12670,6 +12678,9 @@ function fbStartListening(){
     if(typeof renderCorenGrid==='function') renderCorenGrid(corenData);
     if(typeof liveCalcCorens==='function') liveCalcCorens();
     initHero();
+    if(typeof renderComparativo15DU==='function' && typeof _gerarComparativoCompleto==='function'){
+      renderComparativo15DU(_gerarComparativoCompleto());
+    }
     pulseSyncDot();
   });
 
