@@ -9294,8 +9294,14 @@ function importParse(raw){
             });
           });
         });
-        // Sem histórico: joga a sobra (não atribuída) no último dia útil
-        if(!_foundDaily) a.daily[_lastUtil] = (a.daily[_lastUtil]||0) + _remainder;
+        // Cobre qualquer sobra que o histórico não tenha explicado — antes,
+        // achar QUALQUER correspondência no histórico (mesmo parcial ou de
+        // outro operador com nome parecido) fazia pular esse passo inteiro,
+        // deixando uma diferença que nunca aparecia no gráfico (Total Mês
+        // batia, mas os dias ficavam vazios).
+        const _dailySumDepois = Object.values(a.daily).reduce((s,v)=>s+v,0);
+        const _remanescente = a.total - _dailySumDepois;
+        if(_remanescente > 0.01) a.daily[_lastUtil] = (a.daily[_lastUtil]||0) + _remanescente;
       } catch(e) {
         a.daily[_lastUtil] = (a.daily[_lastUtil]||0) + _remainder;
       }
