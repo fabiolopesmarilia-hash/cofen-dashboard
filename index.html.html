@@ -3806,7 +3806,22 @@ function projGetHoJulhoNoDU(duN){
   }catch(e){ return 0; }
 }
 
-// ── PROJEÇÃO HO TOTAL — dois cenários de meta ──
+// ── PROJEÇÃO HO TOTAL — dois cenários de meta (editáveis manualmente) ──
+function getHoProjCenarios(){
+  try{
+    const saved = JSON.parse(localStorage.getItem('cofen_ho_proj_cenarios'));
+    if(Array.isArray(saved) && saved.length===2 && saved.every(v=>typeof v==='number' && v>0)) return saved;
+  }catch(e){}
+  return [1400000, 1800000];
+}
+function setHoProjCenario(idx, valorStr){
+  const v = parseFloat(String(valorStr).replace(/\./g,'').replace(',','.')) || 0;
+  if(v<=0) return;
+  const arr = getHoProjCenarios();
+  arr[idx] = v;
+  localStorage.setItem('cofen_ho_proj_cenarios', JSON.stringify(arr));
+  renderHoProjTable();
+}
 function renderHoProjTable(){
   const tbody = document.getElementById('ho-proj-tbody');
   if(!tbody) return;
@@ -3820,10 +3835,8 @@ function renderHoProjTable(){
   // Projeção = HO atual ÷ DUs passados × DUs totais
   const projecao = hoAtual / duPass * duTotal;
 
-  const cenarios = [
-    { label:'Meta R$ 1.500.000', valor: 1500000 },
-    { label:'Meta R$ 1.800.000', valor: 1800000 },
-  ];
+  const cenariosValores = getHoProjCenarios();
+  const cenarios = cenariosValores.map(v => ({ valor: v }));
 
   const fR2 = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 
@@ -3851,7 +3864,14 @@ function renderHoProjTable(){
 
     return `<tr style="border-bottom:1px solid rgba(255,255,255,.08);background:${rowBg};transition:background .15s"
       onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='${rowBg}'">
-      <td style="padding:10px 14px;font-size:12px;font-weight:800;color:#fff">${c.label}</td>
+      <td style="padding:10px 14px;font-size:12px;font-weight:800;color:#fff">
+        <span style="opacity:.75;margin-right:4px">Meta R$</span>
+        <input type="number" value="${c.valor}" min="0" step="1000"
+          onchange="setHoProjCenario(${i}, this.value)"
+          style="width:110px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);
+          border-radius:6px;color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;
+          padding:4px 6px">
+      </td>
       <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#67E8F9;letter-spacing:.5px">${fR2(metaDia)}</td>
       <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#C084FC;letter-spacing:.5px">${fR2(projecao)}</td>
       <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#4ADE80;letter-spacing:.5px">${fR2(hoAtual)}</td>
