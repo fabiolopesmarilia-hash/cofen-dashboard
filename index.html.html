@@ -858,12 +858,11 @@ select.ev-inp{cursor:pointer}
             <th style="padding:9px 14px;text-align:center;font-size:10px;font-weight:800;color:rgba(255,255,255,.6);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">% PROJEÇÃO</th>
             <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#FCD34D;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">DEVERIA ESTAR HOJE</th>
             <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#F87171;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">DIFERENÇA</th>
-            <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#FB923C;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12);border-left:2px solid rgba(251,146,60,.25)">HO JULHO<br><span style="font-size:8px;font-weight:600;opacity:.7">mesmo DU</span></th>
-            <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#A78BFA;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">VS JULHO</th>
+            <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#FB923C;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12);border-left:2px solid rgba(251,146,60,.25)">FALTA POR DIA ÚTIL<br><span style="font-size:8px;font-weight:600;opacity:.7">nos dias restantes</span></th>
           </tr>
         </thead>
         <tbody id="ho-proj-tbody">
-          <tr><td colspan="9" style="padding:16px;text-align:center;color:rgba(255,255,255,.35);font-size:11px;background:rgba(0,0,0,.2)">⏳ Carregando...</td></tr>
+          <tr><td colspan="8" style="padding:16px;text-align:center;color:rgba(255,255,255,.35);font-size:11px;background:rgba(0,0,0,.2)">⏳ Carregando...</td></tr>
         </tbody>
       </table>
     </div>
@@ -1091,7 +1090,7 @@ select.ev-inp{cursor:pointer}
         </div>
         <div class="ep-group">
           <label class="ep-label">🎯 Meta 1 — Total Recebido (R$)</label>
-          <input class="ep-input" type="number" id="inp-meta" value="1500000" step="1000" min="0" oninput="liveCalc()">
+          <input class="ep-input" type="number" id="inp-meta" value="1400000" step="1000" min="0" oninput="liveCalc()">
         </div>
         <button class="btn-calc" onclick="applyTotal()">⚡ Aplicar e Recalcular</button>
         <button class="btn-outline" onclick="resetTotal()">↩ Resetar</button>
@@ -3217,8 +3216,12 @@ function getFeriados(){
 function setFeriados(arr){localStorage.setItem('cofen_feriados',JSON.stringify(arr));syncPush('cofen_feriados');}
 
 // ─ Config ─
-const META_DEFAULT = 1500000;
+const META_DEFAULT = 1400000;
 let meta            = parseFloat(localStorage.getItem('cofen_meta')         || META_DEFAULT);
+// Meta do mês mudou de R$1.500.000 para R$1.400.000 — se o navegador ainda
+// tinha o valor antigo salvo (não foi um valor customizado diferente), migra
+// automaticamente pro novo padrão.
+if(meta === 1500000){ meta = META_DEFAULT; localStorage.setItem('cofen_meta', meta); }
 let overrideTotalRec= parseFloat(localStorage.getItem('cofen_total')        || '0');
 
 // Trava de sanidade: se o Total ou a Meta digitados manualmente forem absurdamente
@@ -3838,11 +3841,13 @@ function renderHoProjTable(){
     const pctBorder= acima ? 'rgba(74,222,128,.5)'  : quase ? 'rgba(252,211,77,.5)'  : 'rgba(248,113,113,.5)';
     const rowBg    = i%2===0 ? 'rgba(255,255,255,.04)' : 'rgba(0,0,0,.15)';
 
-    // Julho no mesmo DU — calculado ao vivo a partir do Histórico real (HIST_DADOS.Julho).
-    const hoJunhoDU   = projGetHoJulhoNoDU(duPass);
-    const vsJunho     = hoAtual - hoJunhoDU;
-    const vsJunhoColor  = vsJunho >= 0 ? '#4ADE80' : '#F87171';
-    const vsJunhoPrefix = vsJunho >= 0 ? '+' : '';
+    // Falta por dia útil = quanto ainda precisa entrar, em média, em cada
+    // dia útil que resta no mês, pra bater essa meta (considera o HO atual)
+    const duRestantes   = Math.max(0, duTotal - duPass);
+    const faltaTotal     = c.valor - hoAtual;
+    const faltaPorDiaUtil = duRestantes > 0 ? faltaTotal / duRestantes : 0;
+    const faltaJaBatida  = faltaTotal <= 0;
+    const faltaColor     = faltaJaBatida ? '#4ADE80' : '#FB923C';
 
     return `<tr style="border-bottom:1px solid rgba(255,255,255,.08);background:${rowBg};transition:background .15s"
       onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='${rowBg}'">
@@ -3858,8 +3863,7 @@ function renderHoProjTable(){
       </td>
       <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#FCD34D;letter-spacing:.5px">${fR2(deveria)}</td>
       <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:${difColor};letter-spacing:.5px;font-weight:900">${difPrefix}${fR2(diferenca)}</td>
-      <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#FB923C;letter-spacing:.5px;border-left:2px solid rgba(251,146,60,.15)">${hoJunhoDU > 0 ? fR2(hoJunhoDU) : '<span style=\'color:rgba(255,255,255,.25);font-size:11px\'>—</span>'}</td>
-      <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:${vsJunhoColor};letter-spacing:.5px;font-weight:900">${hoJunhoDU > 0 ? vsJunhoPrefix+fR2(vsJunho) : '<span style=\'color:rgba(255,255,255,.25);font-size:11px\'>—</span>'}</td>
+      <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:${faltaColor};letter-spacing:.5px;font-weight:900;border-left:2px solid rgba(251,146,60,.15)">${faltaJaBatida ? '✅ Meta batida!' : fR2(faltaPorDiaUtil)}</td>
     </tr>`;
   }).join('');
 }
@@ -10789,11 +10793,14 @@ function tvRenderSeletor(){
   if(!cont) return;
   const ocultos = tvBotoesOcultosGetAll();
   const BOTOES = [
+    {id:'geral',                     label:'🏆 Top 5 Geral'},
     {id:'bs',                        label:'🏙️⭐ Stephanie + Katia'},
     {id:'bsk',                       label:'🏙️⭐💜 Stephanie + Katia + Equipe Stephanie'},
-    {id:'COFEN BIRIGUI BRUNA',       label:'💙 Bruna + Digital + Elite'},
-    {id:'COFEN KATIA',               label:'💜 Equipe Stephanie'},
-    {id:'COFEN LETICIA',             label:'🌿 Equipe Letícia'},
+    {id:'COFEN KATIA',               label:'💜 Top 5 Equipe Stephanie'},
+    {id:'COFEN DIGITAL',             label:'🖥️ Top 5 Bruna Chatplay'},
+    {id:'COFEN STEPHANIE 2° TURNO',  label:'⭐ Top 5 Katia'},
+    {id:'COFEN BIRIGUI BRUNA',       label:'💙 Top 5 Equipe Bruna'},
+    {id:'COFEN LETICIA',             label:'🌿 Top 5 Equipe Letícia'},
     {id:'COFEN PAGUEPLAY',           label:'🩷 Pagueplay'},
   ];
   const visiveis = BOTOES.filter(b=>!ocultos.includes(b.id));
@@ -10801,7 +10808,7 @@ function tvRenderSeletor(){
   // Rótulo do botão principal: mostra a opção ativa no momento
   const rotuloAtivo = tvMode==='custom'
     ? (tvCustomEquipes.length ? '🧩 ' + tvCustomEquipes.map(n=>TV_EQUIPES_REAIS[n]||n).join(' + ') : '🧩 Combinar equipes')
-    : (visiveis.find(b=>b.id===tvMode)?.label || '🏆 Ranking Geral');
+    : (visiveis.find(b=>b.id===tvMode)?.label || '🏆 Top 5 Geral');
 
   let opcoesHtml = visiveis.map(b=>{
     const domId = 'tv-btn-' + b.id.replace(/[^a-zA-Z0-9]/g,'_');
@@ -10867,7 +10874,7 @@ function tvSetMode(mode, btnEl){
   if(btnEl){ btnEl.style.background='rgba(20,150,180,.22)'; btnEl.style.color='#000'; }
   // Atualiza label
   const lbl = document.getElementById('tv-mode-label');
-  if(lbl) lbl.textContent = mode==='geral' ? 'RANKING GERAL' : mode==='bb' ? 'BRUNA + STEPHANIE' : mode==='bs' ? 'STEPHANIE + KATIA' : mode==='bsk' ? 'STEPHANIE + KATIA + EQUIPE STEPHANIE' : mode==='COFEN BIRIGUI BRUNA' ? 'BRUNA + DIGITAL + ELITE' : mode==='COFEN KATIA' ? 'EQUIPE STEPHANIE' : (EQ[mode]?.sh||mode).toUpperCase();
+  if(lbl) lbl.textContent = mode==='geral' ? 'TOP 5 GERAL' : mode==='bb' ? 'BRUNA + STEPHANIE' : mode==='bs' ? 'STEPHANIE + KATIA' : mode==='bsk' ? 'STEPHANIE + KATIA + EQUIPE STEPHANIE' : mode==='COFEN BIRIGUI BRUNA' ? 'TOP 5 EQUIPE BRUNA' : mode==='COFEN DIGITAL' ? 'TOP 5 BRUNA CHATPLAY' : mode==='COFEN KATIA' ? 'TOP 5 EQUIPE STEPHANIE' : mode==='COFEN STEPHANIE 2° TURNO' ? 'TOP 5 KATIA' : mode==='COFEN LETICIA' ? 'TOP 5 EQUIPE LETÍCIA' : (EQ[mode]?.sh||mode).toUpperCase();
 
   // Reconstrói lista e reinicia
   tvBuildList();
@@ -10894,6 +10901,19 @@ function tvGetRec(op){
     // Usa o maior entre op.rec e o total do daily (evita regressão se daily estiver incompleto)
     return Math.max(op.rec||0, dailyTotal);
   } catch(e){ return op.rec||0; }
+}
+
+// Retorna os códigos de equipe que compõem o modo atual do Modo TV,
+// quando esse modo é uma COMBINAÇÃO de mais de uma equipe (ex.: "Stephanie
+// + Katia"). Pra modo de equipe única (ou inexistente) retorna null —
+// nesse caso não faz sentido gerar pódios extras "por equipe".
+function tvComboTeams(mode){
+  if(mode==='bb')  return ['COFEN BIRIGUI BRUNA','COFEN MARILIA BRENDA'];
+  if(mode==='bs')  return ['COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO'];
+  if(mode==='bsk') return ['COFEN MARILIA BRENDA','COFEN STEPHANIE 2° TURNO','COFEN KATIA'];
+  if(mode==='custom') return (tvCustomEquipes||[]).slice();
+  if(mode==='geral') return D.equipes.map(e=>e.name);
+  return null;
 }
 
 function tvBuildList(){
@@ -10924,7 +10944,27 @@ function tvBuildList(){
   // Vai ao final da lista, sem alterar os índices dos operadores normais
   // (que usam idx/posição pra calcular colocação, vizinhos etc.).
   const podiumSlide = { _podium:true, name:'PODIUM_TOP5', top: ops.slice(0,10) };
-  tvList = [...ops, ...tvBuildDailyHighlights(), podiumSlide];
+
+  // ── PÓDIOS EXTRAS, UM POR EQUIPE ────────────────────────────────────
+  // Quando o modo atual junta mais de uma equipe (ex.: "Stephanie + Katia"),
+  // depois do pódio combinado mostramos, em seguida, o mesmo pódio TOP 5
+  // — só que separado, um pra cada equipe que compõe essa combinação.
+  const comboTeams = tvComboTeams(tvMode);
+  let podiumsPorEquipe = [];
+  if(comboTeams && comboTeams.length>1){
+    podiumsPorEquipe = comboTeams.map(eqCode=>{
+      const teamOps = base.filter(o=>o.eq===eqCode).sort((a,b)=>tvGetRec(b)-tvGetRec(a));
+      const cfg = EQ[eqCode] || {sh:eqCode, ico:'🏢'};
+      return {
+        _podium:true,
+        name:'PODIUM_TOP5_'+eqCode,
+        top: teamOps.slice(0,10),
+        label: (cfg.ico?cfg.ico+' ':'') + (cfg.sh||eqCode).toUpperCase()
+      };
+    });
+  }
+
+  tvList = [...ops, ...tvBuildDailyHighlights(), podiumSlide, ...podiumsPorEquipe];
 }
 
 // Carinha de projeção de meta pra usar no bloco de Ranking do Modo TV
@@ -11523,8 +11563,9 @@ function tvShowPodiumSlide(slide){
     return `<span class="tv-confetti" style="left:${left}%;font-size:${size}px;animation-duration:${dur}s;animation-delay:${delay}s">${confEmojis[i%confEmojis.length]}</span>`;
   }).join('');
 
-  const isEqMode = tvMode !== 'geral';
-  const modeLbl = tvMode==='geral' ? 'RANKING GERAL'
+  const isEqMode = slide.label ? true : (tvMode !== 'geral');
+  const modeLbl = slide.label ? slide.label
+    : tvMode==='geral' ? 'RANKING GERAL'
     : tvMode==='bs' ? 'STEPHANIE + KATIA'
     : tvMode==='bb' ? 'BRUNA + STEPHANIE'
     : tvMode==='bsk'? 'BRENDA + STEPHANIE + KATIA'
