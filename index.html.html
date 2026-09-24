@@ -3467,6 +3467,29 @@ function buildCal(gridId){
 
   const firstDay = new Date(year,month,1).getDay(); // 0=sun
   const daysInMonth = new Date(year,month+1,0).getDate();
+
+  // Calcula DU.total/passou/restam ANTES de qualquer 'return' por falta de
+  // elemento no DOM. Sem isso, se a grade do calendário (#cal-grid) não
+  // estivesse na tela naquele momento (ex.: aba ainda não aberta), a função
+  // saía cedo e DU.total/DU.passou ficavam travados no valor padrão inicial,
+  // afetando a tabela de Projeção HO e qualquer outro cálculo que dependa de
+  // DU sem que ninguém percebesse.
+  {
+    let _duTotal=0, _duPassed=0;
+    for(let d=1; d<=daysInMonth; d++){
+      const dt = new Date(year,month,d);
+      const dow = dt.getDay();
+      const iso = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const isFeriado = getFeriados().includes(iso);
+      const isWeekend = dow===0||dow===6;
+      const duOv = getDUOverrides()[iso];
+      const isWorkday = duOv===true ? true : duOv===false ? false : (!isWeekend && !isFeriado);
+      if(isWorkday) _duTotal++;
+      if(isWorkday && d<=today) _duPassed++;
+    }
+    DU.total=_duTotal; DU.passou=_duPassed; DU.restam=Math.max(0,_duTotal-_duPassed);
+  }
+
   const grid = document.getElementById(gridId);
   if(!grid) return;
   grid.innerHTML = '';
@@ -3492,7 +3515,7 @@ function buildCal(gridId){
     const isWorkday = duOv===true ? true : duOv===false ? false : (!isWeekend && !isFeriado);
     const isManualUtil = duOv===true;
     const isToday = d===today;
-    const isPast = d<today;
+    const isPast = d<=today;
 
     if(isWorkday) duTotal++;
     if(isWorkday && isPast) duPassed++;
@@ -5224,9 +5247,14 @@ function _calcularDiasConciliacao(raw){
 // Guarda qualquer atualização feita pelos botões "Importar Geral"/"Importar Empresa" —
 // entra POR CIMA da base embutida (CMP_CONCILIACAO_DIAS), mês por mês. Sincroniza via
 // Firebase, então uma importação feita num computador aparece em todos os outros.
-let CMP_CONCILIACAO_DIAS_LIVE = {};
+let CMP_CONCILIACAO_DIAS_LIVE = {
+  // Setembro/2026 (mês corrente, ainda aberto) — semente com o dado real
+  // mais recente da conciliação. Segue sendo atualizado normalmente a cada
+  // novo import (localStorage/Firebase têm prioridade sobre isso).
+  '2026-09': [67079.88,49715.74,58496.85,62445.95,0.0,0.0,0.0,120002.61,54066.2,33966.72,52087.04,0.0,0.0,83270.22,58426.83,49178.3,50374.43,42402.18,0.0,0.0,86706.04,6379.66,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+};
 (function _carregarConciliacaoLive(){
-  try{ const s = localStorage.getItem('cofen_cmp_dias'); if(s) CMP_CONCILIACAO_DIAS_LIVE = JSON.parse(s)||{}; }catch(e){}
+  try{ const s = localStorage.getItem('cofen_cmp_dias'); if(s){ const salvo = JSON.parse(s)||{}; CMP_CONCILIACAO_DIAS_LIVE = {...CMP_CONCILIACAO_DIAS_LIVE, ...salvo}; } }catch(e){}
 })();
 function fbListenConciliacaoDias(){
   if(!fbDb||!fbRoom||fbListeners.cmpDias) return;
@@ -5245,8 +5273,8 @@ function fbListenConciliacaoDias(){
     // Nunca aceitar do Firebase um mês que já tem dado estático completo
     const remoteFiltrado = {};
     Object.keys(remote).forEach(k=>{ if(!CMP_CONCILIACAO_DIAS[k]) remoteFiltrado[k]=remote[k]; });
-    CMP_CONCILIACAO_DIAS_LIVE = remoteFiltrado;
-    try{ localStorage.setItem('cofen_cmp_dias', JSON.stringify(remoteFiltrado)); }catch(e){}
+    CMP_CONCILIACAO_DIAS_LIVE = {...CMP_CONCILIACAO_DIAS_LIVE, ...remoteFiltrado};
+    try{ localStorage.setItem('cofen_cmp_dias', JSON.stringify(CMP_CONCILIACAO_DIAS_LIVE)); }catch(e){}
     if(typeof renderComparativo15DU==='function' && typeof _gerarComparativoCompleto==='function'){
       renderComparativo15DU(_gerarComparativoCompleto());
     }
@@ -11762,9 +11790,9 @@ function tvShow(idx){
 
         <!-- NOME + badges -->
         <div style="position:relative">
-          <!-- Troféu grande de fundo, decorativo, atrás do nome -->
-          <div style="position:absolute;left:-30px;top:-70px;z-index:0;pointer-events:none;user-select:none;
-              font-size:230px;line-height:1;opacity:.4;filter:drop-shadow(0 6px 14px rgba(0,0,0,.2))">🏆</div>
+          <!-- Troféu decorativo, canto superior direito, menor -->
+          <div style="position:absolute;right:-10px;top:-40px;z-index:0;pointer-events:none;user-select:none;
+              font-size:90px;line-height:1;opacity:.4;filter:drop-shadow(0 6px 14px rgba(0,0,0,.2))">🏆</div>
           <div style="position:relative;z-index:2;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:nowrap">
             <div style="display:flex;align-items:baseline;gap:16px;flex:1;min-width:0">
               ${(()=>{
