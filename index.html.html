@@ -3485,7 +3485,7 @@ function buildCal(gridId){
       const duOv = getDUOverrides()[iso];
       const isWorkday = duOv===true ? true : duOv===false ? false : (!isWeekend && !isFeriado);
       if(isWorkday) _duTotal++;
-      if(isWorkday && d<=today) _duPassed++;
+      if(isWorkday && d<today) _duPassed++;
     }
     DU.total=_duTotal; DU.passou=_duPassed; DU.restam=Math.max(0,_duTotal-_duPassed);
   }
@@ -3515,7 +3515,7 @@ function buildCal(gridId){
     const isWorkday = duOv===true ? true : duOv===false ? false : (!isWeekend && !isFeriado);
     const isManualUtil = duOv===true;
     const isToday = d===today;
-    const isPast = d<=today;
+    const isPast = d<today;
 
     if(isWorkday) duTotal++;
     if(isWorkday && isPast) duPassed++;
