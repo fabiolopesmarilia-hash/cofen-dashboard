@@ -855,7 +855,7 @@ select.ev-inp{cursor:pointer}
       #cd-meta-panel:fullscreen #cd-titulo{font-size:clamp(20px,2.6vw,40px)!important}
       #cd-meta-panel:fullscreen #cd-falta-lbl{font-size:clamp(34px,5vw,80px)!important}
       #cd-meta-panel:fullscreen .cd-logo{height:clamp(70px,10vw,150px)!important}
-      #cd-meta-panel:fullscreen #cd-barra-wrap{height:clamp(34px,4vw,60px)!important;max-width:1200px!important}
+      #cd-meta-panel:fullscreen #cd-barra-wrap{display:none!important}
       #cd-meta-panel:fullscreen #cd-barra{min-height:100%}
       #cd-meta-panel:fullscreen #cd-controles,#cd-meta-panel:fullscreen #cd-btn-fs{display:none!important}
       #cd-meta-panel:fullscreen{cursor:pointer}
@@ -7579,10 +7579,10 @@ function renderCountdownMeta(fromInput){
   const duRest = (typeof DU!=='undefined' && DU.restam>0) ? DU.restam : 0;
   document.getElementById('cd-sub').textContent =
     'Meta ' + fR(metaV) + ' · Atual ' + fR(atualV) +
-    (falta>0 && duRest>0 ? ' · ' + duRest + ' dias úteis restantes · ' + fR(falta/duRest) + '/dia útil' : '');
+    (falta>0 && duRest>0 ? ' · ' + duRest + ' dias úteis restantes' : '');
   document.getElementById('cd-barra').style.width = pct.toFixed(1)+'%';
   cdAtualizaFrase(metaV>0 ? atualV/metaV*100 : 0);
-  document.getElementById('cd-pct').textContent = pct.toFixed(1).replace('.',',') + '% da meta atingida';
+  document.getElementById('cd-pct').textContent = pct.toFixed(1).replace('.',',') + '% da meta atingida' + (falta>0 && duRest>0 ? ' · ' + fR(falta/duRest) + '/dia útil' : '');
 }
 document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(renderCountdownMeta, 600); });
 setInterval(()=>{ if(document.activeElement?.id!=='cd-inp-meta' && document.activeElement?.id!=='cd-inp-atual') renderCountdownMeta(); }, 5000);
