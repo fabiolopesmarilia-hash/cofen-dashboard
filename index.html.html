@@ -844,6 +844,38 @@ select.ev-inp{cursor:pointer}
     </div>
   </div>
 
+  <!-- ══ CONTAGEM REGRESSIVA — META COB COFEN ══ -->
+  <div id="cd-meta-panel" style="position:relative;margin:14px 0 0;padding:22px 20px;background:linear-gradient(135deg,#1a0b2e 0%,#0a2540 100%);border-radius:14px;border:1px solid rgba(255,193,7,.35);text-align:center">
+    <button id="cd-btn-fs" onclick="cdTelaCheia()" title="Tela cheia (ESC para sair)" style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;font-weight:800;font-size:14px;padding:8px 14px;cursor:pointer">⛶ Tela cheia</button>
+    <style>
+      #cd-meta-panel:fullscreen{margin:0!important;border-radius:0!important;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:30px!important;overflow:auto}
+      #cd-meta-panel:fullscreen #cd-falta{font-size:clamp(70px,16vw,260px)!important}
+      #cd-meta-panel:fullscreen #cd-sub{font-size:clamp(20px,3vw,44px)!important}
+      #cd-meta-panel:fullscreen #cd-pct{font-size:clamp(22px,3vw,44px)!important}
+      #cd-meta-panel:fullscreen > div:first-of-type{font-size:clamp(16px,2vw,30px)!important}
+      #cd-meta-panel:fullscreen #cd-barra{min-height:100%}
+      #cd-meta-panel:fullscreen #cd-controles,#cd-meta-panel:fullscreen #cd-btn-fs{display:none!important}
+      #cd-meta-panel:fullscreen{cursor:pointer}
+      #cd-meta-panel:fullscreen #cd-frase{display:block!important;font-size:clamp(28px,4.5vw,72px)}
+    </style>
+    <div style="font-size:12px;font-weight:800;color:rgba(255,193,7,.85);letter-spacing:3px;text-transform:uppercase">⏳ CONTAGEM REGRESSIVA · META COB COFEN</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;color:#fff;margin-top:10px;opacity:.85">FALTA</div>
+    <div id="cd-falta" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,9vw,96px);line-height:1;letter-spacing:2px;color:#FFC107;text-shadow:0 0 24px rgba(255,193,7,.4)">R$ 0,00</div>
+    <div id="cd-sub" style="font-size:clamp(16px,2.6vw,26px);font-weight:800;color:rgba(255,255,255,.9);margin-top:12px;line-height:1.35"></div>
+    <div style="height:22px;background:rgba(255,255,255,.1);border-radius:100px;margin:16px auto 6px;max-width:720px;overflow:hidden">
+      <div id="cd-barra" style="height:100%;width:0%;background:linear-gradient(90deg,#f97316,#FFC107,#4ADE80);border-radius:100px;transition:width .5s"></div>
+    </div>
+    <div id="cd-pct" style="font-size:clamp(18px,2.6vw,28px);font-weight:900;color:#fff"></div>
+    <div id="cd-frase" style="display:none;font-family:'Bebas Neue',sans-serif;letter-spacing:3px;color:#fff;text-align:center;margin-top:28px;text-shadow:0 0 20px rgba(255,193,7,.5)"></div>
+    <div id="cd-controles" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:16px">
+      <label style="font-size:14px;font-weight:800;color:rgba(255,255,255,.8);text-align:left">🎯 META (R$)<br>
+        <input id="cd-inp-meta" type="number" min="0" step="1000" oninput="cdSalvar()" style="margin-top:4px;width:230px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);border-radius:8px;color:#fff;font-weight:900;font-size:24px;padding:8px 12px"></label>
+      <label style="font-size:14px;font-weight:800;color:rgba(255,255,255,.8);text-align:left">💰 VALOR ATUAL (R$)<br>
+        <input id="cd-inp-atual" type="number" min="0" step="0.01" placeholder="auto" oninput="cdSalvar()" style="margin-top:4px;width:230px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);border-radius:8px;color:#fff;font-weight:900;font-size:24px;padding:8px 12px"></label>
+      <button onclick="cdAuto()" style="align-self:flex-end;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:8px;color:#fff;font-weight:800;font-size:15px;padding:14px 18px;cursor:pointer">↩ Usar valor automático</button>
+    </div>
+  </div>
+
   <!-- ══ PROJEÇÃO DE META HO TOTAL ══ -->
   <div style="margin:14px 0 0;padding:16px 20px;background:linear-gradient(135deg,#0d1b2a 0%,#0a2540 100%);border-radius:14px;border:1px solid rgba(0,188,212,.2)">
     <div style="font-size:9px;font-weight:800;color:rgba(0,229,255,.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">📈 PROJEÇÃO HO TOTAL — CENÁRIOS DE META</div>
@@ -7407,8 +7439,128 @@ function go(id,el){
 }
 
 // ── REFRESH ALL ──
+// ── CONTAGEM REGRESSIVA DA META (painel grande, valores editáveis) ──
+function cdGetMeta(){
+  const v = parseFloat(localStorage.getItem('cofen_cd_meta'));
+  return v>0 ? v : (meta>0 ? meta : 1400000);
+}
+function cdGetAtual(){
+  const v = parseFloat(localStorage.getItem('cofen_cd_atual'));
+  return v>0 ? v : cdAutoValor();
+}
+// Valor automático = MESMA fonte da tabela "Projeção HO Total" e das metas:
+// soma da coluna PaguePay do arquivo empresa (ppEmpresaAbril). Só cai no
+// total das equipes se esse arquivo ainda não foi importado.
+function cdAutoValor(){
+  return (typeof ppEmpresaAbril!=='undefined' && ppEmpresaAbril>0) ? ppEmpresaAbril : getTotalRec();
+}
+function cdSalvar(){
+  const m = parseFloat(document.getElementById('cd-inp-meta')?.value);
+  const a = parseFloat(document.getElementById('cd-inp-atual')?.value);
+  try{
+    if(m>0) localStorage.setItem('cofen_cd_meta', m); else localStorage.removeItem('cofen_cd_meta');
+    if(a>0) localStorage.setItem('cofen_cd_atual', a); else localStorage.removeItem('cofen_cd_atual');
+  }catch(e){}
+  renderCountdownMeta(true);
+  cdPublicar();
+}
+function cdAuto(){
+  try{ localStorage.removeItem('cofen_cd_atual'); }catch(e){}
+  const i=document.getElementById('cd-inp-atual'); if(i) i.value='';
+  renderCountdownMeta(true);
+  cdPublicar();
+}
+// Envia meta/valor atual pra TODOS os computadores conectados (Firebase) e
+// pras outras abas do mesmo navegador (BroadcastChannel).
+let _cdPubTimer = null;
+function cdPublicar(){
+  clearTimeout(_cdPubTimer);
+  _cdPubTimer = setTimeout(()=>{
+    const dados = {
+      meta:  parseFloat(localStorage.getItem('cofen_cd_meta'))  || 0,
+      atual: parseFloat(localStorage.getItem('cofen_cd_atual')) || 0,
+      _ts: Date.now()
+    };
+    if(typeof fbPush==='function') fbPush('countdown_meta', dados);
+    if(typeof syncBroadcast==='function') syncBroadcast('cd_update', JSON.stringify(dados));
+  }, 400);
+}
+// Aplica aqui o que veio de outro computador/aba
+function cdAplicarRemoto(d){
+  if(!d) return;
+  try{
+    if(d.meta>0)  localStorage.setItem('cofen_cd_meta', d.meta);  else localStorage.removeItem('cofen_cd_meta');
+    if(d.atual>0) localStorage.setItem('cofen_cd_atual', d.atual); else localStorage.removeItem('cofen_cd_atual');
+  }catch(e){}
+  const foco = document.activeElement?.id;
+  if(foco!=='cd-inp-meta' && foco!=='cd-inp-atual') renderCountdownMeta(false);
+  else renderCountdownMeta(true);
+}
+function fbListenCountdown(){
+  if(!fbDb||!fbRoom||fbListeners.countdown) return;
+  fbDb.ref(fbRoom+'/countdown_meta').on('value', snap=>{
+    const remote = snap.val();
+    if(!remote) return;
+    cdAplicarRemoto(remote);
+    if(typeof pulseSyncDot==='function') pulseSyncDot();
+  });
+  fbListeners.countdown = true;
+}
+function cdTelaCheia(){
+  const el=document.getElementById('cd-meta-panel'); if(!el) return;
+  if(document.fullscreenElement){ document.exitFullscreen(); return; }
+  (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el);
+}
+document.addEventListener('click',e=>{ if(document.fullscreenElement && document.fullscreenElement.id==='cd-meta-panel') document.exitFullscreen(); });
+document.addEventListener('fullscreenchange',()=>{
+  const b=document.getElementById('cd-btn-fs');
+  if(b) b.textContent = document.fullscreenElement ? '✕ Sair (ESC)' : '⛶ Tela cheia';
+});
+const CD_FRASES = {
+  baixo: ['CADA LIGAÇÃO NOS APROXIMA DA META!','QUEM NÃO DESISTE, CHEGA LÁ!','O MÊS É DECIDIDO NOS ÚLTIMOS DIAS!','FOCO, FORÇA E FECHAMENTO!'],
+  meio:  ['ESTAMOS NO CAMINHO CERTO — NÃO PARE AGORA!','A META ESTÁ CADA VEZ MAIS PERTO!','MAIS UM ACORDO, MAIS UM PASSO!','JUNTOS A GENTE BATE ESSA META!'],
+  alto:  ['É AGORA! FALTA MUITO POUCO!','A RETA FINAL É NOSSA!','NINGUÉM SEGURA ESSE TIME!','VAMOS FECHAR ESSA META COM CHAVE DE OURO!'],
+  bateu: ['🎉 META BATIDA! PARABÉNS, COB COFEN! 🏆','🏆 MISSÃO CUMPRIDA! ORGULHO DESSE TIME!']
+};
+let _cdFraseIdx = 0;
+function cdAtualizaFrase(pct){
+  const el=document.getElementById('cd-frase'); if(!el) return;
+  const grupo = pct>=100 ? CD_FRASES.bateu : pct>=80 ? CD_FRASES.alto : pct>=50 ? CD_FRASES.meio : CD_FRASES.baixo;
+  el.textContent = grupo[_cdFraseIdx % grupo.length];
+}
+setInterval(()=>{ _cdFraseIdx++; renderCountdownMeta(true); }, 8000);
+function renderCountdownMeta(fromInput){
+  const el = document.getElementById('cd-falta');
+  if(!el) return;
+  const fR = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const metaV  = cdGetMeta();
+  const atualV = cdGetAtual();
+  const falta  = Math.max(0, metaV - atualV);
+  const pct    = metaV>0 ? Math.min(100, atualV/metaV*100) : 0;
+  if(!fromInput){
+    const im=document.getElementById('cd-inp-meta');  if(im) im.value = metaV;
+    const ia=document.getElementById('cd-inp-atual');
+    if(ia){
+      ia.value = parseFloat(localStorage.getItem('cofen_cd_atual'))>0 ? localStorage.getItem('cofen_cd_atual') : '';
+      ia.placeholder = 'auto: ' + cdAutoValor().toLocaleString('pt-BR',{minimumFractionDigits:2});
+    }
+  }
+  el.textContent = falta>0 ? fR(falta) : '🎉 META BATIDA!';
+  el.style.color = falta>0 ? '#FFC107' : '#4ADE80';
+  const duRest = (typeof DU!=='undefined' && DU.restam>0) ? DU.restam : 0;
+  document.getElementById('cd-sub').textContent =
+    'Meta ' + fR(metaV) + ' · Atual ' + fR(atualV) +
+    (falta>0 && duRest>0 ? ' · ' + duRest + ' dias úteis restantes · ' + fR(falta/duRest) + '/dia útil' : '');
+  document.getElementById('cd-barra').style.width = pct.toFixed(1)+'%';
+  cdAtualizaFrase(metaV>0 ? atualV/metaV*100 : 0);
+  document.getElementById('cd-pct').textContent = pct.toFixed(1).replace('.',',') + '% da meta atingida';
+}
+document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(renderCountdownMeta, 600); });
+setInterval(()=>{ if(document.activeElement?.id!=='cd-inp-meta' && document.activeElement?.id!=='cd-inp-atual') renderCountdownMeta(); }, 5000);
+
 function refreshAll(){
   rebuildAll();
+  if(typeof renderCountdownMeta==='function') renderCountdownMeta();
   initHero();
   if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho(); if(typeof mtsAtualizarJulho==='function') mtsAtualizarJulho(); if(typeof mtsAtualizarAgosto==='function') mtsAtualizarAgosto();
   // Sempre atualiza todos os componentes — independente de qual aba está visível
@@ -10704,6 +10856,7 @@ try {
       if(typeof tvRefresh==='function') tvRefresh();
       if(document.getElementById('fotos-grid')) fotosRenderGrid();
     }
+    if(e.data.type === 'cd_update'){ try{ cdAplicarRemoto(JSON.parse(e.data.payload||'{}')); }catch(err){} }
     if(e.data.type === 'meta_update'){
       // Outra aba editou total/meta — aplicar aqui também
       const d = JSON.parse(e.data.payload||'{}');
@@ -12363,6 +12516,7 @@ function syncDisconnect(){
   if(fbListeners.historicoAnual) { fbDb?.ref(fbRoom+'/historicoAnual').off(); }
   if(fbListeners.trilha) { fbDb?.ref(fbRoom+'/trilha').off(); }
   if(fbListeners.cmpDias) { fbDb?.ref(fbRoom+'/cmp_dias').off(); }
+  if(fbListeners.countdown) { fbDb?.ref(fbRoom+'/countdown_meta').off(); }
   fbListeners={};
   fbApp=null; fbDb=null; fbRoom=null;
   fbSaveCfg({});
@@ -12976,6 +13130,8 @@ function fbStartListening(){
   fbListenTrilha();
   // ── Comparativo Mensal (Pague Play, dado diário de conciliação) ──
   fbListenConciliacaoDias();
+  // ── Contagem regressiva da meta (painel) ──
+  fbListenCountdown();
 }
 
 // ── PUSH TO FIREBASE ──
