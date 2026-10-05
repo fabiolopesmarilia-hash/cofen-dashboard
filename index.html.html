@@ -815,7 +815,7 @@ select.ev-inp{cursor:pointer}
     <!-- ══ TABELA METAS & PROJEÇÕES — dentro do hero ══ -->
     <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap;gap:6px">
-        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase">🏆 METAS & PROJEÇÕES HO — EQUIPES AGOSTO 2026</div>
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase">🏆 METAS & PROJEÇÕES HO — EQUIPES <span id="eq-mt-mes">AGOSTO 2026</span></div>
         <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.3);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:3px 10px" id="eq-mt-badge">— DIAS ÚTEIS RESTANTES</div>
       </div>
       <div style="background:rgba(252,211,77,.12);border:1px solid rgba(252,211,77,.3);border-radius:var(--r);padding:6px 12px;font-size:10px;font-weight:700;color:#FCD34D;margin-bottom:8px;letter-spacing:.3px">
@@ -3142,7 +3142,7 @@ let CMP_OPS_DU_JUNHO = {};
 // mesmo com 0 operadores — sem isso, a equipe some de tabelas (Metas HO,
 // Modo TV etc.) sempre que ficar temporariamente vazia.
 (function _garantirEquipesCanonicas(){
-  const _canonicas = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA'];
+  const _canonicas = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA','COFEN TREINAMENTO','COFEN SUPORTE'];
   _canonicas.forEach(nome=>{
     if(!D.equipes.find(e=>e.name===nome)){
       D.equipes.push({name:nome, rec:0, ho:0, n_op:0, acordos:0, ops:[], gerados:0, pagos:0, pendentes:0});
@@ -3329,8 +3329,18 @@ const EQ={
   "COFEN DIGITAL":           {c:"#f953c6",bg:"#FDF2FF",ico:"🖥️",sh:"Digital"},
   "COFEN KATIA":             {c:"#8B5CF6",bg:"#F3F0FF",ico:"💜",sh:"Equipe Stephanie"},
   "COFEN LETICIA":           {c:"#10B981",bg:"#ECFDF5",ico:"🌿",sh:"Letícia"},
-  "COFEN PAGUEPLAY":         {c:"#EC4899",bg:"#FDF2F8",ico:"🩷",sh:"Pagueplay"}
+  "COFEN PAGUEPLAY":         {c:"#EC4899",bg:"#FDF2F8",ico:"🩷",sh:"Pagueplay"},
+  "COFEN TREINAMENTO":       {c:"#06B6D4",bg:"#ECFEFF",ico:"🎓",sh:"Treinamento Isabella"},
+  "COFEN SUPORTE":           {c:"#64748B",bg:"#F1F5F9",ico:"🛟",sh:"Suporte"}
 };
+// Líderes: não entram nos rankings de operadores, mas o recebimento deles SOMA na equipe
+// (total, HO, meta, dia). Login -> chave interna da equipe.
+const LIDER_EQ = {
+  'BRUNA_JUSTIMIANO':'COFEN BIRIGUI BRUNA',
+  'KATIA_REGINA':'COFEN STEPHANIE 2° TURNO',
+  'STEPHANIE_BERNARDES':'COFEN MARILIA BRENDA'
+};
+function _ehLider(nome){ return Object.prototype.hasOwnProperty.call(LIDER_EQ, String(nome||'').toUpperCase()); }
 
 const fR=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const fRK=v=>v>=1e6?"R$ "+(v/1e6).toFixed(2).replace('.',',')+"M":v>=1000?"R$ "+(v/1000).toFixed(1)+"K":fR(v);
@@ -3378,14 +3388,14 @@ let ALL = [];
 function rebuildAll(){
   // NÃO modifica D — apenas filtra ao montar ALL
   // Modificar D causava perda permanente de operadores a cada chamada
-  const _BLOCKED=["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_BERNARDES"];
+  const _BLOCKED=["fabio_aquino", "BRENDA_FERREIRA"];
   const _BLOCKED_TEAMS=[];
   const _gOvR=gGetOverrides();
   const _allRemoved=new Set([...(_gOvR.removidos||[]),..._BLOCKED]);
   ALL=D.equipes
     .filter(e=>!_BLOCKED_TEAMS.includes(e.name))
     .flatMap(e=>e.ops
-      .filter(o=>!_allRemoved.has(o.name))
+      .filter(o=>!_allRemoved.has(o.name) && !_ehLider(o.name))
       .map(o=>({...o,eq:e.name}))
     )
     .sort((a,b)=>b.rec-a.rec);
@@ -3394,7 +3404,7 @@ function rebuildAll(){
     const visibleOps=eq.ops.filter(o=>!_allRemoved.has(o.name));
     eq.rec=visibleOps.reduce((s,o)=>s+o.rec,0);
     eq.ho=visibleOps.reduce((s,o)=>s+o.ho,0);
-    eq.n_op=visibleOps.length;
+    eq.n_op=visibleOps.filter(o=>!_ehLider(o.name)).length;
     eq.acordos=visibleOps.reduce((s,o)=>s+(o.acordos||0),0);
   });
   // Restaurar acordos do localStorage (persistência offline)
@@ -4440,7 +4450,7 @@ function _buildMetasHtml(val, compact){
     </div>`;
 }
 function _buildTeamsHtml(compact){
-  const MAIN = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA'];
+  const MAIN = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN TREINAMENTO','COFEN SUPORTE','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA'];
   const rows = MAIN.map(name=>{
     const eq  = D.equipes.find(e=>e.name===name);
     const cfg = EQ[name]||{c:'#888',sh:name};
@@ -8464,13 +8474,17 @@ function metaOpFillFromTeam(){
 // Quem não está no quadro de produção sai dos rankings (removidos, reversível em Gestão).
 var _reorgPend=false;
 function _reorgGarantir(ov){
-  var V='2026-10-05-a';
+  var V='2026-10-05-b';
   if(ov.reorgV===V) return false;
   var R={
     'COFEN BIRIGUI BRUNA':['Diego Rodrigues','Kaue Nadai','Leticia Romeu','Silva Beatriz','Tassiane Viana','Thais Mayara','Thauany Moura','Amabelly Santos','Caio Shimite','Caroline Valverde','Mirella Arias','Raissa Paloma','Stephanie Fagundes','Thayla Santana'],
     'COFEN STEPHANIE 2° TURNO':['Giovana Souza','Isabela Monteiro','Debora Sobrinho','Gisleide Guedes','Jade Faustino','Kauane Azevedo','Rayssa R. Oliveira'],
-    'COFEN MARILIA BRENDA':['Bruna Teles','Bruna Garbi','Claudineia Messias','Isabella Santos','Itallo Cardamoni','Joao Anguita','Karina Colonez','Leonardo Costa','Rebeca Camargo']
+    'COFEN MARILIA BRENDA':['Bruna Teles','Bruna Garbi','Claudineia Messias','Isabella Santos','Itallo Cardamoni','Joao Anguita','Karina Colonez','Leonardo Costa','Rebeca Camargo','Stephanie Bernardes'],
+    'COFEN TREINAMENTO':['Manuela Marini','Allana Barbosa','Kethely Santos','Leticia Quinallia','Sophia Costa','Luan Pinto'],
+    'COFEN SUPORTE':['Estrategia Cofen']
   };
+  R['COFEN BIRIGUI BRUNA'].push('Bruna Justimiano');
+  R['COFEN STEPHANIE 2° TURNO'].push('Katia Regina');
   function kk(x){return String(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim().split(' ').sort().join(' ');}
   var known=[];
   try{(ORIG.equipes||[]).forEach(function(e){e.ops.forEach(function(o){if(known.indexOf(o.name)<0)known.push(o.name);});});}catch(e){}
@@ -9089,7 +9103,7 @@ function mvApply(){
   // (ex.: "COFEN KATIA"/Equipe Stephanie ficando com 0 operadores não pode
   // sumir da tabela de metas e do resto do dashboard, que sempre espera essa
   // chave existir mesmo zerada).
-  const _EQUIPES_CANONICAS = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA'];
+  const _EQUIPES_CANONICAS = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA','COFEN TREINAMENTO','COFEN SUPORTE'];
   D.equipes = D.equipes.filter(e=>e.ops.length>0 || _EQUIPES_CANONICAS.includes(e.name));
 
   // Persist move
@@ -9358,7 +9372,7 @@ function loadGestaoOverrides(){
       });
     });
     // Mesma proteção: nunca remover as equipes canônicas, só times avulsos vazios
-    const _EQUIPES_CANONICAS2 = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA'];
+    const _EQUIPES_CANONICAS2 = ['COFEN MARILIA BRENDA','COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN DIGITAL','COFEN KATIA','COFEN LETICIA','COFEN TREINAMENTO','COFEN SUPORTE'];
     D.equipes=D.equipes.filter(e=>e.ops.length>0 || _EQUIPES_CANONICAS2.includes(e.name));
     rebuildAll();
   }
@@ -9366,7 +9380,7 @@ function loadGestaoOverrides(){
   if(ov.novos && ov.novos.length>0){
     ov.novos.forEach(n=>{
       if(ALL.find(o=>o.name===n.name)) return;
-      const _BLK=["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_BERNARDES"]; if(_BLK.includes(n.name)) return;
+      const _BLK=["fabio_aquino", "BRENDA_FERREIRA"]; if(_BLK.includes(n.name)) return;
       const eqObj=D.equipes.find(e=>e.name===n.eq);
       if(!eqObj) return;
       const ho=n.rec*0.25;
@@ -9440,6 +9454,8 @@ function importParse(raw){
     if(e.includes('STEPHANIE') || e.includes('STEFANIE') || e.includes('KATIA')) return 'COFEN STEPHANIE 2\u00b0 TURNO';
     if(e.includes('BRUNA') || e.includes('BIRIGUI')) return 'COFEN BIRIGUI BRUNA';
     if(e.includes('LETICIA') || e.includes('LETÍCIA')) return 'COFEN LETICIA';
+    if(e.includes('TREINAMENTO')) return 'COFEN TREINAMENTO';
+    if(e.includes('SUPORTE')) return 'COFEN SUPORTE';
     if(e.includes('PAGUEPLAY') || e.includes('PAGUE PLAY')) return 'COFEN PAGUEPLAY';
     return null;
   }
@@ -10995,6 +11011,8 @@ const TV_EQUIPES_REAIS = {
   'COFEN STEPHANIE 2° TURNO': '⭐ Katia 2°T',
   'COFEN KATIA'             : '💜 Equipe Stephanie',
   'COFEN LETICIA'           : '🌿 Equipe Letícia',
+  'COFEN TREINAMENTO'       : '🎓 Treinamento Isabella',
+  'COFEN SUPORTE'           : '🛟 Suporte',
 };
 
 // ── Botões ocultos do seletor do Modo TV (reversível) ──
@@ -11310,7 +11328,9 @@ const TV_HIGHLIGHT_TEAMS = {
   'COFEN STEPHANIE 2° TURNO': 'Katia 2°T',
   'COFEN KATIA':              'Equipe Stephanie',
   'COFEN MARILIA BRENDA':     'Marília Stephanie',
-  'COFEN LETICIA':            'Equipe Letícia'
+  'COFEN LETICIA':            'Equipe Letícia',
+  'COFEN TREINAMENTO':        'Treinamento Isabella',
+  'COFEN SUPORTE':            'Suporte'
 };
 function tvBuildDailyHighlights(){
   let _removidos=[];
@@ -13066,8 +13086,9 @@ function fbStartListening(){
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
     gSetOverrides({...local,...remote,reorgV:remote.reorgV});
     // Aplicar removidos do Firebase para este dispositivo
-    if(remote.removidos && remote.removidos.length>0){
-      remote.removidos.forEach(nm=>{
+    const _rmEf=(gGetOverrides().removidos)||[];
+    if(_rmEf.length>0){
+      _rmEf.forEach(nm=>{
         D.equipes.forEach(eq=>{
           const i=eq.ops.findIndex(o=>o.name===nm);
           if(i>=0){
@@ -14293,7 +14314,7 @@ loadGestaoOverrides();
 (function(){
   const _gOv=gGetOverrides();
   if(!_gOv.removidos) _gOv.removidos=[];
-  ["fabio_aquino", "BRENDA_FERREIRA", "BRUNA_JUSTIMIANO", "STEPHANIE_BERNARDES"].forEach(n=>{ if(!_gOv.removidos.includes(n)) _gOv.removidos.push(n); });
+  ["fabio_aquino", "BRENDA_FERREIRA"].forEach(n=>{ if(!_gOv.removidos.includes(n)) _gOv.removidos.push(n); });
   gSetOverrides(_gOv);
 })();
 loadSharedPhotos();
@@ -19581,6 +19602,8 @@ const META_HO_PADRAO = {
   'COFEN DIGITAL'           : 37500,
   'COFEN KATIA'             : 130000,
   'COFEN LETICIA'           : 12500,
+  'COFEN TREINAMENTO'       : 20000,
+  'COFEN SUPORTE'           : 20000,
 };
 function metaHoGetAll(){
   try { return JSON.parse(localStorage.getItem('cofen_meta_ho_eq') || '{}'); }
@@ -19649,6 +19672,8 @@ function renderEqMetasTable(){
   const duTotal = (typeof DU !== 'undefined' && DU && DU.total   > 0) ? DU.total   : (duPass + duRest);
 
   // ── Atualizar badge e cabeçalho da coluna com o número real de DUs restantes ──
+  const _mesEl = document.getElementById('eq-mt-mes');
+  if(_mesEl){ const _n=new Date(); _mesEl.textContent=['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'][_n.getMonth()]+' '+_n.getFullYear(); }
   const badge = document.getElementById('eq-mt-badge');
   if(badge) badge.textContent = duRest + ' DIAS ÚTEIS RESTANTES';
 
@@ -19667,8 +19692,10 @@ function renderEqMetasTable(){
   const pctColor = p => p>=100?'#4ADE80':p>=70?'#67E8F9':p>=50?'#FCD34D':'#F87171';
   const pctBg    = p => p>=100?'rgba(74,222,128,.15)':p>=70?'rgba(103,232,249,.12)':p>=50?'rgba(252,211,77,.12)':'rgba(248,113,113,.12)';
 
-  const ORDER = ['COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN KATIA','COFEN MARILIA BRENDA','COFEN LETICIA'];
+  const ORDER = ['COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN KATIA','COFEN MARILIA BRENDA','COFEN LETICIA','COFEN TREINAMENTO','COFEN SUPORTE'];
   const EQ_LABELS = {
+    'COFEN TREINAMENTO'       : 'Treinamento Isabella',
+    'COFEN SUPORTE'           : 'Suporte',
     'COFEN BIRIGUI BRUNA'     : 'Birigui Bruna',
     'COFEN MARILIA BRENDA'    : 'Marília Stephanie',
     'COFEN STEPHANIE 2° TURNO': 'Katia 2°T',
@@ -19736,7 +19763,8 @@ function renderEqMetasTable(){
     // Recebido HOJE pela equipe inteira (soma do dia de todos os operadores).
     // Usa o dia de referência (tvGetRefDay): se o dia corrente ainda não tem
     // nada lançado (ex: de manhã, antes do relatório entrar), pega o dia anterior.
-    const recHoje = eq.ops.reduce((s,o)=>{
+    const _rmL = (gGetOverrides().removidos)||[];
+    const recHoje = eq.ops.filter(o=>!_rmL.includes(o.name)).reduce((s,o)=>{
       try{ return s + (typeof tvGetTodayVal==='function' ? tvGetTodayVal(o) : (parseFloat((o.daily||{})[new Date().getDate()])||0)); }
       catch(e){ return s; }
     },0);
