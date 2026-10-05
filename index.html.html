@@ -4445,8 +4445,8 @@ function _buildTeamsHtml(compact){
     const eq  = D.equipes.find(e=>e.name===name);
     const cfg = EQ[name]||{c:'#888',sh:name};
     const rec = eq ? eq.rec : 0;
-    return {sh: cfg.sh, c: cfg.c, ico: cfg.ico||'', rec};
-  }).sort((a,b)=>b.rec-a.rec);
+    return {sh: cfg.sh, c: cfg.c, ico: cfg.ico||'', rec, n: eq ? (eq.n_op||0) : 0};
+  }).filter(r=>r.n>0).sort((a,b)=>b.rec-a.rec);
   const total = rows.reduce((s,r)=>s+r.rec,0);
   // Sempre grande (bloco no topo)
   const fs  = '14px';
@@ -6735,7 +6735,7 @@ function mkRanking(){
   const feedbackAll = feedbackGetAll();
   document.getElementById('fbtns').innerHTML=
     `<button class="fbtn ${rkFilter==='all'?'on':''}" onclick="setF('all',this)">🏆 Todos</button>`+
-    D.equipes.map(eq=>{
+    D.equipes.filter(eq=>eq.n_op>0||rkFilter===eq.name).map(eq=>{
       const cfg=EQ[eq.name]||{c:'#888',sh:eq.name};
       const on=rkFilter===eq.name;
       return `<button class="fbtn ${on?'on':''}" onclick="setF('${eq.name}',this)"
@@ -7805,7 +7805,7 @@ function rdRenderEqHeroCards(){
   if(!el) return;
   var saved=rdGetSaved();
   // Mostrar apenas equipes com operadores cadastrados (excluir Digital que não tem card)
-  var eqsVisiveis = D.equipes.filter(function(eq){ return eq.name !== 'COFEN DIGITAL'; });
+  var eqsVisiveis = D.equipes.filter(function(eq){ return eq.name !== 'COFEN DIGITAL' && eq.n_op>0; });
   el.innerHTML=eqsVisiveis.map(function(eq){
     var cfg=EQ[eq.name]||{c:'#888',sh:eq.name,ico:'\u{1F3E2}'};
     var hoje=eq.ops.reduce(function(s,op){ return s+(parseFloat(saved[op.name])||0); },0);
@@ -7875,6 +7875,7 @@ function rdBuildSubTabs(){
   while(bar.children.length>1) bar.removeChild(bar.lastChild);
   const saved=rdGetSaved();
   D.equipes.forEach(eq=>{
+    if(!eq.n_op && rdActiveEq!==eq.name) return; // equipe sem ninguém não aparece
     const cfg=EQ[eq.name]||{c:'#888',sh:eq.name};
     const hojeEq=eq.ops.reduce((s,o)=>s+(parseFloat(saved[o.name]||0)),0);
     const isOn=rdActiveEq===eq.name;
@@ -8456,7 +8457,67 @@ function metaOpFillFromTeam(){
 }
 
 // Storage key for manual additions / moves
-function gGetOverrides(){ try{ return JSON.parse(localStorage.getItem('cofen_gestao')||'{}'); }catch(e){return {};} }
+// ══ REORGANIZAÇÃO DOS TIMES (05/10/2026) ══
+// Aplica o quadro oficial de pessoas por equipe usando os mesmos mecanismos da Gestão
+// (moves / novos / removidos), uma única vez por conjunto de dados (flag reorgV) e
+// também quando chega do Firebase um 'gestao' antigo, para ninguém desfazer sem querer.
+// Quem não está no quadro de produção sai dos rankings (removidos, reversível em Gestão).
+var _reorgPend=false;
+function _reorgGarantir(ov){
+  var V='2026-10-05-a';
+  if(ov.reorgV===V) return false;
+  var R={
+    'COFEN BIRIGUI BRUNA':['Diego Rodrigues','Kaue Nadai','Leticia Romeu','Silva Beatriz','Tassiane Viana','Thais Mayara','Thauany Moura','Amabelly Santos','Caio Shimite','Caroline Valverde','Mirella Arias','Raissa Paloma','Stephanie Fagundes','Thayla Santana'],
+    'COFEN STEPHANIE 2° TURNO':['Giovana Souza','Isabela Monteiro','Debora Sobrinho','Gisleide Guedes','Jade Faustino','Kauane Azevedo','Rayssa R. Oliveira'],
+    'COFEN MARILIA BRENDA':['Bruna Teles','Bruna Garbi','Claudineia Messias','Isabella Santos','Itallo Cardamoni','Joao Anguita','Karina Colonez','Leonardo Costa','Rebeca Camargo']
+  };
+  function kk(x){return String(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim().split(' ').sort().join(' ');}
+  var known=[];
+  try{(ORIG.equipes||[]).forEach(function(e){e.ops.forEach(function(o){if(known.indexOf(o.name)<0)known.push(o.name);});});}catch(e){}
+  if(!ov.novos) ov.novos=[];
+  ov.novos.forEach(function(n){if(known.indexOf(n.name)<0)known.push(n.name);});
+  if(!ov.moves) ov.moves=[];
+  if(!ov.removidos) ov.removidos=[];
+  var prod={}, ts=1790000000000;
+  Object.keys(R).forEach(function(team){
+    R[team].forEach(function(nome){
+      var k=kk(nome), op=null;
+      known.forEach(function(n){ if(!op && kk(n)===k) op=n; });
+      if(!op){ op=nome.toUpperCase().replace(/[^A-Z0-9]+/g,'_'); ov.novos.push({name:op,eq:team,rec:0,ts:ts}); known.push(op); }
+      prod[op]=team;
+    });
+  });
+  // moves antigos desses operadores saem; entra o destino oficial
+  ov.moves=ov.moves.filter(function(m){return !prod[m.op];});
+  Object.keys(prod).forEach(function(op){
+    var nv=ov.novos.filter(function(n){return n.name===op;})[0];
+    if(nv){ nv.eq=prod[op]; } else { ov.moves.push({op:op,from:'',to:prod[op],ts:ts}); }
+  });
+  // quem não está no quadro de produção fica fora dos rankings
+  known.forEach(function(n){ if(!prod[n] && ov.removidos.indexOf(n)<0) ov.removidos.push(n); });
+  ov.removidos=ov.removidos.filter(function(n){return !prod[n];});
+  // equipes que ficaram sem gente saem das tabelas e do seletor da TV (só esconde)
+  try{
+    var eo=JSON.parse(localStorage.getItem('cofen_equipes_ocultas_ho')||'[]');
+    ['COFEN KATIA','COFEN LETICIA','COFEN DIGITAL'].forEach(function(t){if(eo.indexOf(t)<0)eo.push(t);});
+    localStorage.setItem('cofen_equipes_ocultas_ho',JSON.stringify(eo));
+    var tb=JSON.parse(localStorage.getItem('cofen_tv_botoes_ocultos')||'[]');
+    ['COFEN KATIA','COFEN LETICIA','COFEN DIGITAL','COFEN PAGUEPLAY','bsk'].forEach(function(t){if(tb.indexOf(t)<0)tb.push(t);});
+    localStorage.setItem('cofen_tv_botoes_ocultos',JSON.stringify(tb));
+  }catch(e){}
+  ov.reorgV=V; _reorgPend=true;
+  return true;
+}
+function gGetOverrides(){
+  var o; try{ o=JSON.parse(localStorage.getItem('cofen_gestao')||'{}'); }catch(e){ o={}; }
+  try{ if(_reorgGarantir(o)) localStorage.setItem('cofen_gestao', JSON.stringify(o)); }catch(e){}
+  return o;
+}
+setInterval(function(){
+  if(!_reorgPend || typeof fbPush!=='function' || typeof fbDb==='undefined' || !fbDb) return;
+  _reorgPend=false;
+  try{ fbPush('gestao',gGetOverrides()); fbPush('equipes_ocultas_ho',equipesOcultasGetAll()); fbPush('tv_botoes_ocultos',tvBotoesOcultosGetAll()); }catch(e){}
+},3000);
 function gSetOverrides(obj){ localStorage.setItem('cofen_gestao', JSON.stringify(obj)); }
 
 // Get metas salvas
@@ -9807,6 +9868,7 @@ function importApply(){
       const opName = m.rawName.trim().replace(/\s+/g,'_');
       const opNameNorm = opName.toUpperCase().replace(/[^A-Z0-9]/g,'');
       if(ALL.find(o=>o.name.toUpperCase().replace(/[^A-Z0-9]/g,'')===opNameNorm)) return; // já existe (evita duplicar por causa de maiúscula/minúscula)
+      if((ovNovos.removidos||[]).some(r=>String(r).toUpperCase().replace(/[^A-Z0-9]/g,'')===opNameNorm)) return; // removido/fora do quadro: não recria
       // Nomes-lixo: linhas de rodapé/cabeçalho/subtotal do arquivo que acabam
       // sendo interpretadas como se fossem um operador novo (ex.: uma linha
       // "Pague Play" de resumo virava um "operador" chamado paguepay, criado
@@ -13002,7 +13064,7 @@ function fbStartListening(){
     if(!remote) return;
     const local = gGetOverrides();
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
-    gSetOverrides({...local,...remote});
+    gSetOverrides({...local,...remote,reorgV:remote.reorgV});
     // Aplicar removidos do Firebase para este dispositivo
     if(remote.removidos && remote.removidos.length>0){
       remote.removidos.forEach(nm=>{
@@ -20681,6 +20743,11 @@ window.prmStart=startS;window.prmClose=closeS;window.prmStep=step;window.prmBoom
 window.prmAdd=function(){L.push({n:'NOVO NOME',v:0});save();render()};
 window.prmSort=function(){sortL();save();render()};
 })();
+</script>
+<script>
+// esconde a aba Ranking Digital enquanto a equipe Digital estiver sem ninguém
+setInterval(function(){try{var d=D.equipes.find(function(e){return e.name==='COFEN DIGITAL'}),vis=d&&d.n_op>0;
+document.querySelectorAll('.tab').forEach(function(t){var o=t.getAttribute('onclick')||'';if(o.indexOf("'ranking-digital'")>-1)t.style.display=vis?'':'none'})}catch(e){}},2000);
 </script>
 
 <!-- ══ PÁGINA MODO TV ══ -->
