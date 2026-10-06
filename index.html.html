@@ -3115,7 +3115,7 @@ const ORIG = {"global":{"total":76462.34,"pp":0,"coren":0,"cofen":0,"daily":{}},
 (function(){
   try {
     const ov = JSON.parse(localStorage.getItem("cofen_op_overrides")||"{}");
-    if(ov["ISABELA_MONTEIRO"] !== undefined) {
+    if(false) { // desativado: o import diário é a fonte de verdade, não apagar override da Isabela
       delete ov["ISABELA_MONTEIRO"];
       localStorage.setItem("cofen_op_overrides", JSON.stringify(ov));
     }
@@ -7695,13 +7695,16 @@ function loadSavedOverrides(){
   }
 
   const savedOps = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+  const _hoMapBoot = JSON.parse(localStorage.getItem('cofen_op_ho')||'{}');
+  const _mesImportado = (localStorage.getItem('cofen_mes_dados')===(new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')));
   if(Object.keys(savedOps).length>0){
     D.equipes.forEach(eq=>{
       eq.ops.forEach(op=>{
+        if(_mesImportado){ op.daily={}; op.tipos={}; } // dados do mês vêm do import (restaurados logo abaixo); nada de resto do snapshot antigo
         if(savedOps[op.name]!==undefined){
           op.rec=savedOps[op.name];
-          op.ho=op.rec*0.25;
-        }
+          op.ho=(_hoMapBoot[op.name]!==undefined ? parseFloat(_hoMapBoot[op.name])||0 : op.rec*0.25);
+        } else if(_mesImportado){ op.rec=0; op.ho=0; } // não veio no relatório deste mês: zerado, igual ao import
       });
       eq.rec=eq.ops.reduce((s,o)=>s+o.rec,0);
       eq.ho=eq.ops.reduce((s,o)=>s+o.ho,0);
@@ -8474,12 +8477,12 @@ function metaOpFillFromTeam(){
 // Quem não está no quadro de produção sai dos rankings (removidos, reversível em Gestão).
 var _reorgPend=false;
 function _reorgGarantir(ov){
-  var V='2026-10-05-b';
+  var V='2026-10-05-c';
   if(ov.reorgV===V) return false;
   var R={
     'COFEN BIRIGUI BRUNA':['Diego Rodrigues','Kaue Nadai','Leticia Romeu','Silva Beatriz','Tassiane Viana','Thais Mayara','Thauany Moura','Amabelly Santos','Caio Shimite','Caroline Valverde','Mirella Arias','Raissa Paloma','Stephanie Fagundes','Thayla Santana'],
     'COFEN STEPHANIE 2° TURNO':['Giovana Souza','Isabela Monteiro','Debora Sobrinho','Gisleide Guedes','Jade Faustino','Kauane Azevedo','Rayssa R. Oliveira'],
-    'COFEN MARILIA BRENDA':['Bruna Teles','Bruna Garbi','Claudineia Messias','Isabella Santos','Itallo Cardamoni','Joao Anguita','Karina Colonez','Leonardo Costa','Rebeca Camargo','Stephanie Bernardes'],
+    'COFEN MARILIA BRENDA':['Bruna Teles','Bruna Garbi','Claudineia Messias','Isabella Santos','Itallo Cardamoni','Joao Anguita','Karina Colonez','Leonardo Costa','Rebeca Camargo','Stephanie Bernardes','Valquiria Xavier'],
     'COFEN TREINAMENTO':['Manuela Marini','Allana Barbosa','Kethely Santos','Leticia Quinallia','Sophia Costa','Luan Pinto'],
     'COFEN SUPORTE':['Estrategia Cofen']
   };
@@ -9383,11 +9386,14 @@ function loadGestaoOverrides(){
       const _BLK=["fabio_aquino", "BRENDA_FERREIRA"]; if(_BLK.includes(n.name)) return;
       const eqObj=D.equipes.find(e=>e.name===n.eq);
       if(!eqObj) return;
-      const ho=n.rec*0.25;
-      const newOp={name:n.name,rec:n.rec,ho,acordos:0,ligacoes:0,
+      let _rN=n.rec, _hN=null;
+      try{ const _o=JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}'); if(_o[n.name]!==undefined) _rN=parseFloat(_o[n.name])||0;
+        const _hm=JSON.parse(localStorage.getItem('cofen_op_ho')||'{}'); if(_hm[n.name]!==undefined) _hN=parseFloat(_hm[n.name])||0; }catch(e){}
+      const ho=(_hN!==null?_hN:_rN*0.25);
+      const newOp={name:n.name,rec:_rN,ho,acordos:0,ligacoes:0,
         med_atraso:0,med_lig_baixa:0,daily:{},tipos:{},n_ag:0,val_ag:0,eq:n.eq};
       eqObj.ops.push(newOp); eqObj.ops.sort((a,b)=>b.rec-a.rec);
-      eqObj.rec+=n.rec; eqObj.ho+=ho; eqObj.n_op=eqObj.ops.length;
+      eqObj.rec+=_rN; eqObj.ho+=ho; eqObj.n_op=eqObj.ops.length;
     });
     rebuildAll();
   }
@@ -9602,6 +9608,7 @@ function importParse(raw){
       acc[rawName]._semData = true;
     }
     if(_contaNoTotal) acc[rawName].total += recVal;
+    if(_contaNoTotal && iHO >= 0 && iHO !== iRec && recVal > 0){ const _hv=_parseNumFlex(row[iHO]); if(_hv>0) acc[rawName].hoRep = (acc[rawName].hoRep||0) + _hv; }
     // Parse tipo de pagamento
     if(iTipo >= 0 && recVal > 0 && row[iTipo]){
       const tipo = row[iTipo].trim().toUpperCase() || 'OUTROS';
@@ -9707,7 +9714,7 @@ function importParse(raw){
       const mEq = matched.eqName;
       found.push({
         rawName, opName:mOp.name, eq:mEq,
-        hoImport:totalReal * 0.25, recImport:totalReal,
+        hoImport:(accData.hoRep>0?accData.hoRep:totalReal*0.25), hoReport:accData.hoRep||0, recImport:totalReal,
         recCurrent:mOp.rec, hoCurrent:mOp.ho,
         diff:totalReal-mOp.rec,
         daily: daily,
@@ -9717,7 +9724,7 @@ function importParse(raw){
       });
     } else {
       missing.push({
-        rawName, ho:totalReal * 0.25, totalReal,
+        rawName, ho:(accData.hoRep>0?accData.hoRep:totalReal*0.25), hoReport:accData.hoRep||0, totalReal,
         eq: normEqReport(accData.eqRaw),
         daily: daily,
         porMes: accData.porMes || {},
@@ -9896,7 +9903,7 @@ function importApply(){
       let eqObj = D.equipes.find(e=>e.name===targetEq);
       if(!eqObj){ eqObj = {name:targetEq, rec:0, ho:0, n_op:0, acordos:0, ops:[]}; D.equipes.push(eqObj); }
       const newOp = {
-        name:opName, rec:m.totalReal, ho:m.totalReal*0.25, acordos:m.acordos||0,
+        name:opName, rec:m.totalReal, ho:(m.hoReport>0?m.hoReport:m.totalReal*0.25), acordos:m.acordos||0,
         ligacoes:0, med_atraso:0, med_lig_baixa:0, daily:m.daily||{}, tipos:m.tipos||{},
         n_ag:0, val_ag:0, eq:targetEq
       };
@@ -9961,7 +9968,7 @@ function importApply(){
       const opReal = eq.ops.find(o=>o.name===r.opName);
       if(!opReal) return;
       opReal.rec = r.recImport;
-      opReal.ho  = r.recImport * 0.25;
+      opReal.ho  = (r.hoReport>0 ? r.hoReport : r.recImport * 0.25);
       if(r.acordos > 0) opReal.acordos = r.acordos;
       if(r.daily) opReal.daily = r.daily;
       if(r.tipos  && Object.keys(r.tipos).length  > 0) opReal.tipos  = r.tipos;
@@ -9979,9 +9986,12 @@ function importApply(){
   rebuildAll();
 
   // Salvar no localStorage
-  const ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+  const ov = {};
   importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
   localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
+  { const _hm={}; importParsed.found.forEach(r=>{ _hm[r.opName]=(r.hoReport>0 ? r.hoReport : r.recImport*0.25); });
+    localStorage.setItem('cofen_op_ho', JSON.stringify(_hm));
+    try{ if(typeof syncPush==='function') syncPush('cofen_op_ho'); }catch(e){} }
 
   // Resetar snapshot base (novos valores importados = nova base)
   localStorage.removeItem('cofen_base_rec');
@@ -12475,7 +12485,7 @@ let fbListeners = {};
 // (overrides, meta, arrecadado e op_acordos já sincronizam por conta própria —
 // não duplicar essas aqui pra não conflitar com a lógica anti-loop delas) ──
 const SYNC_KV_KEYS = [
-  'cofen_du_overrides','cofen_feriados','cofen_premiacoes',
+  'cofen_du_overrides','cofen_feriados','cofen_premiacoes','cofen_op_ho',
   'cofen_hist_empresa','cofen_hist_geral','cofen_geral_daily_julho','cofen_julho_eq',
   'cofen_ops_du_julho','cofen_ops_du_junho',
   'cofen_corens_extra',
@@ -12916,10 +12926,11 @@ function fbStartListening(){
         const opReal = eq.ops.find(o=>o.name===nm);
         if(!opReal||Math.abs(opReal.rec-numVal)<0.01) return;
         opReal.rec = numVal;
-        opReal.ho  = numVal * 0.25;
+        { const _hm=JSON.parse(localStorage.getItem('cofen_op_ho')||'{}'); opReal.ho = (_hm[nm]!==undefined ? parseFloat(_hm[nm])||0 : numVal * 0.25); }
         changed = true;
       });
     });
+    D.equipes.forEach(eq=>eq.ops.forEach(o=>{ if(remote[o.name]===undefined && o.rec>0 && Object.keys(remote).length>3){ o.rec=0; o.ho=0; changed=true; } }));
     if(!changed) return;
     D.equipes.forEach(eq=>{
       eq.rec = eq.ops.reduce((s,o)=>s+o.rec,0);
@@ -12931,7 +12942,7 @@ function fbStartListening(){
       const cmpOp = CMP_OPS_DEDUP.find(c=>c.nome===op.name);
       if(cmpOp && op.rec > 0) cmpOp.abril = op.rec;
     });
-    localStorage.setItem('cofen_op_overrides', JSON.stringify({...local,...remote}));
+    localStorage.setItem('cofen_op_overrides', JSON.stringify({...remote}));
     // Overrides atualizados = nova base; zerar snapshot e reaplicar extras se houver
     localStorage.removeItem('cofen_base_rec');
     const _extraPosOv = typeof extraGetAll==='function' ? extraGetAll() : {};
@@ -19770,7 +19781,7 @@ function renderEqMetasTable(){
     },0);
     const recHojeDiaLbl = (typeof tvGetRefDay==='function' ? String(tvGetRefDay()) : String(new Date().getDate())).padStart(2,'0');
 
-    rows += `<tr style="border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s"
+    rows += `<tr data-eq="${eqName}" title="Clique para ver os membros da equipe" style="cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s"
       onmouseover="this.style.background='rgba(255,255,255,.04)'"
       onmouseout="this.style.background=''">
       <td style="padding:8px 12px">
@@ -20778,6 +20789,90 @@ setInterval(function(){try{var d=D.equipes.find(function(e){return e.name==='COF
 document.querySelectorAll('.tab').forEach(function(t){var o=t.getAttribute('onclick')||'';if(o.indexOf("'ranking-digital'")>-1)t.style.display=vis?'':'none'})}catch(e){}},2000);
 </script>
 
+<script>
+// ══ DRILL-DOWN: clicar na equipe mostra os membros; clicar no membro mostra os recebimentos por data ══
+(function(){
+var MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+var DSEM=['dom','seg','ter','qua','qui','sex','sáb'];
+var lastTeam=null;
+function fR(v){return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function bonito(n){return String(n).replace(/_/g,' ').toLowerCase().replace(/(^|\s)\S/g,function(c){return c.toUpperCase();});}
+function foto(n,sz){var f=null;try{f=photoGet(n);}catch(e){}
+  var b='width:'+sz+'px;height:'+sz+'px;border-radius:50%;flex:none;';
+  if(f) return '<div style="'+b+'background:url('+f+') center/cover;border:2px solid #4ADE80"></div>';
+  return '<div style="'+b+'background:#1f5c44;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:'+Math.round(sz/2.4)+'px">'+esc((n||'?').charAt(0).toUpperCase())+'</div>';}
+function mesRef(){var m=(localStorage.getItem('cofen_mes_dados')||'').match(/^(\d{4})-(\d{2})$/),d=new Date();return m?{y:+m[1],m:+m[2]}:{y:d.getFullYear(),m:d.getMonth()+1};}
+function removidos(){try{return gGetOverrides().removidos||[];}catch(e){return [];}}
+function close(){var el=document.getElementById('eqd-ov');if(el)el.style.display='none';}
+function show(html){
+  var el=document.getElementById('eqd-ov');
+  if(!el){el=document.createElement('div');el.id='eqd-ov';
+    el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99980;display:none;align-items:center;justify-content:center;padding:14px';
+    el.addEventListener('click',function(e){
+      if(e.target===el){close();return;}
+      var b=e.target.closest('[data-act]');if(!b)return;
+      var a=b.getAttribute('data-act');
+      if(a==='close')close();else if(a==='back')team(lastTeam);else if(a==='op')member(b.getAttribute('data-op'));});
+    document.body.appendChild(el);}
+  el.innerHTML='<div style="background:#0f2e22;color:#f1f5f9;border:1px solid rgba(255,255,255,.15);border-radius:16px;width:min(760px,100%);max-height:90vh;overflow:auto;padding:18px;font-family:inherit">'+html+'</div>';
+  el.style.display='flex';}
+function head(titulo,sub,back){
+  return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+   +(back?'<button data-act="back" style="background:rgba(255,255,255,.1);color:#fff;border:0;border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:700">⬅ Voltar</button>':'')
+   +'<div style="flex:1;min-width:0"><div style="font-size:18px;font-weight:800">'+titulo+'</div><div style="font-size:12px;color:#94a3b8">'+sub+'</div></div>'
+   +'<button data-act="close" style="background:#ef4444;color:#fff;border:0;border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:700">✕</button></div>';}
+var TH='style="text-align:right;padding:7px 8px;font-size:10px;letter-spacing:1px;color:#94a3b8;text-transform:uppercase"';
+var TD='style="text-align:right;padding:8px;font-weight:700"';
+function team(key){
+  lastTeam=key;
+  var eq=D.equipes.find(function(e){return e.name===key;});if(!eq)return;
+  var rm=removidos(),hojeMap={};
+  var ops=eq.ops.filter(function(o){var lid=false;try{lid=_ehLider(o.name);}catch(e){}return rm.indexOf(o.name)<0 && !(lid && !(o.rec>0));}).slice().sort(function(a,b){return (b.rec-a.rec)||String(a.name).localeCompare(b.name);});
+  var tot=ops.reduce(function(s,o){return s+o.rec;},0),ho=ops.reduce(function(s,o){return s+o.ho;},0);
+  var hoje=0;
+  var rows=ops.map(function(o,i){
+    var h=0;try{h=tvGetTodayVal(o)||0;}catch(e){}hoje+=h;
+    var lid=false;try{lid=_ehLider(o.name);}catch(e){}
+    return '<tr data-act="op" data-op="'+esc(o.name)+'" style="cursor:pointer;border-top:1px solid rgba(255,255,255,.08)" onmouseover="this.style.background=\'rgba(255,255,255,.07)\'" onmouseout="this.style.background=\'\'">'
+     +'<td style="padding:8px;width:34px;font-weight:800;color:#fbbf24">'+(i+1)+'º</td>'
+     +'<td style="padding:8px"><div style="display:flex;align-items:center;gap:9px">'+foto(o.name,34)+'<b>'+esc(bonito(o.name))+'</b>'+(lid?' <span style="font-size:9px;background:#fbbf24;color:#000;border-radius:6px;padding:2px 6px;font-weight:800">LÍDER</span>':'')+'</div></td>'
+     +'<td '+TD+'>'+fR(o.rec)+'</td><td '+TD+' >'+fR(o.ho)+'</td><td '+TD+'>'+(h>0?fR(h):'-')+'</td>'
+     +'<td '+TD+'>'+(tot>0?(o.rec/tot*100).toFixed(1).replace('.',',')+'%':'-')+'</td></tr>';}).join('');
+  var lbl=(EQ[key]&&EQ[key].sh)||key;
+  show(head('👥 '+esc(lbl),ops.length+' membros | Recebido '+fR(tot)+' | HO '+fR(ho)+' | clique no nome para ver os recebimentos',false)
+   +'<table style="width:100%;border-collapse:collapse"><thead><tr><th></th><th style="text-align:left;padding:7px 8px;font-size:10px;letter-spacing:1px;color:#94a3b8">MEMBRO</th><th '+TH+'>Recebido</th><th '+TH+'>HO</th><th '+TH+'>Último dia</th><th '+TH+'>% equipe</th></tr></thead><tbody>'+rows
+   +'</tbody><tfoot><tr style="border-top:2px solid rgba(255,255,255,.25)"><td></td><td style="padding:9px 8px;font-weight:800">TOTAL DA EQUIPE</td><td '+TD+'>'+fR(tot)+'</td><td '+TD+'>'+fR(ho)+'</td><td '+TD+'>'+(hoje>0?fR(hoje):'-')+'</td><td '+TD+'>100%</td></tr></tfoot></table>');}
+function member(name){
+  var op=null;D.equipes.forEach(function(e){e.ops.forEach(function(o){if(o.name===name)op=o;});});if(!op)return;
+  var r=mesRef(),dl=op.daily||{};
+  var _hj=new Date(),_atual=(r.y===_hj.getFullYear()&&r.m===_hj.getMonth()+1);
+  var dias=Object.keys(dl).map(Number).filter(function(d){return dl[d]>0 && !(_atual && d>_hj.getDate());}).sort(function(a,b){return a-b;});
+  var acum=0,soma=0,lin=dias.map(function(d){var v=dl[d];acum+=v;soma+=v;
+    var dt=new Date(r.y,r.m-1,d);
+    return {d:d,txt:String(d).padStart(2,'0')+'/'+String(r.m).padStart(2,'0')+'/'+r.y,sem:DSEM[dt.getDay()],v:v,ac:acum};}).reverse();
+  var resto=op.rec-soma;
+  var rows=lin.map(function(x){return '<tr style="border-top:1px solid rgba(255,255,255,.08)"><td style="padding:8px">'+x.txt+'</td><td style="padding:8px;color:#94a3b8">'+x.sem+'</td><td '+TD+'>'+fR(x.v)+'</td><td '+TD+' >'+fR(x.ac)+'</td></tr>';}).join('');
+  if(resto>0.01) rows+='<tr style="border-top:1px solid rgba(255,255,255,.08);color:#fbbf24"><td style="padding:8px" colspan="2">Sem data identificada no relatório</td><td '+TD+'>'+fR(resto)+'</td><td></td></tr>';
+  if(!rows) rows='<tr><td colspan="4" style="padding:14px;color:#94a3b8">Nenhum recebimento com data neste mês.</td></tr>';
+  var tp='',tipos=op.tipos||{},tk=Object.keys(tipos).sort(function(a,b){return tipos[b]-tipos[a];});
+  if(tk.length) tp='<div style="margin-top:14px;font-size:10px;letter-spacing:1px;color:#94a3b8">FORMAS DE PAGAMENTO</div>'+tk.map(function(k){return '<div style="display:flex;justify-content:space-between;padding:5px 2px;border-top:1px solid rgba(255,255,255,.06)"><span>'+esc(k)+'</span><b>'+fR(tipos[k])+'</b></div>';}).join('');
+  var hist='';try{var meses=Object.keys(HIST_DADOS||{}).map(function(m){var row=(HIST_DADOS[m].rows||[]).find(function(x){return x.nome===op.name;});return row&&row.total>0?'<div style="display:flex;justify-content:space-between;padding:5px 2px;border-top:1px solid rgba(255,255,255,.06)"><span>'+m+'</span><b>'+fR(row.total)+'</b></div>':'';}).join('');
+    if(meses) hist='<div style="margin-top:14px;font-size:10px;letter-spacing:1px;color:#94a3b8">MESES ANTERIORES</div>'+meses;}catch(e){}
+  show(head(esc(bonito(op.name)),MESES[r.m-1]+' '+r.y+' | Recebido '+fR(op.rec)+' | HO '+fR(op.ho),true)
+   +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">'+foto(op.name,64)+'<div><div style="font-size:11px;color:#94a3b8">'+esc((EQ[op.eq||'']&&EQ[op.eq].sh)||(lastTeam&&EQ[lastTeam]&&EQ[lastTeam].sh)||'')+'</div><div style="font-size:22px;font-weight:800;color:#fbbf24">'+fR(op.rec)+'</div></div></div>'
+   +'<table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:7px 8px;font-size:10px;letter-spacing:1px;color:#94a3b8">DATA</th><th style="text-align:left;padding:7px 8px;font-size:10px;letter-spacing:1px;color:#94a3b8">DIA</th><th '+TH+'>Recebido no dia</th><th '+TH+'>Acumulado</th></tr></thead><tbody>'+rows+'</tbody></table>'
+   +tp+hist
+   +'<div style="margin-top:12px;font-size:11px;color:#94a3b8">As datas vêm do relatório importado. Se o relatório não tiver coluna de data, só aparece o que entrou desde o último import.</div>');}
+document.addEventListener('click',function(e){
+  var tr=e.target.closest&&e.target.closest('#eq-metas-tbody tr[data-eq]');if(!tr)return;
+  for(var n=e.target;n&&n!==tr;n=n.parentElement){
+    if(n.tagName==='BUTTON'||n.tagName==='INPUT'||n.tagName==='SELECT'||n.getAttribute('onclick'))return;}
+  team(tr.getAttribute('data-eq'));});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+window.eqdTeam=team;window.eqdMember=member;
+})();
+</script>
 <!-- ══ PÁGINA MODO TV ══ -->
 <div class="page" id="pg-tv" style="padding:0;margin:0;background:#D3EDE0">
 <style>
