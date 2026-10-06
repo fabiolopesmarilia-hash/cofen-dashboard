@@ -20873,6 +20873,25 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
 window.eqdTeam=team;window.eqdMember=member;
 })();
 </script>
+<script>
+// ══ VIRADA DO DIA: recalcula dias úteis e tabelas sozinho (tela aberta o dia todo/madrugada, Modo TV) ══
+(function(){
+var diaAtual=new Date().toDateString();
+function recalcular(){
+  var hoje=new Date().toDateString();
+  if(hoje===diaAtual) return;
+  diaAtual=hoje;
+  ['buildCal("cal-grid")','buildCal("cal-grid2")'].forEach(function(c){try{eval(c);}catch(e){}});
+  ['initHero','renderPPProjecao','renderHoProjTable','renderEqMetasTable'].forEach(function(fn){
+    try{ if(typeof window[fn]==='function') window[fn](); else if(typeof eval('typeof '+fn)==='string' && eval('typeof '+fn)==='function') eval(fn+'()'); }catch(e){}});
+  try{ if(typeof refreshAll==='function') refreshAll(); }catch(e){}
+}
+setInterval(recalcular,30000);
+document.addEventListener('visibilitychange',function(){ if(!document.hidden) recalcular(); });
+window.addEventListener('focus',recalcular);
+window.__duRecalcular=recalcular;
+})();
+</script>
 <!-- ══ PÁGINA MODO TV ══ -->
 <div class="page" id="pg-tv" style="padding:0;margin:0;background:#D3EDE0">
 <style>
