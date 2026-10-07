@@ -941,7 +941,7 @@ select.ev-inp{cursor:pointer}
         border-radius:100px;padding:3px 10px;cursor:pointer">✏️ mudar dia útil de corte</button>
     </div>
     <div style="overflow-x:auto;border-radius:10px;border:1px solid rgba(255,255,255,.08)">
-      <table style="width:100%;border-collapse:collapse;font-family:Nunito,sans-serif;min-width:640px">
+      <table style="width:100%;border-collapse:collapse;font-family:Nunito,sans-serif;min-width:900px">
         <thead>
           <tr style="background:rgba(0,0,0,.4)">
             <th style="padding:9px 14px;text-align:left;font-size:10px;font-weight:800;color:rgba(255,255,255,.6);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">MÊS</th>
@@ -949,6 +949,8 @@ select.ev-inp{cursor:pointer}
             <th id="cmp15du-th-soma" style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#FFD166;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">SOMA ATÉ 15º D.U.</th>
             <th style="padding:9px 14px;text-align:center;font-size:10px;font-weight:800;color:#C084FC;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">VAR. % VS. MÊS ANT.</th>
             <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#4ADE80;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">TOTAL DO MÊS</th>
+            <th style="padding:9px 14px;text-align:right;font-size:10px;font-weight:800;color:#FB923C;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">META ✏️</th>
+            <th style="padding:9px 14px;text-align:center;font-size:10px;font-weight:800;color:#F472B6;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">% PROJ. DA META ✏️</th>
           </tr>
         </thead>
         <tbody id="cmp15du-tbody">
@@ -5177,6 +5179,13 @@ function _calcularComparativo15DU(raw){
 // Renderiza a tabela #cmp15du-tbody a partir do array calculado. duAlvo = qual dia útil está
 // sendo usado como corte (ex: 18 = hoje é o 18º dia útil do mês atual) — se não vier, assume 15
 // (compatibilidade com o cálculo antigo baseado em arquivo importado).
+// ── Metas manuais do Comparativo Mensal (meta do mês e % de projeção, ambos editáveis) ──
+function cmpMetasGet(){ try{ return JSON.parse(localStorage.getItem('cofen_cmp15du_metas')||'{}'); }catch(e){ return {}; } }
+function cmpMetasSave(o){ try{ localStorage.setItem('cofen_cmp15du_metas',JSON.stringify(o)); if(typeof syncPush==='function') syncPush('cofen_cmp15du_metas'); }catch(e){} }
+function cmpNumBR(v){ let t=String(v||'').replace(/[^\d,.\-]/g,''); if(t.indexOf(',')>-1) t=t.replace(/\./g,'').replace(',','.'); else if(/\.\d{3}$/.test(t)) t=t.replace(/\./g,''); const n=parseFloat(t); return isNaN(n)?0:n; }
+function _cmpRerender(){ const L=window._cmp15duLast; if(L) renderComparativo15DU(L.dados,L.n); }
+function cmpMetaSet(k,v){ const o=cmpMetasGet(); o[k]=o[k]||{}; const n=cmpNumBR(v); if(n>0) o[k].meta=n; else delete o[k].meta; if(!o[k].meta && o[k].pct===undefined) delete o[k]; cmpMetasSave(o); _cmpRerender(); }
+function cmpPctSet(k,v){ const o=cmpMetasGet(); o[k]=o[k]||{}; const raw=String(v||'').trim(); if(raw==='') delete o[k].pct; else o[k].pct=cmpNumBR(raw); if(!o[k].meta && o[k].pct===undefined) delete o[k]; cmpMetasSave(o); _cmpRerender(); }
 function renderComparativo15DU(dados, duAlvo){
   const tbody = document.getElementById('cmp15du-tbody');
   const badge = document.getElementById('cmp15du-badge');
@@ -5184,6 +5193,8 @@ function renderComparativo15DU(dados, duAlvo){
   if(!tbody || !dados || !dados.length) return;
 
   const n = duAlvo || (dados[dados.length-1] && dados[dados.length-1].duN) || 15;
+  window._cmp15duLast = {dados, n};
+  const _metas = cmpMetasGet();
 
   const fMoney = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const hoje = new Date();
@@ -5207,6 +5218,17 @@ function renderComparativo15DU(dados, duAlvo){
       <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">${fMoney(r.soma15)}</td>
       <td style="padding:8px 14px;text-align:center">${varHtml}</td>
       <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">${fMoney(r.totalMes)}${parcial?'*':''}</td>
+      ${(()=>{
+        const mm=_metas[r.mesKey]||{}; const meta=mm.meta||0;
+        const proj = (parcial && typeof DU!=='undefined' && DU.passou>0) ? r.totalMes/DU.passou*DU.total : r.totalMes;
+        const auto = meta>0 ? proj/meta*100 : null;
+        const manual = mm.pct!==undefined;
+        const pct = manual ? mm.pct : auto;
+        const cor = pct===null ? 'rgba(255,255,255,.5)' : pct>=100 ? '#4ADE80' : pct>=80 ? '#FBBF24' : '#F87171';
+        const iBase='background:rgba(255,255,255,.07);color:#fff;border-radius:8px;padding:5px 8px;font-weight:800;font-size:12px;text-align:';
+        return `<td style="padding:6px 10px;text-align:right"><input value="${meta>0?fMoney(meta):''}" data-raw="${meta>0?String(meta).replace('.',','):''}" placeholder="definir meta" title="Clique para digitar a meta de ${r.mesLabel}" onfocus="this.value=this.dataset.raw||''" onchange="cmpMetaSet('${r.mesKey}',this.value)" style="width:140px;${iBase}right;border:1px dashed rgba(251,146,60,.5)"></td>
+        <td style="padding:6px 10px;text-align:center"><input value="${pct===null?'':pct.toFixed(1).replace('.',',')+'%'}" data-raw="${pct===null?'':String(pct.toFixed(1)).replace('.',',')}" placeholder="${meta>0?'':'sem meta'}" title="${manual?'Valor digitado por você (apague para voltar ao automático)':'Automático: '+(parcial?'projeção do mês':'total do mês')+' ÷ meta. Digite para sobrescrever.'}" onfocus="this.value=this.dataset.raw||''" onchange="cmpPctSet('${r.mesKey}',this.value)" style="width:90px;${iBase}center;color:${cor};border:1px ${manual?'solid #F472B6':'dashed rgba(244,114,182,.4)'}"></td>`;
+      })()}
     </tr>`;
   }).join('');
 
@@ -8477,7 +8499,7 @@ function metaOpFillFromTeam(){
 // Quem não está no quadro de produção sai dos rankings (removidos, reversível em Gestão).
 var _reorgPend=false;
 function _reorgGarantir(ov){
-  var V='2026-10-05-c';
+  var V='2026-10-06-d';
   if(ov.reorgV===V) return false;
   var R={
     'COFEN BIRIGUI BRUNA':['Diego Rodrigues','Kaue Nadai','Leticia Romeu','Silva Beatriz','Tassiane Viana','Thais Mayara','Thauany Moura','Amabelly Santos','Caio Shimite','Caroline Valverde','Mirella Arias','Raissa Paloma','Stephanie Fagundes','Thayla Santana'],
@@ -8513,6 +8535,8 @@ function _reorgGarantir(ov){
   // quem não está no quadro de produção fica fora dos rankings
   known.forEach(function(n){ if(!prod[n] && ov.removidos.indexOf(n)<0) ov.removidos.push(n); });
   ov.removidos=ov.removidos.filter(function(n){return !prod[n];});
+  // novos duplicados ou de quem está fora do quadro não podem ser recriados a cada abertura
+  ov.novos=ov.novos.filter(function(n,i,a){return a.findIndex(function(x){return x.name===n.name;})===i && (prod[n.name] || ov.removidos.indexOf(n.name)<0);});
   // equipes que ficaram sem gente saem das tabelas e do seletor da TV (só esconde)
   try{
     var eo=JSON.parse(localStorage.getItem('cofen_equipes_ocultas_ho')||'[]');
@@ -8524,6 +8548,60 @@ function _reorgGarantir(ov){
   }catch(e){}
   ov.reorgV=V; _reorgPend=true;
   return true;
+}
+// ══ QUADRO DE EQUIPES (fonte única: quem fica em qual equipe) ══
+var QUADRO_PADRAO={
+  'COFEN BIRIGUI BRUNA':['Diego Rodrigues','Kaue Nadai','Leticia Romeu','Silva Beatriz','Tassiane Viana','Thais Mayara','Thauany Moura','Amabelly Santos','Caio Shimite','Caroline Valverde','Mirella Arias','Raissa Paloma','Stephanie Fagundes','Thayla Santana','Bruna Justimiano'],
+  'COFEN STEPHANIE 2° TURNO':['Giovana Souza','Isabela Monteiro','Debora Sobrinho','Gisleide Guedes','Jade Faustino','Kauane Azevedo','Rayssa R. Oliveira','Katia Regina'],
+  'COFEN MARILIA BRENDA':['Bruna Teles','Stephanie Bernardes','Bruna Garbi','Claudineia Messias','Isabella Santos','Itallo Cardamoni','Joao Anguita','Karina Colonez','Leonardo Costa','Rebeca Camargo','Valquiria Xavier'],
+  'COFEN TREINAMENTO':['Manuela Marini','Allana Barbosa','Kethely Santos','Leticia Quinallia','Sophia Costa','Luan Pinto'],
+  'COFEN SUPORTE':['Estrategia Cofen']
+};
+function _qk(x){return String(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim().split(' ').sort().join(' ');}
+function _quadroNovoOp(nome,eq){
+  var name=nome.toUpperCase().replace(/[^A-Z0-9]+/g,'_'),rec=0,ho=null;
+  try{
+    var o=JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}');
+    Object.keys(o).forEach(function(k){ if(_qk(k)===_qk(nome)){ name=k; rec=parseFloat(o[k])||0; } });
+    var hm=JSON.parse(localStorage.getItem('cofen_op_ho')||'{}'); if(hm[name]!==undefined) ho=parseFloat(hm[name])||0;
+  }catch(e){}
+  return {name:name,rec:rec,ho:(ho!==null?ho:rec*0.25),acordos:0,ligacoes:0,med_atraso:0,med_lig_baixa:0,daily:{},tipos:{},n_ag:0,val_ag:0,eq:eq};
+}
+function quadroAplicar(){
+  var ov=gGetOverrides(), rm=ov.removidos||[], mov={};
+  try{ mov=JSON.parse(localStorage.getItem('cofen_quadro_mov')||'{}'); }catch(e){}
+  var alvo={}, rmSet={}, rmKeys={};
+  Object.keys(QUADRO_PADRAO).forEach(function(t){ QUADRO_PADRAO[t].forEach(function(n){ alvo[_qk(n)]=t; }); });
+  Object.keys(mov).forEach(function(k){ alvo[k]=mov[k]; });   // mudança manual feita depois na Gestão vence
+  rm.forEach(function(n){ rmSet[n]=1; rmKeys[_qk(n)]=1; });
+  var mudou=false;
+  // melhor cópia de cada pessoa (prefere a que já está na equipe certa, depois a de maior recebimento)
+  var best={};
+  D.equipes.forEach(function(eq){ eq.ops.forEach(function(o){
+    var k=_qk(o.name), t=alvo[k], ch=t?k:'N:'+o.name, sc=(t&&t===eq.name?1e12:0)+(o.rec||0);
+    if(!best[ch] || sc>best[ch].sc) best[ch]={op:o,sc:sc};
+  }); });
+  var mover=[];
+  D.equipes.forEach(function(eq){
+    eq.ops=eq.ops.filter(function(o){
+      var k=_qk(o.name), t=alvo[k], ch=t?k:'N:'+o.name;
+      if(!t && rmSet[o.name]){ mudou=true; return false; }      // removido e fora do quadro: sai da equipe
+      if(best[ch].op!==o){ mudou=true; return false; }          // cópia duplicada
+      if(t && t!==eq.name){ mover.push({op:o,to:t}); mudou=true; return false; } // equipe errada
+      return true;
+    });
+  });
+  function teamObj(t){ var e=D.equipes.find(function(x){return x.name===t;}); if(!e){ e={name:t,rec:0,ho:0,n_op:0,acordos:0,ops:[]}; D.equipes.push(e); } return e; }
+  mover.forEach(function(m){ m.op.eq=m.to; teamObj(m.to).ops.push(m.op); });
+  // quem está no quadro e ainda não existe: cria (a não ser que tenha sido removido de propósito)
+  Object.keys(alvo).forEach(function(k){
+    if(best[k]||rmKeys[k]) return;
+    var nome=null; Object.keys(QUADRO_PADRAO).forEach(function(t){ QUADRO_PADRAO[t].forEach(function(n){ if(_qk(n)===k) nome=n; }); });
+    if(!nome) return;
+    teamObj(alvo[k]).ops.push(_quadroNovoOp(nome,alvo[k])); mudou=true;
+  });
+  if(mudou){ D.equipes.forEach(function(e){ e.ops.sort(function(a,b){return b.rec-a.rec;}); }); rebuildAll(); }
+  return mudou;
 }
 function gGetOverrides(){
   var o; try{ o=JSON.parse(localStorage.getItem('cofen_gestao')||'{}'); }catch(e){ o={}; }
@@ -9113,6 +9191,7 @@ function mvApply(){
   const ov = gGetOverrides();
   if(!ov.moves) ov.moves=[];
   ov.moves.push({op:opName, from:op.eq, to:toEq, ts:Date.now()});
+  try{ const _qm=JSON.parse(localStorage.getItem('cofen_quadro_mov')||'{}'); _qm[_qk(opName)]=toEq; localStorage.setItem('cofen_quadro_mov',JSON.stringify(_qm)); if(typeof syncPush==='function') syncPush('cofen_quadro_mov'); }catch(e){}
   gSetOverrides(ov);
   fbPush('gestao', ov);
 
@@ -9140,19 +9219,20 @@ function mvApply(){
 }
 
 function renderMvEqList(){
-  document.getElementById('mv-eq-list').innerHTML = D.equipes.map(eq=>{
+  const _rmC=(gGetOverrides().removidos||[]);
+  document.getElementById('mv-eq-list').innerHTML = D.equipes.filter(eq=>eq.ops.some(op=>!_rmC.includes(op.name))).map(eq=>{
     const cfg = EQ[eq.name]||{c:'#888',bg:'#eee',ico:'📌',sh:eq.name};
     return `<div style="background:var(--g50);border:1px solid var(--g200);border-radius:var(--rl);padding:14px;border-left:4px solid ${cfg.c}">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
         <div style="font-size:18px">${cfg.ico}</div>
         <div>
           <div style="font-weight:800;font-size:13px;color:var(--g900)">${cfg.sh}</div>
-          <div style="font-size:10px;color:var(--g500);font-weight:600">${eq.n_op} operadores</div>
+          <div style="font-size:10px;color:var(--g500);font-weight:600">${eq.ops.filter(op=>!(gGetOverrides().removidos||[]).includes(op.name)).length} pessoas</div>
         </div>
         <div style="margin-left:auto;font-family:Bebas Neue,sans-serif;font-size:16px;color:${cfg.c}">${fRK(eq.rec)}</div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:5px">
-        ${eq.ops.map(op=>`
+        ${eq.ops.filter(op=>!(gGetOverrides().removidos||[]).includes(op.name)).map(op=>`
           <div style="display:flex;align-items:center;gap:5px;background:var(--w);
             border:1px solid var(--g200);border-radius:100px;padding:4px 10px;cursor:pointer;transition:all .2s"
             title="${fR(op.rec)}"
@@ -9382,7 +9462,7 @@ function loadGestaoOverrides(){
   // Re-apply novos
   if(ov.novos && ov.novos.length>0){
     ov.novos.forEach(n=>{
-      if(ALL.find(o=>o.name===n.name)) return;
+      if(D.equipes.some(e=>e.ops.some(o=>o.name===n.name))) return;
       const _BLK=["fabio_aquino", "BRENDA_FERREIRA"]; if(_BLK.includes(n.name)) return;
       const eqObj=D.equipes.find(e=>e.name===n.eq);
       if(!eqObj) return;
@@ -9397,6 +9477,7 @@ function loadGestaoOverrides(){
     });
     rebuildAll();
   }
+  try{ quadroAplicar(); }catch(e){ console.warn('quadroAplicar',e); }
 }
 
 
@@ -9930,6 +10011,7 @@ function importApply(){
     }
   }
 
+  try{ quadroAplicar(); }catch(e){}
   if(!importParsed.found || importParsed.found.length===0){
     toast(autoCriados>0 ? `✅ ${autoCriados} operador(es) novo(s) criado(s)!` : '⚠️ Nada para importar.');
     return;
@@ -12485,7 +12567,7 @@ let fbListeners = {};
 // (overrides, meta, arrecadado e op_acordos já sincronizam por conta própria —
 // não duplicar essas aqui pra não conflitar com a lógica anti-loop delas) ──
 const SYNC_KV_KEYS = [
-  'cofen_du_overrides','cofen_feriados','cofen_premiacoes','cofen_op_ho',
+  'cofen_du_overrides','cofen_feriados','cofen_premiacoes','cofen_op_ho','cofen_quadro_mov','cofen_cmp15du_metas',
   'cofen_hist_empresa','cofen_hist_geral','cofen_geral_daily_julho','cofen_julho_eq',
   'cofen_ops_du_julho','cofen_ops_du_junho',
   'cofen_corens_extra',
