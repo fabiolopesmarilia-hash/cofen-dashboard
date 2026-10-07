@@ -732,7 +732,7 @@ select.ev-inp{cursor:pointer}
             <div id="pp-ontem-label" style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px">importe o arquivo</div>
           </div>
           <div style="text-align:right">
-            <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">HO (24,96%)</div>
+            <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">HO (22,60%)</div>
             <div id="pp-ontem-ho" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#00E5FF;letter-spacing:1px;line-height:1">—</div>
           </div>
         </div>
@@ -750,7 +750,7 @@ select.ev-inp{cursor:pointer}
             <div id="pp-hoje-label" style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px">recebimento do dia em andamento</div>
           </div>
           <div style="text-align:right">
-            <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">HO (24,96%)</div>
+            <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">HO (22,60%)</div>
             <div id="pp-hoje-ho" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#00E5FF;letter-spacing:1px;line-height:1">R$ 0,00</div>
           </div>
         </div>
@@ -791,7 +791,7 @@ select.ev-inp{cursor:pointer}
     <div class="hmonth">AGOSTO 2026 — COB COFEN</div>
     <div class="hkpis">
       <div class="hkpi"><div class="hkpi-l">Total Real Recebido</div><div class="hkpi-v ok" id="h-total">—</div><div class="hkpi-s">Cobrança Jurídica</div></div>
-      <div class="hkpi"><div class="hkpi-l">HO (25%)</div><div class="hkpi-v tl" id="h-ho">—</div><div class="hkpi-s">Honorários PaguePlay</div></div>
+      <div class="hkpi"><div class="hkpi-l">HO (22,60%)</div><div class="hkpi-v tl" id="h-ho">—</div><div class="hkpi-s">Honorários PaguePlay</div></div>
       <div class="hkpi"><div class="hkpi-l">Falta p/ Meta 1</div><div class="hkpi-v am" id="h-falta">—</div><div class="hkpi-s" id="h-meta-s">Meta: R$ 1M</div></div>
       <div class="hkpi"><div class="hkpi-l">Média Real/DU</div><div class="hkpi-v" id="h-media">—</div><div class="hkpi-s" id="h-du-s">13 D.U. passados</div></div>
       <div class="hkpi"><div class="hkpi-l">Precisa/DU</div><div class="hkpi-v am" id="h-need">—</div><div class="hkpi-s" id="h-restam-s">7 D.U. restantes</div></div>
@@ -888,6 +888,12 @@ select.ev-inp{cursor:pointer}
     </div>
   </div>
   <script>
+// Percentual de HO (honorários) sobre o recebido. Desde outubro/2026 = 22,60%. Para mudar sem mexer no código:
+// localStorage.setItem('cofen_ho_pct','0.226')  (use a fração, ex.: 0.226). Meses fechados ficam como estão.
+var HO_PCT = (function(){ var v=parseFloat(localStorage.getItem('cofen_ho_pct')); return (v>0&&v<1)?v:0.226; })();
+var HO_PCT_TXT = (HO_PCT*100).toFixed(2).replace('.',',')+'%';
+</script>
+<script>
   (function(){
     function apply(){
       var d=null; try{ d=localStorage.getItem('cofen_logo_img'); }catch(e){}
@@ -909,6 +915,18 @@ select.ev-inp{cursor:pointer}
   <!-- ══ PROJEÇÃO DE META HO TOTAL ══ -->
   <div style="margin:14px 0 0;padding:16px 20px;background:linear-gradient(135deg,#0d1b2a 0%,#0a2540 100%);border-radius:14px;border:1px solid rgba(0,188,212,.2)">
     <div style="font-size:9px;font-weight:800;color:rgba(0,229,255,.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">📈 PROJEÇÃO HO TOTAL — CENÁRIOS DE META</div>
+    <div id="ho-proj-du" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-bottom:10px;padding:10px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;font-family:Nunito,sans-serif;font-size:13px;font-weight:800;color:#fff">
+      <span>📅 <b id="hpd-total" style="color:#67E8F9;font-size:16px">--</b> dias úteis</span>
+      <span>Passou
+        <input id="hpd-passou" type="number" min="0" step="1" title="Digite quantos dias úteis já passaram. Vale só hoje; amanhã volta ao automático."
+          onchange="hoProjDUSet(this.value)"
+          style="width:64px;background:rgba(255,255,255,.1);border:1px dashed rgba(251,146,60,.6);border-radius:6px;color:#FB923C;font-family:Nunito,sans-serif;font-weight:800;font-size:15px;padding:3px 6px;text-align:center"></span>
+      <span>Faltam <b id="hpd-faltam" style="color:#4ADE80;font-size:16px">--</b></span>
+      <span id="hpd-tag" style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5)">automático</span>
+      <span id="hpd-rec-wrap" style="display:none;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5)">✏️ recebido manual (vale só até o próximo import) | automático: <b id="hpd-rec-auto" style="color:#4ADE80"></b>
+        <button onclick="hoProjRecSet('')" style="margin-left:6px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:4px 10px;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px;text-transform:none;letter-spacing:0">↺ voltar ao automático</button></span>
+      <button id="hpd-reset" onclick="hoProjDUSet('')" style="display:none;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:4px 10px;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:11px">↺ voltar ao automático</button>
+    </div>
     <div style="overflow-x:auto;border-radius:10px;border:1px solid rgba(255,255,255,.08)">
       <table style="width:100%;border-collapse:collapse;font-family:Nunito,sans-serif;min-width:480px">
         <thead>
@@ -1176,7 +1194,7 @@ select.ev-inp{cursor:pointer}
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
           <div>
             <div style="font-size:10px;font-weight:800;color:#92400E;letter-spacing:.8px;text-transform:uppercase">💼 PaguePay — Arquivo Empresa (rec_total_empresa)</div>
-            <div style="font-size:11px;color:#B45309;font-weight:600;margin-top:3px">Puxado automaticamente da coluna <strong>Pague Play (24,96%)</strong></div>
+            <div style="font-size:11px;color:#B45309;font-weight:600;margin-top:3px">Puxado automaticamente da coluna <strong>Pague Play (22,60%)</strong></div>
           </div>
           <button onclick="importarEmpresa()"
             style="display:flex;align-items:center;gap:6px;background:#D97706;padding:8px 16px;border-radius:var(--rm);border:none;cursor:pointer;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;color:#fff;transition:all .2s;box-shadow:0 4px 12px rgba(217,119,6,.3)"
@@ -1210,7 +1228,7 @@ select.ev-inp{cursor:pointer}
               </div>
               <div style="text-align:right">
                 <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px">Arquivo Empresa</div>
-                <div style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">Pague Play (24,96%)</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">Pague Play (22,60%)</div>
               </div>
             </div>
           </div>
@@ -1229,7 +1247,7 @@ select.ev-inp{cursor:pointer}
 
       <!-- Resultados Meta 1 em tempo real — apenas HO -->
       <div class="res-grid" id="res-cards" style="grid-template-columns:1fr">
-        <div class="res-card"><div class="res-l">HO (25%) — Honorários PaguePay</div><div class="res-v ok" id="res-ho">—</div><div class="res-s">25% sobre o Total Real Recebido</div></div>
+        <div class="res-card"><div class="res-l">HO (22,60%) — Honorários PaguePay</div><div class="res-v ok" id="res-ho">—</div><div class="res-s">22,60% sobre o Total Real Recebido</div></div>
       </div>
       <!-- IDs ocultos preservados -->
       <span id="res-falta" style="display:none"></span>
@@ -1246,7 +1264,7 @@ select.ev-inp{cursor:pointer}
     <div class="ep-header">
       <div>
         <div class="ep-title">👤 EDITAR OPERADORES</div>
-        <div class="ep-sub">Digite o Total Real de cada operador · HO calculado automaticamente (25%)</div>
+        <div class="ep-sub">Digite o Total Real de cada operador · HO calculado automaticamente (22,60%)</div>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn-outline" style="font-size:11px;padding:6px 12px" onclick="applyOps()">✔ Aplicar Todos</button>
@@ -1257,7 +1275,7 @@ select.ev-inp{cursor:pointer}
       <div style="display:grid;grid-template-columns:1fr 130px 130px;gap:8px;padding:7px 10px;
         font-size:10px;font-weight:800;color:var(--g500);letter-spacing:.8px;text-transform:uppercase;
         border-bottom:1px solid var(--g200);margin-bottom:8px">
-        <span>Operador / Equipe</span><span style="text-align:right">Total Real (R$)</span><span style="text-align:right">HO 25% (auto)</span>
+        <span>Operador / Equipe</span><span style="text-align:right">Total Real (R$)</span><span style="text-align:right">HO 22,60% (auto)</span>
       </div>
       <div class="op-editor-list" id="op-editor-list"></div>
     </div>
@@ -1324,7 +1342,7 @@ select.ev-inp{cursor:pointer}
     <div style="display:flex;align-items:center;gap:5px"><span style="background:#FEF9C3;border:1.5px dashed #FCD34D;color:#92400E;border-radius:100px;padding:2px 10px;font-size:10px;font-weight:800">○ Feedback</span><span style="font-size:11px;color:var(--g500)">= Pendente — clique para marcar</span></div>
     <span style="font-size:10px;color:var(--g500);margin-left:auto">Zera automaticamente dia 01 de cada mês</span>
   </div>
-  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
+  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (22,60%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
   <div class="rk-list" id="rk-list"></div>
 </div>
 
@@ -1341,7 +1359,7 @@ select.ev-inp{cursor:pointer}
     <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#fff;line-height:1;margin-bottom:14px">🖥️ RANKING DIGITAL — JUNHO 2026</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="rk-dig-kpis"></div>
   </div>
-  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
+  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (22,60%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
   <div class="rk-list" id="rk-list-digital"></div>
 </div>
 <!-- ══════════ FIM PAGE: RANKING DIGITAL ══════════ -->
@@ -1364,7 +1382,7 @@ select.ev-inp{cursor:pointer}
     <button class="fbtn" id="bb-filter-brenda" onclick="bbSetFilter('COFEN MARILIA BRENDA',this)" style="color:#00A86B;border-color:#00A86B">🏙️ Stephanie</button>
     <button class="fbtn" id="bb-filter-stephanie" onclick="bbSetFilter('COFEN STEPHANIE 2° TURNO',this)" style="color:#F7971E;border-color:#F7971E">⭐ Katia</button>
   </div>
-  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
+  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (22,60%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
   <div class="rk-list" id="rk-list-bb"></div>
 </div>
 <!-- ══════════ FIM PAGE: RANKING BRENDA + STEPHANIE ══════════ -->
@@ -1381,7 +1399,7 @@ select.ev-inp{cursor:pointer}
     <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#fff;line-height:1;margin-bottom:14px">🏙️ RANKING — EQUIPE STEPHANIE</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="rk-brend-kpis"></div>
   </div>
-  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
+  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (22,60%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
   <div class="rk-list" id="rk-list-brenda"></div>
 </div>
 <!-- ══════════ FIM PAGE: RANKING BRENDA ══════════ -->
@@ -1398,7 +1416,7 @@ select.ev-inp{cursor:pointer}
     <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#fff;line-height:1;margin-bottom:14px">💙 RANKING — EQUIPE BRUNA</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="rk-brun-kpis"></div>
   </div>
-  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (25%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
+  <div class="rk-hdr"><span>Pos.</span><span>Operador</span><span>Total Real ↓</span><span>HO (22,60%)</span><span>Meta Ind. / Projeção</span><span>% Projeção</span><span>Acordos</span><span>Eficiência</span><span>Agend.</span></div>
   <div class="rk-list" id="rk-list-bruna"></div>
 </div>
 <!-- ══════════ FIM PAGE: RANKING BRUNA ══════════ -->
@@ -2344,8 +2362,8 @@ select.ev-inp{cursor:pointer}
       <div style="margin-top:10px;display:flex;gap:8px;align-items:flex-start;background:var(--ppl);border:1px solid rgba(0,168,107,.2);border-radius:var(--rm);padding:9px 12px">
         <span style="font-size:14px;flex-shrink:0">💡</span>
         <div style="font-size:11px;color:var(--ppd);font-weight:600;line-height:1.5">
-          Coluna <strong style="color:var(--pp)">Cobradora</strong> = nome do operador · Coluna <strong style="color:var(--pp)">Recebido</strong> = HO (25%) · 
-          O sistema calcula o <strong>Total Real automaticamente</strong> (Recebido ÷ 0,25). 
+          Coluna <strong style="color:var(--pp)">Cobradora</strong> = nome do operador · Coluna <strong style="color:var(--pp)">Recebido</strong> = HO (22,60%) · 
+          O <strong>HO</strong> vem direto da coluna <strong>Total HO</strong> do relatório (se não tiver a coluna, o sistema usa 22,60% do Recebido). 
           <span style="color:var(--g500)">Também aceita arquivos CSV arrastados diretamente.</span>
         </div>
       </div>
@@ -3010,7 +3028,7 @@ select.ev-inp{cursor:pointer}
       <!-- Info box -->
       <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:var(--rm);padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1E40AF;line-height:1.6">
         <strong>Arquivo:</strong> <code>rec_total_geral_*.csv</code><br>
-        Colunas usadas: <strong>Coren</strong> (MT/PI/MA/CE) · <strong>Valor Recebido</strong> · <strong>Valor Tarifa</strong> · <strong>Pague Play (24,96%)</strong> · <strong>Coren (56,28%)</strong> · <strong>Cofen (18,76%)</strong><br>
+        Colunas usadas: <strong>Coren</strong> (MT/PI/MA/CE) · <strong>Valor Recebido</strong> · <strong>Valor Tarifa</strong> · <strong>Pague Play (22,60%)</strong> · <strong>Coren (56,28%)</strong> · <strong>Cofen (18,76%)</strong><br>
         <span style="color:#059669;font-weight:700">⚡ Ao carregar o arquivo, os valores são aplicados automaticamente!</span>
       </div>
 
@@ -3053,21 +3071,21 @@ select.ev-inp{cursor:pointer}
 
 <!-- ══════════════════════════════════════════════════════════════
      MODAL: IMPORTAR TOTAL EMPRESA (rec_total_empresa)
-     Preenche: Total Arrecadado = soma de Pague Play (24,96%) apenas
+     Preenche: Total Arrecadado = soma de Pague Play (22,60%) apenas
      ══════════════════════════════════════════════════════════════ -->
 <div id="modal-import-empresa" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:20px 16px;overflow-y:auto" onclick="if(event.target===this)fecharModalEmpresa()">
   <div style="background:var(--w);border-radius:var(--rxl);max-width:620px;width:100%;box-shadow:var(--sh-lg);margin:auto">
     <div style="background:linear-gradient(135deg,#92400E,#D97706);padding:16px 20px;border-radius:var(--rxl) var(--rxl) 0 0;display:flex;align-items:center;justify-content:space-between">
       <div>
         <div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:#fff;letter-spacing:2px">💼 IMPORTAR — TOTAL EMPRESA (rec_total_empresa)</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">Preenche o Total Arrecadado = soma da coluna <strong>Pague Play (24,96%)</strong></div>
+        <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">Preenche o Total Arrecadado = soma da coluna <strong>Pague Play (22,60%)</strong></div>
       </div>
       <button onclick="fecharModalEmpresa()" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:16px">✕</button>
     </div>
     <div style="padding:18px 20px">
       <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:var(--rm);padding:10px 14px;margin-bottom:14px;font-size:12px;color:#92400E;line-height:1.6">
         <strong>Arquivo:</strong> <code>rec_total_empresa_*.csv</code><br>
-        Coluna usada: <strong>Pague Play (24,96%)</strong> — soma de todas as linhas<br>
+        Coluna usada: <strong>Pague Play (22,60%)</strong> — soma de todas as linhas<br>
         <span style="color:#6B7280">Não altera operadores, equipes ou nenhum outro valor — apenas o campo "Total Arrecadado"</span>
       </div>
 
@@ -3764,14 +3782,14 @@ function renderPPDiaEscolhido(){
     return;
   }
 
-  const ho = rec * 0.2496;
+  const ho = rec *HO_PCT;
   el.innerHTML = `
     <div>
       <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px">Recebido no dia</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#4ADE80;line-height:1">${fR(rec)}</div>
     </div>
     <div>
-      <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px">HO (24,96%)</div>
+      <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px">HO (22,60%)</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#00E5FF;line-height:1">${fR(ho)}</div>
     </div>`;
 }
@@ -3779,7 +3797,7 @@ function renderPPDiaEscolhido(){
 function initHero(){
   renderPPDiasHO();
   const totalRec = getTotalRec();
-  const totalHO  = totalRec * 0.25;
+  const totalHO  = totalRec *HO_PCT;
   const falta    = Math.max(0, meta - totalRec);
   const media    = DU.passou>0 ? totalRec/DU.passou : 0;
   const need     = DU.restam>0 ? falta/DU.restam : 0;
@@ -3829,7 +3847,7 @@ function initHero(){
   s('h-coren-pb', corenPB>0 ? fRK(corenPB) : '—');
 
   // ── Meta 2: Total Arrecadado ──
-  const hoArr    = totalArrecadado * 0.25;
+  const hoArr    = totalArrecadado *HO_PCT;
   const faltaArr = Math.max(0, metaArrecadado - totalArrecadado);
   const mediaArr = DU.passou>0 ? totalArrecadado/DU.passou : 0;
   const needArr  = DU.restam>0 && faltaArr>0 ? faltaArr/DU.restam : 0;
@@ -3919,15 +3937,68 @@ function setHoProjCenario(idx, valorStr){
   localStorage.setItem('cofen_ho_proj_cenarios', JSON.stringify(arr));
   renderHoProjTable();
 }
+// ── Dias úteis da Projeção HO Total: automático (DU), com "passou" editável (vale só hoje) ──
+function _hpdHoje(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function hoProjDUGet(){
+  const total = DU.total||21, auto = DU.passou||0;
+  let passou = auto, manual = false;
+  try{
+    const o = JSON.parse(localStorage.getItem('cofen_ho_proj_passou')||'null');
+    if(o && o.dia===_hpdHoje() && isFinite(o.v)){ passou = Math.max(0, Math.min(total, Math.round(o.v))); manual = (passou!==auto); }
+  }catch(e){}
+  return {total, passou, restam:Math.max(0,total-passou), auto, manual};
+}
+function hoProjDUSet(v){
+  const n = parseInt(String(v).trim(),10);
+  try{
+    if(String(v).trim()==='' || isNaN(n)) localStorage.removeItem('cofen_ho_proj_passou');
+    else localStorage.setItem('cofen_ho_proj_passou', JSON.stringify({v:n, dia:_hpdHoje()}));
+  }catch(e){}
+  renderHoProjTable();
+}
+function hoProjDUAtualizarLinha(d){
+  const set=(id,t)=>{ const e=document.getElementById(id); if(e) e.textContent=t; };
+  set('hpd-total', d.total); set('hpd-faltam', d.restam);
+  const inp=document.getElementById('hpd-passou'); if(inp && document.activeElement!==inp) inp.value=d.passou;
+  set('hpd-tag', d.manual ? '✏️ manual (vale só hoje) | automático: '+d.auto : 'automático');
+  const b=document.getElementById('hpd-reset'); if(b) b.style.display = d.manual ? '' : 'none';
+}
+// ── HO atual (valor recebido) da Projeção: automático, editável à mão ──
+function hoProjRecAuto(){ return ppEmpresaAbril > 0 ? ppEmpresaAbril : (getTotalRec()*HO_PCT); }
+function hoProjRecGet(){
+  const auto = hoProjRecAuto(); let v = auto, manual = false;
+  try{
+    const o = JSON.parse(localStorage.getItem('cofen_ho_proj_rec')||'null');
+    // vale só no dia em que foi digitado e enquanto o valor automático não mudar (import novo apaga)
+    if(o && o.dia===_hpdHoje() && isFinite(o.v) && Math.abs((o.auto||0)-auto)<0.01){ v=o.v; manual=Math.abs(v-auto)>=0.005; }
+  }catch(e){}
+  return {v, auto, manual};
+}
+function hoProjRecSet(raw){
+  const t = String(raw==null?'':raw).trim();
+  try{
+    if(t==='') localStorage.removeItem('cofen_ho_proj_rec');
+    else { const n = cmpNumBR(t); if(n>=0) localStorage.setItem('cofen_ho_proj_rec', JSON.stringify({v:n, dia:_hpdHoje(), auto:hoProjRecAuto()})); }
+  }catch(e){}
+  renderHoProjTable();
+}
+function hoProjRecAtualizarLinha(r){
+  const w=document.getElementById('hpd-rec-wrap'); if(w) w.style.display = r.manual ? '' : 'none';
+  const a=document.getElementById('hpd-rec-auto'); if(a) a.textContent = r.auto.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+}
 function renderHoProjTable(){
   const tbody = document.getElementById('ho-proj-tbody');
   if(!tbody) return;
 
   // HO atual = ppEmpresaAbril (coluna PaguePay do arquivo empresa)
   // Se não importado ainda, usa getTotalRec() * 0.25 como fallback
-  const hoAtual  = ppEmpresaAbril > 0 ? ppEmpresaAbril : (getTotalRec() * 0.25);
-  const duPass   = DU.passou || 1;
-  const duTotal  = DU.total  || 21;
+  const _rec     = hoProjRecGet();
+  const hoAtual  = _rec.v;
+  hoProjRecAtualizarLinha(_rec);
+  const _du      = hoProjDUGet();
+  hoProjDUAtualizarLinha(_du);
+  const duPass   = _du.passou || 1;
+  const duTotal  = _du.total  || 21;
 
   // Projeção = HO atual ÷ DUs passados × DUs totais
   const projecao = hoAtual / duPass * duTotal;
@@ -3953,7 +4024,7 @@ function renderHoProjTable(){
 
     // Falta por dia útil = quanto ainda precisa entrar, em média, em cada
     // dia útil que resta no mês, pra bater essa meta (considera o HO atual)
-    const duRestantes   = Math.max(0, duTotal - duPass);
+    const duRestantes   = _du.restam;
     const faltaTotal     = c.valor - hoAtual;
     const faltaPorDiaUtil = duRestantes > 0 ? faltaTotal / duRestantes : 0;
     const faltaJaBatida  = faltaTotal <= 0;
@@ -3971,7 +4042,10 @@ function renderHoProjTable(){
       </td>
       <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#67E8F9;letter-spacing:.5px">${fR2(metaDia)}</td>
       <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#C084FC;letter-spacing:.5px">${fR2(projecao)}</td>
-      <td style="padding:10px 14px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#4ADE80;letter-spacing:.5px">${fR2(hoAtual)}</td>
+      <td style="padding:6px 10px;text-align:right"><input type="text" value="${fR2(hoAtual)}" data-raw="${String(Math.round(hoAtual*100)/100).replace('.',',')}"
+          title="${_rec.manual?'Valor digitado por você (vale até o próximo import). Apague para voltar ao automático.':'Automático (do relatório). Digite para corrigir à mão.'}"
+          onfocus="this.value=this.dataset.raw" onchange="hoProjRecSet(this.value)"
+          style="width:150px;background:rgba(255,255,255,.06);border:1px ${_rec.manual?'solid #FB923C':'dashed rgba(74,222,128,.4)'};border-radius:8px;color:#4ADE80;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.5px;text-align:right;padding:3px 8px"></td>
       <td style="padding:10px 14px;text-align:center">
         <span style="display:inline-block;padding:4px 14px;border-radius:100px;font-size:13px;font-weight:900;
           color:${pctColor};background:${pctBg};border:1.5px solid ${pctBorder}">
@@ -4100,7 +4174,7 @@ function buildOpEditor(){
         placeholder="${op.rec.toFixed(2)}">
       <div id="opho-${op.name.replace(/[^a-zA-Z0-9]/g,'_')}"
         style="font-family:Bebas Neue,sans-serif;font-size:14px;color:var(--ok);text-align:right;padding-right:4px">
-        ${fR(savedVal*0.25)}
+        ${fR(savedVal*HO_PCT)}
       </div>
       <button class="op-reset" onclick="resetOp('${op.name.replace(/'/g,"\\'")}')">↩</button>
     </div>`;
@@ -4110,7 +4184,7 @@ function buildOpEditor(){
 function onOpInput(opName, inp){
   const safeId = opName.replace(/[^a-zA-Z0-9]/g,'_');
   const v = parseFloat(inp.value)||0;
-  const ho = v*0.25;
+  const ho = v*HO_PCT;
   document.getElementById('opho-'+safeId).textContent = fR(ho);
   document.getElementById('oprow-'+safeId).classList.add('edited');
 }
@@ -4125,7 +4199,7 @@ function resetOp(opName){
   const safeId = opName.replace(/[^a-zA-Z0-9]/g,'_');
   const inp = document.getElementById('opinp-'+safeId);
   if(inp) inp.value = origOp.rec.toFixed(2);
-  document.getElementById('opho-'+safeId).textContent = fR(origOp.rec*0.25);
+  document.getElementById('opho-'+safeId).textContent = fR(origOp.rec*HO_PCT);
   document.getElementById('oprow-'+safeId).classList.remove('edited');
 }
 
@@ -4146,7 +4220,7 @@ function resetOps(){
 function liveCalc(){
   const v = parseFloat(document.getElementById('inp-total').value)||0;
   const m = parseFloat(document.getElementById('inp-meta').value)||META_DEFAULT;
-  const ho    = v*0.25;
+  const ho    = v*HO_PCT;
   const falta = Math.max(0,m-v);
   const media = DU.passou>0 ? v/DU.passou : 0;
   const need  = DU.restam>0 ? falta/DU.restam : 0;
@@ -4248,7 +4322,7 @@ function renderPPProjecao(){
   const el = document.getElementById('pp-proj-inline');
   if(!el) return;
 
-  // ── META HO (25% do recebimento) = R$ 800K ──
+  // ── META HO (22,60% do recebimento) = R$ 800K ──
   const META_EMPRESA = 1000000;
   // ── FONTE CORRETA: ppEmpresaAbril = soma da coluna PaguePay do arquivo empresa ──
   const atual = (typeof ppEmpresaAbril !== 'undefined' && ppEmpresaAbril > 0)
@@ -4423,7 +4497,7 @@ function _buildMetasHtml(val, compact){
     if(faltaLbl) faltaLbl.textContent = 'para o objetivo de R$'+((metas+1)*120)+'K';
   }
   const hoObjetivo = hoObjetivoGet();
-  const hoAtual = val * 0.2496;
+  const hoAtual = val *HO_PCT;
   const hoPct = hoObjetivo > 0 ? Math.min(100, (hoAtual/hoObjetivo*100)) : 0;
   const hoColor = hoAtual >= hoObjetivo ? '#4DB848' : '#00E5FF';
   return `
@@ -4524,7 +4598,7 @@ function _updateOntemCard(){
     if(soma > 0) byEq[eq.name] = soma;
   });
 
-  const hoOntem = totalOntem * 0.2496;
+  const hoOntem = totalOntem *HO_PCT;
   const mes     = String(hoje.getMonth()+1).padStart(2,'0');
   const diaStr  = String(ontemDay).padStart(2,'0') + '/' + mes;
 
@@ -4568,7 +4642,7 @@ function _updateHojeCard(){
   let totalHoje = 0;
   Object.values(saved).forEach(v=>{ totalHoje += parseFloat(v)||0; });
 
-  const hoHoje = totalHoje * 0.2496;
+  const hoHoje = totalHoje *HO_PCT;
   const hoje   = new Date();
   const diaStr = String(hoje.getDate()).padStart(2,'0') + '/' + String(hoje.getMonth()+1).padStart(2,'0');
 
@@ -4600,7 +4674,7 @@ function renderPpMetas(){
 function liveCalcArrecadado(){
   const v = parseFloat(document.getElementById('inp-arrecadado')?.value)||0;
   const m = parseFloat(document.getElementById('inp-meta-arrecadado')?.value)||0;
-  const ho    = v*0.25;
+  const ho    = v*HO_PCT;
   const falta = Math.max(0,m-v);
   const media = DU.passou>0 ? v/DU.passou : 0;
   const need  = DU.restam>0 && falta>0 ? falta/DU.restam : 0;
@@ -5087,7 +5161,7 @@ function _calcularComparativo15DU(raw){
   const iPag  = col(['dt.pagamento','dt pagamento','pagamento']);
   const iBaixa= col(['dt.baixa','data baixa']);
   const iData = col(['data']);
-  const iPP   = col(['pague play','pagueplay','24,96','24.96','pp (']);
+  const iPP   = col(['pague play','pagueplay','24,96','24.96','22,60','22.60','pp (']);
   const iRec  = col(['valor recebido','vlr recebido','recebido','valor rec']);
 
   const iDate = iConc>=0 ? iConc : iPag>=0 ? iPag : iBaixa>=0 ? iBaixa : iData;
@@ -5296,7 +5370,7 @@ function _calcularDiasConciliacao(raw){
   const iPag  = col(['dt.pagamento','dt pagamento','pagamento']);
   const iBaixa= col(['dt.baixa','data baixa']);
   const iData = col(['data']);
-  const iPP   = col(['pague play','pagueplay','24,96','24.96','pp (']);
+  const iPP   = col(['pague play','pagueplay','24,96','24.96','22,60','22.60','pp (']);
   const iRec  = col(['valor recebido','vlr recebido','recebido','valor rec']);
 
   const iDate = iConc>=0 ? iConc : iPag>=0 ? iPag : iBaixa>=0 ? iBaixa : iData;
@@ -5405,7 +5479,7 @@ function atualizarComparativo15DU(raw){
 // Não depende de nenhum arquivo especial ("Importar Geral"/"Importar Empresa") — atualiza
 // sozinho toda vez que o relatório do dia normal é importado, usando o dado real do dia
 // mais recente disponível, e sempre com o dia útil certo (respeitando feriados configurados).
-const PP_PCT = 0.2496;
+const PP_PCT = HO_PCT; // mês corrente usa o percentual atual; meses fechados ficam como estão
 function atualizarComparativo15DUdeHistorico(){
   try{
     if(typeof HIST_DADOS === 'undefined') return false;
@@ -5595,7 +5669,7 @@ function _parseMensal(raw){
   const iData   = col(['data','dt.baixa','dt baixa','date']);
   const iPer    = col(['periodo','period']);  // "Pagamento - 2026/04"
   const iRec    = col(['valor recebido','vlr recebido','recebido','valor rec']);
-  const iPP     = col(['pague play','pagueplay','24,96','24.96','pp (']);
+  const iPP     = col(['pague play','pagueplay','24,96','24.96','22,60','22.60','pp (']);
   const iCorenPctM = col(['coren (56','coren(56','56,28','56.28','coren %']);
   const iCoren  = (() => {
     const priority = ['coren_nome','uf','estado','conselho regional','conselho','coren_uf','coren-uf'];
@@ -5671,7 +5745,7 @@ function _parseEmpresaPPporDUMaio(raw){
   const col = cands => { for(const c of cands){ const i=headers.findIndex(h=>h.includes(c)); if(i>=0)return i; } return -1; };
 
   const iData = col(['dt.baixa','dt baixa','data baixa','data']);
-  const iPP   = col(['pague play','pagueplay','24,96','24.96']);
+  const iPP   = col(['pague play','pagueplay','24,96','24.96','22,60','22.60']);
   if(iData < 0 || iPP < 0) return null;
 
   const pN = s => _parseNumFlex(s);
@@ -5745,7 +5819,7 @@ function _parseImportCSV(raw){
 
   const iValorRec = col(['valor recebido','vlr recebido','recebido','valor rec']);
   const iTarifa   = col(['valor tarifa','tarifa','vlr tarifa']);
-  const iPP       = col(['pague play','pagueplay','pague_play','24,96','24.96','pp (']);
+  const iPP       = col(['pague play','pagueplay','pague_play','24,96','24.96','22,60','22.60','pp (']);
   const iCorenPct = col(['coren (56','coren(56','56,28','56.28','coren %']);
   const iCofenPct = col(['cofen (18','cofen(18','18,76','18.76','cofen %']);
 
@@ -5844,7 +5918,7 @@ function previewGeral(raw){
       </div>
       ${result.hasSplit ? `
       <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
-        <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">📊 Pague Play (24,96%)</div>
+        <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">📊 Pague Play (22,60%)</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#3B82F6">${fR(result.totPP)}</div>
       </div>
       <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
@@ -6172,7 +6246,7 @@ function _parseGeralPorEquipe(raw){
 
 // ══════════════════════════════════════════════════════════════
 // IMPORTAR TOTAL EMPRESA — rec_total_empresa*.csv
-// Preenche: Total Arrecadado = soma de Pague Play (24,96%) apenas
+// Preenche: Total Arrecadado = soma de Pague Play (22,60%) apenas
 // ══════════════════════════════════════════════════════════════
 
 function previewEmpresa(raw){
@@ -6194,7 +6268,7 @@ function previewEmpresa(raw){
       <div style="padding:8px 10px;background:var(--w);border:1px solid #FCD34D;border-radius:var(--rm)">
         <div style="font-size:10px;color:#92400E;font-weight:700;text-transform:uppercase;margin-bottom:3px">💼 Total Arrecadado (PaguePay)</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#D97706">${fR(ppVal)}</div>
-        <div style="font-size:10px;color:var(--g500);margin-top:2px">${result.hasSplit ? 'Coluna: Pague Play (24,96%)' : 'Coluna: Valor Recebido (sem split)'}</div>
+        <div style="font-size:10px;color:var(--g500);margin-top:2px">${result.hasSplit ? 'Coluna: Pague Play (22,60%)' : 'Coluna: Valor Recebido (sem split)'}</div>
       </div>
       <div style="padding:8px 10px;background:var(--w);border:1px solid var(--g200);border-radius:var(--rm)">
         <div style="font-size:10px;color:var(--g500);font-weight:700;text-transform:uppercase;margin-bottom:3px">Bruto Total</div>
@@ -6558,7 +6632,7 @@ function mkEq(){
       </div>
       <div class="eq-kpis">
         <div class="eq-k"><div class="eq-k-l">Total Real</div><div class="eq-k-v" style="color:${cfg.c}">${fRK(eq.rec)}</div></div>
-        <div class="eq-k"><div class="eq-k-l">HO (25%)</div><div class="eq-k-v">${fRK(eq.ho)}</div></div>
+        <div class="eq-k"><div class="eq-k-l">HO (22,60%)</div><div class="eq-k-v">${fRK(eq.ho)}</div></div>
         <div class="eq-k"><div class="eq-k-l">Média/Op</div><div class="eq-k-v" style="color:#3B82F6">${fRK(eq.rec/eq.n_op)}</div></div>
       </div>
       <div class="eq-bar-bg"><div class="eq-bar-f" style="width:${Math.min(100,parseFloat(pct))}%;background:${cfg.c}"></div></div>
@@ -6852,7 +6926,7 @@ function mkRankingDigital(){
   const list = ALL.filter(o=>o.eq===DIG_EQ);
   const maxV = list[0]?.rec||1;
   const totalRec = list.reduce((s,o)=>s+o.rec,0);
-  const totalHO  = totalRec*0.25;
+  const totalHO  = totalRec*HO_PCT;
   const totalAc  = list.reduce((s,o)=>s+(o.acordos||0),0);
 
   const kpisEl = document.getElementById('rk-dig-kpis');
@@ -6862,7 +6936,7 @@ function mkRankingDigital(){
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;letter-spacing:.5px;line-height:1">${fRK(totalRec)}</div>
     </div>
     <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
-      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">HO (25%)</div>
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">HO (22,60%)</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#67E8F9;letter-spacing:.5px;line-height:1">${fRK(totalHO)}</div>
     </div>
     <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
@@ -6949,7 +7023,7 @@ function mkRankingBB(){
   const brenda    = allBB.filter(o=>o.eq==='COFEN MARILIA BRENDA');
   const stephanie = allBB.filter(o=>o.eq==='COFEN STEPHANIE 2° TURNO');
   const totalRec = allBB.reduce((s,o)=>s+o.rec,0);
-  const totalHO  = totalRec*0.25;
+  const totalHO  = totalRec*HO_PCT;
   const totalAc  = allBB.reduce((s,o)=>s+(o.acordos||0),0);
 
   const kpis = document.getElementById('rk-bb-kpis');
@@ -6959,7 +7033,7 @@ function mkRankingBB(){
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;line-height:1">${fRK(totalRec)}</div>
     </div>
     <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
-      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">HO (25%)</div>
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">HO (22,60%)</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#67E8F9;line-height:1">${fRK(totalHO)}</div>
     </div>
     <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
@@ -7047,7 +7121,7 @@ function renderRankingBrend(){
   const COLOR = '#00A86B';
   const ops = ALL.filter(o=>o.eq==='COFEN MARILIA BRENDA');
   const totalRec = ops.reduce((s,o)=>s+o.rec,0);
-  const totalHO  = totalRec*0.25;
+  const totalHO  = totalRec*HO_PCT;
   const totalAc  = ops.reduce((s,o)=>s+(o.acordos||0),0);
   const kpis = document.getElementById('rk-brend-kpis');
   if(kpis) kpis.innerHTML=`
@@ -7056,7 +7130,7 @@ function renderRankingBrend(){
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#4ADE80;line-height:1">${fRK(totalRec)}</div>
     </div>
     <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
-      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">HO (25%)</div>
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">HO (22,60%)</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#67E8F9;line-height:1">${fRK(totalHO)}</div>
     </div>
     <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
@@ -7127,7 +7201,7 @@ function renderRankingBrun(){
   const COLOR = '#4776E6';
   const ops = ALL.filter(o=>o.eq==='COFEN BIRIGUI BRUNA');
   const totalRec = ops.reduce((s,o)=>s+o.rec,0);
-  const totalHO  = totalRec*0.25;
+  const totalHO  = totalRec*HO_PCT;
   const totalAc  = ops.reduce((s,o)=>s+(o.acordos||0),0);
   const kpis = document.getElementById('rk-brun-kpis');
   if(kpis) kpis.innerHTML=`
@@ -7136,7 +7210,7 @@ function renderRankingBrun(){
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#93C5FD;line-height:1">${fRK(totalRec)}</div>
     </div>
     <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
-      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">HO (25%)</div>
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px">HO (22,60%)</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#67E8F9;line-height:1">${fRK(totalHO)}</div>
     </div>
     <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px">
@@ -7264,7 +7338,7 @@ function openM(opName){
 
   document.getElementById('m-kpis').innerHTML=[
     {l:'Total Real',v:fR(op.rec),cls:'ok'},
-    {l:'HO (25%)',v:fR(op.ho),cls:''},
+    {l:'HO (22,60%)',v:fR(op.ho),cls:''},
     {l:'Acordos',v:op.acordos,cls:'info'},
     {l:'Real/Acordo',v:fR(op.acordos>0?op.rec/op.acordos:0),cls:'am'},
     {l:'Agend. Valor',v:fR(op.val_ag),cls:'info'},
@@ -7725,7 +7799,7 @@ function loadSavedOverrides(){
         if(_mesImportado){ op.daily={}; op.tipos={}; } // dados do mês vêm do import (restaurados logo abaixo); nada de resto do snapshot antigo
         if(savedOps[op.name]!==undefined){
           op.rec=savedOps[op.name];
-          op.ho=(_hoMapBoot[op.name]!==undefined ? parseFloat(_hoMapBoot[op.name])||0 : op.rec*0.25);
+          op.ho=(_hoMapBoot[op.name]!==undefined ? parseFloat(_hoMapBoot[op.name])||0 : op.rec*HO_PCT);
         } else if(_mesImportado){ op.rec=0; op.ho=0; } // não veio no relatório deste mês: zerado, igual ao import
       });
       eq.rec=eq.ops.reduce((s,o)=>s+o.rec,0);
@@ -7804,8 +7878,8 @@ function rdSumToday(){return Object.values(rdGetSaved()).reduce((s,v)=>s+(parseF
 function rdAtivos(){return Object.values(rdGetSaved()).filter(v=>(parseFloat(v)||0)>0).length}
 
 function rdUpdateKPIs(){
-  const hoje=rdSumToday(), hojeHO=hoje*0.25;
-  const baseRec=getTotalRec(), accRec=baseRec+hoje, accHO=accRec*0.25;
+  const hoje=rdSumToday(), hojeHO=hoje*HO_PCT;
+  const baseRec=getTotalRec(), accRec=baseRec+hoje, accHO=accRec*HO_PCT;
   const ativos=rdAtivos();
   const metaDia=parseFloat(document.getElementById('rd-meta-dia')?.value||30680);
   const pct=metaDia>0?Math.min(100,hoje/metaDia*100):0;
@@ -7886,7 +7960,7 @@ function rdOnInput(opName,inp){
   const base=op?op.rec:0;
   const hojeHOEl=document.getElementById('rd-hojeho-'+safeId);
   const totalEl=document.getElementById('rd-totalhoje-'+safeId);
-  if(hojeHOEl) hojeHOEl.textContent=fR(v*0.25);
+  if(hojeHOEl) hojeHOEl.textContent=fR(v*HO_PCT);
   if(totalEl){
     totalEl.textContent=fR(base+v);
     totalEl.style.color=v>0?'var(--pp)':'var(--g500)';
@@ -7949,7 +8023,7 @@ function rdUpdateEqKpis(eqName){
   s('eq-kpi-base',fR(eq.rec));
   s('eq-kpi-hoje',hojeEq>0?fR(hojeEq):'R$ 0,00',hojeEq>0?cfg.c:'var(--g300)');
   s('eq-kpi-total',fR(totalEq),cfg.c);
-  s('eq-kpi-ho',fR(totalEq*0.25));
+  s('eq-kpi-ho',fR(totalEq*HO_PCT));
 }
 
 function rdRender(){
@@ -8038,7 +8112,7 @@ function rdRender(){
       <div style="text-align:right">
         <div id="rd-totalhoje-${sid}" style="font-family:Bebas Neue,sans-serif;font-size:15px;
           color:${hasVal?cfg.c:'var(--g500)'};letter-spacing:.5px">${fR(op.rec+vHoje)}</div>
-        <div id="rd-hojeho-${sid}" style="font-size:10px;color:var(--ok);font-weight:700">HO: ${fR((op.rec+vHoje)*0.25)}</div>
+        <div id="rd-hojeho-${sid}" style="font-size:10px;color:var(--ok);font-weight:700">HO: ${fR((op.rec+vHoje)*HO_PCT)}</div>
       </div>
     </div>`;
   }).join('');
@@ -8088,7 +8162,7 @@ function rdAddAgora(opName){
   const row=document.getElementById('rdrow-'+sid);
   if(acumEl){acumEl.textContent='+'+fR(vHoje);acumEl.style.color='#F97316';}
   if(totalEl){totalEl.textContent=fR((op?.rec||0)+vHoje);totalEl.style.color=cfg.c;}
-  if(hojehoEl) hojehoEl.textContent='HO: '+fR(((op?.rec||0)+vHoje)*0.25);
+  if(hojehoEl) hojehoEl.textContent='HO: '+fR(((op?.rec||0)+vHoje)*HO_PCT);
   if(row) row.style.background='#FFFDF5';
   rdUpdateKPIs();
   toast('💰 +'+fR(v)+' adicionado a '+opName.replace(/_/g,' '));
@@ -8188,7 +8262,7 @@ function rdConfirmarEdicao(opName){
 
   if(acumEl){ acumEl.textContent = vHoje>0 ? '+'+fR(vHoje) : '—'; acumEl.style.color = vHoje>0?'#F97316':'var(--g300)'; }
   if(totalEl){ totalEl.textContent=fR((op?.rec||0)+vHoje); totalEl.style.color=vHoje>0?cfg.c:'var(--g500)'; }
-  if(hojehoEl) hojehoEl.textContent='HO: '+fR(((op?.rec||0)+vHoje)*0.25);
+  if(hojehoEl) hojehoEl.textContent='HO: '+fR(((op?.rec||0)+vHoje)*HO_PCT);
   if(row) row.style.background = vHoje>0?'#FFFDF5':'';
 
   // Re-renderiza para mostrar/ocultar botões
@@ -8565,7 +8639,7 @@ function _quadroNovoOp(nome,eq){
     Object.keys(o).forEach(function(k){ if(_qk(k)===_qk(nome)){ name=k; rec=parseFloat(o[k])||0; } });
     var hm=JSON.parse(localStorage.getItem('cofen_op_ho')||'{}'); if(hm[name]!==undefined) ho=parseFloat(hm[name])||0;
   }catch(e){}
-  return {name:name,rec:rec,ho:(ho!==null?ho:rec*0.25),acordos:0,ligacoes:0,med_atraso:0,med_lig_baixa:0,daily:{},tipos:{},n_ag:0,val_ag:0,eq:eq};
+  return {name:name,rec:rec,ho:(ho!==null?ho:rec*HO_PCT),acordos:0,ligacoes:0,med_atraso:0,med_lig_baixa:0,daily:{},tipos:{},n_ag:0,val_ag:0,eq:eq};
 }
 function quadroAplicar(){
   var ov=gGetOverrides(), rm=ov.removidos||[], mov={};
@@ -8818,7 +8892,7 @@ function _extraAplicar(extraMap){
       const baseRec = baseSnap[op.name] !== undefined ? parseFloat(baseSnap[op.name])||0
         : (overrides[op.name] !== undefined ? parseFloat(overrides[op.name])||0 : 0);
       op.rec = baseRec + extraPorOp;
-      op.ho  = op.rec * 0.25;
+      op.ho  = op.rec *HO_PCT;
     });
 
     eq.rec = eq.ops.reduce((s,o)=>s+o.rec, 0);
@@ -9339,7 +9413,7 @@ function novoApply(){
   if(!eqNm){ toast('⚠️ Selecione a equipe!'); return; }
   if(ALL.find(o=>o.name===nome)){ toast('⚠️ Operador já existe: '+nome); return; }
 
-  const ho = rec*0.25;
+  const ho = rec*HO_PCT;
   const newOp = {
     name:nome, rec, ho, acordos:0, ligacoes:0,
     med_atraso:0, med_lig_baixa:0, daily:{}, tipos:{}, n_ag:0, val_ag:0, eq:eqNm
@@ -9469,7 +9543,7 @@ function loadGestaoOverrides(){
       let _rN=n.rec, _hN=null;
       try{ const _o=JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}'); if(_o[n.name]!==undefined) _rN=parseFloat(_o[n.name])||0;
         const _hm=JSON.parse(localStorage.getItem('cofen_op_ho')||'{}'); if(_hm[n.name]!==undefined) _hN=parseFloat(_hm[n.name])||0; }catch(e){}
-      const ho=(_hN!==null?_hN:_rN*0.25);
+      const ho=(_hN!==null?_hN:_rN*HO_PCT);
       const newOp={name:n.name,rec:_rN,ho,acordos:0,ligacoes:0,
         med_atraso:0,med_lig_baixa:0,daily:{},tipos:{},n_ag:0,val_ag:0,eq:n.eq};
       eqObj.ops.push(newOp); eqObj.ops.sort((a,b)=>b.rec-a.rec);
@@ -9795,7 +9869,7 @@ function importParse(raw){
       const mEq = matched.eqName;
       found.push({
         rawName, opName:mOp.name, eq:mEq,
-        hoImport:(accData.hoRep>0?accData.hoRep:totalReal*0.25), hoReport:accData.hoRep||0, recImport:totalReal,
+        hoImport:(accData.hoRep>0?accData.hoRep:totalReal*HO_PCT), hoReport:accData.hoRep||0, recImport:totalReal,
         recCurrent:mOp.rec, hoCurrent:mOp.ho,
         diff:totalReal-mOp.rec,
         daily: daily,
@@ -9805,7 +9879,7 @@ function importParse(raw){
       });
     } else {
       missing.push({
-        rawName, ho:(accData.hoRep>0?accData.hoRep:totalReal*0.25), hoReport:accData.hoRep||0, totalReal,
+        rawName, ho:(accData.hoRep>0?accData.hoRep:totalReal*HO_PCT), hoReport:accData.hoRep||0, totalReal,
         eq: normEqReport(accData.eqRaw),
         daily: daily,
         porMes: accData.porMes || {},
@@ -9848,7 +9922,7 @@ function importPreview(raw){
 
   // Render preview OK
   const totalImport = result.found.reduce((s,r)=>s+r.recImport,0);
-  const totalHoImport = totalImport*0.25;
+  const totalHoImport = totalImport*HO_PCT;
   document.getElementById('import-preview-ok').innerHTML =
     // totals row
     `<div style="display:grid;grid-template-columns:36px 1fr 130px 130px 130px 110px;
@@ -9865,7 +9939,7 @@ function importPreview(raw){
       font-size:10px;font-weight:800;color:var(--g500);letter-spacing:1px;text-transform:uppercase">
       <span></span><span>Operador</span>
       <span style="text-align:right">Total Importado</span>
-      <span style="text-align:right">HO (25%)</span>
+      <span style="text-align:right">HO (22,60%)</span>
       <span style="text-align:right">Total Atual</span>
       <span style="text-align:right">Diferença</span>
     </div>` +
@@ -9984,7 +10058,7 @@ function importApply(){
       let eqObj = D.equipes.find(e=>e.name===targetEq);
       if(!eqObj){ eqObj = {name:targetEq, rec:0, ho:0, n_op:0, acordos:0, ops:[]}; D.equipes.push(eqObj); }
       const newOp = {
-        name:opName, rec:m.totalReal, ho:(m.hoReport>0?m.hoReport:m.totalReal*0.25), acordos:m.acordos||0,
+        name:opName, rec:m.totalReal, ho:(m.hoReport>0?m.hoReport:m.totalReal*HO_PCT), acordos:m.acordos||0,
         ligacoes:0, med_atraso:0, med_lig_baixa:0, daily:m.daily||{}, tipos:m.tipos||{},
         n_ag:0, val_ag:0, eq:targetEq
       };
@@ -10050,7 +10124,7 @@ function importApply(){
       const opReal = eq.ops.find(o=>o.name===r.opName);
       if(!opReal) return;
       opReal.rec = r.recImport;
-      opReal.ho  = (r.hoReport>0 ? r.hoReport : r.recImport * 0.25);
+      opReal.ho  = (r.hoReport>0 ? r.hoReport : r.recImport *HO_PCT);
       if(r.acordos > 0) opReal.acordos = r.acordos;
       if(r.daily) opReal.daily = r.daily;
       if(r.tipos  && Object.keys(r.tipos).length  > 0) opReal.tipos  = r.tipos;
@@ -10071,7 +10145,7 @@ function importApply(){
   const ov = {};
   importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
   localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
-  { const _hm={}; importParsed.found.forEach(r=>{ _hm[r.opName]=(r.hoReport>0 ? r.hoReport : r.recImport*0.25); });
+  { const _hm={}; importParsed.found.forEach(r=>{ _hm[r.opName]=(r.hoReport>0 ? r.hoReport : r.recImport*HO_PCT); });
     localStorage.setItem('cofen_op_ho', JSON.stringify(_hm));
     try{ if(typeof syncPush==='function') syncPush('cofen_op_ho'); }catch(e){} }
 
@@ -11036,7 +11110,7 @@ try {
       Object.keys(ov).forEach(nm=>{
         const op=ALL.find(o=>o.name===nm);
         if(!op) return;
-        op.rec=ov[nm]; op.ho=op.rec*0.25;
+        op.rec=ov[nm]; op.ho=op.rec*HO_PCT;
       });
       // Recalc equipes
       D.equipes.forEach(eq=>{
@@ -12231,7 +12305,7 @@ function tvShow(idx){
           </div>
           <div style="background:linear-gradient(135deg,#00A0C4,#00E5FF);box-shadow:0 6px 20px rgba(0,229,255,.35);
               border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 HO (25%)</div>
+            <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 HO (22,60%)</div>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:23px;color:#fff;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.15)">${fR(op.ho)}</div>
           </div>
           <div style="background:linear-gradient(135deg,#7C3AED,#A78BFA);box-shadow:0 6px 20px rgba(124,58,237,.35);
@@ -12983,7 +13057,7 @@ function fbStartListening(){
 
       if(acumEl)  { acumEl.textContent  = vHoje>0?'+'+fR(vHoje):'—'; acumEl.style.color = vHoje>0?'#F97316':'var(--g400)'; }
       if(totalEl) { totalEl.textContent = fR((op.rec||0)+vHoje); totalEl.style.color = cfg.c; }
-      if(hojehoEl){ hojehoEl.textContent= 'HO: '+fR(((op.rec||0)+vHoje)*0.25); }
+      if(hojehoEl){ hojehoEl.textContent= 'HO: '+fR(((op.rec||0)+vHoje)*HO_PCT); }
       if(row)     { row.style.background = vHoje>0?'#FFFDF5':''; }
     });
 
@@ -13008,7 +13082,7 @@ function fbStartListening(){
         const opReal = eq.ops.find(o=>o.name===nm);
         if(!opReal||Math.abs(opReal.rec-numVal)<0.01) return;
         opReal.rec = numVal;
-        { const _hm=JSON.parse(localStorage.getItem('cofen_op_ho')||'{}'); opReal.ho = (_hm[nm]!==undefined ? parseFloat(_hm[nm])||0 : numVal * 0.25); }
+        { const _hm=JSON.parse(localStorage.getItem('cofen_op_ho')||'{}'); opReal.ho = (_hm[nm]!==undefined ? parseFloat(_hm[nm])||0 : numVal *HO_PCT); }
         changed = true;
       });
     });
@@ -13416,7 +13490,7 @@ function applyOps(){
     eq.ops.forEach(op=>{
       if(overrides[op.name] !== undefined){
         op.rec = overrides[op.name];
-        op.ho  = op.rec * 0.25;
+        op.ho  = op.rec *HO_PCT;
       }
     });
     eq.rec = eq.ops.reduce((s,o)=>s+o.rec, 0);
@@ -13566,7 +13640,7 @@ async function fbAutoConnect(){
 // ── EXPORT CSV ──
 function exportCSV(){
   const rows = [
-    ['Pos','Operador','Equipe','Total Real (R$)','HO 25% (R$)','Acordos Gerados','Acordos Pagos','Conversão (%)','Ticket Médio (R$)','Agendamentos']
+    ['Pos','Operador','Equipe','Total Real (R$)','HO 22,60% (R$)','Acordos Gerados','Acordos Pagos','Conversão (%)','Ticket Médio (R$)','Agendamentos']
   ];
   ALL.forEach((op,i)=>{
     const cfg = EQ[op.eq]||{sh:op.eq};
@@ -14071,7 +14145,7 @@ function restaurarOp(opName){
   if(novoEntry){
     const eq = D.equipes.find(e=>e.name===novoEntry.eq);
     if(eq && !eq.ops.find(o=>o.name===opName)){
-      eq.ops.push({name:opName, rec:novoEntry.rec||0, ho:(novoEntry.rec||0)*0.25, acordos:0, ligacoes:0, daily:{}, tipos:{}, n_ag:0, val_ag:0});
+      eq.ops.push({name:opName, rec:novoEntry.rec||0, ho:(novoEntry.rec||0)*HO_PCT, acordos:0, ligacoes:0, daily:{}, tipos:{}, n_ag:0, val_ag:0});
       eq.rec = eq.ops.reduce((s,o)=>s+o.rec,0);
       eq.ho  = eq.ops.reduce((s,o)=>s+o.ho, 0);
       eq.n_op= eq.ops.length;
@@ -15050,7 +15124,7 @@ function fechAnalisar(){
     if(!nome || nome.toLowerCase()==='total' || /^\s*$/.test(nome)) continue;
     const subGrupo = idxSub>=0 ? (cols[idxSub]||'').trim() : '';
     const rec = fechParseNumero(cols[idxRec]);
-    const ho = idxHo>=0 ? fechParseNumero(cols[idxHo]) : rec*0.2496;
+    const ho = idxHo>=0 ? fechParseNumero(cols[idxHo]) : rec*HO_PCT;
     if(rec===0 && ho===0) continue;
 
     const eq = fechDetectarEquipe(subGrupo, nome);
@@ -15205,7 +15279,7 @@ const CMP_ABRIL_CUMUL_CAL = {1:54433.18,2:77553.86,3:78064.3,4:78611.18,5:79298.
 const CMP_MARCO_CUMUL = CMP_ABRIL_CUMUL_CAL; // histórico Abril
 // Dados acumulados de ABRIL por Dia Útil (DU→acumulado)
 // DUs de Abril 2026: dias 1,2,3,6,7,8,9,10,13,14,15,16,17,20,22,23,24,27,28,29,30 (feriados: 18-Páscoa, 21-Tiradentes)
-const CMP_JUNHO_DU = {1:36646.18,2:57458.92,3:80677.23,4:104099.65,5:132801.53,6:159537.6,7:191692.42,8:216216.6,9:237778.24,10:262003.39,11:286067.75,12:314307.79,13:339406.06,14:370230.78,15:395769.76,16:427768.22,17:464220.34,18:500208.14,19:501026.24}; // Maio 2026 encerrado — HO/PaguePay (24,96%)
+const CMP_JUNHO_DU = {1:36646.18,2:57458.92,3:80677.23,4:104099.65,5:132801.53,6:159537.6,7:191692.42,8:216216.6,9:237778.24,10:262003.39,11:286067.75,12:314307.79,13:339406.06,14:370230.78,15:395769.76,16:427768.22,17:464220.34,18:500208.14,19:501026.24}; // Maio 2026 encerrado — HO/PaguePay (22,60%)
 // Dados acumulados de MAIO 2026 por Dia Útil (DU→acumulado) — atualizado dinamicamente via importação
 // ── AGOSTO 2026 — mês corrente (ao vivo, 100% calculado do Histórico real, sem snapshot fixo) ──
 // Dias do calendário de AGOSTO correspondentes a cada DU (índice 0 = DU1); só dias úteis, sem feriados
@@ -15214,7 +15288,7 @@ const CMP_AGOSTO_CUMUL_STATIC = {}; // Agosto começou agora — não existe fec
 const CMP_AGOSTO_CUMUL = {...CMP_AGOSTO_CUMUL_STATIC};
 
 // CMP_JULHO_CUMUL: acumulado global de Julho por DU (gerado do arquivo rec_58_0905.xls)
-const CMP_JULHO_CUMUL_STATIC = {1:67397.04,2:93051.1,3:120807.72,4:142217.95,5:187993.28,6:219667.06,7:243575.96,8:271200.6}; // Julho 2026 — HO/PaguePay (24,96%) — rec_conciliação_3006.xls — só dias já fechados; DU9 em diante vem ao vivo do overrideTotalRec, dias futuros ficam vazios até acontecerem
+const CMP_JULHO_CUMUL_STATIC = {1:67397.04,2:93051.1,3:120807.72,4:142217.95,5:187993.28,6:219667.06,7:243575.96,8:271200.6}; // Julho 2026 — HO/PaguePay (22,60%) — rec_conciliação_3006.xls — só dias já fechados; DU9 em diante vem ao vivo do overrideTotalRec, dias futuros ficam vazios até acontecerem
 // Inicia com dados estáticos do XLS — sobrescrito dinamicamente se houver importação mais recente
 const CMP_JULHO_CUMUL = {...CMP_JULHO_CUMUL_STATIC};
 // CMP_JULHO_EQ: acumulado POR EQUIPE por DU (gerado do arquivo rec_58_0905.xls)
@@ -16734,7 +16808,7 @@ setInterval(()=>{
     <div style="padding:20px">
       <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1E40AF;line-height:1.7">
         <strong>Arquivo:</strong> rec_total_geral_*.xls / .csv<br>
-        <strong>Campos lidos:</strong> Data · Coren · Forma Pgto · Valor Recebido · Valor Tarifa · Pague Play (24,96%) · Coren (56,28%) · Cofen (18,76%) · Operador<br>
+        <strong>Campos lidos:</strong> Data · Coren · Forma Pgto · Valor Recebido · Valor Tarifa · Pague Play (22,60%) · Coren (56,28%) · Cofen (18,76%) · Operador<br>
         <span style="color:#6B7280;font-size:11px">Importe diariamente com o arquivo atualizado</span>
       </div>
       <div id="vg-drop"
@@ -16788,7 +16862,7 @@ setInterval(()=>{
   var CAMPOS = [
     {k:'vr', l:'Valor Recebido',      c:'#1a6ef5'},
     {k:'vt', l:'Valor Tarifa',         c:'#6c5ce7'},
-    {k:'pp', l:'Pague Play (24,96%)',  c:'#0f9e76'},
+    {k:'pp', l:'Pague Play (22,60%)',  c:'#0f9e76'},
     {k:'cr', l:'Coren (56,28%)',       c:'#d97706'},
     {k:'cf', l:'Cofen (18,76%)',       c:'#e74c3c'},
   ];
@@ -16927,7 +17001,7 @@ setInterval(()=>{
     var iFo  = ci(['forma pgto','forma pag']);
     var iVR  = ci(['valor recebido','vlr recebido','valor rec']);
     var iVT  = ci(['valor tarifa','vlr tarifa','tarifa']);
-    var iPP  = ci(['pague play','pagueplay','24,96','24.96']);
+    var iPP  = ci(['pague play','pagueplay','24,96','24.96','22,60','22.60']);
     var iCR  = ci(['coren (56','coren(56','56,28']);
     var iCF  = ci(['cofen (18','cofen(18','18,76']);
     var iOp  = ci(['operador','operator']);
@@ -18780,7 +18854,7 @@ function projOpRender(){
                : op.rec || 0;
       const extra = parseFloat(rdHoje[op.name]||0);
       const rec   = base + extra;
-      opMap[op.name] = { name: op.name, eq: eq.name, rec, ho: rec*0.2496 };
+      opMap[op.name] = { name: op.name, eq: eq.name, rec, ho: rec*HO_PCT };
     });
   });
 
@@ -20557,7 +20631,7 @@ function addOperadorApply(){
   if(!eqNm){ toast('⚠️ Selecione a equipe!'); return; }
   if(ALL.find(o=>o.name===nome)){ toast('⚠️ Operador já existe: '+nome); return; }
 
-  const ho = rec*0.25;
+  const ho = rec*HO_PCT;
   const newOp = { name:nome,rec,ho,acordos:0,ligacoes:0,med_atraso:0,med_lig_baixa:0,daily:{},tipos:{},n_ag:0,val_ag:0,eq:eqNm };
   const eqObj = D.equipes.find(e=>e.name===eqNm);
   if(!eqObj){
