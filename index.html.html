@@ -8638,10 +8638,12 @@ function _reorgGarantir(ov){
 var QUADRO_PADRAO={
   'COFEN BIRIGUI BRUNA':['Diego Rodrigues','Kaue Nadai','Leticia Romeu','Silva Beatriz','Tassiane Viana','Thais Mayara','Thauany Moura','Amabelly Santos','Caio Shimite','Caroline Valverde','Mirella Arias','Raissa Paloma','Stephanie Fagundes','Thayla Santana','Bruna Justimiano'],
   'COFEN STEPHANIE 2° TURNO':['Giovana Souza','Isabela Monteiro','Debora Sobrinho','Gisleide Guedes','Jade Faustino','Kauane Azevedo','Rayssa R. Oliveira','Katia Regina'],
-  'COFEN MARILIA BRENDA':['Bruna Teles','Stephanie Bernardes','Bruna Garbi','Claudineia Messias','Isabella Santos','Itallo Cardamoni','Joao Anguita','Karina Colonez','Leonardo Costa','Rebeca Camargo','Valquiria Xavier'],
+  'COFEN MARILIA BRENDA':['Bruna Teles','Stephanie Bernardes','Bruna Garbi','Claudineia Messias','Isabella Santos','Itallo Cardamoni','Joao Anguita','Karina Colonez','Leonardo Costa','Rebeca Camargo'],
   'COFEN TREINAMENTO':['Manuela Marini','Allana Barbosa','Kethely Santos','Leticia Quinallia','Sophia Costa','Luan Pinto'],
   'COFEN SUPORTE':['Estrategia Cofen']
 };
+// Quem saiu da empresa: some das equipes e rankings e não é recriado por import. (Para voltar, restaurar em Gestão.)
+var QUADRO_REMOVIDOS=['Valquiria Xavier'];
 function _qk(x){return String(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim().split(' ').sort().join(' ');}
 function _quadroNovoOp(nome,eq){
   var name=nome.toUpperCase().replace(/[^A-Z0-9]+/g,'_'),rec=0,ho=null;
@@ -8656,6 +8658,12 @@ function quadroAplicar(){
   var ov=gGetOverrides(), rm=ov.removidos||[], mov={};
   try{ mov=JSON.parse(localStorage.getItem('cofen_quadro_mov')||'{}'); }catch(e){}
   var alvo={}, rmSet={}, rmKeys={};
+  try{
+    var rmQ=QUADRO_REMOVIDOS.map(_qk), alterou=false;
+    D.equipes.forEach(function(eq){eq.ops.forEach(function(o){ if(rmQ.indexOf(_qk(o.name))>=0 && rm.indexOf(o.name)<0){ rm.push(o.name); alterou=true; } });});
+    if(ov.novos){ var n0=ov.novos.length; ov.novos=ov.novos.filter(function(n){return rmQ.indexOf(_qk(n.name))<0;}); if(ov.novos.length!==n0) alterou=true; }
+    if(alterou){ ov.removidos=rm; gSetOverrides(ov); try{ fbPush('gestao',ov); }catch(e){} }
+  }catch(e){}
   Object.keys(QUADRO_PADRAO).forEach(function(t){ QUADRO_PADRAO[t].forEach(function(n){ alvo[_qk(n)]=t; }); });
   Object.keys(mov).forEach(function(k){ alvo[k]=mov[k]; });   // mudança manual feita depois na Gestão vence
   rm.forEach(function(n){ rmSet[n]=1; rmKeys[_qk(n)]=1; });
@@ -21111,8 +21119,9 @@ window.cnfRender=function(){
   var h='<div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">🔎 Conferência com o último relatório importado</div>';
   if(!c){box.innerHTML=h+'<div style="font-size:13px;color:var(--g500)">Ainda não há relatório importado neste navegador. Depois do próximo import, a conferência aparece aqui.</div>';return;}
   var d=new Date(c.s.ts),quando=d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  var tr={};
-  Object.keys(c.s.ops).forEach(function(n){var r=c.s.ops[n];var t=tr[r.eq]||(tr[r.eq]={rel:0,relHo:0,dash:0,dashHo:0,n:0});t.rel+=r.rec;t.relHo+=r.ho;});
+  var tr={}, dNomes={};
+  D.equipes.forEach(function(eq){eq.ops.forEach(function(o){dNomes[o.name]=1;});});
+  Object.keys(c.s.ops).forEach(function(n){if(!dNomes[n])return;var r=c.s.ops[n];var t=tr[r.eq]||(tr[r.eq]={rel:0,relHo:0,dash:0,dashHo:0,n:0});t.rel+=r.rec;t.relHo+=r.ho;});
   D.equipes.forEach(function(eq){eq.ops.forEach(function(o){var r=c.s.ops[o.name];if(!r)return;var t=tr[r.eq]||(tr[r.eq]={rel:0,relHo:0,dash:0,dashHo:0,n:0});});});
   var td={};D.equipes.forEach(function(eq){eq.ops.forEach(function(o){if(!c.s.ops[o.name])return;var t=td[eq.name]||(td[eq.name]={dash:0,dashHo:0,n:0});t.dash+=o.rec||0;t.dashHo+=o.ho||0;if((o.rec||0)>0)t.n++;});});
   var rows=Object.keys(tr).filter(function(k){return tr[k].rel>0||(td[k]&&td[k].dash>0);}).sort(function(a,b){return tr[b].rel-tr[a].rel;}).map(function(k){
