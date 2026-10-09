@@ -10159,6 +10159,7 @@ function importApply(){
   { const _hm={}; importParsed.found.forEach(r=>{ _hm[r.opName]=(r.hoReport>0 ? r.hoReport : r.recImport*HO_PCT); });
     localStorage.setItem('cofen_op_ho', JSON.stringify(_hm));
     try{ if(typeof syncPush==='function') syncPush('cofen_op_ho'); }catch(e){} }
+  try{ cnfSalvar(); }catch(e){} // foto do relatório importado (rec/ho por operador) para a conferência
 
   // Resetar snapshot base (novos valores importados = nova base)
   localStorage.removeItem('cofen_base_rec');
@@ -12652,7 +12653,7 @@ let fbListeners = {};
 // (overrides, meta, arrecadado e op_acordos já sincronizam por conta própria —
 // não duplicar essas aqui pra não conflitar com a lógica anti-loop delas) ──
 const SYNC_KV_KEYS = [
-  'cofen_du_overrides','cofen_feriados','cofen_premiacoes','cofen_op_ho','cofen_quadro_mov','cofen_cmp15du_metas',
+  'cofen_du_overrides','cofen_feriados','cofen_premiacoes','cofen_op_ho','cofen_quadro_mov','cofen_cmp15du_metas','cofen_ultimo_import',
   'cofen_hist_empresa','cofen_hist_geral','cofen_geral_daily_julho','cofen_julho_eq',
   'cofen_ops_du_julho','cofen_ops_du_junho',
   'cofen_corens_extra',
@@ -13502,6 +13503,7 @@ function applyOps(){
       if(overrides[op.name] !== undefined){
         op.rec = overrides[op.name];
         op.ho  = op.rec *HO_PCT;
+        try{ cnfOpManual(op.name, op.rec, op.ho); }catch(e){}
       }
     });
     eq.rec = eq.ops.reduce((s,o)=>s+o.rec, 0);
@@ -21057,6 +21059,85 @@ setInterval(recalcular,30000);
 document.addEventListener('visibilitychange',function(){ if(!document.hidden) recalcular(); });
 window.addEventListener('focus',recalcular);
 window.__duRecalcular=recalcular;
+})();
+</script>
+<script>
+// ══ CONFERÊNCIA COM O ÚLTIMO RELATÓRIO IMPORTADO ══
+// O relatório importado é a fonte da verdade do mês. Guardamos uma foto dele (rec/ho por operador) e, se
+// qualquer outra coisa (sincronização antiga, snapshot, outro computador) deixar um valor diferente na tela,
+// o dashboard avisa, mostra a diferença e corrige sozinho.
+(function(){
+var KEY='cofen_ultimo_import', avisou=false;
+function fR(v){return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function ym(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function ler(){try{return JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){return null;}}
+function extrasAtivos(){try{var e=extraGetAll();return Object.keys(e).some(function(k){return k!=='_ts'&&Math.abs(parseFloat(e[k])||0)>0;});}catch(e){return false;}}
+window.cnfSalvar=function(){
+  var s={ts:Date.now(),mes:ym(),ops:{}};
+  D.equipes.forEach(function(eq){eq.ops.forEach(function(o){s.ops[o.name]={rec:+(o.rec||0),ho:+(o.ho||0),eq:eq.name};});});
+  try{localStorage.setItem(KEY,JSON.stringify(s));if(typeof syncPush==='function')syncPush(KEY);}catch(e){}
+  avisou=false; setTimeout(window.cnfRender,50);
+};
+window.cnfOpManual=function(nome,rec,ho){ // edição manual no Editar Valores vale como nova verdade desse operador
+  var s=ler(); if(!s||!s.ops[nome]) return; s.ops[nome].rec=+rec||0; s.ops[nome].ho=+ho||0;
+  try{localStorage.setItem(KEY,JSON.stringify(s));if(typeof syncPush==='function')syncPush(KEY);}catch(e){}
+};
+function comparar(){
+  var s=ler(); if(!s) return null; var dif=[];
+  D.equipes.forEach(function(eq){eq.ops.forEach(function(o){
+    var r=s.ops[o.name]; if(!r) return;
+    if(Math.abs((o.rec||0)-r.rec)>0.01||Math.abs((o.ho||0)-r.ho)>0.01) dif.push({nome:o.name,eq:eq.name,rel:r.rec,dash:o.rec||0,relHo:r.ho,dashHo:o.ho||0});
+  });});
+  return {s:s,dif:dif};
+}
+function aplicar(c){
+  var m={};c.dif.forEach(function(d){m[d.nome]=d;});
+  D.equipes.forEach(function(eq){eq.ops.forEach(function(o){var d=m[o.name];if(d){o.rec=d.rel;o.ho=d.relHo;}});
+    eq.rec=eq.ops.reduce(function(a,o){return a+o.rec;},0);eq.ho=eq.ops.reduce(function(a,o){return a+o.ho;},0);});
+  try{rebuildAll();}catch(e){} try{refreshAll();}catch(e){}
+}
+window.cnfCorrigir=function(){var c=comparar();if(!c||!c.dif.length){window.cnfRender();return;}aplicar(c);window.cnfRender();try{toast('✅ '+c.dif.length+' valores ajustados ao último relatório importado');}catch(e){}};
+function auto(){
+  var c=comparar(); if(!c||!c.dif.length) return;
+  if(c.s.mes!==ym()) return;            // só vale para o relatório do mês corrente
+  if(extrasAtivos()) return;            // com "Extra por Equipe" ligado a diferença é proposital
+  aplicar(c);
+  if(!avisou){avisou=true;try{toast('⚠️ '+c.dif.length+' valores estavam diferentes do relatório e foram ajustados');}catch(e){}}
+  window.cnfRender();
+}
+window.cnfRender=function(){
+  var box=document.getElementById('cnf-box'); if(!box) return;
+  var c=comparar();
+  var h='<div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">🔎 Conferência com o último relatório importado</div>';
+  if(!c){box.innerHTML=h+'<div style="font-size:13px;color:var(--g500)">Ainda não há relatório importado neste navegador. Depois do próximo import, a conferência aparece aqui.</div>';return;}
+  var d=new Date(c.s.ts),quando=d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  var tr={};
+  Object.keys(c.s.ops).forEach(function(n){var r=c.s.ops[n];var t=tr[r.eq]||(tr[r.eq]={rel:0,relHo:0,dash:0,dashHo:0,n:0});t.rel+=r.rec;t.relHo+=r.ho;});
+  D.equipes.forEach(function(eq){eq.ops.forEach(function(o){var r=c.s.ops[o.name];if(!r)return;var t=tr[r.eq]||(tr[r.eq]={rel:0,relHo:0,dash:0,dashHo:0,n:0});});});
+  var td={};D.equipes.forEach(function(eq){eq.ops.forEach(function(o){if(!c.s.ops[o.name])return;var t=td[eq.name]||(td[eq.name]={dash:0,dashHo:0,n:0});t.dash+=o.rec||0;t.dashHo+=o.ho||0;if((o.rec||0)>0)t.n++;});});
+  var rows=Object.keys(tr).filter(function(k){return tr[k].rel>0||(td[k]&&td[k].dash>0);}).sort(function(a,b){return tr[b].rel-tr[a].rel;}).map(function(k){
+    var x=tr[k],y=td[k]||{dash:0,dashHo:0,n:0},ok=Math.abs(x.rel-y.dash)<0.02&&Math.abs(x.relHo-y.dashHo)<0.02;
+    var nm=(typeof EQ!=='undefined'&&EQ[k]&&EQ[k].sh)||k;
+    return '<tr style="border-top:1px solid var(--g200)"><td style="padding:6px 8px;font-weight:800">'+nm+'</td><td style="padding:6px 8px;text-align:right">'+fR(x.rel)+'</td><td style="padding:6px 8px;text-align:right">'+fR(y.dash)+'</td><td style="padding:6px 8px;text-align:right">'+fR(x.relHo)+'</td><td style="padding:6px 8px;text-align:right">'+fR(y.dashHo)+'</td><td style="padding:6px 8px;text-align:center">'+(ok?'✅':'⚠️')+'</td></tr>';}).join('');
+  var st=c.dif.length?'<div style="margin:8px 0;padding:8px 12px;background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;font-size:13px;font-weight:700;color:#92400E">⚠️ '+c.dif.length+' valor(es) diferentes do relatório'+(extrasAtivos()?' (há "Extra por Equipe" ligado, por isso não corrijo sozinho)':'')+' <button onclick="cnfCorrigir()" style="margin-left:8px;background:#16A34A;color:#fff;border:0;border-radius:8px;padding:5px 12px;font-weight:800;cursor:pointer">Corrigir agora</button></div>'
+    :'<div style="margin:8px 0;padding:8px 12px;background:#DCFCE7;border:1px solid #16A34A;border-radius:8px;font-size:13px;font-weight:800;color:#166534">✅ Dashboard confere com o relatório importado</div>';
+  var det=c.dif.length?'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:6px"><thead><tr style="color:var(--g500);font-size:10px;text-transform:uppercase"><th style="text-align:left;padding:5px 8px">Operador</th><th style="text-align:right;padding:5px 8px">Relatório</th><th style="text-align:right;padding:5px 8px">Dashboard</th><th style="text-align:right;padding:5px 8px">Diferença</th></tr></thead><tbody>'+c.dif.sort(function(a,b){return Math.abs(b.dash-b.rel)-Math.abs(a.dash-a.rel);}).slice(0,40).map(function(x){return '<tr style="border-top:1px solid var(--g200)"><td style="padding:5px 8px">'+x.nome.replace(/_/g,' ')+'</td><td style="padding:5px 8px;text-align:right">'+fR(x.rel)+'</td><td style="padding:5px 8px;text-align:right">'+fR(x.dash)+'</td><td style="padding:5px 8px;text-align:right;color:#DC2626;font-weight:800">'+fR(x.dash-x.rel)+'</td></tr>';}).join('')+'</tbody></table>':'';
+  box.innerHTML=h+'<div style="font-size:12px;color:var(--g500);margin-bottom:6px">Relatório importado em <b>'+quando+'</b> (mês '+c.s.mes+'). Valores do relatório contra o que está na tela:</div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="color:var(--g500);font-size:10px;text-transform:uppercase"><th style="text-align:left;padding:5px 8px">Equipe</th><th style="text-align:right;padding:5px 8px">Recebido (relatório)</th><th style="text-align:right;padding:5px 8px">Recebido (tela)</th><th style="text-align:right;padding:5px 8px">HO (relatório)</th><th style="text-align:right;padding:5px 8px">HO (tela)</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>'+st+det
+    +'<button onclick="cnfRender()" style="margin-top:8px;background:var(--g100,#f1f5f9);border:1px solid var(--g200);border-radius:8px;padding:6px 12px;font-weight:800;cursor:pointer">🔄 Conferir de novo</button>';
+};
+function injetar(){
+  var pg=document.getElementById('pg-import'); if(!pg||document.getElementById('cnf-box')) return;
+  var alvo=null;pg.querySelectorAll('div').forEach(function(d){if(!alvo&&d.firstElementChild&&/Como importar.{1,4}passo a passo/.test(d.firstElementChild.textContent||''))alvo=d;});
+  if(!alvo) return;
+  var c=document.createElement('div');c.id='cnf-box';c.style.cssText='background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:16px;box-shadow:var(--sh);margin-bottom:12px';
+  alvo.parentNode.insertBefore(c,alvo);window.cnfRender();
+}
+setTimeout(injetar,800);setTimeout(injetar,3000);
+setInterval(function(){injetar();auto();},20000);
+setTimeout(auto,6000);
+window.cnfAuto=auto;
+document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.tab'))setTimeout(function(){injetar();window.cnfRender();},400);});
 })();
 </script>
 <!-- ══ PÁGINA MODO TV ══ -->
