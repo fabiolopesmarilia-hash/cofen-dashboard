@@ -5263,8 +5263,11 @@ function cmpMetasGet(){ try{ return JSON.parse(localStorage.getItem('cofen_cmp15
 function cmpMetasSave(o){ try{ localStorage.setItem('cofen_cmp15du_metas',JSON.stringify(o)); if(typeof syncPush==='function') syncPush('cofen_cmp15du_metas'); }catch(e){} }
 function cmpNumBR(v){ let t=String(v||'').replace(/[^\d,.\-]/g,''); if(t.indexOf(',')>-1) t=t.replace(/\./g,'').replace(',','.'); else if(/\.\d{3}$/.test(t)) t=t.replace(/\./g,''); const n=parseFloat(t); return isNaN(n)?0:n; }
 function _cmpRerender(){ const L=window._cmp15duLast; if(L) renderComparativo15DU(L.dados,L.n); }
-function cmpTotaisGet(){ try{ return JSON.parse(localStorage.getItem('cofen_cmp15du_totais')||'{}'); }catch(e){ return {}; } }
-function cmpTotalSet(k,v){ const o=cmpTotaisGet(); const n=cmpNumBR(v); if(n>0) o[k]=n; else delete o[k]; try{ localStorage.setItem('cofen_cmp15du_totais',JSON.stringify(o)); if(typeof syncPush==='function') syncPush('cofen_cmp15du_totais'); }catch(e){} _cmpRerender(); }
+// Totais informados pelo gestor. Setembro/2026: fechou com "mais de R$ 1.400.000" (valor exato ainda não informado), por isso provisório.
+const CMP_TOTAIS_PADRAO = { '2026-09': 1400000 };
+function cmpTotaisGet(){ let o={}; try{ o=JSON.parse(localStorage.getItem('cofen_cmp15du_totais')||'{}'); }catch(e){} return o; }
+function cmpTotaisEf(){ return Object.assign({}, CMP_TOTAIS_PADRAO, cmpTotaisGet()); }   // valor 0 digitado/apagado = volta ao automático
+function cmpTotalSet(k,v){ const o=cmpTotaisGet(); const n=cmpNumBR(v); if(n>0) o[k]=n; else o[k]=0; try{ localStorage.setItem('cofen_cmp15du_totais',JSON.stringify(o)); if(typeof syncPush==='function') syncPush('cofen_cmp15du_totais'); }catch(e){} _cmpRerender(); }
 // Mês fechado com dado que termina antes do fim do mês? devolve 'DD/MM' do último dia com valor (ou '')
 function cmpDadoCortadoEm(mesKey){
   try{
@@ -5287,7 +5290,7 @@ function renderComparativo15DU(dados, duAlvo){
   const n = duAlvo || (dados[dados.length-1] && dados[dados.length-1].duN) || 15;
   window._cmp15duLast = {dados, n};
   const _metas = cmpMetasGet();
-  const _totais = cmpTotaisGet();
+  const _totais = cmpTotaisEf(), _totaisSalvos = cmpTotaisGet();
 
   const fMoney = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const hoje = new Date();
@@ -5312,8 +5315,8 @@ function renderComparativo15DU(dados, duAlvo){
       <td style="padding:8px 14px;text-align:center">${varHtml}</td>
       ${(()=>{
         if(parcial) return `<td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">${fMoney(r.totalMes)}*</td>`;
-        const man = _totais[r.mesKey]>0, tot = man ? _totais[r.mesKey] : r.totalMes, corte = man ? '' : cmpDadoCortadoEm(r.mesKey);
-        return `<td style="padding:6px 10px;text-align:right"><input value="${fMoney(tot)}" data-raw="${String(tot).replace('.',',')}" title="${man?'Total digitado por você (apague para voltar ao automático)':'Automático (conciliação). Digite o total real do mês se estiver incompleto.'}" onfocus="this.value=this.dataset.raw" onchange="cmpTotalSet('${r.mesKey}',this.value)" style="width:150px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.85);border-radius:8px;padding:4px 8px;font-weight:700;font-size:12px;text-align:right;border:1px ${man?'solid #FB923C':'dashed rgba(255,255,255,.2)'}">${corte?`<div style="font-size:9px;font-weight:800;color:#FBBF24;margin-top:2px">⚠️ dado só até ${corte}, faltam dias do mês</div>`:''}</td>`;
+        const man = _totais[r.mesKey]>0, prov = man && !(_totaisSalvos[r.mesKey]>0), tot = man ? _totais[r.mesKey] : r.totalMes, corte = man ? '' : cmpDadoCortadoEm(r.mesKey);
+        return `<td style="padding:6px 10px;text-align:right"><input value="${fMoney(tot)}" data-raw="${String(tot).replace('.',',')}" title="${prov?'Provisório: você informou que o mês fechou com mais de R$ 1,4 mi. Digite o total exato. Apague para voltar ao automático.':man?'Total digitado por você (apague para voltar ao automático)':'Automático (conciliação). Digite o total real do mês se estiver incompleto.'}" onfocus="this.value=this.dataset.raw" onchange="cmpTotalSet('${r.mesKey}',this.value)" style="width:150px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.85);border-radius:8px;padding:4px 8px;font-weight:700;font-size:12px;text-align:right;border:1px ${man?'solid #FB923C':'dashed rgba(255,255,255,.2)'}">${corte?`<div style="font-size:9px;font-weight:800;color:#FBBF24;margin-top:2px">⚠️ dado só até ${corte}, faltam dias do mês</div>`:''}${prov?`<div style="font-size:9px;font-weight:800;color:#FBBF24;margin-top:2px">provisório (mais de 1,4 mi): digite o total exato</div>`:''}</td>`;
       })()}
       ${(()=>{
         const mm=_metas[r.mesKey]||{}; const meta=mm.meta||0;
