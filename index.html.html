@@ -1087,7 +1087,7 @@ var HO_PCT_TXT = (HO_PCT*100).toFixed(2).replace('.',',')+'%';
 
   <!-- SEÇÕES ORIGINAIS -->
   <div class="g2">
-    <div class="card"><div class="sec">📈 Recebimento Diário (PaguePlay Consolidado)</div><div class="ch-w"><canvas id="ch-gd"></canvas></div><div id="proj-op-dash" style="margin-top:14px"></div></div>
+    <div class="card"><div class="sec">📈 Recebimento Diário (PaguePlay Consolidado)</div><div class="ch-w"><canvas id="ch-gd"></canvas></div><div id="proj-op-dash" style="margin-top:14px"></div><div id="rec-dia-conc" style="margin-top:14px"></div></div>
     <div>
       <div class="du-strip" style="margin-bottom:12px">
         <div class="du-title" id="du-title-1">📅 Dias Úteis — Junho 2026 (Seg–Sex)</div>
@@ -12704,7 +12704,7 @@ let fbListeners = {};
 const SYNC_KV_KEYS = [
   'cofen_du_overrides','cofen_feriados','cofen_premiacoes','cofen_op_ho','cofen_quadro_mov','cofen_cmp15du_metas','cofen_cmp15du_totais','cofen_ultimo_import',
   'cofen_hist_empresa','cofen_hist_geral','cofen_geral_daily_julho','cofen_julho_eq',
-  'cofen_ops_du_julho','cofen_ops_du_junho','cofen_proj_meta_ho_op','cofen_import_linhas',
+  'cofen_ops_du_julho','cofen_ops_du_junho','cofen_proj_meta_ho_op','cofen_import_linhas','cofen_rec_dia_conc',
   'cofen_corens_extra',
   'cofen_coren_mt','cofen_coren_pi','cofen_coren_ma','cofen_coren_ce','cofen_coren_sp',
   'cofen_coren_rj','cofen_coren_mg','cofen_coren_rs','cofen_coren_pr','cofen_coren_ba',
@@ -21266,7 +21266,8 @@ window.projOpDashFiltro = function(k,v){ var F=window._projOpFiltro||(window._pr
 window.projOpDashRender = function(){
   var box=document.getElementById('proj-op-dash'); if(!box) return;
   var duT=(typeof DU!=='undefined'&&DU.total)||0, duP=(typeof DU!=='undefined'&&DU.passou)||0;
-  var todos=linhas().sort(function(a,b){ return (b.rec||0)-(a.rec||0); });
+  function pOf(o){ var m=metaHO(o), h=(m>0&&duT>0)?m/duT*duP:0; if(!(h>0)) return -1; return (o.ho>0?o.ho:(o.rec||0)*HO_PCT)/h; }
+  var todos=linhas(); todos.forEach(function(o){ o._p=pOf(o); }); todos.sort(function(a,b){ return (b._p-a._p)||((b.rec||0)-(a.rec||0)); }); // maior projeção primeiro; sem meta por último
   var F=window._projOpFiltro||(window._projOpFiltro={eq:'',q:''});
   function qDe(op){ var m=metaHO(op), h=(m>0&&duT>0)?m/duT*duP:0; if(!(h>0)) return 'sem'; var ho=op.ho>0?op.ho:(op.rec||0)*HO_PCT, p=ho/h*100; return p>=100?'q1':p>=80?'q2':p>=57?'q3':'q4'; }
   var equipes=[]; todos.forEach(function(o){ if(equipes.indexOf(o.sh)<0) equipes.push(o.sh); }); equipes.sort();
@@ -21287,9 +21288,9 @@ window.projOpDashRender = function(){
       +'<td style="padding:5px 6px;font-weight:800;white-space:nowrap;'+(op.vivo?'cursor:pointer" onclick="openM(\''+op.name+'\')"':'"')+'>'+op.name.replace(/_/g,' ')+'</td>'
       +'<td style="padding:5px 6px;text-align:right">'+fR(rec)+'</td>'
       +'<td style="padding:5px 6px;text-align:right;font-weight:700;color:var(--pp)">'+fR(ho)+'</td>'
-      +'<td style="padding:5px 6px;text-align:right;cursor:pointer" title="Clique para editar a meta HO" onclick="projOpDashEditMeta(\''+encodeURIComponent(op.name)+'\')">'+(meta>0?fR(meta):'—')+' ✏️</td>'
-      +'<td style="padding:5px 6px;text-align:right">'+(hoje>0?fR(hoje):'—')+'</td>'
-      +'<td style="padding:5px 6px;text-align:center"><span style="display:inline-block;min-width:58px;padding:2px 8px;border-radius:100px;font-weight:900;background:'+cc.b+';color:'+cc.c+'">'+(pc===null?'—':pc.toFixed(1).replace('.',',')+'%')+'</span></td></tr>';
+      +'<td style="padding:5px 6px;text-align:right;cursor:pointer" title="Clique para editar a meta HO" onclick="projOpDashEditMeta(\''+encodeURIComponent(op.name)+'\')">'+(meta>0?fR(meta):'-')+' ✏️</td>'
+      +'<td style="padding:5px 6px;text-align:right">'+(hoje>0?fR(hoje):'-')+'</td>'
+      +'<td style="padding:5px 6px;text-align:center"><span style="display:inline-block;min-width:58px;padding:2px 8px;border-radius:100px;font-weight:900;background:'+cc.b+';color:'+cc.c+'">'+(pc===null?'-':pc.toFixed(1).replace('.',',')+'%')+'</span></td></tr>';
   }).join('');
   var pT=tHj>0?tH/tHj*100:null, cT=pT===null?{c:'#64748B',b:'#F1F5F9'}:cor(pT);
   var agora=new Date();
@@ -21301,7 +21302,65 @@ window.projOpDashRender = function(){
     +'<thead><tr style="background:var(--g50);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--g700)">'
     +'<th style="padding:6px;text-align:left">Equipe</th><th style="padding:6px;text-align:left">Usuário</th><th style="padding:6px;text-align:right">Recebido</th><th style="padding:6px;text-align:right">Total HO</th><th style="padding:6px;text-align:right">Metas</th><th style="padding:6px;text-align:right">Hoje</th><th style="padding:6px;text-align:center">Projeção</th></tr></thead>'
     +'<tbody>'+(rows||'<tr><td colspan="7" style="padding:14px;text-align:center;color:var(--g500)">Nenhum operador neste filtro</td></tr>')+'</tbody>'
-    +'<tfoot><tr style="background:var(--g50);font-weight:900;border-top:2px solid var(--g200)"><td style="padding:6px" colspan="2">TOTAL'+(lista.length<todos.length?' (filtro)':'')+'</td><td style="padding:6px;text-align:right">'+fR(tR)+'</td><td style="padding:6px;text-align:right;color:var(--pp)">'+fR(tH)+'</td><td style="padding:6px;text-align:right">'+fR(tM)+'</td><td style="padding:6px;text-align:right">'+fR(tHj)+'</td><td style="padding:6px;text-align:center"><span style="display:inline-block;min-width:58px;padding:2px 8px;border-radius:100px;background:'+cT.b+';color:'+cT.c+'">'+(pT===null?'—':pT.toFixed(1).replace('.',',')+'%')+'</span></td></tr></tfoot></table></div>';
+    +'<tfoot><tr style="background:var(--g50);font-weight:900;border-top:2px solid var(--g200)"><td style="padding:6px" colspan="2">TOTAL'+(lista.length<todos.length?' (filtro)':'')+'</td><td style="padding:6px;text-align:right">'+fR(tR)+'</td><td style="padding:6px;text-align:right;color:var(--pp)">'+fR(tH)+'</td><td style="padding:6px;text-align:right">'+fR(tM)+'</td><td style="padding:6px;text-align:right">'+fR(tHj)+'</td><td style="padding:6px;text-align:center"><span style="display:inline-block;min-width:58px;padding:2px 8px;border-radius:100px;background:'+cT.b+';color:'+cT.c+'">'+(pT===null?'-':pT.toFixed(1).replace('.',',')+'%')+'</span></td></tr></tfoot></table></div>';
+  try{ recDiaConcRender(); }catch(e){}
+};
+
+// ── Recebimento por dia: HO (Pague Play) e Total (Valor Recebido) por Dt.Conciliação ──
+var RDC_SEED={mes:'2026-10',ts:Date.parse('2026-10-21T08:00:00'),dias:{"2026-10-01": [78402.44, 343839.1], "2026-10-02": [56793.29, 248742.22], "2026-10-05": [92363.01, 394049.09], "2026-10-06": [57661.86, 249547.5], "2026-10-07": [57757.29, 251601.32], "2026-10-08": [55413.69, 242123.69], "2026-10-09": [53618.69, 235300.76], "2026-10-13": [98106.11, 425729.72], "2026-10-14": [38397.68, 168548.11], "2026-10-15": [50783.38, 222766.26], "2026-10-16": [48438.1, 212299.79], "2026-10-19": [63781.3, 277851.95], "2026-10-20": [47302.85, 207754.82], "2026-10-21": [7405.38, 31132.72]},vazio:[808824.33,3522383.55]};
+function rdcLer(){ try{ var x=JSON.parse(localStorage.getItem('cofen_rec_dia_conc')||'null'); if(x&&x.mes===mesAtual()&&x.dias) return x; }catch(e){} return RDC_SEED.mes===mesAtual()?RDC_SEED:null; }
+function rdcNum(t){ return parseFloat(String(t).replace(/\./g,'').replace(',','.'))||0; }
+window.recDiaConcRender=function(){
+  var box=document.getElementById('rec-dia-conc'); if(!box||window._rdcAberto) return;
+  var st=rdcLer(), dias={}, mes=mesAtual();
+  if(st) Object.keys(st.dias).forEach(function(k){ dias[k]={ho:st.dias[k][0],tot:st.dias[k][1],est:false}; });
+  var gd=(typeof D!=='undefined'&&D.global&&D.global.daily)||{};
+  Object.keys(gd).forEach(function(d){ var v=+gd[d], k=mes+'-'+('0'+d).slice(-2); if(v>0&&!dias[k]) dias[k]={ho:v*HO_PCT,tot:v,est:true}; });
+  var keys=Object.keys(dias).sort(), sH=0, sT=0, temEst=false, SEM=['dom','seg','ter','qua','qui','sex','sáb'];
+  var rows=keys.map(function(k){
+    var d=dias[k], p=k.split('-'), dt=new Date(+p[0],+p[1]-1,+p[2]);
+    sH+=d.ho; sT+=d.tot; if(d.est) temEst=true;
+    var st2=d.est?'color:var(--g500);font-style:italic':'';
+    return '<tr style="border-top:1px solid var(--g200);'+st2+'" '+(d.est?'title="Estimado pelo import do dashboard (HO = '+(HO_PCT*100).toFixed(1).replace('.',',')+'% do total). Cole a tabela de conciliação para o valor real."':'')+'>'
+      +'<td style="padding:5px 6px;font-weight:800">'+p[2]+'/'+p[1]+'/'+p[0]+(d.est?' <span style="font-size:9px">(est.)</span>':'')+'</td>'
+      +'<td style="padding:5px 6px;color:var(--g500)">'+SEM[dt.getDay()]+'</td>'
+      +'<td style="padding:5px 6px;text-align:right;font-weight:700;color:var(--pp)">'+fR(d.ho)+'</td>'
+      +'<td style="padding:5px 6px;text-align:right">'+fR(d.tot)+'</td>'
+      +'<td style="padding:5px 6px;text-align:right">'+(d.tot>0?(d.ho/d.tot*100).toFixed(1).replace('.',',')+'%':'-')+'</td></tr>';
+  }).join('');
+  var vz=st&&st.vazio, tdB='padding:6px;text-align:right';
+  var foot='<tr style="background:var(--g50);font-weight:900;border-top:2px solid var(--g200)"><td style="padding:6px" colspan="2">SOMA DOS DIAS'+(temEst?' (inclui estimados)':'')+'</td><td style="'+tdB+';color:var(--pp)">'+fR(sH)+'</td><td style="'+tdB+'">'+fR(sT)+'</td><td style="'+tdB+'">'+(sT>0?(sH/sT*100).toFixed(1).replace('.',',')+'%':'-')+'</td></tr>';
+  if(vz) foot+='<tr style="font-weight:700;color:var(--g700)"><td style="padding:6px" colspan="2">Sem data de conciliação</td><td style="'+tdB+'">'+fR(vz[0])+'</td><td style="'+tdB+'">'+fR(vz[1])+'</td><td style="'+tdB+'"></td></tr>'
+    +'<tr style="background:var(--g50);font-weight:900"><td style="padding:6px" colspan="2">TOTAL GERAL</td><td style="'+tdB+';color:var(--pp)">'+fR(sH+vz[0])+'</td><td style="'+tdB+'">'+fR(sT+vz[1])+'</td><td style="'+tdB+'"></td></tr>';
+  var ult=st?new Date(st.ts):null;
+  box.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px;padding-top:10px;border-top:1px solid var(--g200)">'
+    +'<div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase">💰 Recebimento por dia · HO e Total</div>'
+    +'<div style="display:flex;gap:10px;align-items:center"><span style="font-size:10px;color:var(--g500);font-weight:600">'+(ult?'Conciliação colada em '+ult.toLocaleDateString('pt-BR')+' '+ult.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'Sem tabela de conciliação')+'</span>'
+    +'<button onclick="recDiaConcAbrir()" style="padding:4px 10px;border:1px solid var(--g200);border-radius:8px;background:#fff;font-size:11px;font-weight:800;cursor:pointer;color:var(--g900)">📋 Colar tabela</button></div></div>'
+    +'<div style="overflow-x:auto;border:1px solid var(--g200);border-radius:var(--rm)"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--g900)">'
+    +'<thead><tr style="background:var(--g50);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--g700)"><th style="padding:6px;text-align:left">Dt. Conciliação</th><th style="padding:6px;text-align:left">Dia</th><th style="padding:6px;text-align:right">HO (Pague Play)</th><th style="padding:6px;text-align:right">Total (Valor Recebido)</th><th style="padding:6px;text-align:right">% HO</th></tr></thead>'
+    +'<tbody>'+(rows||'<tr><td colspan="5" style="padding:14px;text-align:center;color:var(--g500)">Sem dados do mês</td></tr>')+'</tbody><tfoot>'+foot+'</tfoot></table></div>';
+};
+window.recDiaConcAbrir=function(){
+  var box=document.getElementById('rec-dia-conc'); if(!box) return; window._rdcAberto=true;
+  box.innerHTML='<div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;padding-top:10px;border-top:1px solid var(--g200)">💰 Colar tabela de conciliação</div>'
+    +'<textarea id="rdc-ta" rows="9" placeholder="Cole aqui as linhas: Dt.Conciliação | Soma de Pague Play | Soma de Valor Recebido" style="width:100%;box-sizing:border-box;padding:8px;border:1px solid var(--g200);border-radius:8px;font-size:11px;font-family:inherit"></textarea>'
+    +'<div style="display:flex;gap:8px;margin-top:6px"><button onclick="recDiaConcSalvar()" style="padding:6px 14px;border:0;border-radius:8px;background:var(--pp);color:#fff;font-size:11px;font-weight:800;cursor:pointer">Salvar</button><button onclick="recDiaConcFechar()" style="padding:6px 14px;border:1px solid var(--g200);border-radius:8px;background:#fff;font-size:11px;font-weight:800;cursor:pointer;color:var(--g900)">Cancelar</button></div>';
+};
+window.recDiaConcFechar=function(){ window._rdcAberto=false; recDiaConcRender(); };
+window.recDiaConcSalvar=function(){
+  var ta=document.getElementById('rdc-ta'); if(!ta) return;
+  var dias={}, vazio=null, n=0, mes='';
+  ta.value.split(/\r?\n/).forEach(function(l){
+    var m=l.match(/(\d{2})\/(\d{2})\/(\d{4})\D+?R\$\s*([\d.]+,\d{2})\D+?R\$\s*([\d.]+,\d{2})/);
+    if(m){ var k=m[3]+'-'+m[2]+'-'+m[1]; if(k.slice(0,7)>mes) mes=k.slice(0,7); dias[k]=[rdcNum(m[4]),rdcNum(m[5])]; n++; return; }
+    var v=l.match(/\(vazio\)\D+?R\$\s*([\d.]+,\d{2})\D+?R\$\s*([\d.]+,\d{2})/i);
+    if(v&&!vazio) vazio=[rdcNum(v[1]),rdcNum(v[2])];
+  });
+  if(!n){ alert('Não encontrei datas. Cole as linhas com Dt.Conciliação, Soma de Pague Play e Soma de Valor Recebido.'); return; }
+  Object.keys(dias).forEach(function(k){ if(k.slice(0,7)!==mes) delete dias[k]; });
+  try{ localStorage.setItem('cofen_rec_dia_conc',JSON.stringify({mes:mes,ts:Date.now(),dias:dias,vazio:vazio})); syncPush('cofen_rec_dia_conc'); }catch(e){}
+  window._rdcAberto=false; recDiaConcRender();
 };
 setTimeout(function(){ try{ projOpDashRender(); }catch(e){} },1500);
 setInterval(function(){ var a=document.activeElement; if(a&&a.tagName==='SELECT'&&document.getElementById('proj-op-dash')&&document.getElementById('proj-op-dash').contains(a)) return; try{ projOpDashRender(); }catch(e){} },60000);
