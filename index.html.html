@@ -21262,10 +21262,19 @@ window.projOpDashEditMeta = function(enc){
   try{ syncPush('cofen_proj_meta_ho_op'); }catch(e){}
   projOpDashRender();
 };
+window.projOpDashFiltro = function(k,v){ var F=window._projOpFiltro||(window._projOpFiltro={eq:'',q:''}); F[k]=v; projOpDashRender(); };
 window.projOpDashRender = function(){
   var box=document.getElementById('proj-op-dash'); if(!box) return;
   var duT=(typeof DU!=='undefined'&&DU.total)||0, duP=(typeof DU!=='undefined'&&DU.passou)||0;
-  var lista=linhas().sort(function(a,b){ return (b.rec||0)-(a.rec||0); });
+  var todos=linhas().sort(function(a,b){ return (b.rec||0)-(a.rec||0); });
+  var F=window._projOpFiltro||(window._projOpFiltro={eq:'',q:''});
+  function qDe(op){ var m=metaHO(op), h=(m>0&&duT>0)?m/duT*duP:0; if(!(h>0)) return 'sem'; var ho=op.ho>0?op.ho:(op.rec||0)*HO_PCT, p=ho/h*100; return p>=100?'q1':p>=80?'q2':p>=57?'q3':'q4'; }
+  var equipes=[]; todos.forEach(function(o){ if(equipes.indexOf(o.sh)<0) equipes.push(o.sh); }); equipes.sort();
+  var lista=todos.filter(function(o){ return (!F.eq||o.sh===F.eq)&&(!F.q||qDe(o)===F.q); });
+  var optEq='<option value="">Todas as equipes</option>'+equipes.map(function(e){ var a=String(e).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); return '<option value="'+a+'"'+(F.eq===e?' selected':'')+'>'+a+'</option>'; }).join('');
+  var QS=[['','Todos os quartis'],['q1','🟢 1º Quartil (100% ou mais)'],['q2','🔵 2º Quartil (80% a 99,9%)'],['q3','🟡 3º Quartil (57% a 79,9%)'],['q4','🔴 4º Quartil (abaixo de 57%)'],['sem','Sem meta']];
+  var optQ=QS.map(function(x){ return '<option value="'+x[0]+'"'+(F.q===x[0]?' selected':'')+'>'+x[1]+'</option>'; }).join('');
+  var selCss='padding:5px 8px;border:1px solid var(--g200);border-radius:8px;font-size:11px;font-weight:700;background:#fff;color:var(--g900)';
   var tR=0,tH=0,tM=0,tHj=0;
   var rows=lista.map(function(op){
     var rec=op.rec||0, ho=op.ho>0?op.ho:rec*HO_PCT, meta=metaHO(op);
@@ -21287,14 +21296,15 @@ window.projOpDashRender = function(){
   box.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px;padding-top:10px;border-top:1px solid var(--g200)">'
     +'<div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase">🎯 Projeção dos Operadores · D.U. '+duP+'/'+duT+'</div>'
     +'<div style="font-size:10px;color:var(--g500);font-weight:600">Atualização automática · '+agora.toLocaleDateString('pt-BR')+' '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'</div></div>'
-    +'<div style="max-height:460px;overflow:auto;border:1px solid var(--g200);border-radius:var(--rm)"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--g900)">'
-    +'<thead><tr style="position:sticky;top:0;background:var(--g50);z-index:1;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--g700)">'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px"><select onchange="projOpDashFiltro(\'eq\',this.value)" style="'+selCss+'">'+optEq+'</select><select onchange="projOpDashFiltro(\'q\',this.value)" style="'+selCss+'">'+optQ+'</select><span style="font-size:11px;font-weight:700;color:var(--g500)">'+lista.length+' de '+todos.length+' operadores</span>'+((F.eq||F.q)?'<a href="javascript:void(0)" onclick="window._projOpFiltro={eq:\'\',q:\'\'};projOpDashRender()" style="font-size:11px;font-weight:800;color:var(--pp)">Limpar filtros</a>':'')+'</div>'
+    +'<div style="overflow-x:auto;border:1px solid var(--g200);border-radius:var(--rm)"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--g900)">'
+    +'<thead><tr style="background:var(--g50);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--g700)">'
     +'<th style="padding:6px;text-align:left">Equipe</th><th style="padding:6px;text-align:left">Usuário</th><th style="padding:6px;text-align:right">Recebido</th><th style="padding:6px;text-align:right">Total HO</th><th style="padding:6px;text-align:right">Metas</th><th style="padding:6px;text-align:right">Hoje</th><th style="padding:6px;text-align:center">Projeção</th></tr></thead>'
-    +'<tbody>'+(rows||'<tr><td colspan="7" style="padding:14px;text-align:center;color:var(--g500)">Sem operadores carregados</td></tr>')+'</tbody>'
-    +'<tfoot><tr style="position:sticky;bottom:0;background:var(--g50);font-weight:900;border-top:2px solid var(--g200)"><td style="padding:6px" colspan="2">TOTAL</td><td style="padding:6px;text-align:right">'+fR(tR)+'</td><td style="padding:6px;text-align:right;color:var(--pp)">'+fR(tH)+'</td><td style="padding:6px;text-align:right">'+fR(tM)+'</td><td style="padding:6px;text-align:right">'+fR(tHj)+'</td><td style="padding:6px;text-align:center"><span style="display:inline-block;min-width:58px;padding:2px 8px;border-radius:100px;background:'+cT.b+';color:'+cT.c+'">'+(pT===null?'—':pT.toFixed(1).replace('.',',')+'%')+'</span></td></tr></tfoot></table></div>';
+    +'<tbody>'+(rows||'<tr><td colspan="7" style="padding:14px;text-align:center;color:var(--g500)">Nenhum operador neste filtro</td></tr>')+'</tbody>'
+    +'<tfoot><tr style="background:var(--g50);font-weight:900;border-top:2px solid var(--g200)"><td style="padding:6px" colspan="2">TOTAL'+(lista.length<todos.length?' (filtro)':'')+'</td><td style="padding:6px;text-align:right">'+fR(tR)+'</td><td style="padding:6px;text-align:right;color:var(--pp)">'+fR(tH)+'</td><td style="padding:6px;text-align:right">'+fR(tM)+'</td><td style="padding:6px;text-align:right">'+fR(tHj)+'</td><td style="padding:6px;text-align:center"><span style="display:inline-block;min-width:58px;padding:2px 8px;border-radius:100px;background:'+cT.b+';color:'+cT.c+'">'+(pT===null?'—':pT.toFixed(1).replace('.',',')+'%')+'</span></td></tr></tfoot></table></div>';
 };
 setTimeout(function(){ try{ projOpDashRender(); }catch(e){} },1500);
-setInterval(function(){ try{ projOpDashRender(); }catch(e){} },60000);
+setInterval(function(){ var a=document.activeElement; if(a&&a.tagName==='SELECT'&&document.getElementById('proj-op-dash')&&document.getElementById('proj-op-dash').contains(a)) return; try{ projOpDashRender(); }catch(e){} },60000);
 document.addEventListener('visibilitychange',function(){ if(!document.hidden){ try{ projOpDashRender(); }catch(e){} } });
 })();
 </script>
