@@ -12706,7 +12706,7 @@ let fbListeners = {};
 const SYNC_KV_KEYS = [
   'cofen_du_overrides','cofen_feriados','cofen_premiacoes','cofen_op_ho','cofen_quadro_mov','cofen_cmp15du_metas','cofen_cmp15du_totais','cofen_ultimo_import',
   'cofen_hist_empresa','cofen_hist_geral','cofen_geral_daily_julho','cofen_julho_eq',
-  'cofen_ops_du_julho','cofen_ops_du_junho','cofen_proj_meta_ho_op','cofen_import_linhas','cofen_rec_dia_conc','cofen_rec_dia_imp','cofen_plano_meta',
+  'cofen_ops_du_julho','cofen_ops_du_junho','cofen_proj_meta_ho_op','cofen_import_linhas','cofen_rec_dia_conc','cofen_rec_dia_imp','cofen_plano_meta','cofen_proj_ocultos',
   'cofen_corens_extra',
   'cofen_coren_mt','cofen_coren_pi','cofen_coren_ma','cofen_coren_ce','cofen_coren_sp',
   'cofen_coren_rj','cofen_coren_mg','cofen_coren_rs','cofen_coren_pr','cofen_coren_ba',
@@ -21223,6 +21223,19 @@ function titulo(t){ return String(t||'').toLowerCase().replace(/(^|\s)\S/g,funct
 function mesAtual(){ var h=new Date(); return h.getFullYear()+'-'+String(h.getMonth()+1).padStart(2,'0'); }
 function snapLer(){ try{ var x=JSON.parse(localStorage.getItem('cofen_import_linhas')||'null'); return (x&&x.mes===mesAtual()&&Array.isArray(x.rows))?x.rows:[]; }catch(e){ return []; } }
 // Linhas = operadores vivos do dashboard + quem veio no último relatório importado e não está no dashboard (equipe como vem no arquivo)
+function ocLer(){ try{ var x=JSON.parse(localStorage.getItem('cofen_proj_ocultos')||'[]'); return Array.isArray(x)?x:[]; }catch(e){ return []; } }
+window.projOpDashExcluir=function(enc){
+  var nome=decodeURIComponent(enc);
+  if(!confirm('Excluir '+nome.replace(/_/g,' ')+' da Projeção dos Operadores?\n\nSó sai desta tabela e dos totais dela. Dá para restaurar depois.')) return;
+  var oc=ocLer(), k=nk(nome); if(oc.indexOf(k)<0) oc.push(k);
+  try{ localStorage.setItem('cofen_proj_ocultos',JSON.stringify(oc)); syncPush('cofen_proj_ocultos'); }catch(e){}
+  projOpDashRender();
+};
+window.projOpDashRestaurar=function(){
+  if(!confirm('Restaurar todos os operadores excluídos da tabela?')) return;
+  try{ localStorage.setItem('cofen_proj_ocultos','[]'); syncPush('cofen_proj_ocultos'); }catch(e){}
+  projOpDashRender();
+};
 function linhas(){
   var out=[], vistos={};
   (typeof ALL!=='undefined'?ALL:[]).forEach(function(op){
@@ -21235,7 +21248,8 @@ function linhas(){
     var k=nk(r.n); if(!k||vistos[k]||rem.indexOf(k)>=0) return; vistos[k]=1;
     out.push({name:r.n,eq:r.sg,sh:titulo(r.sg)||'Sem equipe',c:'#94A3B8',rec:r.rec||0,ho:r.ho>0?r.ho:(r.rec||0)*HO_PCT,vivo:false});
   });
-  return out;
+  var oc=ocLer();
+  return out.filter(function(o){ return oc.indexOf(nk(o.name))<0; });
 }
 window.projOpDashSnapshot=function(){
   var ip=(typeof importParsed!=='undefined')?importParsed:null; if(!ip) return;
@@ -21301,19 +21315,20 @@ window.projOpDashRender = function(){
       +'<td style="padding:5px 6px;text-align:right;font-weight:700;color:var(--pp)">'+fR(ho)+'</td>'
       +'<td style="padding:5px 6px;text-align:right;cursor:pointer" title="Clique para editar a meta HO" onclick="projOpDashEditMeta(\''+encodeURIComponent(op.name)+'\')">'+(meta>0?fR(meta):'-')+' ✏️</td>'
       +'<td style="padding:5px 6px;text-align:right">'+(hoje>0?fR(hoje):'-')+'</td>'
-      +'<td style="padding:5px 6px;text-align:center"><span style="display:inline-block;min-width:58px;padding:2px 8px;border-radius:100px;font-weight:900;background:'+cc.b+';color:'+cc.c+'">'+(pc===null?'-':pc.toFixed(1).replace('.',',')+'%')+'</span></td></tr>';
+      +'<td style="padding:5px 6px;text-align:center"><span style="display:inline-block;min-width:58px;padding:2px 8px;border-radius:100px;font-weight:900;background:'+cc.b+';color:'+cc.c+'">'+(pc===null?'-':pc.toFixed(1).replace('.',',')+'%')+'</span></td>'
+      +'<td style="padding:5px 6px;text-align:center"><a href="javascript:void(0)" title="Excluir da tabela" onclick="projOpDashExcluir(\''+encodeURIComponent(op.name)+'\')" style="text-decoration:none;font-size:13px">🗑️</a></td></tr>';
   }).join('');
   var pT=tHj>0?tH/tHj*100:null, cT=pT===null?{c:'#64748B',b:'#F1F5F9'}:cor(pT);
   var agora=new Date();
   box.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px;padding-top:10px;border-top:1px solid var(--g200)">'
     +'<div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase">🎯 Projeção dos Operadores · D.U. '+duP+'/'+duT+'</div>'
     +'<div style="font-size:10px;color:var(--g500);font-weight:600">Atualização automática · '+agora.toLocaleDateString('pt-BR')+' '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'</div></div>'
-    +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px"><select onchange="projOpDashFiltro(\'eq\',this.value)" style="'+selCss+'">'+optEq+'</select><select onchange="projOpDashFiltro(\'q\',this.value)" style="'+selCss+'">'+optQ+'</select><span style="font-size:11px;font-weight:700;color:var(--g500)">'+lista.length+' de '+todos.length+' operadores</span>'+((F.eq||F.q)?'<a href="javascript:void(0)" onclick="window._projOpFiltro={eq:\'\',q:\'\'};projOpDashRender()" style="font-size:11px;font-weight:800;color:var(--pp)">Limpar filtros</a>':'')+'</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px"><select onchange="projOpDashFiltro(\'eq\',this.value)" style="'+selCss+'">'+optEq+'</select><select onchange="projOpDashFiltro(\'q\',this.value)" style="'+selCss+'">'+optQ+'</select><span style="font-size:11px;font-weight:700;color:var(--g500)">'+lista.length+' de '+todos.length+' operadores</span>'+((F.eq||F.q)?'<a href="javascript:void(0)" onclick="window._projOpFiltro={eq:\'\',q:\'\'};projOpDashRender()" style="font-size:11px;font-weight:800;color:var(--pp)">Limpar filtros</a>':'')+(ocLer().length?'<a href="javascript:void(0)" onclick="projOpDashRestaurar()" style="font-size:11px;font-weight:800;color:var(--g700)">Restaurar excluídos ('+ocLer().length+')</a>':'')+'</div>'
     +'<div style="overflow-x:auto;border:1px solid var(--g200);border-radius:var(--rm)"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--g900)">'
     +'<thead><tr style="background:var(--g50);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--g700)">'
-    +'<th style="padding:6px;text-align:left">Equipe</th><th style="padding:6px;text-align:left">Usuário</th><th style="padding:6px;text-align:right">Recebido</th><th style="padding:6px;text-align:right">Total HO</th><th style="padding:6px;text-align:right">Metas</th><th style="padding:6px;text-align:right">Hoje</th><th style="padding:6px;text-align:center">Projeção</th></tr></thead>'
-    +'<tbody>'+(rows||'<tr><td colspan="7" style="padding:14px;text-align:center;color:var(--g500)">Nenhum operador neste filtro</td></tr>')+'</tbody>'
-    +'<tfoot><tr style="background:var(--g50);font-weight:900;border-top:2px solid var(--g200)"><td style="padding:6px" colspan="2">TOTAL'+(lista.length<todos.length?' (filtro)':'')+'</td><td style="padding:6px;text-align:right">'+fR(tR)+'</td><td style="padding:6px;text-align:right;color:var(--pp)">'+fR(tH)+'</td><td style="padding:6px;text-align:right">'+fR(tM)+'</td><td style="padding:6px;text-align:right">'+fR(tHj)+'</td><td style="padding:6px;text-align:center"><span style="display:inline-block;min-width:58px;padding:2px 8px;border-radius:100px;background:'+cT.b+';color:'+cT.c+'">'+(pT===null?'-':pT.toFixed(1).replace('.',',')+'%')+'</span></td></tr></tfoot></table></div>';
+    +'<th style="padding:6px;text-align:left">Equipe</th><th style="padding:6px;text-align:left">Usuário</th><th style="padding:6px;text-align:right">Recebido</th><th style="padding:6px;text-align:right">Total HO</th><th style="padding:6px;text-align:right">Metas</th><th style="padding:6px;text-align:right">Hoje</th><th style="padding:6px;text-align:center">Projeção</th><th style="padding:6px"></th></tr></thead>'
+    +'<tbody>'+(rows||'<tr><td colspan="8" style="padding:14px;text-align:center;color:var(--g500)">Nenhum operador neste filtro</td></tr>')+'</tbody>'
+    +'<tfoot><tr style="background:var(--g50);font-weight:900;border-top:2px solid var(--g200)"><td style="padding:6px" colspan="2">TOTAL'+(lista.length<todos.length?' (filtro)':'')+'</td><td style="padding:6px;text-align:right">'+fR(tR)+'</td><td style="padding:6px;text-align:right;color:var(--pp)">'+fR(tH)+'</td><td style="padding:6px;text-align:right">'+fR(tM)+'</td><td style="padding:6px;text-align:right">'+fR(tHj)+'</td><td style="padding:6px;text-align:center"><span style="display:inline-block;min-width:58px;padding:2px 8px;border-radius:100px;background:'+cT.b+';color:'+cT.c+'">'+(pT===null?'-':pT.toFixed(1).replace('.',',')+'%')+'</span></td><td></td></tr></tfoot></table></div>';
   try{ recDiaConcRender(); }catch(e){}
 };
 
