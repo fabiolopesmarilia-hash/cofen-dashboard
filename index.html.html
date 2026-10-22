@@ -1087,7 +1087,7 @@ var HO_PCT_TXT = (HO_PCT*100).toFixed(2).replace('.',',')+'%';
 
   <!-- SEÇÕES ORIGINAIS -->
   <div class="g2">
-    <div class="card"><div class="sec">📈 Recebimento Diário (PaguePlay Consolidado)</div><div class="ch-w"><canvas id="ch-gd"></canvas></div><div id="proj-op-dash" style="margin-top:14px"></div><div id="rec-dia-conc" style="margin-top:14px"></div></div>
+    <div class="card"><div class="sec">📈 Recebimento Diário (PaguePlay Consolidado)</div><div class="ch-w"><canvas id="ch-gd"></canvas></div><div id="proj-op-dash" style="margin-top:14px"></div><div id="rec-dia-conc" style="margin-top:14px"></div><div id="plano-meta" style="margin-top:14px"></div></div>
     <div>
       <div class="du-strip" style="margin-bottom:12px">
         <div class="du-title" id="du-title-1">📅 Dias Úteis — Junho 2026 (Seg–Sex)</div>
@@ -9763,6 +9763,7 @@ function importParse(raw){
 
   // Acumula por operador (nome raw do arquivo)
   const acc = {};
+  const _dia = {}; // recebimento e HO por data de pagamento (todas as linhas do relatório)
   for(let i=1; i<lines.length; i++){
     const row = lines[i].split(sep).map(v=>v.trim().replace(/^"|"$/g,''));
     if(row.length <= Math.max(iCob,iRec)) continue;
@@ -9792,6 +9793,7 @@ function importParse(raw){
         if(_ehMesAtual){
           acc[rawName].daily[day] = (acc[rawName].daily[day]||0) + recVal;
         }
+        if(dp.year && dp.month){ const _k=dp.year+'-'+String(dp.month).padStart(2,'0')+'-'+String(day).padStart(2,'0'); if(!_dia[_k]) _dia[_k]=[0,0]; _dia[_k][1]+=recVal; if(iHO>=0 && iHO!==iRec){ const _hv2=_parseNumFlex(row[iHO]); if(_hv2>0) _dia[_k][0]+=_hv2; } }
         // Também guarda por mês (relatório pode trazer o ano inteiro numa importação só)
         const mesNomeLinha = dp.month ? MES_NOME_POR_NUM[dp.month] : null;
         if(mesNomeLinha){
@@ -9937,7 +9939,7 @@ function importParse(raw){
 
   found.sort((a,b)=>b.recImport-a.recImport);
   missing.sort((a,b)=>b.totalReal-a.totalReal);
-  return {found, missing, sep, iCob, iRec, totalLines:lines.length-1, _acc: acc};
+  return {found, missing, sep, iCob, iRec, totalLines:lines.length-1, _acc: acc, _dia: _dia};
 }
 
 // ── PREVIEW (live as user types) ──
@@ -12704,7 +12706,7 @@ let fbListeners = {};
 const SYNC_KV_KEYS = [
   'cofen_du_overrides','cofen_feriados','cofen_premiacoes','cofen_op_ho','cofen_quadro_mov','cofen_cmp15du_metas','cofen_cmp15du_totais','cofen_ultimo_import',
   'cofen_hist_empresa','cofen_hist_geral','cofen_geral_daily_julho','cofen_julho_eq',
-  'cofen_ops_du_julho','cofen_ops_du_junho','cofen_proj_meta_ho_op','cofen_import_linhas','cofen_rec_dia_conc',
+  'cofen_ops_du_julho','cofen_ops_du_junho','cofen_proj_meta_ho_op','cofen_import_linhas','cofen_rec_dia_conc','cofen_rec_dia_imp','cofen_plano_meta',
   'cofen_corens_extra',
   'cofen_coren_mt','cofen_coren_pi','cofen_coren_ma','cofen_coren_ce','cofen_coren_sp',
   'cofen_coren_rj','cofen_coren_mg','cofen_coren_rs','cofen_coren_pr','cofen_coren_ba',
@@ -21247,6 +21249,15 @@ window.projOpDashSnapshot=function(){
   (ip.found||[]).forEach(function(f){ add(f.opName,f.rawName,f.recImport,f.hoReport>0?f.hoReport:f.hoImport); });
   (ip.missing||[]).forEach(function(m){ add(m.rawName,m.rawName,m.totalReal,m.hoReport>0?m.hoReport:m.ho); });
   try{ localStorage.setItem('cofen_import_linhas',JSON.stringify({ts:Date.now(),mes:mesAtual(),rows:rows})); syncPush('cofen_import_linhas'); }catch(e){}
+  try{ // recebimento por dia (HO e Total) do relatório importado: troca os meses presentes no arquivo, mantém os demais
+    var nd=ip._dia||{}, meses={}; Object.keys(nd).forEach(function(k){ meses[k.slice(0,7)]=1; });
+    if(Object.keys(nd).length){
+      var ant={}; try{ ant=(JSON.parse(localStorage.getItem('cofen_rec_dia_imp')||'{}').dias)||{}; }catch(e2){}
+      Object.keys(ant).forEach(function(k){ if(meses[k.slice(0,7)]) delete ant[k]; });
+      Object.keys(nd).forEach(function(k){ ant[k]=[Math.round(nd[k][0]*100)/100,Math.round(nd[k][1]*100)/100]; });
+      localStorage.setItem('cofen_rec_dia_imp',JSON.stringify({ts:Date.now(),dias:ant})); syncPush('cofen_rec_dia_imp');
+    }
+  }catch(e){}
   try{ projOpDashRender(); }catch(e){}
 };
 function fR(v){ return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
@@ -21310,36 +21321,37 @@ window.projOpDashRender = function(){
 var RDC_SEED={mes:'2026-10',ts:Date.parse('2026-10-21T08:00:00'),dias:{"2026-10-01": [78402.44, 343839.1], "2026-10-02": [56793.29, 248742.22], "2026-10-05": [92363.01, 394049.09], "2026-10-06": [57661.86, 249547.5], "2026-10-07": [57757.29, 251601.32], "2026-10-08": [55413.69, 242123.69], "2026-10-09": [53618.69, 235300.76], "2026-10-13": [98106.11, 425729.72], "2026-10-14": [38397.68, 168548.11], "2026-10-15": [50783.38, 222766.26], "2026-10-16": [48438.1, 212299.79], "2026-10-19": [63781.3, 277851.95], "2026-10-20": [47302.85, 207754.82], "2026-10-21": [7405.38, 31132.72]},vazio:[808824.33,3522383.55]};
 function rdcLer(){ try{ var x=JSON.parse(localStorage.getItem('cofen_rec_dia_conc')||'null'); if(x&&x.mes===mesAtual()&&x.dias) return x; }catch(e){} return RDC_SEED.mes===mesAtual()?RDC_SEED:null; }
 function rdcNum(t){ return parseFloat(String(t).replace(/\./g,'').replace(',','.'))||0; }
+function impDiaLer(){ try{ var x=JSON.parse(localStorage.getItem('cofen_rec_dia_imp')||'null'); return (x&&x.dias)?x:null; }catch(e){ return null; } }
 window.recDiaConcRender=function(){
   var box=document.getElementById('rec-dia-conc'); if(!box||window._rdcAberto) return;
-  var st=rdcLer(), dias={}, mes=mesAtual();
-  if(st) Object.keys(st.dias).forEach(function(k){ dias[k]={ho:st.dias[k][0],tot:st.dias[k][1],est:false}; });
-  var gd=(typeof D!=='undefined'&&D.global&&D.global.daily)||{};
-  Object.keys(gd).forEach(function(d){ var v=+gd[d], k=mes+'-'+('0'+d).slice(-2); if(v>0&&!dias[k]) dias[k]={ho:v*HO_PCT,tot:v,est:true}; });
-  var keys=Object.keys(dias).sort(), sH=0, sT=0, temEst=false, SEM=['dom','seg','ter','qua','qui','sex','sáb'];
+  var mes=mesAtual(), imp=impDiaLer(), cc=rdcLer(), dias={}, temEst=false;
+  if(imp) Object.keys(imp.dias).forEach(function(k){ if(k.slice(0,7)===mes) dias[k]={ho:imp.dias[k][0],tot:imp.dias[k][1],est:false}; });
+  if(!imp){ var gd=(typeof D!=='undefined'&&D.global&&D.global.daily)||{}; Object.keys(gd).forEach(function(d){ var v=+gd[d]; if(v>0){ dias[mes+'-'+('0'+d).slice(-2)]={ho:v*HO_PCT,tot:v,est:true}; temEst=true; } }); }
+  var conc=cc?cc.dias:{};
+  var keys=Object.keys(dias).concat(Object.keys(conc).filter(function(k){ return !dias[k]; })).sort();
+  var SEM=['dom','seg','ter','qua','qui','sex','sáb'], sH=0,sT=0,cH=0,cT=0, tdB='padding:6px;text-align:right', pc=function(h,t){ return t>0?(h/t*100).toFixed(1).replace('.',',')+'%':'-'; };
   var rows=keys.map(function(k){
-    var d=dias[k], p=k.split('-'), dt=new Date(+p[0],+p[1]-1,+p[2]);
-    sH+=d.ho; sT+=d.tot; if(d.est) temEst=true;
-    var st2=d.est?'color:var(--g500);font-style:italic':'';
-    return '<tr style="border-top:1px solid var(--g200);'+st2+'" '+(d.est?'title="Estimado pelo import do dashboard (HO = '+(HO_PCT*100).toFixed(1).replace('.',',')+'% do total). Cole a tabela de conciliação para o valor real."':'')+'>'
+    var d=dias[k]||{ho:0,tot:0,est:false}, c=conc[k], p=k.split('-'), dt=new Date(+p[0],+p[1]-1,+p[2]);
+    sH+=d.ho; sT+=d.tot; if(c){ cH+=c[0]; cT+=c[1]; }
+    var est=d.est?'color:var(--g500);font-style:italic':'';
+    return '<tr style="border-top:1px solid var(--g200);'+est+'">'
       +'<td style="padding:5px 6px;font-weight:800">'+p[2]+'/'+p[1]+'/'+p[0]+(d.est?' <span style="font-size:9px">(est.)</span>':'')+'</td>'
       +'<td style="padding:5px 6px;color:var(--g500)">'+SEM[dt.getDay()]+'</td>'
       +'<td style="padding:5px 6px;text-align:right;font-weight:700;color:var(--pp)">'+fR(d.ho)+'</td>'
       +'<td style="padding:5px 6px;text-align:right">'+fR(d.tot)+'</td>'
-      +'<td style="padding:5px 6px;text-align:right">'+(d.tot>0?(d.ho/d.tot*100).toFixed(1).replace('.',',')+'%':'-')+'</td></tr>';
+      +'<td style="padding:5px 6px;text-align:right">'+pc(d.ho,d.tot)+'</td>'
+      +(cc?'<td style="padding:5px 6px;text-align:right;border-left:1px solid var(--g200)">'+(c?fR(c[0]):'-')+'</td><td style="padding:5px 6px;text-align:right">'+(c?fR(c[1]):'-')+'</td>':'')+'</tr>';
   }).join('');
-  var vz=st&&st.vazio, tdB='padding:6px;text-align:right';
-  var foot='<tr style="background:var(--g50);font-weight:900;border-top:2px solid var(--g200)"><td style="padding:6px" colspan="2">SOMA DOS DIAS'+(temEst?' (inclui estimados)':'')+'</td><td style="'+tdB+';color:var(--pp)">'+fR(sH)+'</td><td style="'+tdB+'">'+fR(sT)+'</td><td style="'+tdB+'">'+(sT>0?(sH/sT*100).toFixed(1).replace('.',',')+'%':'-')+'</td></tr>';
-  if(vz) foot+='<tr style="font-weight:700;color:var(--g700)"><td style="padding:6px" colspan="2">Sem data de conciliação</td><td style="'+tdB+'">'+fR(vz[0])+'</td><td style="'+tdB+'">'+fR(vz[1])+'</td><td style="'+tdB+'"></td></tr>'
-    +'<tr style="background:var(--g50);font-weight:900"><td style="padding:6px" colspan="2">TOTAL GERAL</td><td style="'+tdB+';color:var(--pp)">'+fR(sH+vz[0])+'</td><td style="'+tdB+'">'+fR(sT+vz[1])+'</td><td style="'+tdB+'"></td></tr>';
-  var ult=st?new Date(st.ts):null;
+  var foot='<tr style="background:var(--g50);font-weight:900;border-top:2px solid var(--g200)"><td style="padding:6px" colspan="2">TOTAL DO MÊS'+(temEst?' (estimado)':'')+'</td><td style="'+tdB+';color:var(--pp)">'+fR(sH)+'</td><td style="'+tdB+'">'+fR(sT)+'</td><td style="'+tdB+'">'+pc(sH,sT)+'</td>'+(cc?'<td style="'+tdB+';border-left:1px solid var(--g200)">'+fR(cH)+'</td><td style="'+tdB+'">'+fR(cT)+'</td>':'')+'</tr>';
+  var ult=imp?new Date(imp.ts):null;
   box.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px;padding-top:10px;border-top:1px solid var(--g200)">'
     +'<div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase">💰 Recebimento por dia · HO e Total</div>'
-    +'<div style="display:flex;gap:10px;align-items:center"><span style="font-size:10px;color:var(--g500);font-weight:600">'+(ult?'Conciliação colada em '+ult.toLocaleDateString('pt-BR')+' '+ult.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'Sem tabela de conciliação')+'</span>'
-    +'<button onclick="recDiaConcAbrir()" style="padding:4px 10px;border:1px solid var(--g200);border-radius:8px;background:#fff;font-size:11px;font-weight:800;cursor:pointer;color:var(--g900)">📋 Colar tabela</button></div></div>'
+    +'<div style="display:flex;gap:10px;align-items:center"><span style="font-size:10px;color:var(--g500);font-weight:600">'+(ult?'Atualiza a cada import · último em '+ult.toLocaleDateString('pt-BR')+' '+ult.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'Aguardando o próximo import do relatório')+'</span>'
+    +'<button onclick="recDiaConcAbrir()" style="padding:4px 10px;border:1px solid var(--g200);border-radius:8px;background:#fff;font-size:11px;font-weight:800;cursor:pointer;color:var(--g900)">📋 Colar conciliação</button></div></div>'
     +'<div style="overflow-x:auto;border:1px solid var(--g200);border-radius:var(--rm)"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--g900)">'
-    +'<thead><tr style="background:var(--g50);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--g700)"><th style="padding:6px;text-align:left">Dt. Conciliação</th><th style="padding:6px;text-align:left">Dia</th><th style="padding:6px;text-align:right">HO (Pague Play)</th><th style="padding:6px;text-align:right">Total (Valor Recebido)</th><th style="padding:6px;text-align:right">% HO</th></tr></thead>'
-    +'<tbody>'+(rows||'<tr><td colspan="5" style="padding:14px;text-align:center;color:var(--g500)">Sem dados do mês</td></tr>')+'</tbody><tfoot>'+foot+'</tfoot></table></div>';
+    +'<thead><tr style="background:var(--g50);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--g700)"><th style="padding:6px;text-align:left">Data</th><th style="padding:6px;text-align:left">Dia</th><th style="padding:6px;text-align:right">HO (relatório)</th><th style="padding:6px;text-align:right">Total (relatório)</th><th style="padding:6px;text-align:right">% HO</th>'+(cc?'<th style="padding:6px;text-align:right;border-left:1px solid var(--g200)">HO (conciliação)</th><th style="padding:6px;text-align:right">Total (conciliação)</th>':'')+'</tr></thead>'
+    +'<tbody>'+(rows||'<tr><td colspan="7" style="padding:14px;text-align:center;color:var(--g500)">Sem dados do mês</td></tr>')+'</tbody><tfoot>'+foot+'</tfoot></table></div>';
+  try{ planoMetaRender(); }catch(e){}
 };
 window.recDiaConcAbrir=function(){
   var box=document.getElementById('rec-dia-conc'); if(!box) return; window._rdcAberto=true;
@@ -21361,6 +21373,66 @@ window.recDiaConcSalvar=function(){
   Object.keys(dias).forEach(function(k){ if(k.slice(0,7)!==mes) delete dias[k]; });
   try{ localStorage.setItem('cofen_rec_dia_conc',JSON.stringify({mes:mes,ts:Date.now(),dias:dias,vazio:vazio})); syncPush('cofen_rec_dia_conc'); }catch(e){}
   window._rdcAberto=false; recDiaConcRender();
+};
+
+// ── Plano diário para bater a meta (HO): redistribui o que falta pelos dias que restam, todo dia ──
+// Peso de cada dia = perfil histórico (Ago/Set) por "quantos D.U. faltam depois dele"; sábado e domingo pesam pouco.
+var PL_W={7:74713.71,6:66080.65,5:63548.28,4:61929.02,3:68350.68,2:82996.17,1:100029.73,0:244768.75,sab:12424.43,dom:5209.45};
+var PL_SEED={mes:'2026-10',meta:1600000,baseData:'2026-10-20',baseVal:807524.70};
+function plCfg(){ try{ var x=JSON.parse(localStorage.getItem('cofen_plano_meta')||'null'); if(x&&x.mes===mesAtual()) return x; }catch(e){} return PL_SEED.mes===mesAtual()?PL_SEED:{mes:mesAtual(),meta:0,baseData:'',baseVal:0}; }
+function plSalvar(c){ try{ localStorage.setItem('cofen_plano_meta',JSON.stringify(c)); syncPush('cofen_plano_meta'); }catch(e){} planoMetaRender(); }
+function plUtil(iso,dow){ var ov=getDUOverrides()[iso]; if(ov===true) return true; if(ov===false) return false; return !(dow===0||dow===6)&&getFeriados().indexOf(iso)<0; }
+function plIso(y,m,d){ return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
+window.planoMetaEditar=function(){
+  var c=plCfg(), r=prompt('Meta do mês em HO (R$):',c.meta||''); if(r===null) return;
+  var v=rdcNum(r); if(!(v>0)) return; c=JSON.parse(JSON.stringify(c)); c.meta=v; plSalvar(c);
+};
+window.planoRecebidoEditar=function(){
+  var now=new Date(), ontem=new Date(now.getFullYear(),now.getMonth(),now.getDate()-1);
+  var r=prompt('HO acumulado do mês até ontem ('+('0'+ontem.getDate()).slice(-2)+'/'+('0'+(ontem.getMonth()+1)).slice(-2)+'), em R$:',''); if(r===null) return;
+  var v=rdcNum(r); if(!(v>=0)) return; var c=JSON.parse(JSON.stringify(plCfg()));
+  c.baseData=plIso(ontem.getFullYear(),ontem.getMonth(),ontem.getDate()); c.baseVal=v; plSalvar(c);
+};
+window.planoMetaRender=function(){
+  var box=document.getElementById('plano-meta'); if(!box) return;
+  var now=new Date(), y=now.getFullYear(), m=now.getMonth(), hoje=now.getDate(), dim=new Date(y,m+1,0).getDate();
+  var cfg=plCfg(), SEM=['dom','seg','ter','qua','qui','sex','sáb'], dias=[], i;
+  for(i=1;i<=dim;i++){ var dw=new Date(y,m,i).getDay(), iso=plIso(y,m,i); dias.push({d:i,iso:iso,dow:dw,util:plUtil(iso,dw)}); }
+  var restam=0; for(i=dias.length-1;i>=0;i--){ dias[i].k=restam; if(dias[i].util) restam++; }
+  function peso(x){ if(x.util) return PL_W[Math.min(x.k,7)]; return x.dow===0?PL_W.dom:PL_W.sab; }
+  // acumulado até ontem: base informada + dias seguintes (conciliação colada depois do dia, ou estimativa pelo import)
+  var cc=rdcLer(), imp=impDiaLer(), recebido=cfg.baseVal||0, estim=false, semDado=0, razao=0;
+  if(cc&&imp){ var sc=0,si=0; Object.keys(cc.dias).forEach(function(k){ if(imp.dias[k]&&imp.dias[k][0]>0){ sc+=cc.dias[k][0]; si+=imp.dias[k][0]; } }); razao=si>0?sc/si:0; }
+  dias.forEach(function(x){
+    if(x.d>=hoje||(cfg.baseData&&x.iso<=cfg.baseData)) return;
+    var c=cc&&cc.dias[x.iso], final=c&&cc.ts>=new Date(y,m,x.d+1).getTime();
+    if(final){ recebido+=c[0]; }
+    else if(imp&&imp.dias[x.iso]&&razao>0){ recebido+=imp.dias[x.iso][0]*razao; estim=true; }
+    else if(x.util) semDado++;
+  });
+  var meta=cfg.meta||0, falta=Math.max(0,meta-recebido), fut=dias.filter(function(x){ return x.d>=hoje; });
+  var somaW=fut.reduce(function(a,x){ return a+peso(x); },0), duRest=fut.filter(function(x){ return x.util; }).length;
+  var fmt=function(v){ return fR(v); }, pct=function(v){ return (v*100).toFixed(1).replace('.',',')+'%'; };
+  var card=function(t,v,ex){ return '<div style="flex:1;min-width:150px;background:#fff;border:1px solid var(--g200);border-radius:10px;padding:8px 10px"><div style="font-size:9px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.5px">'+t+'</div><div style="font-size:14px;font-weight:900;color:var(--g900)">'+v+'</div>'+(ex||'')+'</div>'; };
+  var cum=recebido, rows='', hojePlano=0;
+  fut.forEach(function(x){
+    var pl=somaW>0?falta*peso(x)/somaW:0; cum+=pl; if(x.d===hoje) hojePlano=pl;
+    rows+='<tr style="border-top:1px solid var(--g200);'+(x.d===hoje?'background:#ECFDF5;font-weight:800':'')+(x.util?'':';color:var(--g500)')+'"><td style="padding:5px 6px;font-weight:800">'+('0'+x.d).slice(-2)+'/'+('0'+(m+1)).slice(-2)+'/'+y+(x.d===hoje?' (hoje)':'')+'</td><td style="padding:5px 6px">'+SEM[x.dow]+'</td><td style="padding:5px 6px;text-align:right;font-weight:700;color:var(--pp)">'+fmt(pl)+'</td><td style="padding:5px 6px;text-align:right">'+fmt(cum)+'</td><td style="padding:5px 6px;text-align:right">'+(meta>0?pct(cum/meta):'-')+'</td></tr>';
+  });
+  var tdB='padding:6px;text-align:right';
+  var corpo=meta>0?(
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+    +card('Meta (HO) <a href="javascript:void(0)" onclick="planoMetaEditar()" style="text-decoration:none">✏️</a>',fmt(meta))
+    +card('Recebido até ontem <a href="javascript:void(0)" onclick="planoRecebidoEditar()" style="text-decoration:none" title="Corrigir o valor">✏️</a>',fmt(recebido),'<div style="font-size:9px;color:var(--g500)">'+pct(recebido/meta)+' da meta'+(estim?' · inclui estimativa pelo import':'')+(semDado?' · '+semDado+' dia(s) sem dado':'')+'</div>')
+    +card('Falta receber',fmt(falta))
+    +card('Dias úteis restantes (com hoje)',String(duRest),'<div style="font-size:9px;color:var(--g500)">média '+(duRest>0?fmt(falta/duRest):'-')+' por D.U.</div>')
+    +card('Plano de hoje',fmt(hojePlano))+'</div>'
+    +(falta<=0?'<div style="padding:10px;border-radius:10px;background:#D1FAE5;color:#065F46;font-weight:900;text-align:center;margin-bottom:8px">🎉 Meta do mês batida!</div>':
+      '<div style="overflow-x:auto;border:1px solid var(--g200);border-radius:var(--rm)"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--g900)"><thead><tr style="background:var(--g50);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--g700)"><th style="padding:6px;text-align:left">Data</th><th style="padding:6px;text-align:left">Dia</th><th style="padding:6px;text-align:right">Plano para a meta</th><th style="padding:6px;text-align:right">Acumulado do plano</th><th style="padding:6px;text-align:right">% da meta no plano</th></tr></thead><tbody>'+rows+'</tbody><tfoot><tr style="background:var(--g50);font-weight:900;border-top:2px solid var(--g200)"><td style="padding:6px" colspan="2">TOTAL (falta receber)</td><td style="'+tdB+';color:var(--pp)">'+fmt(falta)+'</td><td style="'+tdB+'"></td><td style="'+tdB+'"></td></tr></tfoot></table></div>')
+  ):'<div style="padding:12px;border:1px dashed var(--g200);border-radius:10px;text-align:center;font-size:12px;color:var(--g700)">Defina a meta do mês para gerar o plano. <a href="javascript:void(0)" onclick="planoMetaEditar()" style="font-weight:800;color:var(--pp)">Definir meta</a></div>';
+  box.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px;padding-top:10px;border-top:1px solid var(--g200)">'
+    +'<div style="font-size:10px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase">🎯 Plano diário para bater a meta</div>'
+    +'<div style="font-size:10px;color:var(--g500);font-weight:600">Recalcula todo dia com o que falta e os dias que restam · '+now.toLocaleDateString('pt-BR')+'</div></div>'+corpo;
 };
 setTimeout(function(){ try{ projOpDashRender(); }catch(e){} },1500);
 setInterval(function(){ var a=document.activeElement; if(a&&a.tagName==='SELECT'&&document.getElementById('proj-op-dash')&&document.getElementById('proj-op-dash').contains(a)) return; try{ projOpDashRender(); }catch(e){} },60000);
