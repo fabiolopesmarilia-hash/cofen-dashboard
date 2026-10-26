@@ -7739,6 +7739,7 @@ function refreshAll(){
   // Sempre atualiza todos os componentes — independente de qual aba está visível
   mkGD(); mkDist(); mkTop5();
   try{ if(typeof projOpDashRender==='function') projOpDashRender(); }catch(e){}
+  try{ if(typeof lidAuto==='function'){ lidAuto(); lidRender(); } }catch(e){}
   mkEq();
   mkRanking();
   if(document.getElementById('pg-ranking-digital')?.classList.contains('on')) mkRankingDigital();
@@ -10197,7 +10198,7 @@ function importApply(){
     localStorage.setItem('cofen_op_ho', JSON.stringify(_hm));
     try{ if(typeof syncPush==='function') syncPush('cofen_op_ho'); }catch(e){} }
   try{ cnfSalvar(); }catch(e){} // foto do relatório importado (rec/ho por operador) para a conferência
-  try{ if(typeof projOpDashSnapshot==='function') projOpDashSnapshot(); }catch(e){} // linhas completas do relatório (todas as equipes) para a Projeção dos Operadores
+  try{ if(typeof projOpDashSnapshot==='function') projOpDashSnapshot(); }catch(e){} try{ if(typeof lidAuto==='function'){ lidAuto(); lidRender(); } }catch(e){} // linhas completas do relatório (todas as equipes) para a Projeção dos Operadores
   try{ if(document.getElementById('pg-proj-ano')&&document.getElementById('pg-proj-ano').classList.contains('on')) projAnoRender(); }catch(e){}
 
   // Resetar snapshot base (novos valores importados = nova base)
@@ -12706,7 +12707,7 @@ let fbListeners = {};
 const SYNC_KV_KEYS = [
   'cofen_du_overrides','cofen_feriados','cofen_premiacoes','cofen_op_ho','cofen_quadro_mov','cofen_cmp15du_metas','cofen_cmp15du_totais','cofen_ultimo_import',
   'cofen_hist_empresa','cofen_hist_geral','cofen_geral_daily_julho','cofen_julho_eq',
-  'cofen_ops_du_julho','cofen_ops_du_junho','cofen_proj_meta_ho_op','cofen_import_linhas','cofen_rec_dia_conc','cofen_rec_dia_imp','cofen_plano_meta','cofen_proj_ocultos',
+  'cofen_ops_du_julho','cofen_ops_du_junho','cofen_proj_meta_ho_op','cofen_lid_metas','cofen_import_linhas','cofen_rec_dia_conc','cofen_rec_dia_imp','cofen_plano_meta','cofen_proj_ocultos',
   'cofen_corens_extra',
   'cofen_coren_mt','cofen_coren_pi','cofen_coren_ma','cofen_coren_ce','cofen_coren_sp',
   'cofen_coren_rj','cofen_coren_mg','cofen_coren_rs','cofen_coren_pr','cofen_coren_ba',
@@ -18169,6 +18170,8 @@ function mtsAtualizarJulho(){
       font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px">✏️ Editar Metas Mensais</button>
   </div>
 
+  <div id="mts-lid" style="margin:14px 0"></div>
+
   <!-- Modal: Editar Metas Mensais (Total Recebido, por mês/equipe) -->
   <div id="mts-editar-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);
     align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this) mtsEditarFechar()">
@@ -21452,6 +21455,122 @@ window.planoMetaRender=function(){
 setTimeout(function(){ try{ projOpDashRender(); }catch(e){} },1500);
 setInterval(function(){ var a=document.activeElement; if(a&&a.tagName==='SELECT'&&document.getElementById('proj-op-dash')&&document.getElementById('proj-op-dash').contains(a)) return; try{ projOpDashRender(); }catch(e){} },60000);
 document.addEventListener('visibilitychange',function(){ if(!document.hidden){ try{ projOpDashRender(); }catch(e){} } });
+})();
+</script>
+<script>
+// ══ METAS DAS LÍDERES (Metas 2026): metas salvas por mês e recebido guardado sozinho todo mês ══
+// Histórico Jan-Set/2026 vem da planilha "Controle de Resultado | Liderança | Pagueplay".
+// Todo mês: a meta do mês seguinte nasce igual à do anterior; o recebido de cada líder é a soma da equipe vinculada,
+// gravado a cada atualização e congelado quando o mês vira (primeiro import do mês seguinte, ou seja, fechamento do último dia / 1º dia útil).
+(function(){
+var LID=[{k:'BRENDA',n:'Brenda',eq:''},{k:'BRUNA',n:'Bruna',eq:'COFEN BIRIGUI BRUNA'},{k:'STEPHANIE',n:'Stephanie',eq:'COFEN MARILIA BRENDA'},{k:'KATIA',n:'Katia',eq:'COFEN STEPHANIE 2° TURNO'},{k:'LETICIA',n:'Letícia',eq:'COFEN LETICIA'},{k:'ISABELA',n:'Isabela',eq:'COFEN TREINAMENTO'},{k:'LAYSA',n:'Laysa',eq:''}];
+var SEED={"2026-01": {"BRENDA": [20000, 20352.13], "BRUNA": [495000, 396058.95], "STEPHANIE": [20000, 20352.13], "LAYSA": [155000, 79300.54]}, "2026-02": {"BRENDA": [30000, 30447.39], "BRUNA": [122500, 156464.86], "STEPHANIE": [30000, 30447.39], "LAYSA": [155000, 83640.7]}, "2026-03": {"BRENDA": [50000, 75170.12], "BRUNA": [200000, 195000.0], "STEPHANIE": [50000, 75170.12], "LAYSA": [146500, 116920.07]}, "2026-04": {"BRENDA": [125000, 112522.0], "BRUNA": [300000, 317000.0], "STEPHANIE": [125000, 93790.81], "LAYSA": [111000, 83154.7]}, "2026-05": {"BRENDA": [112500, 127351.0], "BRUNA": [450000, 519793.68], "STEPHANIE": [112500, 96235.78], "LAYSA": [115000, 133601.68]}, "2026-06": {"BRENDA": [150000, 107744.91], "BRUNA": [300000, 227801.5], "STEPHANIE": [112500, 87847.93], "LAYSA": [146000, 103347.55]}, "2026-07": {"BRENDA": [550000, 553568.16], "BRUNA": [300000, 192698.87], "STEPHANIE": [135817.31, 123703.41], "KATIA": [40000, 100974.19], "LAYSA": [150000, 100365.16]}, "2026-08": {"BRENDA": [560000, 440429.17], "BRUNA": [353125, 313420.47], "STEPHANIE": [114086.54, 97118.75], "KATIA": [114086.54, 77747.18], "ISABELA": [70000, 57629.42], "LAYSA": [114086.54, 97118.75]}, "2026-09": {"BRENDA": [520000, 388652.95], "BRUNA": [350000, 313380.3], "STEPHANIE": [100000, 103997.92], "KATIA": [100000, 84203.86], "ISABELA": [67000, 79634.34]}};
+var MES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+function num(v){ var t=String(v==null?'':v).replace(/[^\d,.\-]/g,''); if(t.indexOf(',')>=0) t=t.replace(/\./g,'').replace(',','.'); return parseFloat(t)||0; }
+function R(v){ return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+function ymReal(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function ymDados(){ var m=localStorage.getItem('cofen_mes_dados'); return /^\d{4}-\d{2}$/.test(m||'')?m:ymReal(); }
+function nomeMes(ym){ return MES[+ym.slice(5)-1]+'/'+ym.slice(0,4); }
+function ler(){
+  var st={eqs:{},meses:{}}; try{ var x=JSON.parse(localStorage.getItem('cofen_lid_metas')||'null'); if(x&&x.meses){ st=x; if(!st.eqs) st.eqs={}; } }catch(e){}
+  Object.keys(SEED).forEach(function(ym){ if(!st.meses[ym]){ st.meses[ym]={}; Object.keys(SEED[ym]).forEach(function(k){ st.meses[ym][k]={m:SEED[ym][k][0],r:SEED[ym][k][1],f:true}; }); } });
+  return st;
+}
+function gravar(st){ try{ localStorage.setItem('cofen_lid_metas',JSON.stringify(st)); syncPush('cofen_lid_metas'); }catch(e){} }
+function eqDe(st,L){ return (L.k in st.eqs)?st.eqs[L.k]:L.eq; }
+function vivo(eq){ if(!eq||typeof D==='undefined'||!D.equipes) return null; var e=D.equipes.filter(function(x){ return x.name===eq; })[0]; return e?(e.rec||0):null; }
+function ultimaMeta(st,ym,k){ var ms=Object.keys(st.meses).filter(function(m){ return m<ym; }).sort().reverse(); for(var i=0;i<ms.length;i++){ var e=st.meses[ms[i]][k]; if(e&&e.m>0) return e.m; } return 0; }
+window.lidAuto=function(){
+  var st=ler(), ym=ymDados(), ch=false;
+  if(!st.meses[ym]){ st.meses[ym]={}; ch=true; }
+  LID.forEach(function(L){ if(!st.meses[ym][L.k]){ st.meses[ym][L.k]={m:ultimaMeta(st,ym,L.k),r:null,f:false}; ch=true; } });
+  LID.forEach(function(L){ var e=st.meses[ym][L.k]; if(e.rm) return; var v=vivo(eqDe(st,L)); if(v!==null&&e.r!==v){ e.r=v; ch=true; } });
+  Object.keys(st.meses).forEach(function(m){ if(m<ym) Object.keys(st.meses[m]).forEach(function(k){ var e=st.meses[m][k]; if(e&&!e.f){ e.f=true; ch=true; } }); });
+  if(ch) gravar(st);
+};
+function chip(p){ if(p===null) return '<span style="color:var(--g500)">-</span>'; var c=p>=100?['#D1FAE5','#065F46']:p>=80?['#DBEAFE','#1E40AF']:p>=50?['#FEF3C7','#92400E']:['#FEE2E2','#991B1B']; return '<span style="display:inline-block;min-width:54px;padding:2px 8px;border-radius:100px;font-weight:900;background:'+c[0]+';color:'+c[1]+'">'+p.toFixed(1).replace('.',',')+'%</span>'; }
+window.lidSalvar=function(){
+  var st=ler(), ym=ymDados(); if(!st.meses[ym]) st.meses[ym]={};
+  LID.forEach(function(L){
+    var e=st.meses[ym][L.k]||(st.meses[ym][L.k]={m:0,r:null,f:false});
+    var m=document.getElementById('lid-m-'+L.k), q=document.getElementById('lid-e-'+L.k), r=document.getElementById('lid-r-'+L.k);
+    if(m) e.m=num(m.value);
+    if(q){ st.eqs[L.k]=q.value; }
+    if(r&&r.value!==''){ e.r=num(r.value); e.rm=true; } else if(r){ delete e.rm; }
+  });
+  gravar(st); lidAuto(); window._lidEditando=false; lidRender();
+  var b=document.getElementById('lid-ok'); if(b){ b.style.display='inline'; setTimeout(function(){ if(b) b.style.display='none'; },2500); }
+};
+window.lidEditarCelula=function(ym,k,campo){
+  var st=ler(), e=(st.meses[ym]||{})[k]; var atual=e?(campo==='m'?e.m:e.r):''; var r=prompt((campo==='m'?'Meta':'Recebido')+' de '+k.charAt(0)+k.slice(1).toLowerCase()+' em '+nomeMes(ym)+' (R$):',atual||''); if(r===null) return;
+  if(!st.meses[ym]) st.meses[ym]={}; if(!e) e=st.meses[ym][k]={m:0,r:null,f:ym<ymDados()};
+  if(campo==='m') e.m=num(r); else { e.r=r===''?null:num(r); e.rm=true; }
+  gravar(st); lidRender();
+};
+window.lidRender=function(){
+  var box=document.getElementById('mts-lid'); if(!box) return;
+  var a=document.activeElement; if(a&&box.contains(a)&&(a.tagName==='INPUT'||a.tagName==='SELECT')) return;
+  var st=ler(), ym=ymDados(), cur=st.meses[ym]||{};
+  var cor=function(p){ return p===null?'#94A3B8':p>=100?'#10B981':p>=80?'#3B82F6':p>=50?'#F59E0B':'#EF4444'; };
+  var inp='padding:6px 8px;border:1px solid var(--g200);border-radius:8px;font-size:12px;font-family:inherit;box-sizing:border-box;width:100%';
+  var eqOpts=function(sel){ var o='<option value="">Manual (digitar o recebido)</option>'; if(typeof EQ!=='undefined') Object.keys(EQ).forEach(function(k){ if(k==='COFEN PAGUEPLAY') return; o+='<option value="'+k+'"'+(sel===k?' selected':'')+'>'+EQ[k].sh+'</option>'; }); return o; };
+  var dados=LID.map(function(L){ var e=cur[L.k]||{m:0,r:null}, eq=eqDe(st,L), v=vivo(eq), r=e.r==null?0:e.r; var auto=!!(eq&&v!==null); return {L:L,e:e,eq:eq,r:r,p:(e.m>0&&(auto||e.r!=null))?r/e.m*100:null,auto:auto,semRec:(!auto&&e.r==null)}; });
+  var tM=0,tR=0; dados.forEach(function(d){ tM+=d.e.m||0; tR+=d.r; });
+  var tP=tM>0?tR/tM*100:null, semRec=dados.filter(function(d){ return d.e.m>0&&d.semRec; }).map(function(d){ return d.L.n; });
+  var ord=dados.slice().sort(function(x,y){ return (y.p===null?-1:y.p)-(x.p===null?-1:x.p); });
+  var melhor=ord[0]&&ord[0].p!==null?ord[0]:null, medalhas=['🥇','🥈','🥉'];
+  var kpi=function(t,v,sub,c){ return '<div style="flex:1;min-width:170px;background:#fff;border:1px solid var(--g200);border-left:5px solid '+c+';border-radius:12px;padding:10px 14px"><div style="font-size:10px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.6px">'+t+'</div><div style="font-size:20px;font-weight:900;color:var(--g900);line-height:1.2">'+v+'</div>'+(sub?'<div style="font-size:11px;color:var(--g500);font-weight:600">'+sub+'</div>':'')+'</div>'; };
+  var kpis='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">'
+    +kpi('Meta total das líderes',R(tM),nomeMes(ym),'#3B82F6')
+    +kpi('Recebido total',R(tR),(tP===null?'':tP.toFixed(1).replace('.',',')+'% da meta')+(semRec.length?' · sem recebido: '+semRec.join(', '):''),cor(tP))
+    +kpi('Falta para a meta',tM>0?R(Math.max(0,tM-tR)):'-',tM>0&&tR>=tM?'Meta batida!':'',tM>0&&tR>=tM?'#10B981':'#F59E0B')
+    +kpi('🏆 Melhor do mês',melhor?melhor.L.n:'-',melhor?melhor.p.toFixed(1).replace('.',',')+'% da meta':'defina as metas','#10B981')+'</div>';
+  var cards=ord.map(function(d,i){
+    var L=d.L,e=d.e,c=cor(d.p), w=d.p===null?0:Math.min(100,d.p);
+    return '<div style="background:#fff;border:1px solid var(--g200);border-top:5px solid '+c+';border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div style="font-size:15px;font-weight:900;color:var(--g900)">'+(d.p!==null&&i<3?medalhas[i]+' ':'')+L.n+'</div><div style="font-size:10px;color:var(--g500);font-weight:700">'+(d.eq&&typeof EQ!=='undefined'&&EQ[d.eq]?EQ[d.eq].sh:'Manual')+'</div></div>'
+      +'<div style="font-size:30px;font-weight:900;color:'+c+';line-height:1">'+(d.p===null?'-':d.p.toFixed(1).replace('.',',')+'%')+'</div>'
+      +'<div style="height:10px;background:var(--g100);border-radius:100px;margin:8px 0;overflow:hidden"><div style="height:100%;width:'+w+'%;background:'+c+';border-radius:100px"></div></div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--g700);margin-bottom:10px"><span>Recebido <b>'+(d.semRec?'sem dado':R(d.r))+'</b></span><span>Meta <b>'+(e.m>0?R(e.m):'definir')+'</b></span></div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'
+      +'<div><div style="font-size:9px;font-weight:800;color:var(--g500);text-transform:uppercase;margin-bottom:2px">Meta (R$)</div><input id="lid-m-'+L.k+'" type="text" inputmode="decimal" value="'+(e.m||'')+'" placeholder="definir meta" style="'+inp+';text-align:right"></div>'
+      +'<div><div style="font-size:9px;font-weight:800;color:var(--g500);text-transform:uppercase;margin-bottom:2px">'+(d.auto?'Recebido (auto)':'Recebido (digitar)')+'</div>'+(d.auto?'<div style="padding:6px 8px;font-size:12px;font-weight:800;text-align:right;color:var(--g700)">'+R(d.r)+'</div>':'<input id="lid-r-'+L.k+'" type="text" inputmode="decimal" value="'+(e.rm&&e.r!=null?e.r:'')+'" placeholder="digitar" style="'+inp+';text-align:right">')+'</div></div>'
+      +'<div style="margin-top:6px"><div style="font-size:9px;font-weight:800;color:var(--g500);text-transform:uppercase;margin-bottom:2px">Equipe vinculada</div><select id="lid-e-'+L.k+'" style="'+inp+'">'+eqOpts(d.eq)+'</select></div></div>';
+  }).join('');
+  var meses=Object.keys(st.meses).filter(function(m){ return m<=ym; }).sort();
+  var cel=function(e){ return e&&e.m>0&&e.r!=null; };
+  var th=meses.map(function(m){ return '<th style="padding:7px 8px;text-align:center;border-left:1px solid var(--g200);white-space:nowrap">'+MES[+m.slice(5)-1].slice(0,3)+'/'+m.slice(2,4)+'</th>'; }).join('')+'<th style="padding:7px 8px;text-align:center;border-left:2px solid var(--g200);background:#ECFDF5;white-space:nowrap">TOTAL '+ym.slice(0,4)+'</th>';
+  var hist=LID.map(function(L){
+    var sM=0,sR=0;
+    var tds=meses.map(function(m){
+      var e=(st.meses[m]||{})[L.k]; if(!e||(!(e.m>0)&&e.r==null)) return '<td style="padding:6px 8px;text-align:center;border-left:1px solid var(--g200);color:var(--g500)">-</td>';
+      var p=cel(e)?e.r/e.m*100:null; if(cel(e)){ sM+=e.m; sR+=e.r; }
+      return '<td style="padding:6px 8px;text-align:center;border-left:1px solid var(--g200);white-space:nowrap">'+chip(p)+(e.f?'':'<div style="font-size:9px;color:var(--g500)">em andamento</div>')
+        +'<div style="font-size:10px;color:var(--g700);cursor:pointer" title="Corrigir o recebido" onclick="lidEditarCelula(\''+m+'\',\''+L.k+'\',\'r\')">Rec. '+(e.r!=null?R(e.r):'-')+'</div><div style="font-size:10px;color:var(--g500);cursor:pointer" title="Corrigir a meta" onclick="lidEditarCelula(\''+m+'\',\''+L.k+'\',\'m\')">Meta '+(e.m>0?R(e.m):'-')+'</div></td>';
+    }).join('');
+    return '<tr style="border-top:1px solid var(--g200)"><td style="padding:6px 8px;font-weight:900">'+L.n+'</td>'+tds
+      +'<td style="padding:6px 8px;text-align:center;border-left:2px solid var(--g200);background:#F0FDF4;white-space:nowrap">'+chip(sM>0?sR/sM*100:null)+'<div style="font-size:10px;font-weight:800;color:var(--g700)">Rec. '+R(sR)+'</div><div style="font-size:10px;color:var(--g500)">Meta '+R(sM)+'</div></td></tr>';
+  }).join('');
+  var gM=0,gR=0;
+  var totM=meses.map(function(m){
+    var sM=0,sR=0,best=null; LID.forEach(function(L){ var e=(st.meses[m]||{})[L.k]; if(cel(e)){ sM+=e.m; sR+=e.r; var p=e.r/e.m*100; if(!best||p>best.p) best={n:L.n,p:p}; } });
+    gM+=sM; gR+=sR;
+    return '<td style="padding:7px 8px;text-align:center;border-left:1px solid var(--g200);white-space:nowrap">'+chip(sM>0?sR/sM*100:null)+'<div style="font-size:10px;font-weight:800;color:var(--g700)">Rec. '+R(sR)+'</div><div style="font-size:10px;color:var(--g500)">Meta '+R(sM)+'</div><div style="font-size:10px;font-weight:800;color:#065F46;margin-top:2px">🏆 '+(best?best.n+' '+best.p.toFixed(0)+'%':'-')+'</div></td>';
+  }).join('');
+  var tfoot='<tr style="background:var(--g50);font-weight:900;border-top:2px solid var(--g200)"><td style="padding:7px 8px">TOTAL DO MÊS</td>'+totM+'<td style="padding:7px 8px;text-align:center;border-left:2px solid var(--g200);background:#DCFCE7;white-space:nowrap">'+chip(gM>0?gR/gM*100:null)+'<div style="font-size:10px;color:var(--g700)">Rec. '+R(gR)+'</div><div style="font-size:10px;color:var(--g500)">Meta '+R(gM)+'</div></td></tr>';
+  box.innerHTML='<div style="background:linear-gradient(180deg,#F0FDF4,#fff);border:1px solid var(--g200);border-radius:18px;padding:18px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;letter-spacing:1px;color:var(--g900)">👥 METAS DAS LÍDERES · '+nomeMes(ym).toUpperCase()+'</div>'
+    +'<div style="font-size:10px;color:var(--g500);font-weight:600">Fecha sozinho no 1º import do mês seguinte (último dia do mês ou 1º dia útil)</div></div>'
+    +'<div style="font-size:11px;color:var(--g500);margin-bottom:12px">Líderes do maior para o menor % da meta. Mês novo nasce com a meta do mês anterior e o recebido vem da equipe vinculada.</div>'
+    +kpis
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px">'+cards+'</div>'
+    +'<div style="display:flex;align-items:center;gap:10px;margin:14px 0 18px"><button onclick="lidSalvar()" style="padding:11px 22px;border:0;border-radius:var(--rm);background:linear-gradient(135deg,#00A86B,#00C97C);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;cursor:pointer">💾 Salvar metas das líderes</button><span id="lid-ok" style="display:none;font-weight:800;color:#065F46">✅ Salvo</span></div>'
+    +'<div style="font-size:11px;font-weight:800;color:var(--g700);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px">📊 Controle de Resultado · Liderança · '+ym.slice(0,4)+' <span style="font-weight:600;text-transform:none;color:var(--g500)">(clique em Rec. ou Meta para corrigir)</span></div>'
+    +'<div style="overflow-x:auto;border:1px solid var(--g200);border-radius:var(--rm);background:#fff"><table style="width:100%;border-collapse:collapse;font-size:12px;color:var(--g900)"><thead><tr style="background:var(--g50);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--g700)"><th style="padding:7px 8px;text-align:left">Líder</th>'+th+'</tr></thead><tbody>'+hist+'</tbody><tfoot>'+tfoot+'</tfoot></table></div></div>';
+};
+(function(){ var og=window.go; if(typeof og==='function'){ window.go=function(id){ var r=og.apply(this,arguments); try{ if(id==='metas'){ lidAuto(); lidRender(); } }catch(e){} return r; }; } })();
+setTimeout(function(){ try{ lidAuto(); lidRender(); }catch(e){} },2000);
+setInterval(function(){ try{ lidAuto(); lidRender(); }catch(e){} },60000);
 })();
 </script>
 <script>
