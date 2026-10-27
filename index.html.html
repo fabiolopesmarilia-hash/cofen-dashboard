@@ -390,6 +390,28 @@ select.ev-inp{cursor:pointer}
 .tv-pod-honor-lbl{width:100%;text-align:center;font-size:10px;font-weight:800;color:rgba(255,255,255,.4);
   letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
 
+/* ─ TV RANKING DE PROJEÇÃO DE META (%) ─ */
+.tv-pr-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3.8vw,44px);letter-spacing:4px;color:#34D399;
+  text-shadow:0 0 36px rgba(52,211,153,.5);margin:0}
+.tv-pr-list{position:relative;z-index:3;flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(5px,1vh,10px);padding:10px clamp(16px,4vw,64px) 70px}
+.tv-pr-row{flex:1;min-height:0;display:flex;align-items:center;gap:clamp(10px,1.6vw,22px);padding:0 clamp(10px,1.6vw,22px);
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;opacity:0;
+  animation:tvPodColIn .55s cubic-bezier(.22,1,.36,1) forwards}
+.tv-pr-pos{width:clamp(38px,4.2vw,60px);flex-shrink:0;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:clamp(26px,3.4vw,46px);line-height:1}
+.tv-pr-av{height:min(74%,64px);aspect-ratio:1;border-radius:50%;object-fit:cover;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff}
+.tv-pr-who{width:clamp(170px,27vw,380px);flex-shrink:0;min-width:0}
+.tv-pr-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,2.3vw,30px);letter-spacing:.6px;color:#fff;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tv-pr-team{font-size:clamp(9px,1vw,12px);font-weight:800;letter-spacing:1.3px;text-transform:uppercase;margin-top:2px}
+.tv-pr-track{flex:1;min-width:60px;height:clamp(14px,2.2vh,24px);background:rgba(255,255,255,.09);border-radius:100px;position:relative;overflow:visible}
+.tv-pr-fill{height:100%;border-radius:100px;transition:width 1s cubic-bezier(.22,1,.36,1)}
+.tv-pr-mark{position:absolute;top:-5px;bottom:-5px;width:2px;background:rgba(255,255,255,.55);border-radius:2px}
+.tv-pr-pct{width:clamp(110px,13vw,190px);flex-shrink:0;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,4.2vw,58px);line-height:1}
+.tv-pr-det{width:clamp(120px,14vw,200px);flex-shrink:0;text-align:right;font-size:clamp(10px,1.1vw,14px);font-weight:700;color:rgba(255,255,255,.55);line-height:1.35}
+.tv-pr-det b{color:#fff;font-weight:800}
+.tv-pr-legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:11px;font-weight:800;color:rgba(255,255,255,.55);letter-spacing:1px;margin-top:6px}
+@media (max-width:900px){.tv-pr-det{display:none}.tv-pr-av{display:none}}
+
 /* ─ TRILHA: dado 3D ─ */
 .trilha-dice-scene{width:90px;height:90px;perspective:600px;margin:0 auto}
 .trilha-dice-cube{width:90px;height:90px;position:relative;transform-style:preserve-3d;
@@ -11337,7 +11359,8 @@ function tvRenderSeletor(){
   const ocultos = tvBotoesOcultosGetAll();
   const BOTOES = [
     {id:'geral',                     label:'🏆 Top 5 Geral'},
-    {id:'bs',                        label:'🏙️⭐ Stephanie + Katia'},
+    {id:'proj',                      label:'🎯 Ranking Projeção de Meta (%)'},
+    {id:'bs',                       label:'🏙️⭐ Stephanie + Katia'},
     {id:'bsk',                       label:'🏙️⭐💜 Stephanie + Katia + Equipe Stephanie'},
     {id:'COFEN KATIA',               label:'💜 Top 5 Equipe Stephanie'},
     {id:'COFEN DIGITAL',             label:'🖥️ Top 5 Bruna Chatplay'},
@@ -11417,7 +11440,7 @@ function tvSetMode(mode, btnEl){
   if(btnEl){ btnEl.style.background='rgba(20,150,180,.22)'; btnEl.style.color='#000'; }
   // Atualiza label
   const lbl = document.getElementById('tv-mode-label');
-  if(lbl) lbl.textContent = mode==='geral' ? 'TOP 5 GERAL' : mode==='bb' ? 'BRUNA + STEPHANIE' : mode==='bs' ? 'STEPHANIE + KATIA' : mode==='bsk' ? 'STEPHANIE + KATIA + EQUIPE STEPHANIE' : mode==='COFEN BIRIGUI BRUNA' ? 'TOP 5 EQUIPE BRUNA' : mode==='COFEN DIGITAL' ? 'TOP 5 BRUNA CHATPLAY' : mode==='COFEN KATIA' ? 'TOP 5 EQUIPE STEPHANIE' : mode==='COFEN STEPHANIE 2° TURNO' ? 'TOP 5 KATIA' : mode==='COFEN LETICIA' ? 'TOP 5 EQUIPE LETÍCIA' : (EQ[mode]?.sh||mode).toUpperCase();
+  if(lbl) lbl.textContent = mode==='proj' ? 'RANKING PROJEÇÃO DE META %' : mode==='geral' ? 'TOP 5 GERAL' : mode==='bb' ? 'BRUNA + STEPHANIE' : mode==='bs' ? 'STEPHANIE + KATIA' : mode==='bsk' ? 'STEPHANIE + KATIA + EQUIPE STEPHANIE' : mode==='COFEN BIRIGUI BRUNA' ? 'TOP 5 EQUIPE BRUNA' : mode==='COFEN DIGITAL' ? 'TOP 5 BRUNA CHATPLAY' : mode==='COFEN KATIA' ? 'TOP 5 EQUIPE STEPHANIE' : mode==='COFEN STEPHANIE 2° TURNO' ? 'TOP 5 KATIA' : mode==='COFEN LETICIA' ? 'TOP 5 EQUIPE LETÍCIA' : (EQ[mode]?.sh||mode).toUpperCase();
 
   // Reconstrói lista e reinicia
   tvBuildList();
@@ -11459,7 +11482,38 @@ function tvComboTeams(mode){
   return null;
 }
 
+// ── RANKING POR PROJEÇÃO DE META (%) ─────────────────────────────────
+// Mesma conta da tabela "Projeção dos Operadores": Total HO ÷ (meta HO ÷ D.U. total × D.U. passados).
+// Nos modos de equipe/combinação respeita as equipes do modo; no modo "proj" mostra todo mundo.
+// Páginas de 8 operadores (até 6 páginas), cada uma é um slide da rotação.
+const TV_PROJ_POR_PAG = 8;
+function tvProjTeams(){
+  if(tvMode==='proj' || tvMode==='geral') return null;
+  return tvComboTeams(tvMode) || [tvMode];
+}
+function tvBuildProjRankSlides(){
+  if(typeof window.projOpDashRows!=='function') return [];
+  let rem=[]; try{ rem=(gGetOverrides().removidos)||[]; }catch(e){}
+  const teams = tvProjTeams();
+  let rows = [];
+  try{ rows = window.projOpDashRows(); }catch(e){ return []; }
+  rows = rows.filter(r=> r.p>=0 && !rem.includes(r.name) && (!teams || teams.includes(r.eq)));
+  const pages = Math.min(6, Math.ceil(rows.length/TV_PROJ_POR_PAG));
+  const totH = rows.reduce((s,r)=>s+r.ho,0), totE = rows.reduce((s,r)=>s+r.esperado,0);
+  const pctTotal = totE>0 ? totH/totE*100 : null;
+  return Array.from({length:pages},(_,pg)=>({
+    _projrank:true, name:'PROJRANK_'+pg, page:pg, pages,
+    rows: rows.slice(pg*TV_PROJ_POR_PAG,(pg+1)*TV_PROJ_POR_PAG),
+    total: rows.length, pctTotal
+  }));
+}
+
 function tvBuildList(){
+  if(tvMode==='proj'){
+    tvList = tvBuildProjRankSlides();
+    if(!tvList.length) tvList=[{_projrank:true,name:'PROJRANK_0',page:0,pages:1,rows:[],total:0,pctTotal:null}];
+    return;
+  }
   let _removidos=[];
   try{ _removidos=(gGetOverrides().removidos)||[]; }catch(e){}
   const base = [...ALL].filter(o=>!_removidos.includes(o.name));
@@ -11507,7 +11561,7 @@ function tvBuildList(){
     });
   }
 
-  tvList = [...ops, ...tvBuildDailyHighlights(), podiumSlide, ...podiumsPorEquipe];
+  tvList = [...ops, ...tvBuildDailyHighlights(), podiumSlide, ...podiumsPorEquipe, ...tvBuildProjRankSlides()];
 }
 
 // Carinha de projeção de meta pra usar no bloco de Ranking do Modo TV
@@ -11655,6 +11709,8 @@ document.addEventListener('keydown', e=>{
   if(e.key==='2'){ document.getElementById('tv-btn-COFEN_BIRIGUI_BRUNA')?.click(); }
   // Tecla 9: pula direto pro(s) slide(s) de Destaque do Dia, pra testar sem esperar o ciclo inteiro
   if(e.key==='9'){ tvGoToHighlights(); }
+  // Tecla 8: pula direto pro Ranking de Projeção de Meta (%)
+  if(e.key==='8'){ const i=tvList.findIndex(o=>o._projrank); if(i>=0) tvGoTo(i); else toast('⚠️ Nenhum operador com meta definida.'); }
 });
 
 // Pula direto para o primeiro slide de "Destaque do Dia" da lista atual (tecla 9)
@@ -12139,6 +12195,92 @@ function tvShowPodiumSlide(slide){
   }
 }
 
+// ── SLIDE: RANKING POR PROJEÇÃO DE META (%) ──────────────────────────
+function tvShowProjRankSlide(slide){
+  const now = new Date();
+  const clkEl=document.getElementById('tv-clock-display');
+  if(clkEl) clkEl.textContent=[now.getHours(),now.getMinutes(),now.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
+  const dtEl=document.getElementById('tv-date-display');
+  if(dtEl){const Dw=['DOM','SEG','TER','QUA','QUI','SEX','SAB'];dtEl.textContent=Dw[now.getDay()]+' '+String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0');}
+
+  const rows = slide.rows || [];
+  const fmtPct = v => v.toFixed(1).replace('.',',')+'%';
+  // Mesmos quartis da tabela de Projeção: ≥100 / ≥80 / ≥57 / abaixo
+  const corDe = p => p>=100 ? {c:'#34D399',g:'rgba(52,211,153,.55)'}
+                   : p>=80  ? {c:'#60A5FA',g:'rgba(96,165,250,.5)'}
+                   : p>=57  ? {c:'#FBBF24',g:'rgba(251,191,36,.5)'}
+                            : {c:'#F87171',g:'rgba(248,113,113,.5)'};
+  const medalhas = {0:'🥇',1:'🥈',2:'🥉'};
+  const ESC = 200; // barra cheia = 200%; marca branca em 100%
+
+  const modeLbl = tvMode==='proj' || tvMode==='geral' ? 'TODAS AS EQUIPES'
+    : tvMode==='bs' ? 'STEPHANIE + KATIA'
+    : tvMode==='bb' ? 'BRUNA + STEPHANIE'
+    : tvMode==='bsk'? 'STEPHANIE + KATIA + EQUIPE STEPHANIE'
+    : tvMode==='custom' ? (tvCustomEquipes||[]).map(n=>TV_EQUIPES_REAIS[n]||n).join(' + ').toUpperCase()
+    : ((EQ[tvMode]&&EQ[tvMode].sh) || tvMode).toUpperCase();
+  const mesesPt = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+  const duP = rows[0]?.duP, duT = rows[0]?.duT;
+
+  const rowsHtml = rows.map((r,i)=>{
+    const rank = slide.page*TV_PROJ_POR_PAG + i;
+    const k = corDe(r.p);
+    const cfg = EQ[r.eq] || {c:r.c||'#888',ico:'⭐',sh:r.sh||r.eq};
+    const photo = r.vivo ? photoGet(r.name) : null;
+    const nome = String(r.name).replace(/_/g,' ').toUpperCase();
+    const av = photo
+      ? `<img src="${photo}" class="tv-pr-av" style="border:3px solid ${k.c};box-shadow:0 0 16px ${k.g}">`
+      : `<div class="tv-pr-av" style="border:3px solid ${k.c};background:linear-gradient(160deg,${cfg.c}66,${cfg.c}22);box-shadow:0 0 16px ${k.g}">${ini(String(r.name))}</div>`;
+    const pos = medalhas[rank]
+      ? `<span style="font-size:.85em">${medalhas[rank]}</span>`
+      : `<span style="color:rgba(255,255,255,.55)">${rank+1}°</span>`;
+    const w = Math.max(2, Math.min(r.p, ESC)/ESC*100);
+    const topo = rank===0;
+    return `<div class="tv-pr-row" style="animation-delay:${(.06*i).toFixed(2)}s;${topo?`border-color:${k.c};box-shadow:0 0 26px ${k.g}`:''}">
+        <div class="tv-pr-pos">${pos}</div>
+        ${av}
+        <div class="tv-pr-who">
+          <div class="tv-pr-name">${nome}</div>
+          <div class="tv-pr-team" style="color:${cfg.c}">${cfg.ico||'⭐'} ${cfg.sh||r.eq}</div>
+        </div>
+        <div class="tv-pr-track">
+          <div class="tv-pr-fill" style="width:${w}%;background:linear-gradient(90deg,${k.c}88,${k.c});box-shadow:0 0 14px ${k.g}"></div>
+          <div class="tv-pr-mark" style="left:${100/ESC*100}%" title="100%"></div>
+        </div>
+        <div class="tv-pr-pct" style="color:${k.c};text-shadow:0 0 22px ${k.g}">${fmtPct(r.p)}</div>
+        <div class="tv-pr-det">HO <b>${fR(r.ho)}</b><br>esperado ${fR(r.esperado)}</div>
+      </div>`;
+  }).join('');
+
+  const vazio = `<div style="flex:1;display:flex;align-items:center;justify-content:center;position:relative;z-index:3;
+      color:rgba(255,255,255,.6);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;text-align:center;padding:0 24px">
+      🎯 Nenhum operador com meta definida para montar o ranking</div>`;
+
+  const pctT = slide.pctTotal!=null ? ` · MÉDIA ${fmtPct(slide.pctTotal)}` : '';
+  const pagTxt = slide.pages>1 ? ` · ${slide.page*TV_PROJ_POR_PAG+1}° AO ${slide.page*TV_PROJ_POR_PAG+rows.length}° (${slide.page+1}/${slide.pages})` : '';
+
+  document.getElementById('tv-card').innerHTML = `
+    <div class="tv-podium-wrap" style="height:calc(100vh - 80px)">
+      <div class="tv-podium-head">
+        <div class="tv-pr-title">🎯 RANKING DE PROJEÇÃO DE META</div>
+        <div class="tv-podium-sub">${modeLbl} · ${mesesPt[now.getMonth()]}/${now.getFullYear()}${duP!=null?` · D.U. ${duP}/${duT}`:''}${pctT}${pagTxt}</div>
+        <div class="tv-pr-legend">
+          <span style="color:#34D399">● 100% OU MAIS</span><span style="color:#60A5FA">● 80% A 99,9%</span>
+          <span style="color:#FBBF24">● 57% A 79,9%</span><span style="color:#F87171">● ABAIXO DE 57%</span>
+        </div>
+      </div>
+      ${rows.length ? `<div class="tv-pr-list">${rowsHtml}</div>` : vazio}
+    </div>`;
+
+  tvUpdateDots();
+  const bar=document.getElementById('tv-bar');
+  if(bar){
+    bar.style.transition='none'; bar.style.width='0%';
+    bar.style.background='linear-gradient(90deg,#34D399,#60A5FA,#FBBF24,#34D399)';
+    setTimeout(()=>{ bar.style.transition=`width ${TV_INTERVAL}ms linear`; bar.style.width='100%'; },50);
+  }
+}
+
 function tvShow(idx){
   const op  = tvList[idx];
   if(!op) return;
@@ -12150,6 +12292,9 @@ function tvShow(idx){
   // Slide especial do Pódio Top 5 — renderiza à parte, também não
   // interfere no fluxo normal do ranking (posições, vizinhos etc.).
   if(op._podium){ tvShowPodiumSlide(op); return; }
+
+  // Slide do Ranking por Projeção de Meta (%)
+  if(op._projrank){ tvShowProjRankSlide(op); return; }
 
   const pos = idx + 1;
   // posição GLOBAL (no ranking geral) — para mostrar ranking global mesmo em modo equipe
@@ -21295,6 +21440,16 @@ window.projOpDashEditMeta = function(enc){
   projOpDashRender();
 };
 window.projOpDashFiltro = function(k,v){ var F=window._projOpFiltro||(window._projOpFiltro={eq:'',q:''}); F[k]=v; projOpDashRender(); };
+// Linhas já calculadas (mesma conta da tabela) para o Ranking de Projeção no Modo TV: p = Total HO ÷ (meta ÷ D.U. total × D.U. passados) × 100; p=-1 => sem meta
+window.projOpDashRows = function(){
+  var duT=(typeof DU!=='undefined'&&DU.total)||0, duP=(typeof DU!=='undefined'&&DU.passou)||0;
+  var out=linhas().map(function(o){
+    var m=metaHO(o), h=(m>0&&duT>0)?m/duT*duP:0, ho=o.ho>0?o.ho:(o.rec||0)*HO_PCT;
+    return {name:o.name,eq:o.eq,sh:o.sh,c:o.c,rec:o.rec||0,ho:ho,meta:m,esperado:h,p:h>0?ho/h*100:-1,duP:duP,duT:duT,vivo:o.vivo};
+  });
+  out.sort(function(a,b){ return (b.p-a.p)||(b.rec-a.rec); });
+  return out;
+};
 window.projOpDashRender = function(){
   var box=document.getElementById('proj-op-dash'); if(!box) return;
   var duT=(typeof DU!=='undefined'&&DU.total)||0, duP=(typeof DU!=='undefined'&&DU.passou)||0;
