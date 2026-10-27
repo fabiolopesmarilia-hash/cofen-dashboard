@@ -12293,7 +12293,7 @@ function tvShowProjRankSlide(slide){
         ${av}
         <div class="tv-pr-who">
           <div class="tv-pr-name">${nome}</div>
-          <div class="tv-pr-team" style="color:${cfg.c}">${cfg.ico||'⭐'} ${cfg.sh||r.eq}${bateu?' <span class="tv-pr-tag">🔥 META BATIDA</span>':''}</div>
+          <div class="tv-pr-team" style="color:${cfg.c}">${cfg.ico||'⭐'} ${cfg.sh||r.eq}${(r.meta>0 && r.ho>=r.meta)?' <span class="tv-pr-tag">🏆 META DO MÊS BATIDA</span>':''}</div>
         </div>
         <div class="tv-pr-track">
           <div class="tv-pr-fill" style="width:${w}%;background:linear-gradient(90deg,${k.c}88,${k.c});box-shadow:0 0 14px ${k.g}"></div>
