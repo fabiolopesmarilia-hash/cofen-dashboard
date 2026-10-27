@@ -18497,6 +18497,8 @@ function mtsAtualizarJulho(){
     </div>
   </div>
 
+  <div id="mts-meses-lid"></div>
+
   <!-- Legend -->
   <div class="mts-legend">
     <div class="mts-leg-item"><div class="mts-leg-dot" style="background:var(--ok)"></div> 1° Quartil (acima de 99,99%)</div>
@@ -21533,8 +21535,41 @@ window.lidEditarCelula=function(ym,k,campo){
   if(campo==='m') e.m=num(r); else { e.r=r===''?null:num(r); e.rm=true; }
   gravar(st); lidRender();
 };
+// ── Blocos mensais da aba Metas 2026 (embaixo): gerados sozinhos com as metas e resultados das líderes, todo mês ──
+var AV={BRENDA:['BR','mts-av-br'],BRUNA:['BN','mts-av-br'],STEPHANIE:['ST','mts-av-st'],KATIA:['KT','mts-av-lu'],LETICIA:['LT','mts-av-bb'],ISABELA:['IS','mts-av-st'],LAYSA:['LY','mts-av-lu']};
+function R0(v){ return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}); }
+function qInfo(p){ if(p>=100) return {c:'meta',b:'mts-qb-meta',t:'Meta batida'}; if(p>=80) return {c:'q1',b:'mts-qb-1',t:'2° Quartil'}; if(p>=50) return {c:'q2',b:'mts-qb-2',t:'3° Quartil'}; return {c:'q3',b:'mts-qb-3',t:'4° Quartil'}; }
+window.lidMesesRender=function(){
+  var box=document.getElementById('mts-meses-lid'); if(!box) return;
+  var st=ler(), atual=ymDados(), meses=Object.keys(st.meses).filter(function(m){ return m<=atual; }).sort().reverse();
+  var pg=document.getElementById('pg-metas'); if(pg) Array.prototype.forEach.call(pg.querySelectorAll('.mts-month-block'),function(b){ if(!b.classList.contains('lid-gen')) b.style.display='none'; });
+  var html='';
+  meses.forEach(function(m){
+    var itens=LID.map(function(L){ var e=(st.meses[m]||{})[L.k]; return {L:L,e:e}; }).filter(function(x){ return x.e&&(x.e.m>0||x.e.r!=null); });
+    if(!itens.length) return;
+    var tot=0, tm=0; itens.forEach(function(x){ if(x.e.r!=null){ tot+=x.e.r; if(x.e.m>0) tm+=x.e.m; } });
+    itens.forEach(function(x){ x.p=(x.e.m>0&&x.e.r!=null)?x.e.r/x.e.m*100:null; });
+    itens.sort(function(a,b){ return (b.p===null?-1:b.p)-(a.p===null?-1:a.p); });
+    var aberto=(m===atual), fechado=!!itens.every(function(x){ return x.e.f; });
+    var cards=itens.map(function(x){
+      var av=AV[x.L.k]||['--','mts-av-st'], p=x.p, q=p===null?null:qInfo(p), e=x.e;
+      return '<div class="mts-card '+(q?'c-'+q.c:'')+'"><div class="mts-av '+av[1]+'">'+av[0]+'</div><div class="mts-name">'+x.L.n+'</div><div class="mts-sub">'+(aberto?'Resultado parcial':'Resultado do mês')+'</div>'
+        +'<div class="mts-fl">Meta</div><div class="mts-fv">'+(e.m>0?R0(e.m):'a definir')+'</div><div class="mts-divider"></div>'
+        +'<div class="mts-fl">Recebido</div><div class="mts-rv '+(q?q.c:'')+'">'+(e.r!=null?R(e.r):'sem dado')+'</div>'
+        +'<div class="mts-pct-row"><span class="mts-pct-num '+(q?q.c:'')+'">'+(p===null?'-':p.toFixed(1).replace('.',',')+'%')+'</span><span class="mts-pct-lbl">da meta</span></div>'
+        +(q?'<span class="mts-qbadge '+q.b+'">'+q.t+'</span>':'<span class="mts-qbadge" style="background:#EFF2F5;color:#3D4B5C;border:1px solid #C5CDD8">Sem recebido</span>')
+        +'<div class="mts-bar-bg"><div class="mts-bar-f '+(q?q.c:'')+'" style="width:'+(p===null?0:Math.min(100,p))+'%"></div></div></div>';
+    }).join('');
+    html+='<div class="mts-month-block lid-gen"><div class="mts-month-hdr"><span class="mts-month-name">'+MES[+m.slice(5)-1].toUpperCase()+' '+m.slice(0,4)+'</span><div class="mts-month-rule"></div>'
+      +(aberto&&!fechado?'<span class="mts-badge mts-badge-active">⚡ Em andamento</span>':'<span class="mts-badge mts-badge-done">✔ Encerrado</span>')+'</div>'
+      +'<div class="mts-total-bar'+(aberto&&!fechado?' blue':'')+'"><span class="mts-total-label">Total recebido pelas líderes no mês'+(tm>0?' · '+(tot/tm*100).toFixed(1).replace('.',',')+'% da meta somada ('+R0(tm)+')':'')+'</span><span class="mts-total-value">'+R(tot)+'</span></div>'
+      +'<div class="mts-cards">'+cards+'</div></div>';
+  });
+  box.innerHTML=html||'<div style="padding:14px;color:var(--g500)">Sem metas salvas ainda.</div>';
+};
 window.lidRender=function(){
   var box=document.getElementById('mts-lid'); if(!box) return;
+  try{ lidMesesRender(); }catch(e){}
   var a=document.activeElement; if(a&&box.contains(a)&&(a.tagName==='INPUT'||a.tagName==='SELECT')) return;
   var st=ler(), ym=ymDados(), cur=st.meses[ym]||{};
   var cor=function(p){ return p===null?'#94A3B8':p>=100?'#10B981':p>=80?'#3B82F6':p>=50?'#F59E0B':'#EF4444'; };
