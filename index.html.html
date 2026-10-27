@@ -9841,13 +9841,21 @@ function importParse(raw){
       acc[rawName]._semData = true;
     }
     if(_contaNoTotal) acc[rawName].total += recVal;
-    if(_contaNoTotal && iHO >= 0 && iHO !== iRec && recVal > 0){ const _hv=_parseNumFlex(row[iHO]); if(_hv>0) acc[rawName].hoRep = (acc[rawName].hoRep||0) + _hv; }
+    if(_contaNoTotal && iHO >= 0 && iHO !== iRec && recVal > 0){ const _hv=_parseNumFlex(row[iHO]); if(_hv>0){ acc[rawName].hoRep = (acc[rawName].hoRep||0) + _hv;
+      // Controle de arredondamento: o Excel/colar mostra o HO de cada linha com 2 casas (ex.: 12,03 em vez de 12,02998).
+      // Somando 400 linhas assim, o total do operador sai alguns centavos diferente do relatório original.
+      const _hc = recVal*HO_PCT; acc[rawName].hoCalc = (acc[rawName].hoCalc||0) + _hc; acc[rawName].hoN = (acc[rawName].hoN||0) + 1;
+      if(Math.abs(_hv-_hc) <= 0.0051) acc[rawName].hoOk = (acc[rawName].hoOk||0) + 1; } }
     // Parse tipo de pagamento
     if(iTipo >= 0 && recVal > 0 && row[iTipo]){
       const tipo = row[iTipo].trim().toUpperCase() || 'OUTROS';
       acc[rawName].tipos[tipo] = (acc[rawName].tipos[tipo]||0) + recVal;
     }
   }
+
+  // Se TODAS as linhas de HO do operador batem com Recebido × HO% (só diferem por arredondamento de centavos),
+  // usa o HO exato (Recebido × HO%) em vez da soma das linhas arredondadas — assim o total confere com o relatório.
+  Object.keys(acc).forEach(k=>{ const a=acc[k]; if(a.hoRep>0 && a.hoN>0 && a.hoOk===a.hoN) a.hoRep = a.hoCalc; });
 
   // Sem coluna de data: usa o último dia útil (não o dia atual)
   // Se hoje é segunda, o arquivo é da sexta anterior
