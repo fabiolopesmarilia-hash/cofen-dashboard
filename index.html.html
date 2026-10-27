@@ -409,6 +409,11 @@ select.ev-inp{cursor:pointer}
 .tv-pr-pct{width:clamp(110px,13vw,190px);flex-shrink:0;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,4.2vw,58px);line-height:1}
 .tv-pr-det{width:clamp(120px,14vw,200px);flex-shrink:0;text-align:right;font-size:clamp(10px,1.1vw,14px);font-weight:700;color:rgba(255,255,255,.55);line-height:1.35}
 .tv-pr-det b{color:#fff;font-weight:800}
+.tv-pr-hi{background:linear-gradient(90deg,rgba(52,211,153,.20),rgba(52,211,153,.07) 60%,rgba(255,255,255,.05));
+  border:2px solid var(--hi,#34D399);animation:tvPodColIn .55s cubic-bezier(.22,1,.36,1) forwards,tvPrHiGlow 2.2s ease-in-out .6s infinite}
+@keyframes tvPrHiGlow{0%,100%{box-shadow:0 0 10px rgba(52,211,153,.30)}50%{box-shadow:0 0 30px rgba(52,211,153,.75)}}
+.tv-pr-hi .tv-pr-name{text-shadow:0 0 14px rgba(52,211,153,.55)}
+.tv-pr-tag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:100px;background:#34D399;color:#04281C;font-size:.95em;letter-spacing:1px;vertical-align:middle}
 .tv-pr-legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:11px;font-weight:800;color:rgba(255,255,255,.55);letter-spacing:1px;margin-top:6px}
 @media (max-width:900px){.tv-pr-det{display:none}.tv-pr-av{display:none}}
 
@@ -12195,6 +12200,52 @@ function tvShowPodiumSlide(slide){
   }
 }
 
+// ── FOGOS DE ARTIFÍCIO (canvas) — rodam enquanto o slide estiver na tela ──
+function tvProjFogos(cv){
+  if(!cv) return;
+  let W = 0, H = 0;
+  const ctx = cv.getContext('2d');
+  const cores = ['#FFD447','#34D399','#60A5FA','#F472B6','#FB923C','#E879F9','#FFFFFF'];
+  let rockets=[], parts=[], last=performance.now(), nextLaunch=0;
+  function launch(){
+    const x = W*(.1+Math.random()*.8);
+    rockets.push({x, y:H, vx:(Math.random()-.5)*1.2, vy:-(H*.0085+Math.random()*H*.004), alvo:H*(.16+Math.random()*.3), cor:cores[Math.floor(Math.random()*cores.length)]});
+  }
+  function explode(r){
+    const n = 54+Math.floor(Math.random()*30), cor2 = cores[Math.floor(Math.random()*cores.length)];
+    for(let i=0;i<n;i++){
+      const a = Math.PI*2*i/n + Math.random()*.2, v = 1.4+Math.random()*3.6;
+      parts.push({x:r.x,y:r.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,dec:.008+Math.random()*.01,cor:i%3===0?cor2:r.cor});
+    }
+  }
+  function frame(t){
+    if(!cv.isConnected) return; // slide trocou: para sozinho
+    const cw = cv.clientWidth || window.innerWidth, ch = cv.clientHeight || window.innerHeight;
+    if(cw!==W || ch!==H){ W = cv.width = cw; H = cv.height = ch; }
+    const dt = Math.min(2,(t-last)/16.7); last=t;
+    ctx.globalCompositeOperation='destination-out';
+    ctx.fillStyle='rgba(0,0,0,.22)'; ctx.fillRect(0,0,W,H); // rastro
+    ctx.globalCompositeOperation='lighter';
+    if(t>nextLaunch){ launch(); if(Math.random()<.5) launch(); nextLaunch=t+520+Math.random()*500; }
+    rockets = rockets.filter(r=>{
+      r.x+=r.vx*dt; r.y+=r.vy*dt; r.vy+=.05*dt;
+      ctx.fillStyle=r.cor; ctx.beginPath(); ctx.arc(r.x,r.y,3.2,0,7); ctx.fill();
+      if(r.y<=r.alvo || r.vy>=-1){ explode(r); return false; }
+      return true;
+    });
+    parts = parts.filter(p=>{
+      p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=.045*dt; p.vx*=.992; p.life-=p.dec*dt;
+      if(p.life<=0) return false;
+      ctx.globalAlpha=Math.max(0,p.life); ctx.fillStyle=p.cor;
+      ctx.beginPath(); ctx.arc(p.x,p.y,3*p.life+1,0,7); ctx.fill();
+      return true;
+    });
+    ctx.globalAlpha=1;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
 // ── SLIDE: RANKING POR PROJEÇÃO DE META (%) ──────────────────────────
 function tvShowProjRankSlide(slide){
   const now = new Date();
@@ -12205,10 +12256,10 @@ function tvShowProjRankSlide(slide){
 
   const rows = slide.rows || [];
   const fmtPct = v => v.toFixed(1).replace('.',',')+'%';
-  // Mesmos quartis da tabela de Projeção: ≥100 / ≥80 / ≥57 / abaixo
+  // Faixas do ranking TV: ≥100 verde / 80–99,9 azul / 50–79,9 amarelo / abaixo de 50 vermelho
   const corDe = p => p>=100 ? {c:'#34D399',g:'rgba(52,211,153,.55)'}
                    : p>=80  ? {c:'#60A5FA',g:'rgba(96,165,250,.5)'}
-                   : p>=57  ? {c:'#FBBF24',g:'rgba(251,191,36,.5)'}
+                   : p>=50  ? {c:'#FBBF24',g:'rgba(251,191,36,.5)'}
                             : {c:'#F87171',g:'rgba(248,113,113,.5)'};
   const medalhas = {0:'🥇',1:'🥈',2:'🥉'};
   const ESC = 200; // barra cheia = 200%; marca branca em 100%
@@ -12236,12 +12287,13 @@ function tvShowProjRankSlide(slide){
       : `<span style="color:rgba(255,255,255,.55)">${rank+1}°</span>`;
     const w = Math.max(2, Math.min(r.p, ESC)/ESC*100);
     const topo = rank===0;
-    return `<div class="tv-pr-row" style="animation-delay:${(.06*i).toFixed(2)}s;${topo?`border-color:${k.c};box-shadow:0 0 26px ${k.g}`:''}">
+    const bateu = r.p>=100;
+    return `<div class="tv-pr-row${bateu?' tv-pr-hi':''}" style="animation-delay:${(.06*i).toFixed(2)}s;--hi:${k.c};${topo?`border-color:${k.c};box-shadow:0 0 26px ${k.g}`:''}">
         <div class="tv-pr-pos">${pos}</div>
         ${av}
         <div class="tv-pr-who">
           <div class="tv-pr-name">${nome}</div>
-          <div class="tv-pr-team" style="color:${cfg.c}">${cfg.ico||'⭐'} ${cfg.sh||r.eq}</div>
+          <div class="tv-pr-team" style="color:${cfg.c}">${cfg.ico||'⭐'} ${cfg.sh||r.eq}${bateu?' <span class="tv-pr-tag">🔥 META BATIDA</span>':''}</div>
         </div>
         <div class="tv-pr-track">
           <div class="tv-pr-fill" style="width:${w}%;background:linear-gradient(90deg,${k.c}88,${k.c});box-shadow:0 0 14px ${k.g}"></div>
@@ -12266,11 +12318,13 @@ function tvShowProjRankSlide(slide){
         <div class="tv-podium-sub">${modeLbl} · ${mesesPt[now.getMonth()]}/${now.getFullYear()}${duP!=null?` · D.U. ${duP}/${duT}`:''}${pctT}${pagTxt}</div>
         <div class="tv-pr-legend">
           <span style="color:#34D399">● 100% OU MAIS</span><span style="color:#60A5FA">● 80% A 99,9%</span>
-          <span style="color:#FBBF24">● 57% A 79,9%</span><span style="color:#F87171">● ABAIXO DE 57%</span>
+          <span style="color:#FBBF24">● 50% A 79,9%</span><span style="color:#F87171">● ABAIXO DE 50%</span>
         </div>
       </div>
       ${rows.length ? `<div class="tv-pr-list">${rowsHtml}</div>` : vazio}
+      ${slide.page===0 && rows.length ? '<canvas id="tv-fw-canvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:6;pointer-events:none"></canvas>' : ''}
     </div>`;
+  if(slide.page===0 && rows.length) tvProjFogos(document.getElementById('tv-fw-canvas'));
 
   tvUpdateDots();
   const bar=document.getElementById('tv-bar');
