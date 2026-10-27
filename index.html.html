@@ -21452,10 +21452,14 @@ window.projOpDashRestaurar=function(){
 };
 function linhas(){
   var out=[], vistos={};
+  // Valores do relatório importado (Recebido e Total HO por operador) mandam sobre o que está na tela
+  var rel=null; try{ var u=JSON.parse(localStorage.getItem('cofen_ultimo_import')||'null'); if(u&&u.mes===mesAtual()&&u.ops) rel=u.ops; }catch(e){}
   (typeof ALL!=='undefined'?ALL:[]).forEach(function(op){
     vistos[nk(op.name)]=1;
     var cfg=(typeof EQ!=='undefined'&&EQ[op.eq])||{c:'#888',sh:op.eq};
-    out.push({name:op.name,eq:op.eq,sh:cfg.sh,c:cfg.c,rec:op.rec||0,ho:op.ho>0?op.ho:(op.rec||0)*HO_PCT,vivo:true});
+    var r=rel&&rel[op.name]&&rel[op.name].doArquivo?rel[op.name]:null;
+    var rec=r?r.rec:(op.rec||0), ho=r?r.ho:(op.ho>0?op.ho:(op.rec||0)*HO_PCT);
+    out.push({name:op.name,eq:op.eq,sh:cfg.sh,c:cfg.c,rec:rec,ho:ho,vivo:true});
   });
   var rem=(typeof QUADRO_REMOVIDOS!=='undefined'?QUADRO_REMOVIDOS:[]).map(nk);
   snapLer().forEach(function(r){
@@ -21883,7 +21887,10 @@ function ler(){try{return JSON.parse(localStorage.getItem(KEY)||'null');}catch(e
 function extrasAtivos(){try{var e=extraGetAll();return Object.keys(e).some(function(k){return k!=='_ts'&&Math.abs(parseFloat(e[k])||0)>0;});}catch(e){return false;}}
 window.cnfSalvar=function(){
   var s={ts:Date.now(),mes:ym(),ops:{}};
-  D.equipes.forEach(function(eq){eq.ops.forEach(function(o){s.ops[o.name]={rec:+(o.rec||0),ho:+(o.ho||0),eq:eq.name};});});
+  // Valores direto do ARQUIVO importado (Recebido e Total HO de cada operador no relatório) — não da tela
+  var rep={}, ip=(typeof importParsed!=='undefined')?importParsed:null;
+  if(ip&&ip.found) ip.found.forEach(function(f){ rep[f.opName]={rec:+f.recImport||0,ho:+(f.hoReport>0?f.hoReport:f.hoImport)||0}; });
+  D.equipes.forEach(function(eq){eq.ops.forEach(function(o){var r=rep[o.name];s.ops[o.name]={rec:r?r.rec:+(o.rec||0),ho:r?r.ho:+(o.ho||0),eq:eq.name,doArquivo:!!r};});});
   try{localStorage.setItem(KEY,JSON.stringify(s));if(typeof syncPush==='function')syncPush(KEY);}catch(e){}
   avisou=false; setTimeout(window.cnfRender,50);
 };
