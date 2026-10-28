@@ -697,7 +697,7 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('comparativo',this)">📊 Comparativo Mês</div>
   <div class="tab"     onclick="go('inadimpl',this)">🚨 Inadimplência</div>
   <div class="tab"     onclick="go('metas',this)">🎯 Metas 2026</div>
-  <div class="tab"     onclick="go('cofre',this);cofreRender();cofreSnd(0)" style="background:linear-gradient(135deg,#0B1F14,#1B4332);color:#FFD60A;font-weight:900;border-left:2px solid #FFD60A">🎮 SUPER JOGO · COFRE</div>
+  <div class="tab"     onclick="go('cofre',this);CF.sig=cofreSig();cofreRender();cofreSnd(0)" style="background:linear-gradient(135deg,#0B1F14,#1B4332);color:#FFD60A;font-weight:900;border-left:2px solid #FFD60A">🎮 SUPER JOGO · COFRE</div>
 
 </div>
 
@@ -22086,11 +22086,14 @@ const fp=v=>(v||0).toFixed(0)+'%';
 function lsG(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 function lsS(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 const cfDU=()=>{const d=(typeof DU!=='undefined'&&DU)||{};return{total:d.total||21,passou:Math.max(d.passou||1,1)}};
-function cofreCfg(){
+function cofreCfg(auto){
   const eq=(typeof D!=='undefined'&&D.equipes)||[],hj=new Date().getDate();let ult=0,temHoje=false;
   eq.forEach(e=>(e.ops||[]).forEach(o=>Object.keys(o.daily||{}).forEach(k=>{if(o.daily[k]>0){if(+k>ult)ult=+k;if(+k===hj)temHoje=true;}})));
   const def={dia:(ult&&!temHoje)?ult:hj,pct1:70,pct2:100,pct3:130,p1:20,p2:40,p3:60,mc:100,pc:5,metaPadrao:18000,orc:0,avistaMeta:5,horas:'11:00,14:00,16:00,17:30',ph_on:1,ph_ini:'16:00',ph_fim:'17:00',ph_meta:2000,bau:CF_BAU_DEF};
-  return Object.assign(def,lsG(CF.KEY,{}));
+  if(auto)return def;
+  const sv=lsG(CF.KEY,{}),hoje=new Date().toISOString().slice(0,10);
+  if(!(sv.diaOn===hoje&&sv.dia>0))delete sv.dia;   // dia manual só vale no dia em que foi definido; depois volta ao automático
+  return Object.assign(def,sv);
 }
 const dk=p=>p+'_'+cofreCfg().dia;
 const CFIDS=['dia','pct1','p1','pct2','p2','pct3','p3','mc','pc','metaPadrao','orc','avistaMeta','horas','ph_on','ph_ini','ph_fim','ph_meta','bau'];
@@ -22098,6 +22101,7 @@ function cofreCfgToggle(){const c=cofreCfg();CFIDS.forEach(k=>$c('cf-'+k).value=
 function cofreSalvar(){
   const c={};CFIDS.forEach(k=>{const v=$c('cf-'+k).value;c[k]=['horas','ph_ini','ph_fim','bau'].includes(k)?v:(parseFloat(v)||0);});
   if(!(c.pct1<c.pct2&&c.pct2<c.pct3))return toast('⚠️ Os % precisam crescer: Cofre 1 < 2 < 3');
+  if(c.dia>0&&c.dia!==cofreCfg(true).dia)c.diaOn=new Date().toISOString().slice(0,10);else delete c.dia;
   lsS(CF.KEY,c);toast('✅ Regras salvas');cofreRender();
 }
 function cofreEdit(k,v){
@@ -22329,6 +22333,16 @@ function cofreWpp(abrir){
 }
 function cofreTV(){const el=$c('pg-cofre');if(document.fullscreenElement){document.exitFullscreen();return;}(el.requestFullscreen?el.requestFullscreen():Promise.resolve()).catch(()=>{});}
 document.addEventListener('fullscreenchange',()=>{CF.tv=document.fullscreenElement&&document.fullscreenElement.id==='pg-cofre';clearInterval(CF.tvT);if(CF.tv){const seq=['corrida','cofres','equipes','ligas','missoes','conq','duelo'];let i=0;CF.tvT=setInterval(()=>{if($c('cf-modal').classList.contains('on'))return;CF.view=seq[++i%seq.length];cofreRender();},14000);}});
+// ── atualização automática: roda junto com o importador/sincronização do dashboard ──
+CF.sig='';
+function cofreSig(){let t=0,n=0;((typeof D!=='undefined'&&D.equipes)||[]).forEach(e=>(e.ops||[]).forEach(o=>{t+=(+o.rec||0)+(+o.ho||0);const dd=o.daily||{};Object.keys(dd).forEach(k=>{n+=1;t+=(+dd[k]||0)*(+k||1)%9973;});}));try{t+=JSON.stringify(getMetasOp()).length}catch(e){}return t.toFixed(2)+'|'+n;}
+function cofreAtualiza(){
+  const p=$c('pg-cofre');if(!p)return;
+  if(p.classList.contains('on')){CF.sig=cofreSig();const typing=document.activeElement&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);if(!typing)cofreRender();}
+  else CF.sujo=true;
+}
+if(typeof refreshAll==='function'&&!refreshAll._cofre){const _ra=refreshAll;refreshAll=function(){const r=_ra.apply(this,arguments);try{cofreAtualiza();}catch(e){}return r;};refreshAll._cofre=1;}
+setInterval(()=>{const p=$c('pg-cofre');if(p&&p.classList.contains('on')&&cofreSig()!==CF.sig)cofreAtualiza();},4000);
 setInterval(()=>{const p=$c('pg-cofre');if(p&&p.classList.contains('on')){const typing=document.activeElement&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);if(!$c('cf-modal').classList.contains('on')&&!typing)cofreRender();cofreAutoSnap();}},15000);
 setInterval(()=>{const p=$c('pg-cofre');if(p&&p.classList.contains('on'))$c('cf-clock').textContent=cofreProxHora()+' · dia útil '+cfDU().passou+'/'+cfDU().total;},1000);
 
