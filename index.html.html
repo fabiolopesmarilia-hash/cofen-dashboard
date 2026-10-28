@@ -697,8 +697,7 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('comparativo',this)">📊 Comparativo Mês</div>
   <div class="tab"     onclick="go('inadimpl',this)">🚨 Inadimplência</div>
   <div class="tab"     onclick="go('metas',this)">🎯 Metas 2026</div>
-  <div class="tab"     onclick="go('premiacoes',this);prmRender()">🏆 Premiações</div>
-  <div class="tab"     onclick="go('tv',this);tvEnter()" style="background:linear-gradient(135deg,#001a0a,#003d1a);color:#FFDF00;font-weight:900;border-left:2px solid #FFDF00">📺 MODO TV</div>
+  <div class="tab"     onclick="go('cofre',this);cofreRender();cofreSnd(0)" style="background:linear-gradient(135deg,#0B1F14,#1B4332);color:#FFD60A;font-weight:900;border-left:2px solid #FFD60A">🎮 SUPER JOGO · COFRE</div>
 
 </div>
 
@@ -7616,7 +7615,7 @@ function closeM(e){
 function go(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
-  ['geral','editor','equipes','ranking','ranking-digital','ranking-bb','ranking-brenda','ranking-bruna','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas','recdia-op','proj-op','proj-ano','trilha','campanhas','fechamento','relatorio-diretoria','premiacoes'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
+  ['geral','editor','equipes','ranking','ranking-digital','ranking-bb','ranking-brenda','ranking-bruna','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas','recdia-op','proj-op','proj-ano','trilha','campanhas','fechamento','relatorio-diretoria','premiacoes','cofre'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
   document.getElementById('pg-'+id).classList.add('on');
   if(id==='geral'){mkGD();mkDist();buildDUManualGrid();if(typeof _updateOntemCard==='function')_updateOntemCard();}
   if(id==='editor') buildOpEditor();
@@ -21210,6 +21209,110 @@ function tvEnter(){
 </script>
 
 <!-- ══ PÁGINA PREMIAÇÕES ══ -->
+<div class="page" id="pg-cofre">
+<style>
+#pg-cofre{--cg:#00E08A;--cy:#FFD60A;--cp:#B26BFF;--cb:#0A1410}
+#pg-cofre .cf-wrap{background:radial-gradient(1200px 500px at 80% -10%,#1d5a3e 0,transparent 60%),linear-gradient(160deg,#07110d,#0d241a 55%,#0a1a2a);border-radius:20px;padding:18px;color:#eafff4;position:relative;overflow:hidden}
+#pg-cofre .cf-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+#pg-cofre .cf-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:3px;background:linear-gradient(90deg,#fff,var(--cy));-webkit-background-clip:text;color:transparent;line-height:1}
+#pg-cofre .cf-sub{font-size:12px;opacity:.7}
+#pg-cofre .cf-btn{padding:9px 14px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.07);color:#fff;border-radius:12px;font:800 12px Nunito,sans-serif;cursor:pointer;transition:.15s}
+#pg-cofre .cf-btn:hover{background:rgba(255,255,255,.18);transform:translateY(-1px)}
+#pg-cofre .cf-btn.y{background:var(--cy);color:#10200f;border:none}
+#pg-cofre .cf-pills{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+#pg-cofre .cf-pill{padding:9px 16px;border-radius:99px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);font:800 13px Nunito,sans-serif;color:#cfe;cursor:pointer}
+#pg-cofre .cf-pill.on{background:linear-gradient(135deg,var(--cg),#00a86b);color:#052;border-color:transparent;box-shadow:0 0 18px rgba(0,224,138,.45)}
+#pg-cofre .cf-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:14px}
+#pg-cofre .cf-ticker{display:flex;gap:10px;overflow:hidden;font-size:12px;white-space:nowrap;margin-top:12px;background:rgba(0,0,0,.3);border-radius:10px;padding:8px 12px}
+#pg-cofre .cf-ticker span{opacity:.9}
+#pg-cofre .cf-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
+#pg-cofre .cf-k b{display:block;font:400 26px 'Bebas Neue';letter-spacing:1px;color:var(--cy)}
+#pg-cofre .cf-k small{font-size:9px;text-transform:uppercase;letter-spacing:1px;opacity:.6;font-weight:800}
+#pg-cofre .cf-av{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:900 13px Nunito;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.4)}
+#pg-cofre .cf-row{display:grid;grid-template-columns:30px 36px 190px 1fr 110px;gap:10px;align-items:center;padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.07);cursor:pointer}
+#pg-cofre .cf-row:hover{background:rgba(255,255,255,.05)}
+#pg-cofre .cf-track{height:30px;border-radius:99px;background:rgba(0,0,0,.35);position:relative;overflow:visible}
+#pg-cofre .cf-fill{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,#0a6,#00E08A,#FFD60A);transition:width 1s cubic-bezier(.3,1.3,.5,1)}
+#pg-cofre .cf-runner{position:absolute;top:-4px;font-size:24px;transition:left 1s cubic-bezier(.3,1.3,.5,1);transform:translateX(-50%)}
+#pg-cofre .cf-gate{position:absolute;top:-2px;font-size:15px;transform:translateX(-50%)}
+#pg-cofre .cf-gate::after{content:'';position:absolute;left:50%;top:18px;height:14px;border-left:2px dashed rgba(255,255,255,.3)}
+#pg-cofre .cf-vaults{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+#pg-cofre .cf-vault{text-align:center;padding:18px;border-radius:18px;border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05)}
+#pg-cofre .cf-vault.v1{border-color:#cd7f32}#pg-cofre .cf-vault.v2{border-color:#C0C0C0}#pg-cofre .cf-vault.v3{border-color:var(--cy);box-shadow:0 0 28px rgba(255,214,10,.25)}
+#pg-cofre .cf-vault .big{font-size:64px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))}
+#pg-cofre .cf-vault h3{font:400 28px 'Bebas Neue';letter-spacing:2px;margin:4px 0;color:var(--cy)}
+#pg-cofre .cf-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border-radius:99px;padding:3px 10px 3px 3px;margin:3px;font-size:11px;font-weight:800;cursor:pointer}
+#pg-cofre .cf-chip .cf-av{width:22px;height:22px;font-size:9px}
+#pg-cofre .cf-badges{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+#pg-cofre .cf-q{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+#pg-cofre .cf-mrow{display:grid;grid-template-columns:34px 1fr 120px 90px 150px;gap:8px;align-items:center;padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.07);font-size:12px}
+@media(max-width:700px){#pg-cofre .cf-mrow{grid-template-columns:34px 1fr 110px}#pg-cofre .cf-mrow .hid{display:none}}
+#pg-cofre .cf-sel{padding:8px 12px;border-radius:10px;background:#0b1f17;color:#fff;border:1px solid rgba(255,255,255,.25);font:800 13px Nunito;max-width:100%}
+#pg-cofre .cf-bar{height:22px;border-radius:99px;background:rgba(0,0,0,.4);overflow:hidden}
+#pg-cofre .cf-bar i{display:block;height:100%;border-radius:99px;transition:width 1s cubic-bezier(.3,1.3,.5,1)}
+#pg-cofre .cf-cfg input,#pg-cofre .cf-cfg textarea{width:100%;padding:7px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:#0b1f17;color:#fff;font:800 13px Nunito}
+#pg-cofre .cf-cfg label{font-size:10px;font-weight:800;text-transform:uppercase;opacity:.75}
+#cf-modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
+#cf-modal.on{display:flex}
+#cf-box{background:linear-gradient(160deg,#0d241a,#0a1a2a);border:2px solid var(--cy);border-radius:22px;max-width:520px;width:100%;padding:22px;color:#eafff4;max-height:92vh;overflow:auto;text-align:center;font-family:Nunito,sans-serif}
+#cf-fx{position:fixed;inset:0;pointer-events:none;z-index:10000}
+@keyframes cfShake{0%,100%{transform:rotate(0)}20%{transform:rotate(-8deg) scale(1.1)}40%{transform:rotate(8deg) scale(1.15)}60%{transform:rotate(-6deg) scale(1.1)}80%{transform:rotate(6deg)}}
+@keyframes cfPop{0%{transform:scale(.2);opacity:0}60%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+@keyframes cfPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,214,10,.6)}50%{box-shadow:0 0 0 12px rgba(255,214,10,0)}}
+#pg-cofre .shake{animation:cfShake .6s infinite;display:inline-block}
+#pg-cofre .pop{animation:cfPop .6s both}
+#pg-cofre .pulse{animation:cfPulse 1.4s infinite}
+#pg-cofre:fullscreen{overflow:auto;background:#07110d;padding:20px}
+#pg-cofre:fullscreen .cf-row{font-size:18px;grid-template-columns:40px 46px 220px 1fr 130px;padding:12px 4px}
+#pg-cofre:fullscreen .cf-av{width:44px;height:44px;font-size:16px}
+#pg-cofre:fullscreen .cf-runner{font-size:32px}
+@media(max-width:700px){#pg-cofre .cf-row{grid-template-columns:24px 30px 1fr 70px}#pg-cofre .cf-row .cf-track{grid-column:1/-1}}
+</style>
+<div class="cf-wrap">
+  <div class="cf-head">
+    <div><div class="cf-sub" style="letter-spacing:2px;font-weight:800">SUPER JOGO · TEMPORADA <span id="cf-temp"></span></div>
+      <div class="cf-title">🔐 OPERAÇÃO COFRE PREMIADO</div>
+      <div class="cf-sub" id="cf-clock"></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="cf-btn y" onclick="cofreTV()">📺 Telão (auto)</button>
+      <button class="cf-btn" onclick="cofreWpp(true)">📲 Enviar no WhatsApp</button>
+      <button class="cf-btn" onclick="cofreCopiaLink('corrida')">🔗 Link do jogo</button>
+      <button class="cf-btn" onclick="cofreSnap(true)">📸 Virada agora</button>
+      <button class="cf-btn" id="cf-snd" onclick="cofreSndToggle()">🔊 Som</button>
+      <button class="cf-btn" onclick="cofreCfgToggle()">⚙️ Regras</button>
+    </div>
+  </div>
+  <div id="cf-ph"></div>
+  <div class="cf-ticker" id="cf-ticker"></div>
+  <div class="cf-kpis" id="cf-kpis"></div>
+  <div class="cf-card cf-cfg" id="cf-cfg" style="display:none;margin-top:12px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+      <div><label>Dia do jogo</label><input id="cf-dia" type="number"></div>
+      <div><label>Cofre 1 · % da meta do dia</label><input id="cf-pct1" type="number"></div><div><label>Cofre 1 · prêmio R$</label><input id="cf-p1" type="number"></div>
+      <div><label>Cofre 2 · % da meta do dia</label><input id="cf-pct2" type="number"></div><div><label>Cofre 2 · prêmio R$</label><input id="cf-p2" type="number"></div>
+      <div><label>Cofre 3 · % da meta do dia</label><input id="cf-pct3" type="number"></div><div><label>Cofre 3 · prêmio R$</label><input id="cf-p3" type="number"></div>
+      <div><label>Coletivo · % da meta do time (0 = off)</label><input id="cf-mc" type="number"></div><div><label>Coletivo · prêmio R$/op</label><input id="cf-pc" type="number"></div>
+      <div><label>Meta mensal HO padrão (sem meta própria)</label><input id="cf-metaPadrao" type="number"></div>
+      <div><label>Orçamento de prêmios do dia R$</label><input id="cf-orc" type="number"></div>
+      <div><label>Missão: acordos à vista no mês</label><input id="cf-avistaMeta" type="number"></div>
+      <div><label>Horários das viradas</label><input id="cf-horas" type="text"></div>
+      <div><label>⚡ Power Hour (1=on)</label><input id="cf-ph_on" type="number"></div>
+      <div><label>Power Hour início</label><input id="cf-ph_ini" type="text"></div>
+      <div><label>Power Hour fim</label><input id="cf-ph_fim" type="text"></div>
+      <div><label>Power Hour meta (HO do time R$)</label><input id="cf-ph_meta" type="number"></div>
+    </div>
+    <div style="margin-top:10px"><label>Baú Surpresa — um prêmio por linha: rótulo|peso|valor R$</label>
+      <textarea id="cf-bau" rows="6"></textarea></div>
+    <div class="cf-sub" style="margin-top:8px">Metas individuais: aba 🎯 Metas do jogo (mesma base de “Meta por operador” do dashboard). Pontua só o que o sistema confirma; o jogo não premia abordagem agressiva — respeito ao devedor sempre.</div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="cf-btn y" onclick="cofreSalvar()">💾 Salvar regras</button><button class="cf-btn" onclick="cofreReset()">♻️ Zerar dia (baús, feed, viradas)</button></div>
+  </div>
+  <div class="cf-pills" id="cf-pills"></div>
+  <div id="cf-view"></div>
+</div>
+<div id="cf-modal" onclick="if(event.target===this)cofreFechar()"><div id="cf-box"></div></div>
+<canvas id="cf-fx"></canvas>
+</div>
+
 <div class="page" id="pg-premiacoes">
 <style>
 #pg-premiacoes .prm-box{background:radial-gradient(circle at 50% -10%,#2a1f5c,#0d1020 60%);color:#f4f5ff;border-radius:18px;padding:22px 16px 30px;max-width:980px;width:100%;margin:0 auto}
@@ -21968,3 +22071,265 @@ document.addEventListener('click',function(e){if(e.target.closest&&e.target.clos
   <iframe id="tv-iframe" style="width:100%;border:none;display:block;height:calc(100vh - 58px)" allowfullscreen></iframe>
 </div><!-- /pg-tv -->
 
+<script>
+// ══ SUPER JOGO: OPERAÇÃO COFRE PREMIADO v3 (metas individuais em HO) ══
+const CF={KEY:'cofre_premiado_cfg3',view:'corrida',tv:false,tvT:null,snd:true,D:[],cfg:null,ac:null,mOp:null,last:null};
+const CF_VIEWS=[['corrida','🏁 Corrida'],['cofres','🔐 Cofres'],['metas','🎯 Metas'],['ligas','🏆 Ligas'],['equipes','🛡️ Equipes'],['missoes','🎯 Missões'],['duelo','⚔️ Duelo'],['conq','🏅 Conquistas'],['bau','🎰 Baú'],['viradas','⏱️ Viradas']];
+const CF_BAU_DEF="Aplausos do time 👏|30|0\nCafé por conta da casa ☕|20|0\nR$ 5 extra|25|5\nR$ 10 extra|15|10\nR$ 20 extra|8|20\nCURINGA: sai 30min mais cedo 🎟️|2|0";
+const CF_LV=[[0,'Cadete','🐢'],[60,'Arrombador','🏃'],[80,'Agente','🚴'],[100,'Mestre do Cofre','🏎️'],[120,'Lenda','🚀']];
+const CF_LIGAS=[['💎','Liga Diamante','≥100% do esperado','#4fc3ff'],['🥇','Liga Ouro','80–99,9%','#FFD60A'],['🥈','Liga Prata','57–79,9%','#C0C0C0'],['🥉','Liga Bronze','<57%','#cd7f32']];
+const CF_CAP=['BRENDA','BRUNA','STEPHANIE','KATIA','LETICIA','ISABELA','LAYSA'];
+const $c=id=>document.getElementById(id);
+const esc=t=>String(t).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const cofreK=v=>'R$ '+Math.round(v||0).toLocaleString('pt-BR');
+const fp=v=>(v||0).toFixed(0)+'%';
+function lsG(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function lsS(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+const cfDU=()=>{const d=(typeof DU!=='undefined'&&DU)||{};return{total:d.total||21,passou:Math.max(d.passou||1,1)}};
+function cofreCfg(){
+  const eq=(typeof D!=='undefined'&&D.equipes)||[],hj=new Date().getDate();let ult=0,temHoje=false;
+  eq.forEach(e=>(e.ops||[]).forEach(o=>Object.keys(o.daily||{}).forEach(k=>{if(o.daily[k]>0){if(+k>ult)ult=+k;if(+k===hj)temHoje=true;}})));
+  const def={dia:(ult&&!temHoje)?ult:hj,pct1:70,pct2:100,pct3:130,p1:20,p2:40,p3:60,mc:100,pc:5,metaPadrao:18000,orc:0,avistaMeta:5,horas:'11:00,14:00,16:00,17:30',ph_on:1,ph_ini:'16:00',ph_fim:'17:00',ph_meta:2000,bau:CF_BAU_DEF};
+  return Object.assign(def,lsG(CF.KEY,{}));
+}
+const dk=p=>p+'_'+cofreCfg().dia;
+const CFIDS=['dia','pct1','p1','pct2','p2','pct3','p3','mc','pc','metaPadrao','orc','avistaMeta','horas','ph_on','ph_ini','ph_fim','ph_meta','bau'];
+function cofreCfgToggle(){const c=cofreCfg();CFIDS.forEach(k=>$c('cf-'+k).value=c[k]);const e=$c('cf-cfg');e.style.display=e.style.display==='none'?'block':'none';}
+function cofreSalvar(){
+  const c={};CFIDS.forEach(k=>{const v=$c('cf-'+k).value;c[k]=['horas','ph_ini','ph_fim','bau'].includes(k)?v:(parseFloat(v)||0);});
+  if(!(c.pct1<c.pct2&&c.pct2<c.pct3))return toast('⚠️ Os % precisam crescer: Cofre 1 < 2 < 3');
+  lsS(CF.KEY,c);toast('✅ Regras salvas');cofreRender();
+}
+function cofreEdit(k,v){
+  const c=lsG(CF.KEY,{});c[k]=parseFloat(v)||0;const m=Object.assign({},cofreCfg(),c);
+  if(!(m.pct1<m.pct2&&m.pct2<m.pct3)){toast('⚠️ Os % precisam crescer: Cofre 1 < 2 < 3');cofreRender();return;}
+  lsS(CF.KEY,c);toast('✅ Cofre atualizado');cofreRender();
+}
+function cofreReset(){if(!confirm('Zerar baús, feed, viradas e Power Hour deste dia?'))return;['cf_spin','cf_feed','cf_snap','cf_last','cf_done','cf_ph'].forEach(p=>{try{localStorage.removeItem(dk(p))}catch(e){}});cofreRender();}
+// ── metas individuais (mesma base do dashboard: cofen_metas_op, em HO mensal) ──
+function cofreMetaOp(nome){const f=(typeof getMetaOp==='function')?getMetaOp(nome):0;return f>0?f:0;}
+function cofreSetMeta(en,v){
+  const nome=decodeURIComponent(en),val=parseFloat(v)||0;
+  if(typeof setMetaOp==='function'){setMetaOp(nome,val);try{if(typeof fbPush==='function')fbPush('metas_op',getMetasOp());}catch(e){}}
+  toast(val>0?'✅ Meta de '+nome.split('_')[0]+' salva':'Meta removida (usa a padrão)');cofreRender();
+}
+function cofreMetaEquipe(){
+  const eq=$c('cf-meq').value,v=parseFloat($c('cf-mval').value)||0;if(!eq||v<=0)return toast('Escolha a equipe e o valor');
+  CF.D.filter(o=>o.eq===eq).forEach(o=>setMetaOp(o.nome,v));
+  try{if(typeof fbPush==='function')fbPush('metas_op',getMetasOp());}catch(e){}
+  toast('✅ Meta aplicada à equipe');cofreRender();
+}
+// ── dados ──
+function cofreDados(){
+  const c=cofreCfg(),eq=(typeof D!=='undefined'&&D.equipes)||[],hj=new Date().getDate(),du=cfDU(),now=new Date(),out=[];
+  const dias=new Set();eq.forEach(e=>(e.ops||[]).forEach(o=>Object.keys(o.daily||{}).forEach(k=>{if(o.daily[k]>0&&+k<=c.dia)dias.add(+k)})));
+  const dl=[...dias].sort((a,b)=>b-a);
+  const dow=d=>new Date(now.getFullYear(),now.getMonth(),d).getDay();
+  const semana=d=>{const w=dow(d)||7;return {ini:d-(w-1),fim:d}};
+  eq.forEach(e=>(e.ops||[]).forEach(op=>{
+    const d=op.daily||{},sem=!Object.keys(d).length,rec=+op.rec||0,ratio=rec>0?(+op.ho||0)/rec:0.226;
+    const ho=x=>(+x||0)*(ratio||0.226);
+    const mp=cofreMetaOp(op.name),meta=mp||c.metaPadrao,metaDia=meta/du.total;
+    const vd=k=>sem?(k===hj&&c.dia===hj?rec:0):(+d[k]||0);
+    const v=ho(vd(c.dia)),pct=metaDia>0?v/metaDia*100:0;
+    const pd=k=>metaDia>0?ho(vd(k))/metaDia*100:0;
+    const hist=dl.filter(k=>k!==c.dia);
+    const media=hist.length?hist.reduce((s,k)=>s+ho(vd(k)),0)/hist.length:0;
+    let streak=0;for(const k of dl){if(k>=c.dia)continue;if(pd(k)>=100)streak++;else break;}
+    if(pct>=100)streak++;
+    const alld=[...new Set([...dl,c.dia])];
+    const xp=Math.round(alld.reduce((s,k)=>s+Math.min(200,pd(k)),0));
+    const avg=alld.length?xp/alld.length:0;let lv=0;CF_LV.forEach((l,i)=>{if(avg>=l[0])lv=i});
+    const sm=semana(c.dia);const diasSem=alld.filter(k=>k>=sm.ini&&k<=sm.fim&&pd(k)>=100).length;
+    const hoMes=+op.ho||0,esp=meta*du.passou/du.total,proj=esp>0?hoMes/esp*100:0;
+    const q=proj>=100?0:proj>=80?1:proj>=57?2:3;
+    const n=pct>=c.pct3?3:pct>=c.pct2?2:pct>=c.pct1?1:0;
+    out.push({nome:op.name,eq:e.name,v,pct,metaDia,meta,semMeta:!mp,media,mediaPct:metaDia>0?media/metaDia*100:0,evol:metaDia>0?(v-media)/metaDia*100:0,streak,xp,avg,lv,diasSem,hoMes,proj,q,n,avista:+op.avista||0,acordos:+op.acordos||0,rec});
+  }));
+  const r=out.filter(o=>o.v>0||o.media>0).sort((a,b)=>b.pct-a.pct);
+  r.forEach((o,i)=>o.pos=i+1);return r;
+}
+const cfCor=n=>{let h=0;for(const ch of n)h=(h*31+ch.charCodeAt(0))%360;return `hsl(${h},60%,42%)`};
+const cfIni=n=>{const p=n.split(/[_\s]+/);return ((p[0]||'?')[0]+((p[1]||'')[0]||'')).toUpperCase()};
+const cfFoto=n=>{try{return (typeof photoGet==='function')?photoGet(n):''}catch(e){return ''}};
+const cfAv=n=>{const f=cfFoto(n);return f?`<span class="cf-av" style="overflow:hidden;background:${cfCor(n)}"><img src="${f}" style="width:100%;height:100%;object-fit:cover"></span>`:`<span class="cf-av" style="background:${cfCor(n)}">${esc(cfIni(n))}</span>`};
+const cfNome=n=>esc(n.split('_').map(s=>s.charAt(0).toUpperCase()+s.slice(1).toLowerCase()).join(' '));
+const cfPrem=(o,c,col)=>[0,c.p1,c.p2,c.p3][o.n]+(col?c.pc:0);
+const cfEn=n=>encodeURIComponent(n);
+const cfCap=eq=>{const u=eq.toUpperCase();return CF_CAP.find(x=>u.includes(x))||''};
+// ── som / efeitos ──
+function cofreSnd(t){if(!CF.snd)return;try{CF.ac=CF.ac||new (window.AudioContext||window.webkitAudioContext)();const a=CF.ac;(t===1?[523,659,784,1047]:t===2?[392,523]:t===3?[300,350,300]:[]).forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain();o.type='triangle';o.frequency.value=f;o.connect(g);g.connect(a.destination);const s=a.currentTime+i*.12;g.gain.setValueAtTime(.15,s);g.gain.exponentialRampToValueAtTime(.001,s+.25);o.start(s);o.stop(s+.26);});}catch(e){}}
+function cofreSndToggle(){CF.snd=!CF.snd;$c('cf-snd').textContent=CF.snd?'🔊 Som':'🔇 Mudo';cofreSnd(2);}
+function cofreConfete(n=140){const cv=$c('cf-fx');if(!cv)return;cv.width=innerWidth;cv.height=innerHeight;const x=cv.getContext('2d');const cols=['#FFD60A','#00E08A','#B26BFF','#ff5c8a','#4fc3ff','#fff'];const P=Array.from({length:n},()=>({x:innerWidth/2+(Math.random()-.5)*200,y:innerHeight*.45,vx:(Math.random()-.5)*16,vy:-Math.random()*16-4,s:5+Math.random()*7,c:cols[Math.random()*6|0],r:Math.random()*6,vr:(Math.random()-.5)*.4}));let f=0;(function an(){x.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.vy+=.45;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);x.restore();});if(++f<130)requestAnimationFrame(an);else x.clearRect(0,0,cv.width,cv.height);})();}
+function cofreModal(h){$c('cf-box').innerHTML=h;$c('cf-modal').classList.add('on');}
+function cofreFechar(){$c('cf-modal').classList.remove('on');}
+// ── links de interação ──
+function cofreLink(view,op){const b=location.href.split('#')[0];return b+'#cofre/'+view+(op?'/'+cfEn(op):'');}
+function cofreCopia(txt,msg){(navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast(msg||'🔗 Link copiado!')).catch(()=>prompt('Copie:',txt));}
+function cofreCopiaLink(view,en){cofreCopia(cofreLink(view,en?decodeURIComponent(en):''),'🔗 Link copiado! Cole no grupo do WhatsApp');}
+function cofreZap(texto){window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank');}
+function cofreZapOp(en,tipo){
+  const o=CF.D.find(x=>x.nome===decodeURIComponent(en));if(!o)return;const c=CF.cfg;
+  const nx=o.n<3?[c.pct1,c.pct2,c.pct3][o.n]:0,falta=nx?(nx-o.pct)/100*o.metaDia:0;
+  const t=tipo==='parabens'?`🔐 *COFRE ${o.n} ABERTO!* 🎉\n${cfNome(o.nome).replace(/&#39;/g,"'")} está em ${fp(o.pct)} da meta do dia (${cofreK(o.v)} de HO). Parabéns, time! 👏\n${cofreLink('perfil',o.nome)}`:`🔥 *Falta pouco!* ${cfNome(o.nome)} está em ${fp(o.pct)} da meta do dia${nx?` — faltam ~${cofreK(falta)} de HO para o próximo cofre`:' e já tem o cofre máximo'}. Bora! 💪\n${cofreLink('perfil',o.nome)}`;
+  cofreZap(t);
+}
+function cofreHash(){
+  const h=location.hash;if(!h.startsWith('#cofre'))return;const p=h.split('/');const view=p[1]||'corrida',op=p[2]?decodeURIComponent(p[2]):'';
+  const tab=[...document.querySelectorAll('.tab')].find(t=>(t.getAttribute('onclick')||'').includes("go('cofre'"));if(tab)tab.click();
+  if(view==='perfil'){CF.view='corrida';cofreRender();setTimeout(()=>cofrePerfil(cfEn(op)),300);}else if(CF_VIEWS.some(v=>v[0]===view)){CF.view=view;cofreRender();}
+}
+addEventListener('hashchange',cofreHash);addEventListener('load',()=>setTimeout(cofreHash,2500));
+// ── feed / comemoração ──
+function cofreEventos(d,c){
+  const last=lsG(dk('cf_last'),null),feed=lsG(dk('cf_feed'),[]),now={},novos=[];
+  d.forEach(o=>{now[o.nome]=o.n;if(last&&o.n>(last[o.nome]||0)){const t=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});feed.unshift({t,m:`🔓 ${o.nome.split('_')[0]} abriu o COFRE ${o.n}! (${fp(o.pct)} da meta · +${cofreK([0,c.p1,c.p2,c.p3][o.n])})`,n:o.nome,l:o.n});novos.push(o);}});
+  lsS(dk('cf_last'),now);if(novos.length){lsS(dk('cf_feed'),feed.slice(0,30));cofreCelebra(novos[0],feed[0].m);}return feed;
+}
+function cofreCelebra(o,msg){
+  cofreSnd(1);cofreConfete(220);
+  cofreModal(`<div class="pop" style="font-size:80px">${['','🔓','🔓🔓','👑'][o.n]}</div><div style="font:400 40px 'Bebas Neue';letter-spacing:3px;color:#FFD60A">COFRE ${o.n} ABERTO!</div>${cfAv(o.nome)}<div style="font:900 22px Nunito;margin:8px 0">${cfNome(o.nome)}</div><div style="opacity:.8">${esc(msg)}</div><div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="cf-btn y" onclick="cofreFechar()">🎉 Bora pro próximo!</button><button class="cf-btn" onclick="cofreZapOp('${cfEn(o.nome)}','parabens')">📲 Mandar parabéns</button></div>`);
+  setTimeout(()=>{if($c('cf-modal').classList.contains('on')&&CF.tv)cofreFechar()},6000);
+}
+// ── viradas ──
+function cofreSnap(manual){const d=CF.D,snap=lsG(dk('cf_snap'),[]),t=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});const rec={t,tot:d.reduce((s,o)=>s+o.v,0),r:{}};d.forEach(o=>rec.r[o.nome]={p:o.pos,v:o.v,pc:o.pct});snap.push(rec);lsS(dk('cf_snap'),snap);if(manual){toast('📸 Virada registrada às '+t);cofreSnd(2);cofreRender();}}
+function cofreAutoSnap(){
+  const c=cofreCfg(),hs=(c.horas||'').split(',').map(s=>s.trim()).filter(Boolean),done=lsG(dk('cf_done'),[]),n=new Date();if(c.dia!==n.getDate())return;
+  hs.forEach(h=>{const [H,M]=h.split(':').map(Number);const alvo=new Date();alvo.setHours(H,M||0,0,0);if(n>=alvo&&!done.includes(h)){done.push(h);lsS(dk('cf_done'),done);if(CF.D.length){cofreSnap(false);cofreModal(`<div class="pop" style="font-size:64px">⏱️</div><div style="font:400 36px 'Bebas Neue';letter-spacing:2px;color:#FFD60A">VIRADA DAS ${h}!</div><div style="margin:10px 0">Top 3 da meta do dia:</div>${CF.D.slice(0,3).map((o,i)=>`<div style="font:900 18px Nunito;margin:4px">${['🥇','🥈','🥉'][i]} ${cfNome(o.nome)} — ${fp(o.pct)}</div>`).join('')}<div style="margin-top:12px;display:flex;gap:8px;justify-content:center"><button class="cf-btn y" onclick="cofreFechar()">Fechar</button><button class="cf-btn" onclick="cofreWpp(true)">📲 Enviar no WhatsApp</button></div>`);cofreSnd(2);cofreConfete(80);}}});
+}
+function cofreProxHora(){const c=cofreCfg(),n=new Date();let best=null;(c.horas||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(h=>{const [H,M]=h.split(':').map(Number);const a=new Date();a.setHours(H,M||0,0,0);if(a>n&&(!best||a<best.a))best={a,h};});if(!best)return 'Todas as viradas de hoje já aconteceram';const s=Math.floor((best.a-n)/1000);return `⏱️ Próxima virada ${best.h} — em ${Math.floor(s/3600)?Math.floor(s/3600)+'h ':''}${String(Math.floor(s%3600/60)).padStart(2,'0')}m ${String(s%60).padStart(2,'0')}s`;}
+// ── power hour (evento relâmpago medido por snapshot do sistema) ──
+function cofrePH(d,c){
+  const el=$c('cf-ph');if(!el)return;if(!c.ph_on){el.innerHTML='';return;}
+  const n=new Date(),t=s=>{const [H,M]=(s||'0:0').split(':').map(Number);const a=new Date();a.setHours(H,M||0,0,0);return a};
+  const ini=t(c.ph_ini),fim=t(c.ph_fim),tot=d.reduce((s,o)=>s+o.v,0);let base=lsG(dk('cf_ph'),null);
+  if(!base&&n>=ini&&n<fim&&c.dia===n.getDate()){base={tot};lsS(dk('cf_ph'),base);}
+  let h='';const m2=x=>String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0');
+  if(n<ini)h=`<span>⚡ <b>POWER HOUR</b> às ${c.ph_ini} — meta do time: +${cofreK(c.ph_meta)} de HO em 1h. Prepare o gás!</span>`;
+  else if(n<fim){const g=base?tot-base.tot:0,p=Math.min(100,g/c.ph_meta*100);h=`<span>⚡ <b>POWER HOUR NO AR!</b> Termina em ${m2(Math.floor((fim-n)/1000))} · time +${cofreK(g)} / ${cofreK(c.ph_meta)}</span><div class="cf-bar" style="margin-top:6px"><i style="width:${p}%;background:linear-gradient(90deg,#B26BFF,#FFD60A)"></i></div>`;}
+  else if(base){const g=tot-base.tot,ok=g>=c.ph_meta;h=`<span>⚡ Power Hour encerrada: time fez +${cofreK(g)} de ${cofreK(c.ph_meta)} ${ok?'✅ META BATIDA!':'— quase! Amanhã tem mais.'}</span>`;}
+  el.innerHTML=h?`<div class="cf-card pulse" style="margin-top:12px;border-color:#B26BFF">${h}</div>`:'';
+}
+// ── render ──
+function cofreView(v){CF.view=v;cofreRender();}
+function cofreRender(){
+  const c=cofreCfg();CF.cfg=c;const d=CF.D=cofreDados(),du=cfDU();
+  const metaTime=d.reduce((s,o)=>s+o.metaDia,0),total=d.reduce((s,o)=>s+o.v,0),pctT=metaTime>0?total/metaTime*100:0,col=c.mc>0&&pctT>=c.mc;CF.col=col;CF.pctT=pctT;CF.total=total;CF.metaTime=metaTime;
+  const feed=cofreEventos(d,c);const snap=lsG(dk('cf_snap'),[]);CF.last=snap[snap.length-1]||null;
+  $c('cf-temp').textContent=new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'}).toUpperCase();
+  $c('cf-pills').innerHTML=CF_VIEWS.map(([k,t])=>`<button class="cf-pill ${CF.view===k?'on':''}" onclick="cofreView('${k}')">${t}</button>`).join('');
+  const premT=d.reduce((s,o)=>s+cfPrem(o,c,col),0),estoura=c.orc>0&&premT>c.orc;
+  const k=(t,v,x)=>`<div class="cf-card cf-k"><small>${t}</small><b ${x||''}>${v}</b></div>`;
+  $c('cf-kpis').innerHTML=k('HO do dia '+String(c.dia).padStart(2,'0'),cofreK(total))+k('Meta do time hoje',fp(pctT))+k('🔓 Cofre 1',d.filter(o=>o.n>=1).length)+k('🔓 Cofre 2',d.filter(o=>o.n>=2).length)+k('👑 Cofre 3',d.filter(o=>o.n>=3).length)+k('🔥 Sequência 2+',d.filter(o=>o.streak>=2).length)+k('💰 Prêmios'+(c.orc>0?' / orçam.':''),cofreK(premT)+(c.orc>0?' / '+cofreK(c.orc):''),estoura?'style="color:#ff6b6b"':'');
+  $c('cf-ticker').innerHTML=feed.length?feed.slice(0,5).map(f=>`<span style="cursor:pointer" onclick="cofrePerfil('${cfEn(f.n)}')">${f.t} ${esc(f.m)}</span>`).join(' ·· '):'<span>🎮 O jogo começou! Abra o primeiro cofre e apareça aqui.</span>';
+  cofrePH(d,c);
+  const f={corrida:vCorrida,cofres:vCofres,metas:vMetas,ligas:vLigas,equipes:vEquipes,missoes:vMissoes,duelo:vDuelo,conq:vConq,bau:vBau,viradas:vViradas}[CF.view];
+  $c('cf-view').innerHTML=d.length?f(d,c):'<div class="cf-card" style="text-align:center;padding:40px">Sem recebimento para o dia '+c.dia+' ainda. Importe o relatório ou ajuste o dia em ⚙️ Regras.</div>';
+  $c('cf-clock').textContent=cofreProxHora()+' · dia útil '+du.passou+'/'+du.total;
+}
+function vCorrida(d,c){
+  const max=c.pct3*1.2,pos=p=>Math.min(98,p/max*100),gate=(m,i)=>`<span class="cf-gate" style="left:${pos(m)}%">${['🥉','🥈','👑'][i]}</span>`;
+  const colB=c.mc>0?`<div class="cf-card" style="margin-bottom:12px"><b>🤝 Desafio coletivo</b> time em ${fp(CF.pctT)} da meta do dia (precisa ${c.mc}%) ${CF.col?'✅ LIBERADO! +'+cofreK(c.pc)+' p/ cada':''}<div class="cf-bar" style="margin-top:6px"><i style="width:${Math.min(100,CF.pctT/c.mc*100)}%;background:linear-gradient(90deg,#00E08A,#FFD60A)"></i></div></div>`:'';
+  return colB+`<div class="cf-card">`+d.map(o=>{
+    const ant=CF.last&&CF.last.r[o.nome]?CF.last.r[o.nome].p-o.pos:0;
+    const seta=ant>0?`<span style="color:#00E08A">▲${ant}</span>`:ant<0?`<span style="color:#ff6b6b">▼${-ant}</span>`:'<span style="opacity:.4">•</span>';
+    const nx=o.n<3?[c.pct1,c.pct2,c.pct3][o.n]:0,falta=nx?(nx-o.pct)/100*o.metaDia:0,quase=nx&&o.pct>=nx*.85?' pulse':'';
+    return `<div class="cf-row" onclick="cofrePerfil('${cfEn(o.nome)}')"><b>${o.pos}º</b>${cfAv(o.nome)}<div style="font-weight:800;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${cfNome(o.nome)} ${o.streak>=3?'🔥'+o.streak:''}<div style="font-size:10px;opacity:.6">${CF_LIGAS[o.q][0]} ${CF_LV[o.lv][1]} ${seta}${o.semMeta?' · meta padrão':''}</div></div>
+    <div class="cf-track${quase}"><div class="cf-fill" style="width:${pos(o.pct)}%"></div>${gate(c.pct1,0)}${gate(c.pct2,1)}${gate(c.pct3,2)}<span class="cf-runner" style="left:${pos(o.pct)}%">${CF_LV[o.lv][2]}</span></div>
+    <div style="text-align:right;font-weight:900;color:#FFD60A;font-size:14px">${fp(o.pct)}<div style="font-size:9px;opacity:.75;color:#fff">${cofreK(o.v)} HO${nx?' · faltam '+cofreK(falta):' · MÁX'}</div></div></div>`;
+  }).join('')+`</div><div class="cf-sub" style="margin-top:8px">Posição por % da meta do dia (justo entre metas diferentes). Toque no operador para ver o perfil, editar a meta e mandar WhatsApp.</div>`;
+}
+function vCofres(d,c){
+  const defs=[[1,'🥉','Cofre Bronze','pct1','p1'],[2,'🥈','Cofre Prata','pct2','p2'],[3,'👑','Cofre Ouro','pct3','p3']];
+  return `<div class="cf-vaults">`+defs.map(([n,ic,nm,kp,kv])=>{
+    const ab=d.filter(o=>o.n>=n),qs=d.filter(o=>o.n<n&&o.pct>=c[kp]*.8);
+    return `<div class="cf-vault v${n}"><div class="big ${ab.length?'':'shake'}">${ab.length?'🔓':'🔒'}</div><h3>${nm}</h3>
+    <div style="display:flex;gap:8px;justify-content:center;align-items:flex-end;flex-wrap:wrap"><label style="font-size:9px;opacity:.7;text-transform:uppercase;font-weight:800">% meta do dia<input class="cf-sel" type="number" min="1" step="5" value="${c[kp]}" style="width:90px;display:block;margin-top:2px" onchange="cofreEdit('${kp}',this.value)"></label><span style="padding-bottom:9px">→</span><label style="font-size:9px;opacity:.7;text-transform:uppercase;font-weight:800">Prêmio R$<input class="cf-sel" type="number" min="0" step="5" value="${c[kv]}" style="width:90px;display:block;margin-top:2px;color:#FFD60A" onchange="cofreEdit('${kv}',this.value)"></label></div>
+    <div style="margin:10px 0;font-size:11px;opacity:.7">ABERTO POR ${ab.length} · a meta em R$ depende de cada operador (aba 🎯 Metas)</div>${ab.map(o=>`<span class="cf-chip" onclick="cofrePerfil('${cfEn(o.nome)}')">${cfAv(o.nome)}${cfNome(o.nome).split(' ')[0]}</span>`).join('')||'<i style="opacity:.5">ninguém ainda… seja o primeiro!</i>'}
+    ${qs.length?`<div style="margin-top:12px;font-size:11px;color:#FFD60A;font-weight:800">🔥 QUASE LÁ (80%+ da meta do cofre)</div>${qs.map(o=>`<span class="cf-chip pulse" onclick="cofrePerfil('${cfEn(o.nome)}')">${cfAv(o.nome)}${cfNome(o.nome).split(' ')[0]} · faltam ${cofreK((c[kp]-o.pct)/100*o.metaDia)}</span>`).join('')}`:''}</div>`}).join('')+`</div>`;
+}
+function vMetas(d,c){
+  const eqs=[...new Set(d.map(o=>o.eq))];
+  const l=[...d].sort((a,b)=>a.eq.localeCompare(b.eq)||a.nome.localeCompare(b.nome));
+  return `<div class="cf-card"><b>🎯 Meta mensal de HO por operador</b> <span class="cf-sub">— cada um tem a sua. Vale também no “Meta por operador” do dashboard e sincroniza. Em branco = meta padrão (${cofreK(c.metaPadrao)}).</span>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;align-items:flex-end"><label style="font-size:9px;opacity:.7;text-transform:uppercase;font-weight:800">Aplicar a toda a equipe<select class="cf-sel" id="cf-meq" style="display:block;margin-top:2px">${eqs.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('')}</select></label><label style="font-size:9px;opacity:.7;text-transform:uppercase;font-weight:800">Meta HO R$<input class="cf-sel" id="cf-mval" type="number" step="500" style="display:block;margin-top:2px;width:120px"></label><button class="cf-btn y" onclick="cofreMetaEquipe()">Aplicar</button></div>
+  <div class="cf-mrow" style="font-size:9px;opacity:.6;text-transform:uppercase;font-weight:800"><span></span><span>Operador</span><span>Meta mensal HO</span><span class="hid">Meta/dia</span><span class="hid">Cofres em R$ (HO/dia)</span></div>`+
+  l.map(o=>`<div class="cf-mrow"><span onclick="cofrePerfil('${cfEn(o.nome)}')" style="cursor:pointer">${cfAv(o.nome)}</span><div style="font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${cfNome(o.nome)}<div style="font-size:9px;opacity:.6">${esc(o.eq)} · hoje ${fp(o.pct)}</div></div><input class="cf-sel" type="number" step="500" min="0" value="${o.semMeta?'':o.meta}" placeholder="${c.metaPadrao}" style="width:110px" onchange="cofreSetMeta('${cfEn(o.nome)}',this.value)"><span class="hid">${cofreK(o.metaDia)}</span><span class="hid" style="font-size:10px">🥉${cofreK(c.pct1/100*o.metaDia)} 🥈${cofreK(c.pct2/100*o.metaDia)} 👑${cofreK(c.pct3/100*o.metaDia)}</span></div>`).join('')+`</div>`;
+}
+function vLigas(d,c){
+  const cols=CF_LIGAS.map((L,q)=>{const m=d.filter(o=>o.q===q&&!o.semMeta||o.q===q&&o.semMeta).sort((a,b)=>b.proj-a.proj);
+    const lim=[100,80,57][q-1];return `<div class="cf-card" style="border-color:${L[3]}"><div style="font-size:30px">${L[0]}</div><b style="color:${L[3]}">${L[1]}</b><div class="cf-sub">${L[2]} · ${m.length} ops</div><div style="margin-top:8px">${m.map(o=>{const up=q>0?[100,80,57][q-1]:0;const falta=q>0?Math.max(0,up-o.proj)/100*o.meta*cfDU().passou/cfDU().total:0;return `<span class="cf-chip" title="${q>0?'Falta ~'+cofreK(falta)+' de HO no mês para subir':'Topo!'}" onclick="cofrePerfil('${cfEn(o.nome)}')">${cfAv(o.nome)}${cfNome(o.nome).split(' ')[0]} ${o.proj.toFixed(0)}%${q>0&&falta<o.meta*0.04?' ⬆':''}</span>`}).join('')||'<i class="cf-sub">vazio</i>'}</div></div>`}).join('');
+  const ev=d.filter(o=>o.media>0).sort((a,b)=>b.evol-a.evol);
+  const seas=lsG('cf_seasons',{}),keys=Object.keys(seas).sort().reverse();
+  return `<div class="cf-sub" style="margin-bottom:8px">Ligas pelo ritmo do mês (HO recebido ÷ meta esperada até hoje). Operadores do meio competem com quem está perto e sobem de liga. ⬆ = quase subindo.</div><div class="cf-q">${cols}</div>
+  <div class="cf-card" style="margin-top:14px"><b>📈 Missão Recuperação</b> <span class="cf-sub">— quem mais evoluiu sobre a própria média (pontos de % da meta do dia). Todo mundo joga!</span>`+(ev.length?ev.slice(0,12).map((o,i)=>`<div class="cf-row" style="grid-template-columns:30px 36px 130px 1fr 92px" onclick="cofrePerfil('${cfEn(o.nome)}')"><b>${['🥇','🥈','🥉'][i]||(i+1)+'º'}</b>${cfAv(o.nome)}<div style="font-weight:800;font-size:13px">${cfNome(o.nome)}</div><div class="cf-bar"><i style="width:${Math.min(100,Math.abs(o.evol))}%;background:${o.evol>=0?'linear-gradient(90deg,#00a86b,#00E08A)':'linear-gradient(90deg,#a33,#ff6b6b)'}"></i></div><div style="text-align:right;font-weight:900;color:${o.evol>=0?'#00E08A':'#ff6b6b'}">${o.evol>=0?'+':''}${o.evol.toFixed(0)} pts</div></div>`).join(''):'<p class="cf-sub">Sem histórico para comparar.</p>')+`</div>
+  <div class="cf-card" style="margin-top:14px"><b>🏁 Temporada mensal</b> <span class="cf-sub">— no 1º dia útil começa nova; o histórico fica guardado aqui.</span><div style="margin:8px 0"><button class="cf-btn y" onclick="cofreFecharTemp()">Fechar temporada de ${new Date().toLocaleDateString('pt-BR',{month:'long'})}</button></div>${keys.map(k=>`<div style="padding:6px 0;border-top:1px solid rgba(255,255,255,.1)"><b style="color:#FFD60A">${k}</b> · ${seas[k].slice(0,5).map((x,i)=>`${['🥇','🥈','🥉','4º','5º'][i]} ${cfNome(x.n).split(' ')[0]} ${x.xp}xp`).join(' &nbsp; ')}</div>`).join('')||'<i class="cf-sub">Nenhuma temporada fechada ainda.</i>'}</div>`;
+}
+function cofreFecharTemp(){const k=new Date().toISOString().slice(0,7),s=lsG('cf_seasons',{});if(s[k]&&!confirm('Já existe temporada fechada neste mês. Substituir?'))return;s[k]=[...CF.D].sort((a,b)=>b.xp-a.xp).map(o=>({n:o.nome,xp:o.xp,proj:Math.round(o.proj)}));lsS('cf_seasons',s);toast('🏁 Temporada salva no histórico');cofreRender();}
+function vEquipes(d,c){
+  const g={};d.forEach(o=>{(g[o.eq]=g[o.eq]||[]).push(o)});
+  const L=Object.entries(g).map(([e,m])=>{const v=m.reduce((s,o)=>s+o.v,0),md=m.reduce((s,o)=>s+o.metaDia,0),ho=m.reduce((s,o)=>s+o.hoMes,0),me=m.reduce((s,o)=>s+o.meta,0)*cfDU().passou/cfDU().total;return{e,m,v,md,pct:md?v/md*100:0,pm:me?ho/me*100:0,ab:m.filter(o=>o.n>=1).length,ok:m.filter(o=>o.pct>=100).length}}).sort((a,b)=>b.pct-a.pct);
+  const mx=Math.max(...L.map(x=>x.pct),130);
+  return `<div class="cf-sub" style="margin-bottom:8px">Batalha de equipes: % da meta do dia somada do time. Cada líder é o capitão.</div><div class="cf-card">`+L.map((t,i)=>`<div style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px"><b>${['🥇','🥈','🥉'][i]||(i+1)+'º'} ${esc(t.e)} ${cfCap(t.e)?'· 👑 Capitã/Capitão '+cfCap(t.e):''}</b><b style="color:#FFD60A">${fp(t.pct)} hoje · ${fp(t.pm)} no mês</b></div><div class="cf-bar" style="margin:6px 0;height:26px"><i style="width:${Math.min(100,t.pct/mx*100)}%;background:linear-gradient(90deg,#B26BFF,#00E08A,#FFD60A)"></i></div><div class="cf-sub">${t.m.length} operadores · ${t.ok} na meta do dia · ${t.ab} com cofre aberto · ${cofreK(t.v)} HO de ${cofreK(t.md)}</div></div>`).join('')+`</div>`;
+}
+function cfMiss(o,c){
+  const du=cfDU();return {
+    dia:[['🎯','Bater a meta do dia','100% da meta do dia',o.pct,100,50],['🔓','Abrir o Cofre 1',c.pct1+'% da meta do dia',o.pct,c.pct1,20],['💪','Superar a própria média','acima do seu ritmo',o.media>0?o.v/o.media*100:0,100,30]],
+    semana:[['📅','3 dias na meta na semana','dias ≥100% (seg–sex)',o.diasSem,3,100],['🔥','Sequência de 3 dias ≥100%','dias seguidos',o.streak,3,80]],
+    mes:[['💳','Acordos à vista','fechados no mês (sistema)',o.avista,c.avistaMeta,150]]};
+}
+function vMissoes(d,c){
+  const sel=CF.mOp&&d.find(o=>o.nome===CF.mOp)?CF.mOp:d[0].nome,o=d.find(x=>x.nome===sel);CF.mOp=sel;const M=cfMiss(o,c);
+  const bl=(t,arr)=>`<div class="cf-card"><b>${t}</b>`+arr.map(([ic,nm,ds,v,m,xp])=>{const p=Math.min(100,m>0?v/m*100:0),ok=p>=100;return `<div style="margin:10px 0"><div style="display:flex;justify-content:space-between;gap:8px"><span>${ic} <b>${nm}</b> <span class="cf-sub">${ds}</span></span><b style="color:${ok?'#00E08A':'#FFD60A'}">${ok?'✅ +'+xp+' XP':Math.round(v)+'/'+Math.round(m)}</b></div><div class="cf-bar" style="margin-top:4px"><i style="width:${p}%;background:${ok?'#00E08A':'linear-gradient(90deg,#B26BFF,#FFD60A)'}"></i></div></div>`}).join('')+`</div>`;
+  const tm=`<div class="cf-card"><b>🛡️ Missões do time</b><div style="margin:10px 0">🤝 Desafio coletivo: ${fp(CF.pctT)} / ${c.mc}% ${CF.col?'✅':''}</div></div>`;
+  const resumo=d.map(x=>{const m=cfMiss(x,c),all=[...m.dia,...m.semana,...m.mes],ok=all.filter(a=>a[3]>=a[4]).length;return {x,ok,t:all.length}}).sort((a,b)=>b.ok-a.ok);
+  return `<div class="cf-card" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><b>Operador:</b><select class="cf-sel" onchange="CF.mOp=this.value;cofreRender()">${d.map(x=>`<option value="${esc(x.nome)}" ${x.nome===sel?'selected':''}>${cfNome(x.nome)}</option>`).join('')}</select><span class="cf-sub">Só contam missões confirmadas pelos dados do sistema.</span><button class="cf-btn" onclick="cofreCopiaLink('missoes')">🔗 Link das missões</button></div>
+  <div class="cf-q" style="margin-top:12px">${bl('📅 Missões do dia',M.dia)}${bl('🗓️ Missões da semana',M.semana)}${bl('📆 Missão do mês',M.mes)}${tm}</div>
+  <div class="cf-card" style="margin-top:12px"><b>Quem mais cumpriu missões</b><div style="margin-top:6px">${resumo.slice(0,10).map(r=>`<span class="cf-chip" onclick="cofrePerfil('${cfEn(r.x.nome)}')">${cfAv(r.x.nome)}${cfNome(r.x.nome).split(' ')[0]} ${r.ok}/${r.t}</span>`).join('')}</div></div>`;
+}
+function vDuelo(d,c){
+  const a=CF.duA&&d.find(o=>o.nome===CF.duA)?CF.duA:d[0].nome,b=CF.duB&&d.find(o=>o.nome===CF.duB)?CF.duB:(d[1]||d[0]).nome;
+  const sel=(id,v)=>`<select class="cf-sel" id="${id}" onchange="CF.duA=$c('cf-da').value;CF.duB=$c('cf-db').value;cofreRender()">${d.map(o=>`<option value="${esc(o.nome)}" ${o.nome===v?'selected':''}>${cfNome(o.nome)}</option>`).join('')}</select>`;
+  const A=d.find(o=>o.nome===a),B=d.find(o=>o.nome===b),mx=Math.max(A.pct,B.pct,1),lid=A.pct>=B.pct?A:B,per=lid===A?B:A;
+  const bar=(o,cl)=>`<div style="flex:1;text-align:center">${cfAv(o.nome)}<div style="font-weight:900;margin:4px 0">${cfNome(o.nome)}</div><div style="height:220px;display:flex;align-items:flex-end;justify-content:center"><div style="width:70%;height:${Math.max(4,o.pct/mx*100)}%;background:${cl};border-radius:14px 14px 0 0;transition:height 1s cubic-bezier(.3,1.3,.5,1);display:flex;align-items:flex-start;justify-content:center;font-size:26px">${o===lid&&A.pct!==B.pct?'👑':''}</div></div><div style="font:400 26px 'Bebas Neue';color:#FFD60A">${fp(o.pct)}</div><div class="cf-sub">${cofreK(o.v)} de ${cofreK(o.metaDia)}</div></div>`;
+  const dif=lid.pct-per.pct;
+  return `<div class="cf-card"><div style="display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:12px">${sel('cf-da',A.nome)}<span style="font-size:28px">⚔️</span>${sel('cf-db',B.nome)}<button class="cf-btn" onclick="CF.duA=CF.D[0].nome;CF.duB=CF.D[Math.min(1,CF.D.length-1)].nome;cofreRender()">🎯 Top 1 vs Top 2</button><button class="cf-btn" onclick="cofreCopia(cofreLink('duelo'),'🔗 Link do duelo copiado')">🔗 Link</button></div>
+  <div style="display:flex;gap:20px;align-items:flex-end">${bar(A,'linear-gradient(#00E08A,#007a50)')}<div style="font:400 40px 'Bebas Neue'">VS</div>${bar(B,'linear-gradient(#B26BFF,#5a2aa0)')}</div>
+  <div style="text-align:center;margin-top:14px;font-weight:800;font-size:15px">${A.pct===B.pct?'🤝 Empate técnico!':`${cfNome(per.nome)} precisa de <span style="color:#FFD60A">${dif.toFixed(0)} pontos</span> (≈ ${cofreK(dif/100*per.metaDia)} de HO) para virar contra ${cfNome(lid.nome)}!`}</div>
+  <div style="text-align:center;margin-top:10px"><button class="cf-btn" onclick="cofreZap('⚔️ DUELO: ${cfNome(A.nome).replace(/'/g,'')} ${fp(A.pct)} x ${fp(B.pct)} ${cfNome(B.nome).replace(/'/g,'')} — quem vira? 🔥')">📲 Provocar no WhatsApp</button></div></div>`;
+}
+function cfBadges(d,c){const top=d[0];return [['👑','Rei do Dia','Maior % da meta do dia',o=>o===top],['👑','Cofre Ouro','Abriu o cofre 3',o=>o.n>=3],['🔓','Abridor','Abriu pelo menos um cofre',o=>o.n>=1],['🔥','Em Chamas','3+ dias seguidos na meta',o=>o.streak>=3],['🚀','Foguete','50%+ acima da própria média',o=>o.media>0&&o.v>=o.media*1.5],['💪','Superação','Bateu a própria média',o=>o.media>0&&o.v>=o.media],['🎯','Na Porta','80%+ do próximo cofre',o=>o.n<3&&o.pct>=[c.pct1,c.pct2,c.pct3][o.n]*.8],['🧗','Escalador','Subiu 3+ posições desde a última virada',o=>CF.last&&CF.last.r[o.nome]&&CF.last.r[o.nome].p-o.pos>=3],['💎','Liga Diamante','Ritmo do mês ≥100%',o=>o.q===0&&!o.semMeta],['📅','Semana Perfeita','3+ dias na meta na semana',o=>o.diasSem>=3],['⭐','Lenda','Nível máximo',o=>o.lv>=4]];}
+function vConq(d,c){return `<div class="cf-badges">`+cfBadges(d,c).map(([ic,nm,ds,f])=>{const h=d.filter(f);return `<div class="cf-card" style="${h.length?'':'opacity:.55'}"><div style="font-size:38px">${ic}</div><b>${nm}</b><div class="cf-sub">${ds}</div><div style="margin-top:6px">${h.map(o=>`<span class="cf-chip" onclick="cofrePerfil('${cfEn(o.nome)}')">${cfAv(o.nome)}${cfNome(o.nome).split(' ')[0]}</span>`).join('')||'<i class="cf-sub">ninguém ainda</i>'}</div></div>`}).join('')+`</div>`;}
+function cofreBau(){return (cofreCfg().bau||CF_BAU_DEF).split('\n').map(l=>l.split('|')).filter(p=>p[0]&&p[0].trim()).map(p=>({r:p[0].trim(),w:parseFloat(p[1])||1,v:parseFloat(p[2])||0}));}
+function vBau(d,c){const sp=lsG(dk('cf_spin'),{}),el=d.filter(o=>o.n>=1);return `<div class="cf-card" style="text-align:center"><div style="font-size:60px">🎰</div><div style="font:400 30px 'Bebas Neue';letter-spacing:2px;color:#FFD60A">BAÚ SURPRESA</div><div class="cf-sub">Abriu um cofre? Ganhou 1 giro! Prêmio sorteado na hora.</div><div style="margin-top:12px">${el.map(o=>sp[o.nome]?`<span class="cf-chip" style="opacity:.7">${cfAv(o.nome)}${cfNome(o.nome).split(' ')[0]}: ${esc(sp[o.nome])}</span>`:`<span class="cf-chip pulse" onclick="cofreGirar('${cfEn(o.nome)}')">${cfAv(o.nome)}${cfNome(o.nome).split(' ')[0]} 🎁 GIRAR</span>`).join('')||'<i class="cf-sub">Ninguém liberou o baú ainda — abra o Cofre 1!</i>'}</div><div class="cf-sub" style="margin-top:14px">Prêmios possíveis: ${cofreBau().map(p=>esc(p.r)).join(' · ')}</div></div>`;}
+function cofreGirar(en){
+  const nome=decodeURIComponent(en),sp=lsG(dk('cf_spin'),{});if(sp[nome])return toast('Esse baú já foi aberto hoje');
+  const pr=cofreBau(),tot=pr.reduce((s,p)=>s+p.w,0);let r=Math.random()*tot,win=pr[0];for(const p of pr){if((r-=p.w)<=0){win=p;break;}}
+  let i=0;cofreModal(`<div id="cf-slot" style="font:900 26px Nunito;min-height:70px;padding:20px 0;color:#FFD60A">🎰</div><div class="cf-sub">Girando para ${cfNome(nome)}…</div>`);
+  const t=setInterval(()=>{$c('cf-slot').textContent=pr[i++%pr.length].r;cofreSnd(3);},90);
+  setTimeout(()=>{clearInterval(t);sp[nome]=win.r;lsS(dk('cf_spin'),sp);$c('cf-box').innerHTML=`<div class="pop" style="font-size:80px">🎁</div><div style="font:400 34px 'Bebas Neue';letter-spacing:2px;color:#FFD60A">${cfNome(nome)} GANHOU</div><div class="pop" style="font:900 26px Nunito;margin:12px 0">${esc(win.r)}</div><button class="cf-btn y" onclick="cofreFechar();cofreRender()">Show! 🎉</button> <button class="cf-btn" onclick="cofreZap('🎰 ${cfNome(nome).replace(/'/g,'')} abriu o Baú Surpresa e ganhou: ${win.r.replace(/'/g,'')} 🎉')">📲 Contar no WhatsApp</button>`;cofreSnd(1);cofreConfete(win.v>0?200:90);},2200);
+}
+function vViradas(d,c){const sn=lsG(dk('cf_snap'),[]);return `<div class="cf-card"><b>⏱️ Linha do tempo das viradas</b> <span class="cf-sub">${cofreProxHora()}</span>${sn.length?sn.slice().reverse().map(s=>{const t=Object.entries(s.r).sort((a,b)=>a[1].p-b[1].p).slice(0,3);return `<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1)"><b style="color:#FFD60A">${s.t}</b> · time ${cofreK(s.tot)} · ${t.map((e,i)=>`${['🥇','🥈','🥉'][i]} ${cfNome(e[0]).split(' ')[0]} ${e[1].pc!=null?fp(e[1].pc):cofreK(e[1].v)}`).join(' &nbsp; ')}</div>`}).join(''):'<p class="cf-sub">Nenhuma virada ainda. Elas acontecem sozinhas nos horários configurados (com a tela aberta) ou pelo botão 📸.</p>'}</div>`;}
+function cofrePerfil(en){
+  const o=CF.D.find(x=>x.nome===decodeURIComponent(en));if(!o)return;const c=CF.cfg,nx=CF_LV[o.lv+1],bd=cfBadges(CF.D,c).filter(b=>b[3](o)),sp=lsG(dk('cf_spin'),{});
+  const pn=o.n<3?[c.pct1,c.pct2,c.pct3][o.n]:0,M=cfMiss(o,c),all=[...M.dia,...M.semana,...M.mes],ok=all.filter(a=>a[3]>=a[4]).length,e=cfEn(o.nome);
+  cofreModal(`<div style="font-size:54px">${CF_LV[o.lv][2]}</div>${cfAv(o.nome)}<div style="font:900 22px Nunito;margin:6px 0">${cfNome(o.nome)}</div><div class="cf-sub">${esc(o.eq)}</div><div style="color:#FFD60A;font-weight:800;margin-top:4px">${CF_LV[o.lv][1]} · ${o.xp} XP · ${CF_LIGAS[o.q][0]} ${CF_LIGAS[o.q][1]}</div>
+  <div class="cf-bar" style="margin:8px 0"><i style="width:${nx?Math.min(100,(o.avg-CF_LV[o.lv][0])/(nx[0]-CF_LV[o.lv][0])*100):100}%;background:linear-gradient(90deg,#B26BFF,#FFD60A)"></i></div><div class="cf-sub">${nx?'Média diária '+fp(o.avg)+' — chegue a '+nx[0]+'% para virar '+nx[1]:'Nível máximo!'}</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0"><div class="cf-card cf-k"><small>Meta do dia</small><b>${fp(o.pct)}</b></div><div class="cf-card cf-k"><small>HO hoje</small><b>${cofreK(o.v)}</b></div><div class="cf-card cf-k"><small>Posição</small><b>${o.pos}º</b></div><div class="cf-card cf-k"><small>Sequência</small><b>${o.streak?'🔥'+o.streak:'—'}</b></div></div>
+  <div style="text-align:left;background:rgba(255,255,255,.06);border-radius:12px;padding:10px;margin-bottom:10px"><label style="font-size:10px;font-weight:800;text-transform:uppercase;opacity:.75">Meta mensal de HO de ${esc(o.nome.split('_')[0])} ${o.semMeta?'(usando a padrão)':''}</label><div style="display:flex;gap:8px;margin-top:4px"><input class="cf-sel" id="cf-pm" type="number" step="500" value="${o.semMeta?'':o.meta}" placeholder="${c.metaPadrao}" style="flex:1"><button class="cf-btn y" onclick="cofreSetMeta('${e}',$c('cf-pm').value);cofrePerfil('${e}')">Salvar</button></div><div class="cf-sub" style="margin-top:4px">Meta/dia ${cofreK(o.metaDia)} · 🥉${cofreK(c.pct1/100*o.metaDia)} 🥈${cofreK(c.pct2/100*o.metaDia)} 👑${cofreK(c.pct3/100*o.metaDia)}</div></div>
+  <div>${pn?`🎯 Faltam <b style="color:#FFD60A">${cofreK((pn-o.pct)/100*o.metaDia)}</b> de HO para o próximo cofre!`:'👑 Cofre máximo conquistado!'}</div><div class="cf-sub" style="margin-top:4px">Missões cumpridas: ${ok}/${all.length} · Ritmo do mês: ${fp(o.proj)}</div>
+  <div style="margin:12px 0">${bd.map(b=>`<span class="cf-chip" title="${b[2]}">${b[0]} ${b[1]}</span>`).join('')||'<span class="cf-sub">Sem conquistas ainda</span>'}</div>
+  ${o.n>=1?(sp[o.nome]?`<div class="cf-sub">Baú de hoje: ${esc(sp[o.nome])}</div>`:`<button class="cf-btn y pulse" onclick="cofreGirar('${e}')">🎁 Abrir Baú Surpresa</button>`):''}
+  <div style="margin-top:12px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap"><button class="cf-btn" onclick="CF.duA=decodeURIComponent('${e}');CF.duB=CF.D[0].nome===CF.duA?(CF.D[1]||CF.D[0]).nome:CF.D[0].nome;CF.view='duelo';cofreFechar();cofreRender()">⚔️ Desafiar o líder</button><button class="cf-btn" onclick="CF.mOp=decodeURIComponent('${e}');CF.view='missoes';cofreFechar();cofreRender()">🎯 Minhas missões</button><button class="cf-btn" onclick="cofreCopiaLink('perfil','${e}')">🔗 Meu painel</button><button class="cf-btn" onclick="cofreZapOp('${e}','${o.n>=1?'parabens':'incentivo'}')">📲 WhatsApp</button><button class="cf-btn" onclick="cofreFechar()">Fechar</button></div>`);
+}
+function cofreWpp(abrir){
+  const d=CF.D,c=CF.cfg;if(!d.length)return;
+  const t=`🔐 *OPERAÇÃO COFRE PREMIADO* — dia ${c.dia}\n⏱️ ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})} · time em ${fp(CF.pctT)} da meta do dia\n\n`+d.slice(0,10).map((o,i)=>`${['🥇','🥈','🥉'][i]||(i+1)+'º'} ${cfNome(o.nome).replace(/&#39;/g,"'")} — ${fp(o.pct)} ${['','🥉','🥈','👑'][o.n]}`).join('\n')+`\n\n🔥 Quem abre o próximo cofre? Bora!\n${cofreLink('corrida')}`;
+  if(abrir)cofreZap(t);else cofreCopia(t,'📲 Placar copiado!');
+}
+function cofreTV(){const el=$c('pg-cofre');if(document.fullscreenElement){document.exitFullscreen();return;}(el.requestFullscreen?el.requestFullscreen():Promise.resolve()).catch(()=>{});}
+document.addEventListener('fullscreenchange',()=>{CF.tv=document.fullscreenElement&&document.fullscreenElement.id==='pg-cofre';clearInterval(CF.tvT);if(CF.tv){const seq=['corrida','cofres','equipes','ligas','missoes','conq','duelo'];let i=0;CF.tvT=setInterval(()=>{if($c('cf-modal').classList.contains('on'))return;CF.view=seq[++i%seq.length];cofreRender();},14000);}});
+setInterval(()=>{const p=$c('pg-cofre');if(p&&p.classList.contains('on')){const typing=document.activeElement&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);if(!$c('cf-modal').classList.contains('on')&&!typing)cofreRender();cofreAutoSnap();}},15000);
+setInterval(()=>{const p=$c('pg-cofre');if(p&&p.classList.contains('on'))$c('cf-clock').textContent=cofreProxHora()+' · dia útil '+cfDU().passou+'/'+cfDU().total;},1000);
+
+</script>
