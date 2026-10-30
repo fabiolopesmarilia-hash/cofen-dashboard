@@ -5025,13 +5025,26 @@ function _gerarComparativoCompleto(){
       total += dias[i]||0;
       if(i < duDia) soma += dias[i]||0;
     }
+    // Dado diário termina antes do dia de corte (com dia útil no meio)? Então a soma
+    // até o corte está subestimada (ex.: Set/2026 só tem dado até 22/09, corte 28/09).
+    let _ultDia = 0; for(let i=0;i<dias.length;i++){ if((dias[i]||0)>0) _ultDia = i+1; }
+    let _incompleta = false;
+    if(_ultDia>0 && _ultDia<duDia){
+      for(let d=_ultDia+1; d<=duDia; d++){
+        const _dt = new Date(anoNum, mesNum-1, d), _w = _dt.getDay();
+        const _iso = anoNum+'-'+String(mesNum).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+        if(_w!==0 && _w!==6 && feriados.indexOf(_iso)<0){ _incompleta = true; break; }
+      }
+    }
     return {
       mesKey,
       mesLabel: MESES_ABREV_PT[mesNum-1]+'/'+anoNum,
       d15Label: String(duDia).padStart(2,'0')+'/'+String(mesNum).padStart(2,'0'),
       soma15: Math.round(soma*100)/100,
       totalMes: Math.round(total*100)/100,
-      duN: duAlvo
+      duN: duAlvo,
+      soma15Incompleta: _incompleta,
+      dadoAteDia: _ultDia
     };
   });
 
@@ -5048,6 +5061,7 @@ function _gerarComparativoCompleto(){
       if(_linhaAtualCmp){
         _linhaAtualCmp.soma15   = Math.round(ppEmpresaAbril*100)/100;
         _linhaAtualCmp.totalMes = Math.round(ppEmpresaAbril*100)/100;
+        _linhaAtualCmp.soma15Incompleta = false;
       } else {
         linhas.push({
           mesKey: _mesAtualKeyCmp,
@@ -5334,10 +5348,17 @@ function renderComparativo15DU(dados, duAlvo){
       const up = r.varPct>=0;
       varHtml = `<span style="color:${up?'#4ADE80':'#F87171'};font-weight:800;font-size:11px">${up?'▲ +':'▼ '}${r.varPct.toFixed(1).replace('.',',')}%</span>`;
     }
+    // Base incompleta (dado diário acaba antes do corte): não mostra variação falsa
+    const _prevInc = i>0 && dados[i-1] && dados[i-1].soma15Incompleta;
+    if(r.soma15Incompleta || _prevInc){
+      const _msg = r.soma15Incompleta ? ('Dado diário só até '+String(r.dadoAteDia).padStart(2,'0')+'/'+r.mesKey.slice(5)+' e o corte é '+r.d15Label+'. Importe a conciliação completa do mês.') : 'O mês anterior está com dado incompleto, então a variação não é confiável.';
+      varHtml = `<span title="${_msg}" style="color:#FBBF24;font-weight:800;font-size:10px">⚠️ base incompleta</span>`;
+    }
+    const _somaAviso = r.soma15Incompleta ? `<span title="Dado diário só até ${String(r.dadoAteDia).padStart(2,'0')}/${r.mesKey.slice(5)}; o corte é ${r.d15Label}. Soma subestimada." style="color:#FBBF24;margin-right:4px">⚠️</span>` : '';
     return `<tr style="${isLast?'':'border-bottom:1px solid rgba(255,255,255,.06)'}">
       <td style="padding:8px 14px;font-size:12px;font-weight:800;color:#fff">${r.mesLabel}${parcial?' ⚠️':''}</td>
       <td style="padding:8px 14px;text-align:center;font-size:11px;color:${parcial?'#67E8F9':'rgba(255,255,255,.6)'};font-weight:700">${r.d15Label}${ehDataDeOntem?' (dado de ontem)':''}</td>
-      <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">${fMoney(r.soma15)}</td>
+      <td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:800;color:#FFD166">${_somaAviso}${fMoney(r.soma15)}</td>
       <td style="padding:8px 14px;text-align:center">${varHtml}</td>
       ${(()=>{
         if(parcial) return `<td style="padding:8px 14px;text-align:right;font-size:12px;font-weight:700;color:rgba(255,255,255,.7)">${fMoney(r.totalMes)}*</td>`;
