@@ -4966,7 +4966,7 @@ const CMP_CONCILIACAO_DIAS = {
 "2026-06":[67824.88,28061.04,27756.62,0.0,21410.23,0.0,0.0,45637.21,31575.86,23898.59,27660.26,18735.16,0.0,0.0,53655.66,42221.23,28129.09,35011.44,29505.28,0.0,0.0,47581.07,26814.13,28396.08,36845.31,32684.62,0.0,0.0,58809.05,98446.5],
 "2026-07":[52169.4,41548.77,38486.71,0.0,0.0,61906.32,50817.2,44509.81,32912.42,45993.95,0.0,0.0,65852.06,27996.31,50050.13,39751.68,37251.96,0.0,0.0,58720.44,39655.82,40472.78,44605.33,52544.12,0.0,0.0,71526.67,49585.89,53245.87,83754.01,118534.95],
 "2026-08":[0.0,0.0,93724.79,49611.37,55493.83,55157.41,49944.33,0.0,0.0,78900.92,43839.3,39873.49,40942.56,39772.53,0.0,0.0,70355.21,43297.89,42269.81,47694.29,45204.91,0.0,0.0,62614.2,43891.59,43245.36,55001.77,61318.31,0.0,0.0,180820.08],
-"2026-09":[67079.88,49715.74,58496.85,62445.95,0.0,0.0,0.0,120002.61,54066.2,33966.72,52087.04,0.0,0.0,83270.22,58426.83,49178.3,50374.43,42402.18,0.0,0.0,86706.04,6379.66,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+"2026-09":[66955.59,49688.82,58517.65,62468.11,0.0,0.0,0.0,119992.73,53937.46,33860.11,52110.66,0.0,0.0,83293.55,58550.34,49130.14,50313.64,42434.67,0.0,0.0,86766.37,43900.37,48826.47,46087.2,53580.66,0.0,0.0,94774.28,79121.05,184179.69]
 };
 
 (function _limparCacheAntigoCmp15du(){
@@ -5303,8 +5303,8 @@ function cmpMetasGet(){ try{ return JSON.parse(localStorage.getItem('cofen_cmp15
 function cmpMetasSave(o){ try{ localStorage.setItem('cofen_cmp15du_metas',JSON.stringify(o)); if(typeof syncPush==='function') syncPush('cofen_cmp15du_metas'); }catch(e){} }
 function cmpNumBR(v){ let t=String(v||'').replace(/[^\d,.\-]/g,''); if(t.indexOf(',')>-1) t=t.replace(/\./g,'').replace(',','.'); else if(/\.\d{3}$/.test(t)) t=t.replace(/\./g,''); const n=parseFloat(t); return isNaN(n)?0:n; }
 function _cmpRerender(){ const L=window._cmp15duLast; if(L) renderComparativo15DU(L.dados,L.n); }
-// Totais informados pelo gestor. Setembro/2026: fechou com "mais de R$ 1.400.000" (valor exato ainda não informado), por isso provisório.
-const CMP_TOTAIS_PADRAO = { '2026-09': 1400000 };
+// Totais informados pelo gestor. Setembro/2026: fechamento exato R$ 1.418.489,56 (conciliação por Dt.Conciliação).
+const CMP_TOTAIS_PADRAO = { '2026-09': 1418489.56 };
 function cmpTotaisGet(){ let o={}; try{ o=JSON.parse(localStorage.getItem('cofen_cmp15du_totais')||'{}'); }catch(e){} return o; }
 function cmpTotaisEf(){ return Object.assign({}, CMP_TOTAIS_PADRAO, cmpTotaisGet()); }   // valor 0 digitado/apagado = volta ao automático
 function cmpTotalSet(k,v){ const o=cmpTotaisGet(); const n=cmpNumBR(v); if(n>0) o[k]=n; else o[k]=0; try{ localStorage.setItem('cofen_cmp15du_totais',JSON.stringify(o)); if(typeof syncPush==='function') syncPush('cofen_cmp15du_totais'); }catch(e){} _cmpRerender(); }
@@ -5493,7 +5493,7 @@ let CMP_CONCILIACAO_DIAS_LIVE = {
   // Setembro/2026 (mês corrente, ainda aberto) — semente com o dado real
   // mais recente da conciliação. Segue sendo atualizado normalmente a cada
   // novo import (localStorage/Firebase têm prioridade sobre isso).
-  '2026-09': [67079.88,49715.74,58496.85,62445.95,0.0,0.0,0.0,120002.61,54066.2,33966.72,52087.04,0.0,0.0,83270.22,58426.83,49178.3,50374.43,42402.18,0.0,0.0,86706.04,6379.66,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+  '2026-09': [66955.59,49688.82,58517.65,62468.11,0.0,0.0,0.0,119992.73,53937.46,33860.11,52110.66,0.0,0.0,83293.55,58550.34,49130.14,50313.64,42434.67,0.0,0.0,86766.37,43900.37,48826.47,46087.2,53580.66,0.0,0.0,94774.28,79121.05,184179.69]
 };
 (function _carregarConciliacaoLive(){
   try{ const s = localStorage.getItem('cofen_cmp_dias'); if(s){ const salvo = JSON.parse(s)||{}; CMP_CONCILIACAO_DIAS_LIVE = {...CMP_CONCILIACAO_DIAS_LIVE, ...salvo}; } }catch(e){}
