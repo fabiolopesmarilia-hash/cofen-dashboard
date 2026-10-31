@@ -4473,8 +4473,10 @@ function hoObjetivoGet(){
   }catch(e){}
 })();
 function hoObjetivoSet(v){
+  const ts = Date.now();
   localStorage.setItem('cofen_objetivo_ho', String(v));
-  if(typeof fbPush === 'function') fbPush('objetivo_ho', v);
+  localStorage.setItem('cofen_objetivo_ho_ts', String(ts));
+  if(typeof fbPush === 'function') fbPush('objetivo_ho', {v: v, ts: ts});
 }
 function hoObjetivoEditar(){
   const atual = hoObjetivoGet();
@@ -4537,7 +4539,7 @@ function _buildMetasHtml(val, compact){
       <div style="display:flex;flex-direction:column">
         <span style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.5px;text-transform:uppercase">Objetivo HO do mês</span>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${hoColor};letter-spacing:.5px">
-          ${fR(hoAtual)} <span style="font-size:11px;color:rgba(255,255,255,.35)">/ ${fR(hoObjetivo)} (${hoPct.toFixed(0)}%)</span></span>
+          ${fR(hoAtual)} <span style="font-size:11px;color:rgba(255,255,255,.35)"><span onclick="hoObjetivoEditar()" title="Clique para editar o objetivo" style="cursor:pointer;border-bottom:1px dashed rgba(0,229,255,.6)">/ ${fR(hoObjetivo)} ✏️</span> <span style="font-size:11px;color:rgba(255,255,255,.35)">(${hoPct.toFixed(0)}%)</span></span></span>
       </div>
       <span onclick="hoObjetivoEditar()" title="Editar objetivo de HO manualmente"
         style="cursor:pointer;font-size:13px;padding:5px 9px;border-radius:6px;border:1px solid rgba(0,229,255,.35);
@@ -13622,6 +13624,19 @@ function fbStartListening(){
       mkEq();
       pulseSyncDot();
     });
+  });
+
+  // ── Objetivo HO (editavel; so aplica se o remoto for mais novo) ──
+  fbDb.ref(fbRoom+'/objetivo_ho').on('value', snap=>{
+    const r = snap.val();
+    if(!r || typeof r !== 'object') return;
+    const v = parseFloat(r.v), ts = parseFloat(r.ts)||0;
+    const tsLocal = parseFloat(localStorage.getItem('cofen_objetivo_ho_ts'))||0;
+    if(!(v>0) || ts <= tsLocal || v === hoObjetivoGet()) return;
+    localStorage.setItem('cofen_objetivo_ho', String(v));
+    localStorage.setItem('cofen_objetivo_ho_ts', String(ts));
+    if(typeof renderPpMetas === 'function') renderPpMetas();
+    pulseSyncDot();
   });
 
   // ── Arrecadado + CORENs ──
