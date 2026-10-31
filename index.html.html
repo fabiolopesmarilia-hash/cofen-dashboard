@@ -734,8 +734,8 @@ select.ev-inp{cursor:pointer}
           <div style="font-size:12px;color:rgba(255,255,255,.3);font-weight:600;margin-bottom:6px" id="pp-total-sub">Soma de Julho · coluna Pague Play</div>
         </div>
         <!-- Falta para próximo objetivo — ao lado do total -->
-        <div id="pp-falta-destaque" style="background:rgba(0,188,212,.1);border:2px solid rgba(0,188,212,.4);border-radius:14px;padding:10px 16px;text-align:center;position:relative;min-width:160px;margin-bottom:6px">
-          <div style="font-size:8px;font-weight:800;color:rgba(0,220,255,.65);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 FALTA P/ OBJETIVO</div>
+        <div id="pp-falta-destaque" onclick="hoObjetivoEditar()" title="Clique para editar o objetivo" style="cursor:pointer;background:rgba(0,188,212,.1);border:2px solid rgba(0,188,212,.4);border-radius:14px;padding:10px 16px;text-align:center;position:relative;min-width:160px;margin-bottom:6px">
+          <div style="font-size:8px;font-weight:800;color:rgba(0,220,255,.65);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">🎯 FALTA P/ OBJETIVO <span style="color:#00E5FF">✏️</span></div>
           <div id="pp-falta-valor-big" style="font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:#00E5FF;letter-spacing:1px;margin-bottom:4px">—</div>
           <div id="pp-falta-label-big" style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5)">importe o arquivo</div>
         </div>
@@ -4526,7 +4526,7 @@ function _buildMetasHtml(val, compact){
   if(faltaEl && val>0){
     faltaEl.textContent = fR(falta);
     faltaEl.style.color='#00E5FF';
-    if(faltaLbl) faltaLbl.textContent = 'para o objetivo de R$'+((metas+1)*120)+'K';
+    if(faltaLbl) faltaLbl.textContent = 'para o objetivo de R$'+(proxima/1000).toFixed(0)+'K';
   }
   const hoObjetivo = hoObjetivoGet();
   const hoAtual = val *HO_PCT;
@@ -4534,7 +4534,7 @@ function _buildMetasHtml(val, compact){
   const hoColor = hoAtual >= hoObjetivo ? '#4DB848' : '#00E5FF';
   return `
     <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:7px">${badgesHtml}</div>
-    <div style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+    <div style="margin-bottom:10px;display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap;
       background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px 10px">
       <div style="display:flex;flex-direction:column">
         <span style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.5px;text-transform:uppercase">Objetivo HO do mês</span>
@@ -4542,8 +4542,8 @@ function _buildMetasHtml(val, compact){
           ${fR(hoAtual)} <span style="font-size:11px;color:rgba(255,255,255,.35)"><span onclick="hoObjetivoEditar()" title="Clique para editar o objetivo" style="cursor:pointer;border-bottom:1px dashed rgba(0,229,255,.6)">/ ${fR(hoObjetivo)} ✏️</span> <span style="font-size:11px;color:rgba(255,255,255,.35)">(${hoPct.toFixed(0)}%)</span></span></span>
       </div>
       <span onclick="hoObjetivoEditar()" title="Editar objetivo de HO manualmente"
-        style="cursor:pointer;font-size:13px;padding:5px 9px;border-radius:6px;border:1px solid rgba(0,229,255,.35);
-        background:rgba(0,229,255,.1);color:#00E5FF">✏️ Editar</span>
+        style="cursor:pointer;font-size:13px;font-weight:800;padding:6px 12px;border-radius:6px;border:1px solid rgba(0,229,255,.6);
+        background:rgba(0,229,255,.18);color:#00E5FF;white-space:nowrap">✏️ Editar objetivo</span>
     </div>
     <div style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
       <span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:1px;text-transform:uppercase">
@@ -4703,6 +4703,14 @@ function renderPpMetas(){
   _updateOntemCard();
 }
 
+// Garante que o card (Falta p/ objetivo, Ontem, Hoje) seja preenchido ao abrir a página
+// e ao voltar para a aba, sem depender de um import ou edição para disparar o render.
+(function _ppMetasBoot(){
+  function _go(){ try{ if(typeof renderPpMetas === 'function') renderPpMetas(); }catch(e){} }
+  if(document.readyState === 'complete') setTimeout(_go, 600);
+  else window.addEventListener('load', function(){ setTimeout(_go, 800); });
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) _go(); });
+})();
 function liveCalcArrecadado(){
   const v = parseFloat(document.getElementById('inp-arrecadado')?.value)||0;
   const m = parseFloat(document.getElementById('inp-meta-arrecadado')?.value)||0;
