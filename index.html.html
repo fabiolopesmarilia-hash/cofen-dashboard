@@ -14856,7 +14856,9 @@ function chkCfgSave(){
 function chkLeader(){ const c=chkCfgLoad(); return c.leaders.find(l=>l.id===c.active) || c.leaders[0]; }
 function chkSections(){ return chkLeader().sections; }
 
-function chkDateStr(d){ d=d||new Date(); return `${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`; }
+function chkMonday(d){ d=new Date((d||new Date()).getTime()); d.setHours(12,0,0,0); const w=(d.getDay()+6)%7; d.setDate(d.getDate()-w); return d; }
+function chkDateStr(d){ const m=chkMonday(d); return `w${m.getFullYear()}_${m.getMonth()+1}_${m.getDate()}`; }  // chave da SEMANA (começa na segunda)
+const CHK_STEPS_DAYS_LONG = ['Segunda','Terça','Quarta','Quinta','Sexta'];
 function chkStateKey(leaderId, d){ return `chk_ld_${leaderId}_${chkDateStr(d)}`; }
 function checkLoad(leaderId){
   try{ return JSON.parse(localStorage.getItem(chkStateKey(leaderId||chkLeader().id))||'{}'); }catch(e){ return {}; }
@@ -14870,7 +14872,7 @@ function checkSave(state, leaderId){
 }
 
 // Estado do checklist: { idDaTarefa: [bool x5] }  (etapas I a V)
-const CHK_STEPS = ['I','II','III','IV','V'];
+const CHK_STEPS = ['Seg','Ter','Qua','Qui','Sex'];
 const CHK_BLUE = '#2E75B6';
 
 function chkSteps(state, id){
@@ -14933,6 +14935,7 @@ function chkRenderLeaderBar(){
       <span style="font-size:12px;font-weight:800;color:var(--g700)">Checklist de ${chkEsc(chkLeader().name)}</span>
       <span style="flex:1"></span>
       ${btn('chkToggleEdit()', chkEditMode?'✔ Concluir edição':'✏️ Editar tarefas', chkEditMode?'background:var(--pp);color:#fff;border-color:var(--pp)':'')}
+      ${btn('chkExportCsv()','⬇️ Exportar semana (CSV)')}
       ${btn('chkRenameLeader()','🏷 Renomear líder')}
       ${btn('chkCopyFrom()','📋 Copiar tarefas de…')}
       ${btn('chkRestoreDefault()','♻ Restaurar padrão')}
@@ -14988,6 +14991,23 @@ function chkInlineSave(secId,itemId,el){
   if(!v){ el.textContent=item.label; return; }
   if(v!==item.label){ item.label=v; chkCfgSave(); toast('✏️ Tarefa salva'); }
 }
+function chkMarkDay(k){
+  const secs=chkSections(), state=checkLoad();
+  const all=secs.every(sc=>sc.items.every(i=>chkSteps(state,i.id)[k]));
+  secs.forEach(sc=>sc.items.forEach(i=>{ const a=chkSteps(state,i.id).slice(); a[k]=!all; state[i.id]=a; }));
+  checkSave(state); checkRefreshAll(); toast(all?'↩ Dia desmarcado':'✅ Dia marcado em todas as tarefas');
+}
+function chkExportCsv(){
+  const l=chkLeader(), st=checkLoad(), mon=chkMonday();
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const head=['Bloco','Tarefa',...CHK_STEPS.map((n,k)=>{const d=new Date(mon.getTime());d.setDate(mon.getDate()+k);return n+' '+d.getDate()+'/'+(d.getMonth()+1);}),'%'];
+  const lines=[head.map(q).join(';')];
+  l.sections.forEach(sc=>sc.items.forEach(i=>lines.push([sc.title,i.label,...chkSteps(st,i.id).map(v=>v?'X':''),Math.round(chkItemPct(st,i.id)*100)+'%'].map(q).join(';'))));
+  lines.push(['','PROGRESSO GERAL','','','','','',checkCalcPct(st,l.sections).pct+'%'].map(q).join(';'));
+  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='checklist_'+l.id+'_semana_'+mon.getDate()+'-'+(mon.getMonth()+1)+'.csv'; a.click();
+}
 function chkEditTitle(secId,val){ const {sec}=chkFind(secId); if(sec){ sec.title=val; chkCfgSave(); } }
 function chkEditIcon(secId,val){ const {sec}=chkFind(secId); if(sec){ sec.icon=val||'📌'; chkCfgSave(); } }
 function chkAddItem(secId){
@@ -15038,7 +15058,8 @@ function checkRender(state){
         <th colspan="2" style="${bd};background:#fff;font-size:14px;font-weight:800;padding:8px;text-align:center">Progresso</th>
       </tr>
       <tr>
-        ${CHK_STEPS.map(s=>`<th style="${bd};background:#DDEBF7;font-size:12px;font-weight:800;padding:6px;text-align:center;width:46px">${s}</th>`).join('')}
+        ${CHK_STEPS.map((s,k)=>{ const mon=chkMonday(); const dd=new Date(mon.getTime()); dd.setDate(mon.getDate()+k); const hoje=(new Date().getDay()+6)%7===k;
+          return `<th title="${CHK_STEPS_DAYS_LONG[k]}, ${dd.getDate()}/${dd.getMonth()+1}" style="${bd};background:${hoje?'#BDD7EE':'#DDEBF7'};font-size:12px;font-weight:800;padding:6px;text-align:center;width:52px;color:${hoje?'#1F4E78':'inherit'}">${s}<div style="font-size:9px;font-weight:700;color:#5B7FA3">${dd.getDate()}/${dd.getMonth()+1}</div><button title="Marcar/desmarcar ${CHK_STEPS_DAYS_LONG[k]} em todas as tarefas" onclick="chkMarkDay(${k})" style="margin-top:3px;border:1px solid #9DC3E6;background:#fff;color:#1F4E78;border-radius:4px;font-size:10px;font-weight:800;cursor:pointer;padding:0 6px;line-height:16px">✓ todos</button></th>`;}).join('')}
         <th style="${bd};background:#fff;font-size:12px;font-weight:800;padding:6px;text-align:center;width:64px">%</th>
         <th style="${bd};background:#fff;font-size:12px;font-weight:800;padding:6px;text-align:center">Gráfico</th>
       </tr>
@@ -15055,9 +15076,7 @@ function checkRender(state){
          <button onclick="chkDelSection('${sec.id}')" style="${mini};color:#C00000;margin-left:8px">🗑 Excluir bloco</button>`
       : `${chkEsc(sec.icon)} ${chkEsc(sec.title)} <span style="font-weight:600;color:#5B7FA3;font-size:11px">— ${n} atividade${n===1?'':'s'}</span>`;
     rows += `<tr style="background:#DDEBF7">
-      <td colspan="6" style="${bd};padding:9px 12px;font-size:13px;font-weight:800;color:#1F4E78">${titleCell}</td>
-      <td style="${bd};text-align:center;font-weight:800;color:#C00000;font-size:13px">${Math.round(sp*100)}%</td>
-      ${chkBarCell(sp)}
+      <td colspan="8" style="${bd};padding:9px 12px;font-size:13px;font-weight:800;color:#1F4E78">${titleCell}</td>
     </tr>`;
     sec.items.forEach((item,idx)=>{
       const st = chkSteps(state, item.id);
@@ -15090,7 +15109,7 @@ function checkRender(state){
 
   const tp = checkCalcPct(state, sections).pct;
   rows += `<tr style="background:#DDEBF7">
-    <td colspan="6" style="${bd};padding:10px 12px;font-size:13px;font-weight:800">PROGRESSO GERAL DO DIA — ${chkEsc(chkLeader().name.toUpperCase())}</td>
+    <td colspan="6" style="${bd};padding:10px 12px;font-size:13px;font-weight:800">PROGRESSO GERAL DA SEMANA — ${chkEsc(chkLeader().name.toUpperCase())}</td>
     <td style="${bd};text-align:center;font-weight:800;color:#C00000;font-size:14px">${tp}%</td>
     ${chkBarCell(tp/100)}
   </tr>`;
@@ -15100,7 +15119,7 @@ function checkRender(state){
   </div>
   <div style="font-size:11px;color:var(--g500);padding:2px 6px;line-height:1.6">${ed
     ? '✏️ <strong>Modo edição:</strong> altere o texto das tarefas, reordene (▲▼), exclua (🗑) ou adicione. As mudanças valem só para o checklist de <strong>'+chkEsc(chkLeader().name)+'</strong> e são salvas automaticamente.'
-    : '<strong>Clique no texto de qualquer tarefa para editá-la</strong> (Enter salva). Para adicionar, excluir ou reordenar use ✏️ Editar tarefas. Marque as etapas I a V; o % é calculado por <strong>etapas marcadas ÷ 5</strong>. Cada líder tem o seu próprio checklist — escolha o nome acima.'}</div>`;
+    : '<strong>Clique no texto de qualquer tarefa para editá-la</strong> (Enter salva). Para adicionar, excluir ou reordenar use ✏️ Editar tarefas. Marque os dias (Seg a Sex) de cada tarefa; o % é calculado por <strong>dias marcados ÷ 5</strong>. Cada líder tem o seu próprio checklist — escolha o nome acima.'}</div>`;
 }
 
 function checkToggle(id, stepIdx, checked){
@@ -15138,7 +15157,7 @@ function checkUpdateBar(state){
 }
 
 function checkReset(){
-  if(!confirm('Resetar o checklist de hoje de '+chkLeader().name+'?')) return;
+  if(!confirm('Resetar o checklist da semana de '+chkLeader().name+'?')) return;
   checkSave({});
   checkRefreshAll();
   toast('↩ Checklist resetado!');
@@ -15160,13 +15179,13 @@ function checkBuildChart(){
   if(chkChart){ chkChart.destroy(); chkChart=null; }
   const sections = chkSections(), lid = chkLeader().id;
   const labels=[], data=[];
-  const dayNames=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  for(let i=6;i>=0;i--){
-    const d=new Date(); d.setDate(d.getDate()-i);
-    const state=JSON.parse(localStorage.getItem(chkStateKey(lid,d))||'{}');
-    labels.push((i===0?'Hoje':dayNames[d.getDay()])+' '+d.getDate());
-    data.push(checkCalcPct(state, sections).pct);
-  }
+  const state=checkLoad(lid), mon=chkMonday();
+  const total=sections.reduce((n,sc)=>n+sc.items.length,0);
+  CHK_STEPS.forEach((nm,k)=>{
+    const dd=new Date(mon.getTime()); dd.setDate(mon.getDate()+k);
+    const feitos=sections.reduce((n,sc)=>n+sc.items.filter(i=>chkSteps(state,i.id)[k]).length,0);
+    labels.push(nm+' '+dd.getDate()); data.push(total?Math.round(feitos/total*100):0);
+  });
   chkChart = new Chart(canvas, {
     type:'line',
     data:{ labels, datasets:[{ label:'% Concluído', data, borderColor:'#00A86B', backgroundColor:'rgba(0,168,107,.1)', borderWidth:2.5, pointBackgroundColor:'#00A86B', pointRadius:5, tension:.35, fill:true }] },
@@ -17483,7 +17502,7 @@ setInterval(()=>{
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:var(--rm);padding:6px 14px;font-size:12px;font-weight:700;color:#fff" id="chk-date-label">—</div>
       <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:var(--rm);padding:6px 14px;font-size:12px;font-weight:700;color:#4ADE80" id="chk-pct-label">0% concluído</div>
-      <button onclick="checkReset()" style="padding:6px 14px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">↩ Resetar Dia</button>
+      <button onclick="checkReset()" style="padding:6px 14px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">↩ Resetar Semana</button>
     </div>
   </div>
 
@@ -17493,7 +17512,7 @@ setInterval(()=>{
   <!-- Progress bar geral -->
   <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:14px 18px;box-shadow:var(--sh)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <span style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px">Progresso Geral do Dia</span>
+      <span style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px">Progresso Geral da Semana</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--pp)" id="chk-pct-big">0%</span>
     </div>
     <div style="background:var(--g100);border-radius:100px;height:10px;overflow:hidden">
@@ -17504,7 +17523,7 @@ setInterval(()=>{
 
   <!-- Gráfico de evolução semanal -->
   <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px;box-shadow:var(--sh)">
-    <div style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px">📈 Evolução Semanal — % Checklist Concluído</div>
+    <div style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px">📈 Evolução da Semana — % de tarefas feitas por dia</div>
     <canvas id="chk-chart" height="120"></canvas>
   </div>
 
