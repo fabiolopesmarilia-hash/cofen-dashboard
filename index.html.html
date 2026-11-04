@@ -653,7 +653,7 @@ select.ev-inp{cursor:pointer}
 <div class="topbar">
   <div class="brand">
     <div class="bi"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></div>
-    <div><div class="bn">COB COFEN</div><div class="bs">Dashboard Completo · Agosto 2026</div></div>
+    <div><div class="bn">COB COFEN</div><div class="bs" id="bn-mes-sub">Dashboard Completo · Agosto 2026</div></div>
   </div>
   <div class="hpills">
 
@@ -3268,8 +3268,9 @@ function arqColetar(ym){
   var dias={}; if(emp&&emp.dias) Object.keys(emp.dias).forEach(function(d){ if(d.slice(0,7)===ym) dias[d]=emp.dias[d]; });
   var sHO=0,sTot=0; Object.keys(dias).forEach(function(d){ sHO+=dias[d][0]||0; sTot+=dias[d][1]||0; });
   var n=function(k){ return parseFloat(ch[k])||0; };
+  var mm=0; try{ var cm=JSON.parse(ch['cofen_cmp15du_metas']||'{}'); mm=(cm[ym]&&cm[ym].meta)||0; }catch(e){}
   return {ym:ym, ts:Date.now(), versao:1, chaves:ch, empresaDias:dias,
-    resumo:{ppEmpresa:n('cofen_pp_junho'), objetivoHO:n('cofen_objetivo_ho'), metaGlobal:n('cofen_meta'),
+    resumo:{ppEmpresa:n('cofen_pp_junho'), objetivoHO:n('cofen_objetivo_ho'), metaMes:mm, metaGlobal:n('cofen_meta'),
             metaArrecadado:n('cofen_meta_arrecadado'), totalArrecadado:n('cofen_arrecadado'),
             diasComDado:Object.keys(dias).length, somaHO:Math.round(sHO*100)/100, somaTotal:Math.round(sTot*100)/100}};
 }
@@ -3312,7 +3313,14 @@ function arqMesesFechadosCmp(){
     const _hoje = new Date();
     const _mesAnoReal = `${_hoje.getFullYear()}-${String(_hoje.getMonth()+1).padStart(2,'0')}`;
     const _mesAnoSalvo = localStorage.getItem('cofen_mes_dados');
-    if(_mesAnoSalvo === _mesAnoReal) return; // mesmo mês, nada a fazer
+    const _zerarD = ()=>{ D.equipes.forEach(eq=>{ eq.rec = 0; eq.ho = 0; eq.hoje = 0; eq.ops.forEach(op=>{ op.rec = 0; op.ho = 0; op.hoje = 0; op.daily = {}; op.acordos = 0; op.tipos = {}; }); }); };
+    if(_mesAnoSalvo === _mesAnoReal){
+      // Mesmo mês. O D estático do arquivo (dados de Agosto/2026 gravados no HTML) volta cheio a cada carga da página;
+      // sem nenhum import do mês atual (sem overrides), o recebimento tem que ficar zerado, não com o número de Agosto.
+      let _ov = {}; try{ _ov = JSON.parse(localStorage.getItem('cofen_op_overrides')||'{}')||{}; }catch(e){}
+      if(_mesAnoReal !== '2026-08' && Object.keys(_ov).length === 0) _zerarD();
+      return;
+    }
 
     // Antes de zerar: guarda uma copia do mes que esta fechando (metas, objetivo, recebimento por dia)
     try{ if(/^\d{4}-\d{2}$/.test(_mesAnoSalvo||'') && !arqLer(_mesAnoSalvo)) arqSalvar(_mesAnoSalvo,'auto-virada'); }catch(e){}
@@ -3327,6 +3335,7 @@ function arqMesesFechadosCmp(){
     });
     localStorage.removeItem('cofen_op_overrides');
     localStorage.removeItem('cofen_base_rec');
+    ['cofen_op_hist','cofen_daily_hist','cofen_op_ho','cofen_total'].forEach(k=>localStorage.removeItem(k)); // mes anterior ja esta no Arquivo de Meses
     localStorage.setItem('cofen_mes_dados', _mesAnoReal);
     _mesResetadoAgora = true;
   } catch(e){}
@@ -4520,6 +4529,29 @@ function renderPPProjecao(){
 
 // ── Painel "Arquivo de Meses" ──
 var ARQ_MESES_NOME=['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+function arqMetas(a){
+  var c=a.chaves||{}, r=a.resumo||{}, o={metaMes:r.metaMes||0, objetivo:r.objetivoHO||parseFloat(c['cofen_objetivo_ho'])||0, eq:0, lid:0};
+  try{ var cm=JSON.parse(c['cofen_cmp15du_metas']||'{}'); if(cm[a.ym]&&cm[a.ym].meta) o.metaMes=cm[a.ym].meta; }catch(e){}
+  try{ var e=JSON.parse(c['cofen_meta_ho_eq']||'{}'); o.eq=Object.keys(e).length; }catch(e2){}
+  try{ var l=JSON.parse(c['cofen_lid_metas']||'{}'); o.lid=Object.keys(l).length; }catch(e3){}
+  return o;
+}
+// Navegador que ja virou o mes com a versao antiga: o recebimento de operadores do mes anterior ficou preso.
+// So limpa quando o valor atual e IDENTICO ao que esta guardado no arquivo do mes anterior (ou seja, nada de novo entrou).
+function arqLimparResto(){
+  try{
+    var h=new Date(), atual=h.getFullYear()+'-'+String(h.getMonth()+1).padStart(2,'0');
+    if(localStorage.getItem('cofen_mes_dados')!==atual) return;
+    var a=arqLer(arqMesAnterior()); if(!a||!a.chaves) return;
+    var rem=[]; ['cofen_op_overrides','cofen_op_hist','cofen_daily_hist','cofen_op_ho','cofen_base_rec','cofen_total'].forEach(function(k){
+      var cur=localStorage.getItem(k); if(cur!=null && a.chaves[k]===cur) rem.push(k);
+    });
+    if(!rem.length) return;
+    rem.forEach(function(k){ localStorage.removeItem(k); });
+    if(!sessionStorage.getItem('arq_limpou_'+atual)){ sessionStorage.setItem('arq_limpou_'+atual,'1'); location.reload(); }
+  }catch(e){}
+}
+window.addEventListener('load', function(){ setTimeout(arqLimparResto, 1300); });
 function arqLabel(ym){ var p=ym.split('-'); return ARQ_MESES_NOME[+p[1]-1]+'/'+p[0]; }
 function arqBRL(v){ return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
 function arqMesAnterior(){ var h=new Date(); var d=new Date(h.getFullYear(),h.getMonth()-1,1); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
@@ -4529,11 +4561,11 @@ function arqListar(){
 }
 function arqSalvarMes(ym){
   var novo=arqColetar(ym), ant=arqLer(ym), r=novo.resumo;
-  var msg='Salvar o arquivo de '+arqLabel(ym)+'?\n\nRecebido Pague Play (Empresa): '+arqBRL(r.ppEmpresa)+'\nObjetivo HO: '+arqBRL(r.objetivoHO)+'\nMeta global: '+arqBRL(r.metaGlobal)+'\nDias com recebimento: '+r.diasComDado+' ('+arqBRL(r.somaHO)+' de Pague Play)';
+  var msg='Salvar o arquivo de '+arqLabel(ym)+'?\n\nRecebido Pague Play (Empresa): '+arqBRL(r.ppEmpresa)+'\nObjetivo HO: '+arqBRL(r.objetivoHO)+'\nMeta do mes (Comparativo): '+(r.metaMes?arqBRL(r.metaMes):'NAO DEFINIDA')+'\nDias com recebimento: '+r.diasComDado+' ('+arqBRL(r.somaHO)+' de Pague Play)';
   if(!r.diasComDado) msg+='\n\nATENCAO: nao achei dias deste mes no recebimento por dia (Importar Empresa). As metas serao salvas, mas o comparativo nao ganha o mes.';
   if(ant){ msg+='\n\nJa existe um arquivo deste mes ('+ant.resumo.diasComDado+' dias, '+arqBRL(ant.resumo.somaHO)+'). Ele sera substituido.'; if(r.diasComDado<ant.resumo.diasComDado) msg+='\nCUIDADO: o novo tem MENOS dias que o antigo. Se o mes ja virou e entrou import novo, cancele.'; }
   if(!confirm(msg)) return;
-  arqSalvar(ym,'manual'); arqMesesRender(); try{ if(typeof renderComparativo15DU==='function') renderComparativo15DU(_gerarComparativoCompleto()); }catch(e){}
+  arqSalvar(ym,'manual'); arqMesesRender(); arqLimparResto(); try{ if(typeof renderComparativo15DU==='function') renderComparativo15DU(_gerarComparativoCompleto()); }catch(e){}
   if(typeof toast==='function') toast('Arquivo de '+arqLabel(ym)+' salvo');
 }
 function arqBaixar(ym){
@@ -4551,16 +4583,27 @@ function arqMesesRender(){
   if(!tem) h+='<div style="margin-bottom:10px;padding:10px 12px;border-radius:8px;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.5);color:#FBBF24;font-size:12px;font-weight:700">⚠️ '+arqLabel(ant)+' ainda NAO foi arquivado.<div style="margin-top:8px"><span onclick="arqSalvarMes(\''+ant+'\')" style="'+b+'">💾 Salvar fechamento de '+arqLabel(ant)+' agora</span></div></div>';
   if(!lista.length) h+='<div style="font-size:12px;color:rgba(255,255,255,.4)">Nenhum mes arquivado ainda.</div>';
   lista.forEach(function(a){
-    var r=a.resumo||{};
+    var r=a.resumo||{}, mt=arqMetas(a);
     h+='<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:9px 0;border-top:1px solid rgba(255,255,255,.08)">'
      +'<div><div style="font-size:13px;font-weight:800;color:#fff">'+arqLabel(a.ym)+'</div>'
-     +'<div style="font-size:11px;color:rgba(255,255,255,.55)">Pague Play (Empresa) '+arqBRL(r.ppEmpresa)+' · Objetivo HO '+arqBRL(r.objetivoHO)+' · Meta global '+arqBRL(r.metaGlobal)+' · '+(r.diasComDado||0)+' dias</div>'
+     +'<div style="font-size:11px;color:rgba(255,255,255,.55)">Pague Play (Empresa) '+arqBRL(r.ppEmpresa)+' · Objetivo HO '+arqBRL(mt.objetivo)+' · Meta do mes '+(mt.metaMes?arqBRL(mt.metaMes):'nao definida')+' · '+(r.diasComDado||0)+' dias</div>'
+     +'<div style="font-size:10px;color:rgba(255,255,255,.45)">Metas guardadas: '+mt.eq+' de equipes, '+mt.lid+' de lideres</div>'
      +'<div style="font-size:10px;color:rgba(255,255,255,.35)">salvo em '+new Date(a.ts).toLocaleString('pt-BR')+' ('+(a.origem==='auto-virada'?'automatico na virada':'manual')+')</div></div>'
      +'<div style="display:flex;gap:6px"><span onclick="arqBaixar(\''+a.ym+'\')" style="'+b+'">⬇️ Baixar</span><span onclick="arqSalvarMes(\''+a.ym+'\')" style="'+b+'">🔄 Atualizar</span></div></div>';
   });
   h+='</div>'; box.innerHTML=h;
 }
 window.addEventListener('load', function(){ setTimeout(arqMesesRender, 900); });
+(function _rotulosMes(){
+  function go(){
+    try{
+      var N=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'], d=new Date();
+      var a=document.getElementById('bn-mes-sub'); if(a) a.textContent='Dashboard Completo · '+N[d.getMonth()]+' '+d.getFullYear();
+      var b=document.getElementById('mts-hero-sub-meses'); if(b) b.textContent=N.slice(0,d.getMonth()+1).join(' · ');
+    }catch(e){}
+  }
+  window.addEventListener('load', go); document.addEventListener('DOMContentLoaded', go);
+})();
 document.addEventListener('visibilitychange', function(){ if(!document.hidden) arqMesesRender(); });
 function hoObjetivoGet(){
   const v = parseFloat(localStorage.getItem('cofen_objetivo_ho'));
@@ -10487,6 +10530,8 @@ function importApply(){
     try{
       const opBase = {};
       ALL.forEach(op=>{ opBase[op.name] = {rec: op.rec, ho: op.ho}; });
+      const _hb = new Date();
+      fbDb.ref(fbRoom+'/op_base_mes').set(_hb.getFullYear()+'-'+String(_hb.getMonth()+1).padStart(2,'0'));
       fbDb.ref(fbRoom+'/op_base').set(opBase);
     }catch(e){}
   }
@@ -13393,6 +13438,11 @@ function fbStartListening(){
   fbDb.ref(fbRoom+'/op_base').on('value', snap=>{
     const remote = snap.val();
     if(!remote) return;
+    // So aceita o recebimento do Firebase se ele for do mes atual. Antes, na virada do mes o
+    // Firebase ainda tinha os valores de Outubro e eles voltavam como se fossem de Novembro.
+    fbDb.ref(fbRoom+'/op_base_mes').once('value').then(tag=>{
+    const _h = new Date(), _ymAgora = _h.getFullYear()+'-'+String(_h.getMonth()+1).padStart(2,'0');
+    if(tag.val() !== _ymAgora) return;
     let changed = false;
     D.equipes.forEach(eq=>{
       eq.ops.forEach(op=>{
@@ -13410,6 +13460,7 @@ function fbStartListening(){
       if(typeof projOpRender==='function') projOpRender();
       pulseSyncDot();
     }
+    }).catch(()=>{});
   });
   fbListeners.op_base = true;
 
@@ -18544,7 +18595,7 @@ function mtsAtualizarJulho(){
   <div class="mts-hero">
     <div class="mts-hero-title">Recebimento Geral · Equipe Comercial</div>
     <div class="mts-hero-h">🎯 METAS & RESULTADOS — 2026</div>
-    <div class="mts-hero-sub">Janeiro · Fevereiro · Março · Abril · Maio · Junho · Julho · Agosto</div>
+    <div class="mts-hero-sub" id="mts-hero-sub-meses">Janeiro · Fevereiro · Março · Abril · Maio · Junho · Julho · Agosto</div>
     <button onclick="mtsEditarAbrir()" style="margin-top:10px;padding:8px 16px;border-radius:var(--rm);border:none;
       background:linear-gradient(135deg,#00A86B,#00C97C);color:#fff;font-family:Nunito,sans-serif;font-weight:800;
       font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px">✏️ Editar Metas Mensais</button>
