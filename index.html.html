@@ -3248,12 +3248,74 @@ let _mesResetadoAgora = false;
 // automático todo mês" pedido não acontecia de fato, só ficava dependendo de
 // alguém lembrar de reimportar. Agora, ao abrir o dashboard, comparamos o mês
 // real de hoje com o mês da última importação salva; se mudou, zera tudo.
+// ══════════════════════════════════════════════════════════════
+// ARQUIVO DE MESES: copia de seguranca de metas e recebimento de cada mes.
+// Salva sozinho na virada do mes (antes de zerar) e manualmente pelo painel
+// "Arquivo de Meses" (aba Metas 2026). Guarda em localStorage e no Firebase.
+// ══════════════════════════════════════════════════════════════
+var ARQ_EXCLUIR = /^(cofen_photos|cofen_logo_img|cofen_import_linhas|cofen_ultimo_import|cofen_quadro_mov|cofen_file_version|cofen_arquivo_|cofen_tv_|cofen_gestao|cofen_lider_foto)/;
+function arqChave(ym){ return 'cofen_arquivo_'+ym; }
+function arqLer(ym){ try{ return JSON.parse(localStorage.getItem(arqChave(ym))||'null'); }catch(e){ return null; } }
+function arqColetar(ym){
+  var ch={};
+  for(var i=0;i<localStorage.length;i++){
+    var k=localStorage.key(i);
+    if(!k||k.indexOf('cofen_')!==0||ARQ_EXCLUIR.test(k)) continue;
+    var v=localStorage.getItem(k); if(v==null||v.length>400000) continue;
+    ch[k]=v;
+  }
+  var emp=null; try{ emp=JSON.parse(ch['cofen_empresa_dia']||'null'); }catch(e){}
+  var dias={}; if(emp&&emp.dias) Object.keys(emp.dias).forEach(function(d){ if(d.slice(0,7)===ym) dias[d]=emp.dias[d]; });
+  var sHO=0,sTot=0; Object.keys(dias).forEach(function(d){ sHO+=dias[d][0]||0; sTot+=dias[d][1]||0; });
+  var n=function(k){ return parseFloat(ch[k])||0; };
+  return {ym:ym, ts:Date.now(), versao:1, chaves:ch, empresaDias:dias,
+    resumo:{ppEmpresa:n('cofen_pp_junho'), objetivoHO:n('cofen_objetivo_ho'), metaGlobal:n('cofen_meta'),
+            metaArrecadado:n('cofen_meta_arrecadado'), totalArrecadado:n('cofen_arrecadado'),
+            diasComDado:Object.keys(dias).length, somaHO:Math.round(sHO*100)/100, somaTotal:Math.round(sTot*100)/100}};
+}
+function arqEnviarFb(a){
+  try{
+    if(typeof fbPush!=='function'||typeof fbDb==='undefined'||!fbDb) return;
+    var ch={}; Object.keys(a.chaves||{}).forEach(function(k){ if(/^[A-Za-z0-9_\-]+$/.test(k)) ch[k]=a.chaves[k]; });
+    fbPush('arquivo_mes/'+a.ym.replace('-','_'), {ym:a.ym, ts:a.ts, origem:a.origem||'manual', resumo:a.resumo, empresaDias:a.empresaDias||{}, chaves:ch});
+  }catch(e){}
+}
+function arqSalvar(ym, origem){
+  var a=arqColetar(ym); a.origem=origem||'manual';
+  try{ localStorage.setItem(arqChave(ym), JSON.stringify(a)); }
+  catch(e){
+    var min={}; ['cofen_pp_junho','cofen_objetivo_ho','cofen_meta','cofen_meta_ho_eq','cofen_metas_eq','cofen_metas_op','cofen_lid_metas','cofen_cmp15du_totais','cofen_cmp15du_metas','cofen_empresa_dia'].forEach(function(k){ if(a.chaves[k]!=null) min[k]=a.chaves[k]; });
+    a.chaves=min; a.reduzido=true; try{ localStorage.setItem(arqChave(ym), JSON.stringify(a)); }catch(e2){}
+  }
+  arqEnviarFb(a);
+  return a;
+}
+// Meses fechados guardados no arquivo viram linhas do Comparativo Mensal (dia a dia, coluna Pague Play do arquivo Empresa)
+function arqMesesFechadosCmp(){
+  var out={}, h=new Date(), atual=h.getFullYear()+'-'+String(h.getMonth()+1).padStart(2,'0');
+  try{
+    for(var i=0;i<localStorage.length;i++){
+      var k=localStorage.key(i); if(!k||k.indexOf('cofen_arquivo_')!==0) continue;
+      var ym=k.slice(14); if(!/^\d{4}-\d{2}$/.test(ym)||ym>=atual) continue;
+      var a=arqLer(ym); if(!a||!a.empresaDias) continue;
+      var ds=Object.keys(a.empresaDias); if(!ds.length) continue;
+      var nd=new Date(+ym.slice(0,4), +ym.slice(5,7), 0).getDate(), arr=[]; for(var j=0;j<nd;j++) arr.push(0);
+      ds.forEach(function(d){ var di=+d.slice(8,10); if(di>=1&&di<=nd) arr[di-1]=Math.round((a.empresaDias[d][0]||0)*100)/100; });
+      out[ym]=arr;
+    }
+  }catch(e){}
+  return out;
+}
+
 (function _resetAutomaticoMes(){
   try {
     const _hoje = new Date();
     const _mesAnoReal = `${_hoje.getFullYear()}-${String(_hoje.getMonth()+1).padStart(2,'0')}`;
     const _mesAnoSalvo = localStorage.getItem('cofen_mes_dados');
     if(_mesAnoSalvo === _mesAnoReal) return; // mesmo mês, nada a fazer
+
+    // Antes de zerar: guarda uma copia do mes que esta fechando (metas, objetivo, recebimento por dia)
+    try{ if(/^\d{4}-\d{2}$/.test(_mesAnoSalvo||'') && !arqLer(_mesAnoSalvo)) arqSalvar(_mesAnoSalvo,'auto-virada'); }catch(e){}
 
     // Mudou o mês (ou é a 1ª vez que essa chave existe) — zera tudo que é
     // mensal, tanto em D (dado estático) quanto nos overrides salvos.
@@ -4456,6 +4518,50 @@ function renderPPProjecao(){
   </div>`;
 }
 
+// ── Painel "Arquivo de Meses" ──
+var ARQ_MESES_NOME=['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+function arqLabel(ym){ var p=ym.split('-'); return ARQ_MESES_NOME[+p[1]-1]+'/'+p[0]; }
+function arqBRL(v){ return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+function arqMesAnterior(){ var h=new Date(); var d=new Date(h.getFullYear(),h.getMonth()-1,1); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function arqListar(){
+  var l=[]; for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(k&&k.indexOf('cofen_arquivo_')===0){ var a=arqLer(k.slice(14)); if(a) l.push(a); } }
+  return l.sort(function(x,y){ return y.ym.localeCompare(x.ym); });
+}
+function arqSalvarMes(ym){
+  var novo=arqColetar(ym), ant=arqLer(ym), r=novo.resumo;
+  var msg='Salvar o arquivo de '+arqLabel(ym)+'?\n\nRecebido Pague Play (Empresa): '+arqBRL(r.ppEmpresa)+'\nObjetivo HO: '+arqBRL(r.objetivoHO)+'\nMeta global: '+arqBRL(r.metaGlobal)+'\nDias com recebimento: '+r.diasComDado+' ('+arqBRL(r.somaHO)+' de Pague Play)';
+  if(!r.diasComDado) msg+='\n\nATENCAO: nao achei dias deste mes no recebimento por dia (Importar Empresa). As metas serao salvas, mas o comparativo nao ganha o mes.';
+  if(ant){ msg+='\n\nJa existe um arquivo deste mes ('+ant.resumo.diasComDado+' dias, '+arqBRL(ant.resumo.somaHO)+'). Ele sera substituido.'; if(r.diasComDado<ant.resumo.diasComDado) msg+='\nCUIDADO: o novo tem MENOS dias que o antigo. Se o mes ja virou e entrou import novo, cancele.'; }
+  if(!confirm(msg)) return;
+  arqSalvar(ym,'manual'); arqMesesRender(); try{ if(typeof renderComparativo15DU==='function') renderComparativo15DU(_gerarComparativoCompleto()); }catch(e){}
+  if(typeof toast==='function') toast('Arquivo de '+arqLabel(ym)+' salvo');
+}
+function arqBaixar(ym){
+  var a=arqLer(ym); if(!a) return;
+  var b=new Blob([JSON.stringify(a,null,1)],{type:'application/json'}), u=URL.createObjectURL(b), l=document.createElement('a');
+  l.href=u; l.download='cofen_arquivo_'+ym+'.json'; document.body.appendChild(l); l.click(); setTimeout(function(){ URL.revokeObjectURL(u); l.remove(); },500);
+}
+function arqMesesRender(){
+  var box=document.getElementById('arq-meses'); if(!box) return;
+  var lista=arqListar(), ant=arqMesAnterior(), tem=!!arqLer(ant);
+  var b='cursor:pointer;font-size:12px;font-weight:800;padding:7px 12px;border-radius:6px;border:1px solid rgba(0,229,255,.6);background:rgba(0,229,255,.16);color:#00E5FF';
+  var h='<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 16px">';
+  h+='<div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:4px">🗂️ Arquivo de Meses</div>';
+  h+='<div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:10px">Copia de seguranca das metas e do recebimento de cada mes. Salva sozinha na virada do mes e fica no Firebase.</div>';
+  if(!tem) h+='<div style="margin-bottom:10px;padding:10px 12px;border-radius:8px;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.5);color:#FBBF24;font-size:12px;font-weight:700">⚠️ '+arqLabel(ant)+' ainda NAO foi arquivado.<div style="margin-top:8px"><span onclick="arqSalvarMes(\''+ant+'\')" style="'+b+'">💾 Salvar fechamento de '+arqLabel(ant)+' agora</span></div></div>';
+  if(!lista.length) h+='<div style="font-size:12px;color:rgba(255,255,255,.4)">Nenhum mes arquivado ainda.</div>';
+  lista.forEach(function(a){
+    var r=a.resumo||{};
+    h+='<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:9px 0;border-top:1px solid rgba(255,255,255,.08)">'
+     +'<div><div style="font-size:13px;font-weight:800;color:#fff">'+arqLabel(a.ym)+'</div>'
+     +'<div style="font-size:11px;color:rgba(255,255,255,.55)">Pague Play (Empresa) '+arqBRL(r.ppEmpresa)+' · Objetivo HO '+arqBRL(r.objetivoHO)+' · Meta global '+arqBRL(r.metaGlobal)+' · '+(r.diasComDado||0)+' dias</div>'
+     +'<div style="font-size:10px;color:rgba(255,255,255,.35)">salvo em '+new Date(a.ts).toLocaleString('pt-BR')+' ('+(a.origem==='auto-virada'?'automatico na virada':'manual')+')</div></div>'
+     +'<div style="display:flex;gap:6px"><span onclick="arqBaixar(\''+a.ym+'\')" style="'+b+'">⬇️ Baixar</span><span onclick="arqSalvarMes(\''+a.ym+'\')" style="'+b+'">🔄 Atualizar</span></div></div>';
+  });
+  h+='</div>'; box.innerHTML=h;
+}
+window.addEventListener('load', function(){ setTimeout(arqMesesRender, 900); });
+document.addEventListener('visibilitychange', function(){ if(!document.hidden) arqMesesRender(); });
 function hoObjetivoGet(){
   const v = parseFloat(localStorage.getItem('cofen_objetivo_ho'));
   return (v && v > 0) ? v : 150000;
@@ -5023,7 +5129,9 @@ function _gerarComparativoCompleto(){
       if(!CMP_CONCILIACAO_DIAS[k]) liveApenasMesesNovos[k] = CMP_CONCILIACAO_DIAS_LIVE[k];
     });
   }
-  const fonte = {...CMP_CONCILIACAO_DIAS, ...liveApenasMesesNovos};
+  const _arqMeses = {};
+  try{ const _a = (typeof arqMesesFechadosCmp==='function') ? arqMesesFechadosCmp() : {}; Object.keys(_a).forEach(k=>{ if(!CMP_CONCILIACAO_DIAS[k]) _arqMeses[k]=_a[k]; }); }catch(e){}
+  const fonte = {...CMP_CONCILIACAO_DIAS, ...liveApenasMesesNovos, ..._arqMeses};
   const chaves = Object.keys(fonte).sort();
   const linhas = chaves.map(mesKey=>{
     const [anoStr, mesStr] = mesKey.split('-');
@@ -13647,6 +13755,26 @@ function fbStartListening(){
     pulseSyncDot();
   });
 
+  // ── Arquivo de Meses (copias de seguranca de cada mes) ──
+  fbDb.ref(fbRoom+'/arquivo_mes').on('value', snap=>{
+    const r = snap.val() || {};
+    Object.keys(r).forEach(k=>{
+      const a = r[k]; if(!a || !a.ym) return;
+      const loc = arqLer(a.ym);
+      if(!loc || (a.ts||0) > (loc.ts||0)){
+        try{ localStorage.setItem(arqChave(a.ym), JSON.stringify({ym:a.ym, ts:a.ts, versao:1, origem:a.origem, resumo:a.resumo, empresaDias:a.empresaDias||{}, chaves:a.chaves||{}})); }catch(e){}
+      }
+    });
+    for(let i=0;i<localStorage.length;i++){
+      const k = localStorage.key(i);
+      if(k && k.indexOf('cofen_arquivo_')===0){
+        const ym = k.slice(14);
+        if(!r[ym.replace('-','_')]){ const a = arqLer(ym); if(a) arqEnviarFb(a); }
+      }
+    }
+    if(typeof arqMesesRender==='function') arqMesesRender();
+  });
+
   // ── Arrecadado + CORENs ──
   fbDb.ref(fbRoom+'/arrecadado').on('value', snap=>{
     const remote = snap.val();
@@ -18423,6 +18551,7 @@ function mtsAtualizarJulho(){
   </div>
 
   <div id="mts-lid" style="margin:14px 0"></div>
+  <div id="arq-meses" style="margin:14px 0"></div>
 
   <!-- Modal: Editar Metas Mensais (Total Recebido, por mês/equipe) -->
   <div id="mts-editar-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);
@@ -21584,6 +21713,7 @@ function metaHO(op){
 }
 function nk(s){ return String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,''); }
 function titulo(t){ return String(t||'').toLowerCase().replace(/(^|\s)\S/g,function(c){ return c.toUpperCase(); }).replace(/^Cofen\s+/,''); }
+
 function mesAtual(){ var h=new Date(); return h.getFullYear()+'-'+String(h.getMonth()+1).padStart(2,'0'); }
 function snapLer(){ try{ var x=JSON.parse(localStorage.getItem('cofen_import_linhas')||'null'); return (x&&x.mes===mesAtual()&&Array.isArray(x.rows))?x.rows:[]; }catch(e){ return []; } }
 // Linhas = operadores vivos do dashboard + quem veio no último relatório importado e não está no dashboard (equipe como vem no arquivo)
