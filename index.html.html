@@ -628,6 +628,10 @@ select.ev-inp{cursor:pointer}
 .ag-badge-vencido{background:#FEE2E2;color:#991B1B}
 .ag-badge-campanha{background:#DBEAFE;color:#1E40AF}
 .ag-badge-telefone{background:#F3F4F6;color:#374151}
+
+.chk-lbl{padding:3px 6px;margin:-3px -6px;border-radius:4px;outline:none;cursor:text;border:1px dashed transparent}
+.chk-lbl:hover{border-color:#9DC3E6;background:#F4F9FF}
+.chk-lbl:focus{border-color:#2E75B6;background:#fff;box-shadow:0 0 0 2px rgba(46,117,182,.2)}
 </style>
 
 <!-- Firebase SDK -->
@@ -14979,6 +14983,11 @@ function chkFind(secId, itemId){
   return {sec, item: itemId? sec.items.find(i=>i.id===itemId) : null};
 }
 function chkEditLabel(secId,itemId,val){ const {item}=chkFind(secId,itemId); if(item){ item.label=val; chkCfgSave(); } }
+function chkInlineSave(secId,itemId,el){
+  const v=(el.innerText||'').replace(/\s+/g,' ').trim(); const {item}=chkFind(secId,itemId); if(!item) return;
+  if(!v){ el.textContent=item.label; return; }
+  if(v!==item.label){ item.label=v; chkCfgSave(); toast('✏️ Tarefa salva'); }
+}
 function chkEditTitle(secId,val){ const {sec}=chkFind(secId); if(sec){ sec.title=val; chkCfgSave(); } }
 function chkEditIcon(secId,val){ const {sec}=chkFind(secId); if(sec){ sec.icon=val||'📌'; chkCfgSave(); } }
 function chkAddItem(secId){
@@ -15062,7 +15071,10 @@ function checkRender(state){
                <button title="Excluir tarefa" onclick="chkDelItem('${sec.id}','${item.id}')" style="${mini};color:#C00000">🗑</button>
              </div>
            </div>`
-        : chkEsc(item.label);
+        : `<div class="chk-lbl" contenteditable="true" spellcheck="false" title="Clique para editar o texto da tarefa"
+             onpaste="event.preventDefault();document.execCommand('insertText',false,event.clipboardData.getData('text/plain'))"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+             onblur="chkInlineSave('${sec.id}','${item.id}',this)">${chkEsc(item.label)}</div>`;
       rows += `<tr>
         <td style="${bd};padding:8px 12px;font-size:13px;font-weight:600;color:var(--g700);line-height:1.4">${labelCell}</td>
         ${st.map((v,k)=>`<td style="${bd};text-align:center;padding:4px">
@@ -15088,7 +15100,7 @@ function checkRender(state){
   </div>
   <div style="font-size:11px;color:var(--g500);padding:2px 6px;line-height:1.6">${ed
     ? '✏️ <strong>Modo edição:</strong> altere o texto das tarefas, reordene (▲▼), exclua (🗑) ou adicione. As mudanças valem só para o checklist de <strong>'+chkEsc(chkLeader().name)+'</strong> e são salvas automaticamente.'
-    : 'Marque as etapas I a V de cada tarefa. O % é calculado por <strong>etapas marcadas ÷ 5</strong>. Cada líder tem o seu próprio checklist — escolha o nome acima.'}</div>`;
+    : '<strong>Clique no texto de qualquer tarefa para editá-la</strong> (Enter salva). Para adicionar, excluir ou reordenar use ✏️ Editar tarefas. Marque as etapas I a V; o % é calculado por <strong>etapas marcadas ÷ 5</strong>. Cada líder tem o seu próprio checklist — escolha o nome acima.'}</div>`;
 }
 
 function checkToggle(id, stepIdx, checked){
