@@ -13100,7 +13100,7 @@ const SYNC_KV_KEYS = [
   'cofen_du_overrides','cofen_feriados','cofen_premiacoes','cofen_op_ho','cofen_quadro_mov','cofen_cmp15du_metas','cofen_cmp15du_totais','cofen_ultimo_import',
   'cofen_hist_empresa','cofen_hist_geral','cofen_geral_daily_julho','cofen_julho_eq',
   'cofen_ops_du_julho','cofen_ops_du_junho','cofen_proj_meta_ho_op','cofen_lid_metas','cofen_import_linhas','cofen_rec_dia_conc','cofen_rec_dia_imp','cofen_plano_meta','cofen_proj_ocultos','cofen_empresa_dia',
-  'cofen_corens_extra',
+  'cofen_corens_extra','cofen_chk_cfg',
   'cofen_coren_mt','cofen_coren_pi','cofen_coren_ma','cofen_coren_ce','cofen_coren_sp',
   'cofen_coren_rj','cofen_coren_mg','cofen_coren_rs','cofen_coren_pr','cofen_coren_ba',
   'cofen_coren_go','cofen_coren_pe','cofen_coren_sc','cofen_coren_am','cofen_coren_pb',
@@ -13134,6 +13134,7 @@ function syncApplyKV(key, val){
       if(typeof renderCorenGrid==='function') renderCorenGrid(corenData);
       if(typeof liveCalcCorens==='function') liveCalcCorens();
     }
+    else if(key==='cofen_chk_cfg'){ try{ chkCfg=null; if(document.getElementById('pg-check')?.classList.contains('on') && !chkEditMode) checkRefreshAll(); }catch(e){} }
     else if(key==='cofen_corens_extra'){
       try{
         const extras = JSON.parse(val);
@@ -13777,6 +13778,9 @@ function fbStartListening(){
   });
   fbListeners.extra_eq = true;
 
+  // ── Checklist por líder ──
+  chkListenFirebase();
+
   // ── Checklist por equipe ──
   D.equipes.forEach(eq=>{
     const key = 'chk_eq_'+eq.name.replace(/[^a-zA-Z0-9]/g,'_');
@@ -14096,6 +14100,7 @@ function fbPushAllLocal(){
   // Extra por equipe
   const extraEq=extraGetAll();
   if(Object.keys(extraEq).length>0) fbPush('extra_eq',{...extraEq,_ts:Date.now()});
+  try{ chkCfgLoad().leaders.forEach(l=>{ const s=localStorage.getItem(chkStateKey(l.id)); if(s) fbDb.ref(fbRoom+'/chk_ld/'+chkDateStr()+'/'+l.id).set(s); }); }catch(e){}
   // Chaves genéricas (du_overrides, feriados, histórico Visão Geral, comparativo por operador)
   SYNC_KV_KEYS.forEach(key=>{
     const v = localStorage.getItem(key);
@@ -14813,19 +14818,54 @@ function getEqChecklist(eqName){ return CHK_BY_EQ[eqName] || CHK_SECTIONS; }
 
 let chkChart = null;
 
-function checkTodayKey(){
-  const d=new Date(); return `chk_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
+// ══════════════════════════════════════════
+// CHECKLIST POR LÍDER — tarefas editáveis + filtro por líder
+// Config: { leaders:[{id,name,sections:[{id,icon,title,items:[{id,label}]}]}], active:id }
+// Estado diário: chk_ld_<idLider>_<ano>_<mes>_<dia> = { idTarefa:[5 bools] }
+// ══════════════════════════════════════════
+const CHK_CFG_KEY = 'cofen_chk_cfg';
+const CHK_LEADERS_DEFAULT = ['Stephanie Bernardes','Bruna Justimiano','Katia Regina'];
+let chkEditMode = false;
+let chkCfg = null;
+
+function chkEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function chkUid(p){ return p+Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+function chkSlug(n){ return String(n).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'') || chkUid('l'); }
+function chkDefaultSections(){
+  return CHK_SECTIONS.map(s=>({id:s.id, icon:s.icon, title:s.title, items:s.items.map(i=>({id:i.id,label:i.label}))}));
+}
+function chkCfgDefault(){
+  const leaders = CHK_LEADERS_DEFAULT.map(n=>({id:chkSlug(n), name:n, sections:chkDefaultSections()}));
+  return {leaders, active:leaders[0].id};
+}
+function chkCfgLoad(){
+  if(chkCfg) return chkCfg;
+  try{ const v=JSON.parse(localStorage.getItem(CHK_CFG_KEY)||'null'); if(v && Array.isArray(v.leaders) && v.leaders.length) chkCfg=v; }catch(e){}
+  if(!chkCfg) chkCfg = chkCfgDefault();
+  if(!chkCfg.leaders.find(l=>l.id===chkCfg.active)) chkCfg.active = chkCfg.leaders[0].id;
+  return chkCfg;
+}
+function chkCfgSave(){
+  try{ localStorage.setItem(CHK_CFG_KEY, JSON.stringify(chkCfg)); }catch(e){}
+  if(typeof syncPush==='function') syncPush(CHK_CFG_KEY);
+}
+function chkLeader(){ const c=chkCfgLoad(); return c.leaders.find(l=>l.id===c.active) || c.leaders[0]; }
+function chkSections(){ return chkLeader().sections; }
+
+function chkDateStr(d){ d=d||new Date(); return `${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`; }
+function chkStateKey(leaderId, d){ return `chk_ld_${leaderId}_${chkDateStr(d)}`; }
+function checkLoad(leaderId){
+  try{ return JSON.parse(localStorage.getItem(chkStateKey(leaderId||chkLeader().id))||'{}'); }catch(e){ return {}; }
+}
+function checkSave(state, leaderId){
+  const id = leaderId||chkLeader().id;
+  localStorage.setItem(chkStateKey(id), JSON.stringify(state));
+  if(typeof fbDb!=='undefined' && fbDb && typeof fbRoom!=='undefined' && fbRoom){
+    try{ fbDb.ref(fbRoom+'/chk_ld/'+chkDateStr()+'/'+id).set(JSON.stringify(state)); }catch(e){}
+  }
 }
 
-function checkLoad(){
-  return JSON.parse(localStorage.getItem(checkTodayKey())||'{}');
-}
-
-function checkSave(state){
-  localStorage.setItem(checkTodayKey(), JSON.stringify(state));
-}
-
-// Estado do checklist do líder: { idDaTarefa: [bool, bool, bool, bool, bool] }  (etapas I a V)
+// Estado do checklist: { idDaTarefa: [bool x5] }  (etapas I a V)
 const CHK_STEPS = ['I','II','III','IV','V'];
 const CHK_BLUE = '#2E75B6';
 
@@ -14834,33 +14874,136 @@ function chkSteps(state, id){
   return Array.isArray(v) && v.length===5 ? v : [false,false,false,false,false];
 }
 function chkItemPct(state, id){
-  return chkSteps(state,id).filter(Boolean).length / CHK_STEPS.length;   // = COUNTIF(etapas; marcado) / 5
+  return chkSteps(state,id).filter(Boolean).length / CHK_STEPS.length;
 }
 function chkSecPct(state, sec){
-  return sec.items.reduce((a,i)=>a+chkItemPct(state,i.id),0) / sec.items.length;  // média do bloco
+  return sec.items.length ? sec.items.reduce((a,i)=>a+chkItemPct(state,i.id),0) / sec.items.length : 0;
 }
-
-function checkCalcPct(state){
+function checkCalcPct(state, sections){
+  sections = sections || chkSections();
   let total=0, done=0, sum=0, n=0;
-  CHK_SECTIONS.forEach(s=>s.items.forEach(i=>{
+  sections.forEach(s=>s.items.forEach(i=>{
     total += CHK_STEPS.length;
     done  += chkSteps(state,i.id).filter(Boolean).length;
     sum   += chkItemPct(state,i.id); n++;
   }));
-  return {total, done, pct: n>0 ? Math.round(sum/n*100) : 0};   // média geral das tarefas
+  return {total, done, pct: n>0 ? Math.round(sum/n*100) : 0};
 }
 
 function checkInit(){
-  const state = checkLoad();
+  chkCfgLoad();
   const today = new Date();
   const daysNames=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
   const monthNames=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const lbl = document.getElementById('chk-date-label');
   if(lbl) lbl.textContent = `${daysNames[today.getDay()]}, ${today.getDate()} de ${monthNames[today.getMonth()]}`;
-
+  checkRefreshAll();
+}
+function checkRefreshAll(){
+  const state = checkLoad();
+  chkRenderLeaderBar();
   checkRender(state);
   checkUpdateBar(state);
   checkBuildChart();
+}
+
+// ── Barra de filtro por líder ──
+function chkRenderLeaderBar(){
+  const el = document.getElementById('chk-leader-bar'); if(!el) return;
+  const c = chkCfgLoad();
+  const chips = c.leaders.map(l=>{
+    const p = checkCalcPct(checkLoad(l.id), l.sections).pct;
+    const on = l.id===c.active;
+    const col = p===100?'#16A34A':p>=60?'#B45309':'#6B7280';
+    return `<button onclick="chkSelectLeader('${l.id}')" style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:100px;cursor:pointer;font-family:Nunito,sans-serif;font-size:12px;font-weight:800;border:2px solid ${on?'var(--pp)':'var(--g200)'};background:${on?'var(--pp)':'var(--w)'};color:${on?'#fff':'var(--g700)'};box-shadow:${on?'var(--sh)':'none'}">
+      👤 ${chkEsc(l.name)} <span style="font-size:11px;padding:1px 7px;border-radius:100px;background:${on?'rgba(255,255,255,.2)':'var(--g100)'};color:${on?'#fff':col}">${p}%</span></button>`;
+  }).join('');
+  const btn = (onclick,label,extra)=>`<button onclick="${onclick}" style="padding:8px 12px;border-radius:var(--rm);border:1px solid var(--g200);background:var(--w);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer;${extra||''}">${label}</button>`;
+  el.innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:11px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.8px">Líder:</span>
+      ${chips}
+      ${btn('chkAddLeader()','➕ Líder')}
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--g100)">
+      <span style="font-size:12px;font-weight:800;color:var(--g700)">Checklist de ${chkEsc(chkLeader().name)}</span>
+      <span style="flex:1"></span>
+      ${btn('chkToggleEdit()', chkEditMode?'✔ Concluir edição':'✏️ Editar tarefas', chkEditMode?'background:var(--pp);color:#fff;border-color:var(--pp)':'')}
+      ${btn('chkRenameLeader()','🏷 Renomear líder')}
+      ${btn('chkCopyFrom()','📋 Copiar tarefas de…')}
+      ${btn('chkRestoreDefault()','♻ Restaurar padrão')}
+      ${c.leaders.length>1?btn('chkDeleteLeader()','🗑 Excluir líder','color:#C00000'):''}
+    </div>`;
+}
+function chkSelectLeader(id){
+  const c=chkCfgLoad(); c.active=id; chkCfgSave();
+  checkRefreshAll();
+}
+function chkAddLeader(){
+  const n = (prompt('Nome do líder de equipe:')||'').trim(); if(!n) return;
+  const c=chkCfgLoad();
+  let id=chkSlug(n); if(c.leaders.find(l=>l.id===id)) id=id+'_'+Math.random().toString(36).slice(2,5);
+  c.leaders.push({id,name:n,sections:chkDefaultSections()}); c.active=id; chkCfgSave();
+  checkRefreshAll(); toast('➕ Líder adicionado: '+n);
+}
+function chkRenameLeader(){
+  const l=chkLeader(); const n=(prompt('Novo nome do líder:', l.name)||'').trim(); if(!n) return;
+  l.name=n; chkCfgSave(); checkRefreshAll();
+}
+function chkDeleteLeader(){
+  const c=chkCfgLoad(); if(c.leaders.length<2) return;
+  const l=chkLeader();
+  if(!confirm('Excluir o líder "'+l.name+'" e o checklist dele?')) return;
+  c.leaders = c.leaders.filter(x=>x.id!==l.id); c.active=c.leaders[0].id; chkCfgSave();
+  checkRefreshAll(); toast('🗑 Líder excluído');
+}
+function chkCopyFrom(){
+  const c=chkCfgLoad(); const l=chkLeader();
+  const others=c.leaders.filter(x=>x.id!==l.id); if(!others.length){ toast('Não há outro líder para copiar'); return; }
+  const n=(prompt('Copiar as tarefas de qual líder?\n'+others.map(o=>'• '+o.name).join('\n'))||'').trim().toLowerCase(); if(!n) return;
+  const src=others.find(o=>o.name.toLowerCase()===n) || others.find(o=>o.name.toLowerCase().includes(n));
+  if(!src){ toast('Líder não encontrado'); return; }
+  if(!confirm('Substituir as tarefas de '+l.name+' pelas de '+src.name+'?')) return;
+  l.sections = JSON.parse(JSON.stringify(src.sections)); chkCfgSave(); checkRefreshAll();
+}
+function chkRestoreDefault(){
+  const l=chkLeader();
+  if(!confirm('Restaurar a lista padrão de tarefas de '+l.name+'? As edições serão perdidas.')) return;
+  l.sections = chkDefaultSections(); chkCfgSave(); checkRefreshAll();
+}
+
+// ── Edição de tarefas ──
+function chkToggleEdit(){ chkEditMode=!chkEditMode; checkRefreshAll(); }
+function chkFind(secId, itemId){
+  const sec = chkSections().find(s=>s.id===secId); if(!sec) return {};
+  return {sec, item: itemId? sec.items.find(i=>i.id===itemId) : null};
+}
+function chkEditLabel(secId,itemId,val){ const {item}=chkFind(secId,itemId); if(item){ item.label=val; chkCfgSave(); } }
+function chkEditTitle(secId,val){ const {sec}=chkFind(secId); if(sec){ sec.title=val; chkCfgSave(); } }
+function chkEditIcon(secId,val){ const {sec}=chkFind(secId); if(sec){ sec.icon=val||'📌'; chkCfgSave(); } }
+function chkAddItem(secId){
+  const {sec}=chkFind(secId); if(!sec) return;
+  sec.items.push({id:chkUid('t'), label:'Nova tarefa'}); chkCfgSave(); checkRefreshAll();
+  setTimeout(()=>{ const t=document.querySelectorAll('[data-chk-sec="'+secId+'"]'); if(t.length){ const last=t[t.length-1]; last.focus(); last.select(); } },30);
+}
+function chkDelItem(secId,itemId){
+  const {sec,item}=chkFind(secId,itemId); if(!item) return;
+  if(!confirm('Excluir esta tarefa?\n\n'+item.label)) return;
+  sec.items = sec.items.filter(i=>i.id!==itemId); chkCfgSave(); checkRefreshAll();
+}
+function chkMoveItem(secId,itemId,dir){
+  const {sec}=chkFind(secId); if(!sec) return;
+  const i=sec.items.findIndex(x=>x.id===itemId), j=i+dir; if(i<0||j<0||j>=sec.items.length) return;
+  [sec.items[i],sec.items[j]]=[sec.items[j],sec.items[i]]; chkCfgSave(); checkRefreshAll();
+}
+function chkAddSection(){
+  const t=(prompt('Nome do novo bloco de tarefas:')||'').trim(); if(!t) return;
+  chkSections().push({id:chkUid('s'), icon:'📌', title:t, items:[{id:chkUid('t'),label:'Nova tarefa'}]}); chkCfgSave(); checkRefreshAll();
+}
+function chkDelSection(secId){
+  const {sec}=chkFind(secId); if(!sec) return;
+  if(!confirm('Excluir o bloco "'+sec.title+'" e todas as tarefas dele?')) return;
+  const l=chkLeader(); l.sections=l.sections.filter(s=>s.id!==secId); chkCfgSave(); checkRefreshAll();
 }
 
 function chkBarCell(p){
@@ -14873,6 +15016,10 @@ function checkRender(state){
   const container = document.getElementById('chk-sections');
   if(!container) return;
   const bd = 'border:1px solid #9DC3E6';
+  const sections = chkSections();
+  const ed = chkEditMode;
+  const inp = 'font-family:Nunito,sans-serif;border:1px solid #9DC3E6;border-radius:4px;background:#fff;color:var(--g700)';
+  const mini = 'border:1px solid var(--g200);background:#fff;border-radius:4px;cursor:pointer;font-size:11px;padding:2px 6px;line-height:1.2';
 
   const head = `
     <thead>
@@ -14889,18 +15036,35 @@ function checkRender(state){
     </thead>`;
 
   let rows = '';
-  CHK_SECTIONS.forEach(sec=>{
+  sections.forEach(sec=>{
     const sp = chkSecPct(state, sec);
+    const n = sec.items.length;
+    const titleCell = ed
+      ? `<input value="${chkEsc(sec.icon)}" onchange="chkEditIcon('${sec.id}',this.value)" style="${inp};width:38px;text-align:center;font-size:14px;padding:3px">
+         <input value="${chkEsc(sec.title)}" onchange="chkEditTitle('${sec.id}',this.value)" style="${inp};width:min(380px,70%);font-size:13px;font-weight:800;color:#1F4E78;padding:4px 8px">
+         <span style="font-weight:600;color:#5B7FA3;font-size:11px">— ${n} atividade${n===1?'':'s'}</span>
+         <button onclick="chkDelSection('${sec.id}')" style="${mini};color:#C00000;margin-left:8px">🗑 Excluir bloco</button>`
+      : `${chkEsc(sec.icon)} ${chkEsc(sec.title)} <span style="font-weight:600;color:#5B7FA3;font-size:11px">— ${n} atividade${n===1?'':'s'}</span>`;
     rows += `<tr style="background:#DDEBF7">
-      <td colspan="6" style="${bd};padding:9px 12px;font-size:13px;font-weight:800;color:#1F4E78">${sec.icon} ${sec.title} <span style="font-weight:600;color:#5B7FA3;font-size:11px">— ${sec.sub}</span></td>
+      <td colspan="6" style="${bd};padding:9px 12px;font-size:13px;font-weight:800;color:#1F4E78">${titleCell}</td>
       <td style="${bd};text-align:center;font-weight:800;color:#C00000;font-size:13px">${Math.round(sp*100)}%</td>
       ${chkBarCell(sp)}
     </tr>`;
-    sec.items.forEach(item=>{
+    sec.items.forEach((item,idx)=>{
       const st = chkSteps(state, item.id);
       const p  = chkItemPct(state, item.id);
+      const labelCell = ed
+        ? `<div style="display:flex;gap:6px;align-items:flex-start">
+             <textarea data-chk-sec="${sec.id}" rows="2" onchange="chkEditLabel('${sec.id}','${item.id}',this.value)" style="${inp};flex:1;font-size:13px;font-weight:600;padding:6px 8px;line-height:1.4;resize:vertical">${chkEsc(item.label)}</textarea>
+             <div style="display:flex;flex-direction:column;gap:3px">
+               <button title="Subir" onclick="chkMoveItem('${sec.id}','${item.id}',-1)" style="${mini}" ${idx===0?'disabled':''}>▲</button>
+               <button title="Descer" onclick="chkMoveItem('${sec.id}','${item.id}',1)" style="${mini}" ${idx===n-1?'disabled':''}>▼</button>
+               <button title="Excluir tarefa" onclick="chkDelItem('${sec.id}','${item.id}')" style="${mini};color:#C00000">🗑</button>
+             </div>
+           </div>`
+        : chkEsc(item.label);
       rows += `<tr>
-        <td style="${bd};padding:8px 12px;font-size:13px;font-weight:600;color:var(--g700);line-height:1.4">${item.label}</td>
+        <td style="${bd};padding:8px 12px;font-size:13px;font-weight:600;color:var(--g700);line-height:1.4">${labelCell}</td>
         ${st.map((v,k)=>`<td style="${bd};text-align:center;padding:4px">
           <input type="checkbox" ${v?'checked':''} onchange="checkToggle('${item.id}',${k},this.checked)"
             style="width:20px;height:20px;accent-color:${CHK_BLUE};cursor:pointer;vertical-align:middle"></td>`).join('')}
@@ -14908,11 +15072,13 @@ function checkRender(state){
         ${chkBarCell(p)}
       </tr>`;
     });
+    if(ed) rows += `<tr><td colspan="8" style="${bd};padding:6px 12px;background:#F8FBFF"><button onclick="chkAddItem('${sec.id}')" style="${mini};color:#1F4E78;font-weight:700;padding:5px 10px">➕ Adicionar tarefa neste bloco</button></td></tr>`;
   });
+  if(ed) rows += `<tr><td colspan="8" style="${bd};padding:8px 12px;background:#F8FBFF"><button onclick="chkAddSection()" style="${mini};color:#1F4E78;font-weight:800;padding:6px 12px">➕ Novo bloco de tarefas</button></td></tr>`;
 
-  const tp = checkCalcPct(state).pct;
+  const tp = checkCalcPct(state, sections).pct;
   rows += `<tr style="background:#DDEBF7">
-    <td colspan="6" style="${bd};padding:10px 12px;font-size:13px;font-weight:800">PROGRESSO GERAL DO DIA</td>
+    <td colspan="6" style="${bd};padding:10px 12px;font-size:13px;font-weight:800">PROGRESSO GERAL DO DIA — ${chkEsc(chkLeader().name.toUpperCase())}</td>
     <td style="${bd};text-align:center;font-weight:800;color:#C00000;font-size:14px">${tp}%</td>
     ${chkBarCell(tp/100)}
   </tr>`;
@@ -14920,7 +15086,9 @@ function checkRender(state){
   container.innerHTML = `<div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);overflow:auto;box-shadow:var(--sh)">
     <table style="border-collapse:collapse;width:100%;min-width:760px;font-family:Nunito,sans-serif">${head}<tbody>${rows}</tbody></table>
   </div>
-  <div style="font-size:11px;color:var(--g500);padding:2px 6px;line-height:1.6">Marque as etapas I a V de cada tarefa. O % é calculado por <strong>etapas marcadas ÷ 5</strong>; a barra acompanha o %. A linha de cada bloco mostra a média do bloco e a última linha, a média geral do dia.</div>`;
+  <div style="font-size:11px;color:var(--g500);padding:2px 6px;line-height:1.6">${ed
+    ? '✏️ <strong>Modo edição:</strong> altere o texto das tarefas, reordene (▲▼), exclua (🗑) ou adicione. As mudanças valem só para o checklist de <strong>'+chkEsc(chkLeader().name)+'</strong> e são salvas automaticamente.'
+    : 'Marque as etapas I a V de cada tarefa. O % é calculado por <strong>etapas marcadas ÷ 5</strong>. Cada líder tem o seu próprio checklist — escolha o nome acima.'}</div>`;
 }
 
 function checkToggle(id, stepIdx, checked){
@@ -14931,11 +15099,13 @@ function checkToggle(id, stepIdx, checked){
   checkSave(state);
   checkUpdateBar(state);
   checkRender(state);
+  chkRenderLeaderBar();
   checkSaveWeekly();
 }
 
 function checkUpdateBar(state){
-  const {pct} = checkCalcPct(state);
+  const sections = chkSections();
+  const {pct} = checkCalcPct(state, sections);
   const bar   = document.getElementById('chk-bar');
   const big   = document.getElementById('chk-pct-big');
   const lbl   = document.getElementById('chk-pct-label');
@@ -14943,30 +15113,29 @@ function checkUpdateBar(state){
 
   if(bar)   bar.style.width = pct+'%';
   if(big)   big.textContent = pct+'%';
-  if(lbl)   lbl.textContent = pct+'% concluído';
+  if(lbl)   lbl.textContent = chkLeader().name+' · '+pct+'% concluído';
 
-  if(stats) stats.innerHTML = CHK_SECTIONS.map(sec=>{
+  if(stats) stats.innerHTML = sections.map(sec=>{
     const p = Math.round(chkSecPct(state, sec)*100);
     const col = p===100?'#4ADE80':p>=60?'#FCD34D':'var(--g400)';
     return `<div style="display:flex;align-items:center;gap:5px">
-      <span style="font-size:12px">${sec.icon}</span>
+      <span style="font-size:12px">${chkEsc(sec.icon)}</span>
       <span style="font-size:11px;font-weight:700;color:${col}">${p}%</span>
     </div>`;
   }).join('');
 }
 
 function checkReset(){
-  if(!confirm('Resetar todo o checklist de hoje?')) return;
+  if(!confirm('Resetar o checklist de hoje de '+chkLeader().name+'?')) return;
   checkSave({});
-  checkRender({});
-  checkUpdateBar({});
+  checkRefreshAll();
   toast('↩ Checklist resetado!');
 }
 
 function checkSaveWeekly(){
   const {pct} = checkCalcPct(checkLoad());
   const d=new Date();
-  const key=`chk_week_${d.getFullYear()}_${Math.ceil(d.getDate()/7)}`;
+  const key=`chk_week_${chkLeader().id}_${d.getFullYear()}_${Math.ceil(d.getDate()/7)}`;
   const week=JSON.parse(localStorage.getItem(key)||'{}');
   const dayNames=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
   week[dayNames[d.getDay()]] = pct;
@@ -14977,46 +15146,37 @@ function checkBuildChart(){
   const canvas = document.getElementById('chk-chart');
   if(!canvas) return;
   if(chkChart){ chkChart.destroy(); chkChart=null; }
-
-  // Build last 7 days data
+  const sections = chkSections(), lid = chkLeader().id;
   const labels=[], data=[];
   const dayNames=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
   for(let i=6;i>=0;i--){
     const d=new Date(); d.setDate(d.getDate()-i);
-    const key=`chk_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
-    const state=JSON.parse(localStorage.getItem(key)||'{}');
-    const {pct}=checkCalcPct(state);
+    const state=JSON.parse(localStorage.getItem(chkStateKey(lid,d))||'{}');
     labels.push((i===0?'Hoje':dayNames[d.getDay()])+' '+d.getDate());
-    data.push(pct);
+    data.push(checkCalcPct(state, sections).pct);
   }
-
   chkChart = new Chart(canvas, {
     type:'line',
-    data:{
-      labels,
-      datasets:[{
-        label:'% Concluído',
-        data,
-        borderColor:'#00A86B',
-        backgroundColor:'rgba(0,168,107,.1)',
-        borderWidth:2.5,
-        pointBackgroundColor:'#00A86B',
-        pointRadius:5,
-        tension:.35,
-        fill:true,
-      }]
-    },
+    data:{ labels, datasets:[{ label:'% Concluído', data, borderColor:'#00A86B', backgroundColor:'rgba(0,168,107,.1)', borderWidth:2.5, pointBackgroundColor:'#00A86B', pointRadius:5, tension:.35, fill:true }] },
     options:{
       responsive:true,
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}% concluído`}}
-      },
-      scales:{
-        y:{min:0,max:100,ticks:{callback:v=>v+'%',stepSize:25},grid:{color:'rgba(0,0,0,.05)'}},
-        x:{grid:{display:false}}
-      }
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}% concluído`}} },
+      scales:{ y:{min:0,max:100,ticks:{callback:v=>v+'%',stepSize:25},grid:{color:'rgba(0,0,0,.05)'}}, x:{grid:{display:false}} }
     }
+  });
+}
+
+// Sync em tempo real do checklist dos líderes (chamado ao conectar o Firebase)
+function chkListenFirebase(){
+  if(typeof fbDb==='undefined' || !fbDb || !fbRoom) return;
+  fbDb.ref(fbRoom+'/chk_ld/'+chkDateStr()).on('value', snap=>{
+    const all = snap.val(); if(!all) return;
+    let changed=false;
+    Object.keys(all).forEach(id=>{
+      const k = chkStateKey(id);
+      if(localStorage.getItem(k)!==all[id]){ localStorage.setItem(k, all[id]); changed=true; }
+    });
+    if(changed && document.getElementById('pg-check')?.classList.contains('on') && !chkEditMode){ checkRefreshAll(); pulseSyncDot&&pulseSyncDot(); }
   });
 }
 
@@ -17314,6 +17474,9 @@ setInterval(()=>{
       <button onclick="checkReset()" style="padding:6px 14px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">↩ Resetar Dia</button>
     </div>
   </div>
+
+  <!-- Filtro por líder de equipe -->
+  <div id="chk-leader-bar" style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:12px 16px;box-shadow:var(--sh)"></div>
 
   <!-- Progress bar geral -->
   <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:14px 18px;box-shadow:var(--sh)">
