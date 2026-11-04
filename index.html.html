@@ -14750,44 +14750,61 @@ const CHK_BY_EQ = {
 
 // Checklist genérico (usado pelo painel global de checklist e equipes sem personalizado)
 const CHK_SECTIONS = [
-  { id:'abertura', icon:'🌅', title:'Abertura da Operação', items:[
-    {id:'login_sistema',     label:'Fazer login no sistema / CRM e verificar funcionamento'},
-    {id:'presenca',          label:'Confirmar presença de todos os operadores e supervisores'},
-    {id:'metas_dia',         label:'Comunicar meta do dia para a equipe (valor + HO esperado)'},
-    {id:'script_revisao',    label:'Revisar script de abordagem com a equipe (ajustes do dia anterior)'},
-    {id:'carteira_carregada',label:'Verificar se carteira/lista de devedores está carregada no sistema'},
+  { id:"abertura", icon:"🌅", title:"Abertura da operação", sub:"6 atividades", items:[
+    {id:'ab1', label:"Fazer login nos sistemas, CRM e canais de atendimento, verificando se estão funcionando."},
+    {id:'ab2', label:"Confirmar presença dos operadores e supervisores e organizar eventuais substituições."},
+    {id:'ab3', label:"Verificar se todos estão logados nas filas e equipes corretas."},
+    {id:'ab4', label:"Conferir se as carteiras e listas de devedores estão carregadas e atualizadas."},
+    {id:'ab5', label:"Apresentar a meta diária, o HO esperado e os objetivos individuais."},
+    {id:'ab6', label:"Alinhar orientações, campanhas, alterações de regras e pontos de atenção do dia."},
   ]},
-  { id:'producao', icon:'📞', title:'Acompanhamento de Produção', items:[
-    {id:'ligacoes_1h',       label:'Verificar volume de ligações na 1ª hora e acionar quem está abaixo'},
-    {id:'ranking_am',        label:'Divulgar ranking parcial da manhã para a equipe (motivação)'},
-    {id:'acordos_fechados',  label:'Checar acordos fechados e links gerados até o momento'},
-    {id:'pausa_controlada',  label:'Gerenciar pausas — ninguém em pausa fora do horário permitido'},
-    {id:'operadores_baixos', label:'Identificar operadores com baixa produção e oferecer apoio/script'},
+  { id:"acompanhamento", icon:"📞", title:"Acompanhamento da operação", sub:"7 atividades", items:[
+    {id:'ac1', label:"Acompanhar a produção da primeira hora e identificar operadores abaixo do esperado."},
+    {id:'ac2', label:"Monitorar volume de ligações, contatos efetivos e atendimentos realizados."},
+    {id:'ac3', label:"Acompanhar o desempenho individual e por equipe."},
+    {id:'ac4', label:"Verificar acordos realizados, links gerados e pagamentos confirmados."},
+    {id:'ac5', label:"Controlar pausas, atrasos, ausências e cumprimento dos horários."},
+    {id:'ac6', label:"Acompanhar filas de atendimento, transferências da IA e pendências do ChatPlay."},
+    {id:'ac7', label:"Atuar imediatamente em casos de baixa produtividade ou dificuldades operacionais."},
   ]},
-  { id:'qualidade', icon:'🎯', title:'Qualidade e Conversão', items:[
-    {id:'monitoria_lig',     label:'Monitorar ao menos 2 ligações ao vivo (escuta ativa)'},
-    {id:'feedback_script',   label:'Dar feedback individual sobre script e técnica de abordagem'},
-    {id:'taxa_conversao',    label:'Verificar taxa de conversão (acordos pagos / links gerados)'},
-    {id:'objecoes_dia',      label:'Levantar principais objeções do dia e alinhar resposta com equipe'},
+  { id:"qualidade", icon:"🎯", title:"Qualidade e conversão", sub:"7 atividades", items:[
+    {id:'ql1', label:"Monitorar pelo menos duas ligações ou atendimentos por operador ao longo do dia, conforme a capacidade da operação."},
+    {id:'ql2', label:"Avaliar abordagem, argumentação, condução e postura dos operadores."},
+    {id:'ql3', label:"Verificar se os scripts e procedimentos oficiais estão sendo seguidos."},
+    {id:'ql4', label:"Identificar as principais objeções dos profissionais e alinhar as melhores respostas."},
+    {id:'ql5', label:"Realizar feedbacks individuais e orientar correções de abordagem."},
+    {id:'ql6', label:"Acompanhar conversão de contatos em acordos e de links gerados em pagamentos."},
+    {id:'ql7', label:"Identificar falhas recorrentes da IA, CRM ou SIGEN e encaminhar para correção."},
   ]},
-  { id:'comunicacao', icon:'📢', title:'Comunicação e Motivação', items:[
-    {id:'msg_motivacional',  label:'Enviar mensagem motivacional no grupo da equipe'},
-    {id:'ranking_divulgado', label:'Divulgar ranking atualizado no grupo (pelo menos 1x ao dia)'},
-    {id:'destaque_positivo', label:'Reconhecer publicamente operador destaque do dia'},
-    {id:'alinhamento_sup',   label:'Alinhar com supervisor sobre andamento e eventuais problemas'},
+  { id:"comunicacao", icon:"📢", title:"Comunicação e desenvolvimento da equipe", sub:"5 atividades", items:[
+    {id:'cm1', label:"Manter a equipe informada sobre resultados, metas e mudanças operacionais."},
+    {id:'cm2', label:"Divulgar o ranking atualizado pelo menos uma vez durante o dia."},
+    {id:'cm3', label:"Reconhecer publicamente os destaques e boas práticas."},
+    {id:'cm4', label:"Conversar individualmente com profissionais que apresentem dificuldades."},
+    {id:'cm5', label:"Alinhar com os demais supervisores e a gestão os problemas e necessidades da operação."},
   ]},
-  { id:'dados', icon:'📊', title:'Gestão de Dados e Relatórios', items:[
-    {id:'importar_rec',      label:'Importar relatório de recebimento no dashboard (atualizar ranking)'},
-    {id:'importar_acordos',  label:'Importar relatório de acordos (gerados, pagos, pendentes)'},
-    {id:'meta_equipe_ok',    label:'Verificar se meta por equipe está sendo atingida'},
-    {id:'projecao_mensal',   label:'Verificar projeção mensal e comunicar gap à diretoria se necessário'},
+  { id:"indicadores", icon:"📊", title:"Indicadores e gestão de resultados", sub:"6 atividades", items:[
+    {id:'ind1', label:"Atualizar o dashboard com os relatórios de recebimentos."},
+    {id:'ind2', label:"Conferir acordos gerados, pagos, pendentes e quebrados."},
+    {id:'ind3', label:"Acompanhar o HO realizado em relação às metas individuais e coletivas."},
+    {id:'ind4', label:"Atualizar a projeção diária e mensal."},
+    {id:'ind5', label:"Identificar o valor que falta para atingir as metas e distribuir os objetivos restantes."},
+    {id:'ind6', label:"Comunicar à gerência os desvios relevantes, riscos e oportunidades de melhoria."},
   ]},
-  { id:'encerramento', icon:'🌙', title:'Encerramento do Dia', items:[
-    {id:'relatorio_final',   label:'Gerar e salvar relatório final do dia'},
-    {id:'ranking_final',     label:'Divulgar ranking final do dia para toda a equipe'},
-    {id:'agendamentos_ok',   label:'Confirmar agendamentos de acordos para os próximos dias'},
-    {id:'pendencias',        label:'Registrar pendências e tarefas para o dia seguinte'},
-    {id:'logoff_sistema',    label:'Garantir logoff correto de todos os operadores no sistema'},
+  { id:"conformidade", icon:"⚖️", title:"Controle e conformidade COREN/COFEN", sub:"5 atividades críticas", items:[
+    {id:'cf1', label:"Garantir que os operadores não forneçam informações financeiras sem confirmação no sistema."},
+    {id:'cf2', label:"Verificar se falhas na localização de débitos estão sendo transferidas diretamente para atendimento humano."},
+    {id:'cf3', label:"Garantir que não sejam prometidos descontos, parcelamentos ou condições não autorizadas."},
+    {id:'cf4', label:"Acompanhar reclamações, contestações, problemas de pagamento e solicitações de retorno."},
+    {id:'cf5', label:"Verificar se os atendimentos respeitam as orientações de cobrança humanizada e proteção de dados dos profissionais."},
+  ]},
+  { id:"encerramento", icon:"🌙", title:"Encerramento da operação", sub:"6 atividades", items:[
+    {id:'en1', label:"Gerar e salvar o relatório final de produção e recebimento."},
+    {id:'en2', label:"Divulgar o resultado e o ranking final do dia."},
+    {id:'en3', label:"Conferir os pagamentos realizados e os acordos que ainda aguardam confirmação."},
+    {id:'en4', label:"Revisar os agendamentos e retornos previstos para os próximos dias."},
+    {id:'en5', label:"Registrar problemas, pendências e ações que precisam ser acompanhadas no dia seguinte."},
+    {id:'en6', label:"Garantir o encerramento correto dos atendimentos e o logoff dos operadores."},
   ]},
 ];
 
@@ -14808,10 +14825,29 @@ function checkSave(state){
   localStorage.setItem(checkTodayKey(), JSON.stringify(state));
 }
 
+// Estado do checklist do líder: { idDaTarefa: [bool, bool, bool, bool, bool] }  (etapas I a V)
+const CHK_STEPS = ['I','II','III','IV','V'];
+const CHK_BLUE = '#2E75B6';
+
+function chkSteps(state, id){
+  const v = state[id];
+  return Array.isArray(v) && v.length===5 ? v : [false,false,false,false,false];
+}
+function chkItemPct(state, id){
+  return chkSteps(state,id).filter(Boolean).length / CHK_STEPS.length;   // = COUNTIF(etapas; marcado) / 5
+}
+function chkSecPct(state, sec){
+  return sec.items.reduce((a,i)=>a+chkItemPct(state,i.id),0) / sec.items.length;  // média do bloco
+}
+
 function checkCalcPct(state){
-  let total=0, done=0;
-  CHK_SECTIONS.forEach(s=>s.items.forEach(i=>{ total++; if(state[i.id]) done++; }));
-  return {total, done, pct:total>0?Math.round(done/total*100):0};
+  let total=0, done=0, sum=0, n=0;
+  CHK_SECTIONS.forEach(s=>s.items.forEach(i=>{
+    total += CHK_STEPS.length;
+    done  += chkSteps(state,i.id).filter(Boolean).length;
+    sum   += chkItemPct(state,i.id); n++;
+  }));
+  return {total, done, pct: n>0 ? Math.round(sum/n*100) : 0};   // média geral das tarefas
 }
 
 function checkInit(){
@@ -14827,80 +14863,94 @@ function checkInit(){
   checkBuildChart();
 }
 
+function chkBarCell(p){
+  return `<td style="padding:0;border:1px solid #9DC3E6;background:${CHK_BLUE};width:190px">
+    <div style="padding:6px 8px"><div style="background:#fff;height:22px;border-radius:2px;width:${Math.round(p*100)}%;transition:width .4s"></div></div>
+  </td>`;
+}
+
 function checkRender(state){
   const container = document.getElementById('chk-sections');
   if(!container) return;
+  const bd = 'border:1px solid #9DC3E6';
 
-  container.innerHTML = CHK_SECTIONS.map(sec=>{
-    const done  = sec.items.filter(i=>state[i.id]).length;
-    const total = sec.items.length;
-    const pct   = Math.round(done/total*100);
-    const color = pct===100?'#4ADE80':pct>=60?'#FCD34D':'var(--g300)';
+  const head = `
+    <thead>
+      <tr>
+        <th rowspan="2" style="${bd};background:#fff;font-size:13px;font-weight:800;padding:10px;text-align:center">Tarefas</th>
+        <th colspan="5" style="${bd};background:#fff;font-size:14px;font-weight:800;padding:8px;text-align:center">Etapas</th>
+        <th colspan="2" style="${bd};background:#fff;font-size:14px;font-weight:800;padding:8px;text-align:center">Progresso</th>
+      </tr>
+      <tr>
+        ${CHK_STEPS.map(s=>`<th style="${bd};background:#DDEBF7;font-size:12px;font-weight:800;padding:6px;text-align:center;width:46px">${s}</th>`).join('')}
+        <th style="${bd};background:#fff;font-size:12px;font-weight:800;padding:6px;text-align:center;width:64px">%</th>
+        <th style="${bd};background:#fff;font-size:12px;font-weight:800;padding:6px;text-align:center">Gráfico</th>
+      </tr>
+    </thead>`;
 
-    const items = sec.items.map(item=>{
-      const checked = !!state[item.id];
-      return `<label style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;
-        border-radius:var(--rm);cursor:pointer;transition:background .15s;
-        background:${checked?'#F0FDF4':'var(--g50)'};border:1px solid ${checked?'#BBF7D0':'var(--g200)'};"
-        onmouseover="this.style.background='${checked?'#DCFCE7':'var(--g100)'}'"
-        onmouseout="this.style.background='${checked?'#F0FDF4':'var(--g50)'}'">
-        <input type="checkbox" ${checked?'checked':''} onchange="checkToggle('${item.id}',this.checked)"
-          style="width:16px;height:16px;flex-shrink:0;margin-top:1px;accent-color:var(--pp);cursor:pointer">
-        <span style="font-size:13px;font-weight:${checked?'700':'600'};color:${checked?'var(--pp)':'var(--g700)'};
-          text-decoration:${checked?'none':'none'};line-height:1.4">${item.label}</span>
-        ${checked?'<span style="margin-left:auto;font-size:16px;flex-shrink:0">✅</span>':''}
-      </label>`;
-    }).join('');
+  let rows = '';
+  CHK_SECTIONS.forEach(sec=>{
+    const sp = chkSecPct(state, sec);
+    rows += `<tr style="background:#DDEBF7">
+      <td colspan="6" style="${bd};padding:9px 12px;font-size:13px;font-weight:800;color:#1F4E78">${sec.icon} ${sec.title} <span style="font-weight:600;color:#5B7FA3;font-size:11px">— ${sec.sub}</span></td>
+      <td style="${bd};text-align:center;font-weight:800;color:#C00000;font-size:13px">${Math.round(sp*100)}%</td>
+      ${chkBarCell(sp)}
+    </tr>`;
+    sec.items.forEach(item=>{
+      const st = chkSteps(state, item.id);
+      const p  = chkItemPct(state, item.id);
+      rows += `<tr>
+        <td style="${bd};padding:8px 12px;font-size:13px;font-weight:600;color:var(--g700);line-height:1.4">${item.label}</td>
+        ${st.map((v,k)=>`<td style="${bd};text-align:center;padding:4px">
+          <input type="checkbox" ${v?'checked':''} onchange="checkToggle('${item.id}',${k},this.checked)"
+            style="width:20px;height:20px;accent-color:${CHK_BLUE};cursor:pointer;vertical-align:middle"></td>`).join('')}
+        <td style="${bd};text-align:center;font-weight:800;color:#C00000;font-size:14px">${Math.round(p*100)}%</td>
+        ${chkBarCell(p)}
+      </tr>`;
+    });
+  });
 
-    return `<div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);overflow:hidden;box-shadow:var(--sh)">
-      <div style="padding:12px 18px;background:var(--g50);border-bottom:1px solid var(--g200);
-        display:flex;align-items:center;justify-content:space-between">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:18px">${sec.icon}</span>
-          <span style="font-size:13px;font-weight:800;color:var(--g900)">${sec.title}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="background:var(--g200);border-radius:100px;height:6px;width:80px;overflow:hidden">
-            <div style="height:100%;border-radius:100px;background:${color};width:${pct}%;transition:width .5s"></div>
-          </div>
-          <span style="font-size:11px;font-weight:800;color:${color}">${done}/${total}</span>
-        </div>
-      </div>
-      <div style="padding:10px 14px;display:flex;flex-direction:column;gap:6px">${items}</div>
-    </div>`;
-  }).join('');
+  const tp = checkCalcPct(state).pct;
+  rows += `<tr style="background:#DDEBF7">
+    <td colspan="6" style="${bd};padding:10px 12px;font-size:13px;font-weight:800">PROGRESSO GERAL DO DIA</td>
+    <td style="${bd};text-align:center;font-weight:800;color:#C00000;font-size:14px">${tp}%</td>
+    ${chkBarCell(tp/100)}
+  </tr>`;
+
+  container.innerHTML = `<div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);overflow:auto;box-shadow:var(--sh)">
+    <table style="border-collapse:collapse;width:100%;min-width:760px;font-family:Nunito,sans-serif">${head}<tbody>${rows}</tbody></table>
+  </div>
+  <div style="font-size:11px;color:var(--g500);padding:2px 6px;line-height:1.6">Marque as etapas I a V de cada tarefa. O % é calculado por <strong>etapas marcadas ÷ 5</strong>; a barra acompanha o %. A linha de cada bloco mostra a média do bloco e a última linha, a média geral do dia.</div>`;
 }
 
-function checkToggle(id, checked){
+function checkToggle(id, stepIdx, checked){
   const state = checkLoad();
-  state[id] = checked;
+  const arr = chkSteps(state, id).slice();
+  arr[stepIdx] = checked;
+  state[id] = arr;
   checkSave(state);
   checkUpdateBar(state);
-  // Re-render só o item afetado (mais rápido)
   checkRender(state);
-  // Salvar histórico semanal
   checkSaveWeekly();
 }
 
 function checkUpdateBar(state){
-  const {total, done, pct} = checkCalcPct(state);
+  const {pct} = checkCalcPct(state);
   const bar   = document.getElementById('chk-bar');
   const big   = document.getElementById('chk-pct-big');
   const lbl   = document.getElementById('chk-pct-label');
   const stats = document.getElementById('chk-stats');
-  const color = pct===100?'#4ADE80':pct>=80?'var(--pp)':pct>=50?'#FCD34D':'#EF4444';
 
   if(bar)   bar.style.width = pct+'%';
   if(big)   big.textContent = pct+'%';
   if(lbl)   lbl.textContent = pct+'% concluído';
 
   if(stats) stats.innerHTML = CHK_SECTIONS.map(sec=>{
-    const d=sec.items.filter(i=>state[i.id]).length, t=sec.items.length;
-    const p=Math.round(d/t*100);
-    const col=p===100?'#4ADE80':p>=60?'#FCD34D':'var(--g400)';
+    const p = Math.round(chkSecPct(state, sec)*100);
+    const col = p===100?'#4ADE80':p>=60?'#FCD34D':'var(--g400)';
     return `<div style="display:flex;align-items:center;gap:5px">
       <span style="font-size:12px">${sec.icon}</span>
-      <span style="font-size:11px;font-weight:700;color:${col}">${d}/${t}</span>
+      <span style="font-size:11px;font-weight:700;color:${col}">${p}%</span>
     </div>`;
   }).join('');
 }
@@ -17257,7 +17307,7 @@ setInterval(()=>{
   <!-- Header -->
   <div style="background:linear-gradient(135deg,var(--ppd),#1B4332);border-radius:var(--rxl);padding:16px 22px">
     <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Rotina Diária</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff;margin-bottom:8px">✅ CHECKLIST DO LÍDER — ACOMPANHAMENTO DIÁRIO</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff;margin-bottom:8px">✅ CHECKLIST DIÁRIO | SUPERVISÃO COREN/COFEN</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:var(--rm);padding:6px 14px;font-size:12px;font-weight:700;color:#fff" id="chk-date-label">—</div>
       <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:var(--rm);padding:6px 14px;font-size:12px;font-weight:700;color:#4ADE80" id="chk-pct-label">0% concluído</div>
