@@ -628,10 +628,6 @@ select.ev-inp{cursor:pointer}
 .ag-badge-vencido{background:#FEE2E2;color:#991B1B}
 .ag-badge-campanha{background:#DBEAFE;color:#1E40AF}
 .ag-badge-telefone{background:#F3F4F6;color:#374151}
-
-.chk-lbl{padding:3px 6px;margin:-3px -6px;border-radius:4px;outline:none;cursor:text;border:1px dashed transparent}
-.chk-lbl:hover{border-color:#9DC3E6;background:#F4F9FF}
-.chk-lbl:focus{border-color:#2E75B6;background:#fff;box-shadow:0 0 0 2px rgba(46,117,182,.2)}
 </style>
 
 <!-- Firebase SDK -->
@@ -688,12 +684,13 @@ select.ev-inp{cursor:pointer}
   <div class="tab"     onclick="go('diario',this)">📅 Diário</div>
   <div class="tab"     onclick="go('recdia',this)">⚡ Recebimento do Dia</div>
   <div class="tab"     onclick="go('proj-op',this)">📊 Projeção dos Operadores</div>
+  <div class="tab"     onclick="go('rank-metas',this)">🏅 Ranking Metas 18K e 30K</div>
   <div class="tab"     onclick="go('proj-ano',this)">🗓️ Projeção Operador Ano</div>
   <div class="tab"     onclick="go('gestao',this)">⚙️ Gestão de Equipes</div>
   <div class="tab"     onclick="go('import',this)">📥 Importar Relatório</div>
   <div class="tab"     onclick="go('acordos',this)">🤝 Acordos</div>
   <div class="tab"     onclick="go('calend',this)">📆 Calendário</div>
-  <div class="tab"     onclick="go('check',this)">✅ Checklist Líder</div>
+  <div class="tab"     onclick="go('check',this)">✅ Checklist Supervisores</div>
   <div class="tab"     onclick="go('campanhas',this);campFiltrar('todos');if(!document.getElementById('camp-data').value)document.getElementById('camp-data').value=new Date().toISOString().split('T')[0]">📢 Campanhas</div>
   <div class="tab"     onclick="go('trilha',this);trilhaPopularSelect()">🎲 Trilha</div>
   <div class="tab"     onclick="go('fechamento',this)">📁 Fechar Mês</div>
@@ -1402,7 +1399,7 @@ var HO_PCT_TXT = (HO_PCT*100).toFixed(2).replace('.',',')+'%';
     <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,223,0,.05);pointer-events:none"></div>
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:3px">
       <img src="https://pagueplay.com.br/build/images/logo-pagueplay.svg" style="height:24px;filter:brightness(0) invert(1)" alt="PaguePlay">
-      <div style="font-size:10px;font-weight:700;color:rgba(255,223,0,.6);letter-spacing:2px;text-transform:uppercase">COFEN Marília Stephanie · COFEN Katia 2° Turno &nbsp;🩺💉·🎧📞</div>
+      <div style="font-size:10px;font-weight:700;color:rgba(255,223,0,.6);letter-spacing:2px;text-transform:uppercase">COFEN Stephanie Bernardes · COFEN Katia 2° Turno &nbsp;🩺💉·🎧📞</div>
     </div>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#fff;line-height:1;margin-bottom:14px">🏙️⭐ RANKING — STEPHANIE + KATIA</div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px" id="rk-bb-kpis"></div>
@@ -1618,6 +1615,16 @@ var HO_PCT_TXT = (HO_PCT*100).toFixed(2).replace('.',',')+'%';
     </div>
   </div>
 
+</div>
+
+<!-- ══════════ PAGE: RANKING METAS 18K E 30K ══════════ -->
+<div class="page" id="pg-rank-metas">
+  <div style="background:linear-gradient(135deg,var(--ppd) 0%,#1B4332 45%,#0D3D2B 100%);border-radius:var(--rxl);padding:22px 28px;box-shadow:0 8px 40px rgba(0,0,0,.25)">
+    <div style="font-size:10px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,.55);text-transform:uppercase">HO do mês · todos os operadores</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:2px;color:#fff;line-height:1.1">🏅 RANKING · META R$ 18 MIL E R$ 30 MIL</div>
+    <div id="rkm-sub" style="font-size:12px;color:rgba(255,255,255,.7);margin-top:4px"></div>
+  </div>
+  <div id="rkm-box" style="margin-top:14px"></div>
 </div>
 
 <!-- ══════════ PAGE: PROJEÇÃO DOS OPERADORES ══════════ -->
@@ -2847,9 +2854,9 @@ var HO_PCT_TXT = (HO_PCT*100).toFixed(2).replace('.',',')+'%';
       <div class="sec">🏢 HO/PaguePay Acumulado por Dia Útil — Por Equipe</div>
       <!-- Seletor de equipe -->
       <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px" id="eq-filter-btns">
-        <button class="fbtn on" onclick="cmpEqSelect('COFEN MARILIA BRENDA',this)">Marília Stephanie</button>
-        <button class="fbtn" onclick="cmpEqSelect('COFEN STEPHANIE 2° TURNO',this)">Katia 2°T</button>
-        <button class="fbtn" onclick="cmpEqSelect('COFEN BIRIGUI BRUNA',this)">Birigui Bruna</button>
+        <button class="fbtn on" onclick="cmpEqSelect('COFEN MARILIA BRENDA',this)">Stephanie Bernardes</button>
+        <button class="fbtn" onclick="cmpEqSelect('COFEN STEPHANIE 2° TURNO',this)">Katia Regina</button>
+        <button class="fbtn" onclick="cmpEqSelect('COFEN BIRIGUI BRUNA',this)">Bruna Justimiano</button>
         <button class="fbtn" onclick="cmpEqSelect('COFEN DIGITAL',this)">Digital</button>
       </div>
       <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap" id="eq-chart-legend">
@@ -3448,14 +3455,14 @@ let metaArrecadado     = parseFloat(localStorage.getItem('cofen_meta_arrecadado'
 let ppEmpresaAbril     = parseFloat(localStorage.getItem('cofen_pp_junho')       || '0');
 
 const EQ={
-  "COFEN MARILIA BRENDA":   {c:"#00A86B",bg:"#E6F7F1",ico:"🏙",sh:"Marília Stephanie"},
-  "COFEN BIRIGUI BRUNA":    {c:"#4776E6",bg:"#EEF2FF",ico:"💙",sh:"Birigui Bruna"},
-  "COFEN STEPHANIE 2° TURNO":{c:"#F7971E",bg:"#FFF7ED",ico:"⭐",sh:"Katia 2°T"},
+  "COFEN MARILIA BRENDA":   {c:"#00A86B",bg:"#E6F7F1",ico:"🏙",sh:"Stephanie Bernardes"},
+  "COFEN BIRIGUI BRUNA":    {c:"#4776E6",bg:"#EEF2FF",ico:"💙",sh:"Bruna Justimiano"},
+  "COFEN STEPHANIE 2° TURNO":{c:"#F7971E",bg:"#FFF7ED",ico:"⭐",sh:"Katia Regina"},
   "COFEN DIGITAL":           {c:"#f953c6",bg:"#FDF2FF",ico:"🖥️",sh:"Digital"},
   "COFEN KATIA":             {c:"#8B5CF6",bg:"#F3F0FF",ico:"💜",sh:"Equipe Stephanie"},
   "COFEN LETICIA":           {c:"#10B981",bg:"#ECFDF5",ico:"🌿",sh:"Letícia"},
   "COFEN PAGUEPLAY":         {c:"#EC4899",bg:"#FDF2F8",ico:"🩷",sh:"Pagueplay"},
-  "COFEN TREINAMENTO":       {c:"#06B6D4",bg:"#ECFEFF",ico:"🎓",sh:"Treinamento Isabella"},
+  "COFEN TREINAMENTO":       {c:"#06B6D4",bg:"#ECFEFF",ico:"🎓",sh:"Isabela/Layane"},
   "COFEN SUPORTE":           {c:"#64748B",bg:"#F1F5F9",ico:"🛟",sh:"Suporte"}
 };
 // Líderes: não entram nos rankings de operadores, mas o recebimento deles SOMA na equipe
@@ -4609,6 +4616,259 @@ window.addEventListener('load', function(){ setTimeout(arqMesesRender, 900); });
   window.addEventListener('load', go); document.addEventListener('DOMContentLoaded', go);
 })();
 document.addEventListener('visibilitychange', function(){ if(!document.hidden) arqMesesRender(); });
+// ── Ranking Metas 18K e 30K (todos os operadores com meta HO de R$ 18.000 ou R$ 30.000) ──
+var RKM = (function(){
+  var d={f:'todos',o:'pct',eq:[],ops:[],painel:false};
+  try{ var s=JSON.parse(localStorage.getItem('cofen_rkm_sel')||'null'); if(s){ d.f=s.f||d.f; d.o=s.o||d.o; d.eq=s.eq||[]; d.ops=s.ops||[]; } }catch(e){}
+  return d;
+})();
+function rkmSalvar(){ try{ localStorage.setItem('cofen_rkm_sel',JSON.stringify({f:RKM.f,o:RKM.o,eq:RKM.eq,ops:RKM.ops})); }catch(e){} }
+function rkmFmt(v){ return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+function rkmPct(v){ return (v||0).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'; }
+function rkmSemAcento(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
+function rkmLinhas(){
+  var base=(typeof projOpDashRows==='function')?projOpDashRows():[], all=[];
+  base.forEach(function(r){ if(r.meta>0){ r.pm=r.ho/r.meta*100; r.falta=Math.max(r.meta-r.ho,0); all.push(r); } });
+  var uma={'30':30000,'22':22000,'18':18000,'12':12000,'5':5000}, out=all.slice();
+  if(RKM.eq.length) out=out.filter(function(r){ return RKM.eq.indexOf(r.eq)>=0; });
+  if(RKM.ops.length) out=out.filter(function(r){ return RKM.ops.indexOf(r.name)>=0; });      // pessoas escolhidas valem sobre a faixa de meta
+  else if(RKM.f==='todos') out=out.filter(function(r){ return r.meta===18000||r.meta===30000; });
+  else if(uma[RKM.f]) out=out.filter(function(r){ return r.meta===uma[RKM.f]; });
+  // maior para o menor (milhar, centena, dezena e unidade: ordenacao numerica)
+  out.sort(function(a,b){ return RKM.o==='ho' ? ((b.ho-a.ho)||(b.pm-a.pm)) : ((b.pm-a.pm)||(b.ho-a.ho)); });
+  return {rows:out, all:all, fora:all.length-out.length};
+}
+function rkmTitulo(all){
+  if(RKM.ops.length) return RKM.ops.length+' PESSOAS SELECIONADAS';
+  var eqs=RKM.eq.length?(' · '+all.filter(function(r,i,a){ return a.findIndex(function(x){return x.eq===r.eq;})===i && RKM.eq.indexOf(r.eq)>=0; }).map(function(r){ return r.sh.toUpperCase(); }).join(' E ')):'';
+  var uma={'30':'30','22':'22','18':'18','12':'12','5':'5'};
+  var m=RKM.f==='todos'?'METAS R$ 18 MIL E R$ 30 MIL':RKM.f==='all'?'TODAS AS METAS':'META R$ '+uma[RKM.f]+' MIL';
+  return m+eqs;
+}
+function rkmTexto(R){
+  var d=new Date(), duT=(typeof DU!=='undefined'&&DU.total)||0, duP=(typeof DU!=='undefined'&&DU.passou)||0, med=['🥇','🥈','🥉'];
+  var L=['🏆 *RANKING HO · '+rkmTitulo(R.all)+'*','📅 '+d.toLocaleDateString('pt-BR')+(duT?' · D.U. '+duP+'/'+duT:''),''];
+  R.rows.forEach(function(r,i){
+    L.push((med[i]||'')+' '+(i+1)+'º '+r.name.replace(/_/g,' ')+' ('+r.sh+') · '+rkmPct(r.pm)+' · HO '+rkmFmt(r.ho)+' de '+rkmFmt(r.meta));
+  });
+  L.push('','🔥 Quem ainda não bateu a meta: tem hora para virar o jogo. Bora fechar!');
+  return L.join('\n').replace(/\n 1º/,'\n1º');
+}
+function rkmCopiar(){
+  var txt=rkmTexto(rkmLinhas());
+  function ok(){ if(typeof toast==='function') toast('📋 Ranking copiado para o WhatsApp'); }
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(ok,function(){ rkmCopiarAlt(txt); ok(); }); }
+  else { rkmCopiarAlt(txt); ok(); }
+}
+function rkmCopiarAlt(txt){ var a=document.createElement('textarea'); a.value=txt; document.body.appendChild(a); a.select(); try{ document.execCommand('copy'); }catch(e){} a.remove(); }
+function rkmFiltro(f){ RKM.f=f; rkmSalvar(); rankMetasRender(); }
+function rkmOrdem(o){ RKM.o=o; rkmSalvar(); rkmRes(); }
+function rkmEq(k){ var i=RKM.eq.indexOf(k); if(i>=0) RKM.eq.splice(i,1); else RKM.eq.push(k); rkmSalvar(); rankMetasRender(); }
+function rkmPainel(){ RKM.painel=!RKM.painel; rankMetasRender(); }
+function rkmPessoa(enc,on){
+  var n=decodeURIComponent(enc), i=RKM.ops.indexOf(n);
+  if(on&&i<0) RKM.ops.push(n); if(!on&&i>=0) RKM.ops.splice(i,1);
+  rkmSalvar(); rkmRes(); rkmContaPessoas();
+}
+function rkmPessoasLista(){ var R=rkmLinhas(); return R.all.filter(function(r){ return !RKM.eq.length || RKM.eq.indexOf(r.eq)>=0; }).sort(function(a,b){ return rkmSemAcento(a.name).localeCompare(rkmSemAcento(b.name)); }); }
+function rkmMarcarTodos(on){ RKM.ops = on ? rkmPessoasLista().map(function(r){ return r.name; }) : []; rkmSalvar(); rankMetasRender(); }
+function rkmLimpar(){ RKM.eq=[]; RKM.ops=[]; rkmSalvar(); rankMetasRender(); }
+function rkmBuscar(v){
+  v=rkmSemAcento(v).replace(/[^a-z0-9]+/g,'');
+  document.querySelectorAll('#rkm-lista [data-n]').forEach(function(el){ el.style.display = (!v || el.getAttribute('data-n').indexOf(v)>=0) ? '' : 'none'; });
+}
+function rkmContaPessoas(){ var b=document.getElementById('rkm-btn-pessoas'); if(b) b.textContent='👤 Pessoas'+(RKM.ops.length?' ('+RKM.ops.length+' selecionadas)':' (todas)')+(RKM.painel?' ▴':' ▾'); }
+function rankMetasRender(){
+  var box=document.getElementById('rkm-box'); if(!box) return;
+  var R=rkmLinhas(), bar='cursor:pointer;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:800;border:1px solid ';
+  var semFaixa=RKM.ops.length>0;
+  var bt=function(f,l){ var on=!semFaixa&&RKM.f===f; return '<span onclick="rkmFiltro(\''+f+'\')" style="'+bar+(on?'#10B981':'var(--g200)')+';background:'+(on?'#D1FAE5':'#fff')+';color:'+(on?'#065F46':'var(--g700)')+';'+(semFaixa?'opacity:.45':'')+'">'+l+'</span>'; };
+  var h='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">'
+    +bt('todos','18K e 30K')+bt('30','Meta R$ 30 mil')+bt('22','Meta R$ 22 mil')+bt('18','Meta R$ 18 mil')+bt('12','Meta R$ 12 mil')+bt('5','Meta R$ 5 mil')+bt('all','Todas as metas')
+    +'<select onchange="rkmOrdem(this.value)" style="padding:7px 10px;border:1px solid var(--g200);border-radius:8px;font-size:12px;font-weight:700"><option value="pct"'+(RKM.o==='pct'?' selected':'')+'>Ordenar por % da meta</option><option value="ho"'+(RKM.o==='ho'?' selected':'')+'>Ordenar por HO (R$)</option></select>'
+    +'<span onclick="rkmCopiar()" style="cursor:pointer;margin-left:auto;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:800;background:#00A86B;color:#fff">📋 Copiar para WhatsApp</span></div>';
+  // equipes (varias) e pessoas (varias)
+  var eqs={}; R.all.forEach(function(r){ eqs[r.eq]={sh:r.sh,c:r.c}; });
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"><span style="font-size:11px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.5px">Equipes</span>';
+  Object.keys(eqs).sort(function(a,b){ return eqs[a].sh.localeCompare(eqs[b].sh); }).forEach(function(k){
+    var on=RKM.eq.indexOf(k)>=0;
+    h+='<span onclick="rkmEq(\''+k.replace(/'/g,"\\'")+'\')" style="'+bar+(on?eqs[k].c:'var(--g200)')+';background:'+(on?eqs[k].c:'#fff')+';color:'+(on?'#fff':'var(--g700)')+'">'+(on?'✓ ':'')+eqs[k].sh+'</span>';
+  });
+  h+='<span id="rkm-btn-pessoas" onclick="rkmPainel()" style="'+bar+'var(--g200);background:#fff;color:var(--g700)"></span>'
+    +((RKM.eq.length||RKM.ops.length)?'<span onclick="rkmLimpar()" style="cursor:pointer;font-size:12px;font-weight:800;color:#EF4444;padding:7px 6px">✕ Limpar seleção</span>':'')+'</div>';
+  if(RKM.painel){
+    var lista=rkmPessoasLista();
+    h+='<div style="background:#fff;border:1px solid var(--g200);border-radius:12px;padding:10px 12px;margin-bottom:12px">'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px"><input type="search" placeholder="Buscar pessoa..." oninput="rkmBuscar(this.value)" style="flex:1;min-width:180px;padding:7px 10px;border:1px solid var(--g200);border-radius:8px;font-size:13px">'
+      +'<span onclick="rkmMarcarTodos(true)" style="cursor:pointer;font-size:12px;font-weight:800;color:var(--pp)">Marcar todos</span><span onclick="rkmMarcarTodos(false)" style="cursor:pointer;font-size:12px;font-weight:800;color:var(--g500)">Desmarcar</span></div>'
+      +'<div id="rkm-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:2px 14px;max-height:280px;overflow:auto">';
+    lista.forEach(function(r){
+      h+='<label data-n="'+rkmSemAcento(r.name).replace(/[^a-z0-9]+/g,'')+'" style="display:flex;align-items:center;gap:8px;padding:5px 4px;font-size:12px;cursor:pointer;border-radius:6px"><input type="checkbox" '+(RKM.ops.indexOf(r.name)>=0?'checked ':'')+'onchange="rkmPessoa(\''+encodeURIComponent(r.name)+'\',this.checked)"><span style="font-weight:800;color:var(--g900)">'+r.name.replace(/_/g,' ')+'</span><span style="margin-left:auto;font-size:10px;color:var(--g500);white-space:nowrap">'+r.sh+' · '+rkmFmt(r.meta).replace(',00','')+'</span></label>';
+    });
+    h+='</div></div>';
+  }
+  h+='<div id="rkm-res"></div>';
+  box.innerHTML=h; rkmContaPessoas(); rkmRes();
+}
+function rkmRes(){
+  var res=document.getElementById('rkm-res'); if(!res) return;
+  var R=rkmLinhas(), rows=R.rows, duT=(typeof DU!=='undefined'&&DU.total)||0, duP=(typeof DU!=='undefined'&&DU.passou)||0;
+  var sub=document.getElementById('rkm-sub');
+  if(sub) sub.textContent=rows.length+(rows.length===1?' operador':' operadores')+' · ranking do maior para o menor · D.U. '+duP+'/'+duT+(R.fora?' · '+R.fora+' fora da seleção':'');
+  var tiers={}; rows.forEach(function(r){ var k=r.meta; tiers[k]=tiers[k]||{n:0,h:0}; tiers[k].n++; tiers[k].h+=r.ho; });
+  var h='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">';
+  Object.keys(tiers).map(Number).sort(function(a,b){ return b-a; }).forEach(function(m){ var x=tiers[m];
+    h+='<div style="flex:1;min-width:170px;background:#fff;border:1px solid var(--g200);border-radius:12px;padding:10px 14px"><div style="font-size:10px;font-weight:800;color:var(--g500);text-transform:uppercase">Meta '+rkmFmt(m).replace(',00','')+'</div><div style="font-size:18px;font-weight:900;color:var(--g900)">'+x.n+(x.n===1?' operador':' operadores')+'</div><div style="font-size:11px;color:var(--g700)">HO '+rkmFmt(x.h)+' de '+rkmFmt(x.n*m)+'</div></div>'; });
+  h+='</div>';
+  var med=['🥇','🥈','🥉'];
+  var tr=rows.map(function(r,i){
+    var pc=Math.min(r.pm,100), bate=r.pm>=100, cor=bate?'#10B981':r.pm>=80?'#3B82F6':r.pm>=50?'#F59E0B':'#EF4444';
+    return '<tr style="border-top:1px solid var(--g200);'+(bate?'background:linear-gradient(90deg,#D1FAE5,#ECFDF5);':'')+'">'
+      +'<td style="padding:7px 8px;font-weight:900;text-align:center;font-size:'+(i<3?'18':'12')+'px">'+(med[i]||(i+1)+'º')+'</td>'
+      +'<td style="padding:7px 8px;font-weight:800;white-space:nowrap">'+r.name.replace(/_/g,' ')+'</td>'
+      +'<td style="padding:7px 8px;white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+r.c+';margin-right:5px"></span>'+r.sh+'</td>'
+      +'<td style="padding:7px 8px;text-align:right">'+rkmFmt(r.meta)+'</td>'
+      +'<td style="padding:7px 8px;text-align:right;font-weight:800;color:var(--pp)">'+rkmFmt(r.ho)+'</td>'
+      +'<td style="padding:7px 8px;text-align:right">'+rkmFmt(r.falta)+'</td>'
+      +'<td style="padding:7px 8px;min-width:150px"><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:10px;background:var(--g100);border-radius:100px;overflow:hidden"><div style="width:'+pc+'%;height:100%;background:'+cor+'"></div></div><b style="min-width:54px;text-align:right;color:'+cor+'">'+rkmPct(r.pm)+'</b></div></td></tr>';
+  }).join('');
+  h+='<div style="overflow-x:auto;border:1px solid var(--g200);border-radius:var(--rm);background:#fff"><table style="width:100%;border-collapse:collapse;font-size:12px;color:var(--g900)"><thead><tr style="background:var(--g50);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--g700)"><th style="padding:8px">#</th><th style="padding:8px;text-align:left">Operador</th><th style="padding:8px;text-align:left">Equipe</th><th style="padding:8px;text-align:right">Meta HO</th><th style="padding:8px;text-align:right">HO realizado</th><th style="padding:8px;text-align:right">Falta</th><th style="padding:8px;text-align:left">% da meta</th></tr></thead><tbody>'
+    +(tr||'<tr><td colspan="7" style="padding:16px;text-align:center;color:var(--g500)">Nenhum operador neste filtro</td></tr>')+'</tbody></table></div>';
+  res.innerHTML=h;
+}
+setInterval(function(){ var pg=document.getElementById('pg-rank-metas'); if(pg&&pg.classList.contains('on')) rkmRes(); }, 20000);
+// ══ CHECKLIST DIÁRIO DOS SUPERVISORES (formato planilha: Tasks | Steps I a V | %age | Graph) ══
+var CHKS_SUPS=[{k:'brenda',n:'Brenda'},{k:'bruna',n:'Bruna'},{k:'katia',n:'Katia'},{k:'laysa',n:'Laysa'},{k:'stephanie',n:'Stephanie'}];
+var CHKS_SEC=[
+ {e:'🌅',t:'1. Abertura da operação',it:[
+  'Fazer login nos sistemas, CRM e canais de atendimento, verificando se estão funcionando.',
+  'Confirmar presença dos operadores e supervisores e organizar eventuais substituições.',
+  'Verificar se todos estão logados nas filas e equipes corretas.',
+  'Conferir se as carteiras e listas de devedores estão carregadas e atualizadas.',
+  'Apresentar a meta diária, o HO esperado e os objetivos individuais.',
+  'Alinhar orientações, campanhas, alterações de regras e pontos de atenção do dia.']},
+ {e:'📞',t:'2. Acompanhamento da operação',it:[
+  'Acompanhar a produção da primeira hora e identificar operadores abaixo do esperado.',
+  'Monitorar volume de ligações, contatos efetivos e atendimentos realizados.',
+  'Acompanhar o desempenho individual e por equipe.',
+  'Verificar acordos realizados, links gerados e pagamentos confirmados.',
+  'Controlar pausas, atrasos, ausências e cumprimento dos horários.',
+  'Acompanhar filas de atendimento, transferências da IA e pendências do ChatPlay.',
+  'Atuar imediatamente em casos de baixa produtividade ou dificuldades operacionais.']},
+ {e:'🎯',t:'3. Qualidade e conversão',it:[
+  'Monitorar pelo menos duas ligações ou atendimentos por operador ao longo do dia, conforme a capacidade da operação.',
+  'Avaliar abordagem, argumentação, condução e postura dos operadores.',
+  'Verificar se os scripts e procedimentos oficiais estão sendo seguidos.',
+  'Identificar as principais objeções dos profissionais e alinhar as melhores respostas.',
+  'Realizar feedbacks individuais e orientar correções de abordagem.',
+  'Acompanhar conversão de contatos em acordos e de links gerados em pagamentos.',
+  'Identificar falhas recorrentes da IA, CRM ou SIGEN e encaminhar para correção.']},
+ {e:'📢',t:'4. Comunicação e desenvolvimento da equipe',it:[
+  'Manter a equipe informada sobre resultados, metas e mudanças operacionais.',
+  'Divulgar o ranking atualizado pelo menos uma vez durante o dia.',
+  'Reconhecer publicamente os destaques e boas práticas.',
+  'Conversar individualmente com profissionais que apresentem dificuldades.',
+  'Alinhar com os demais supervisores e a gestão os problemas e necessidades da operação.']},
+ {e:'📊',t:'5. Indicadores e gestão de resultados',it:[
+  'Atualizar o dashboard com os relatórios de recebimentos.',
+  'Conferir acordos gerados, pagos, pendentes e quebrados.',
+  'Acompanhar o HO realizado em relação às metas individuais e coletivas.',
+  'Atualizar a projeção diária e mensal.',
+  'Identificar o valor que falta para atingir as metas e distribuir os objetivos restantes.',
+  'Comunicar à gerência os desvios relevantes, riscos e oportunidades de melhoria.']},
+ {e:'⚖️',t:'6. Controle e conformidade COREN/COFEN',crit:1,it:[
+  'Garantir que os operadores não forneçam informações financeiras sem confirmação no sistema.',
+  'Verificar se falhas na localização de débitos estão sendo transferidas diretamente para atendimento humano.',
+  'Garantir que não sejam prometidos descontos, parcelamentos ou condições não autorizadas.',
+  'Acompanhar reclamações, contestações, problemas de pagamento e solicitações de retorno.',
+  'Verificar se os atendimentos respeitam as orientações de cobrança humanizada e proteção de dados dos profissionais.']},
+ {e:'🌙',t:'7. Encerramento da operação',it:[
+  'Gerar e salvar o relatório final de produção e recebimento.',
+  'Divulgar o resultado e o ranking final do dia.',
+  'Conferir os pagamentos realizados e os acordos que ainda aguardam confirmação.',
+  'Revisar os agendamentos e retornos previstos para os próximos dias.',
+  'Registrar problemas, pendências e ações que precisam ser acompanhadas no dia seguinte.',
+  'Garantir o encerramento correto dos atendimentos e o logoff dos operadores.']}
+];
+var CHKS={sup:'brenda', seg:null};
+function chksIso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function chksSegunda(d){ var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-((x.getDay()+6)%7)); return x; }
+function chksTotal(){ var n=0; CHKS_SEC.forEach(function(s){ n+=s.it.length; }); return n; }
+function chksLer(k){ try{ return JSON.parse(localStorage.getItem('cofen_chk_sup_'+k)||'{}')||{}; }catch(e){ return {}; } }
+function chksFeitos(st,dia){ var o=st[dia]||{}, n=0; Object.keys(o).forEach(function(i){ if(o[i]) n++; }); return n; }
+function chksToggle(k,dia,id,on){
+  var st=chksLer(k); st[dia]=st[dia]||{};
+  if(on) st[dia][id]=1; else delete st[dia][id];
+  if(!Object.keys(st[dia]).length) delete st[dia];
+  try{ localStorage.setItem('cofen_chk_sup_'+k, JSON.stringify(st)); if(typeof syncPush==='function') syncPush('cofen_chk_sup_'+k); }catch(e){}
+  chkSupRender();
+}
+function chksSup(k){ CHKS.sup=k; chkSupRender(); }
+function chksSemana(delta){ var s=new Date(CHKS.seg||chksSegunda(new Date())); s.setDate(s.getDate()+delta*7); CHKS.seg=s; chkSupRender(); }
+function chksHoje(){ CHKS.seg=chksSegunda(new Date()); chkSupRender(); }
+function chksLimparHoje(){
+  var hoje=chksIso(new Date()), sp=CHKS_SUPS.filter(function(s){ return s.k===CHKS.sup; })[0];
+  if(!confirm('Limpar todas as marcações de hoje de '+sp.n+'?')) return;
+  var st=chksLer(CHKS.sup); delete st[hoje];
+  try{ localStorage.setItem('cofen_chk_sup_'+CHKS.sup, JSON.stringify(st)); if(typeof syncPush==='function') syncPush('cofen_chk_sup_'+CHKS.sup); }catch(e){}
+  chkSupRender();
+}
+function chksCopiar(){
+  var hoje=chksIso(new Date()), tot=chksTotal(), d=new Date();
+  var L=['✅ *CHECKLIST DIÁRIO · SUPERVISÃO COREN/COFEN*','📅 '+d.toLocaleDateString('pt-BR'),''];
+  CHKS_SUPS.map(function(s){ var f=chksFeitos(chksLer(s.k),hoje); return {n:s.n,f:f,p:f/tot*100}; })
+    .sort(function(a,b){ return b.f-a.f; })
+    .forEach(function(r,i){ L.push((i+1)+'º '+r.n+' · '+r.f+'/'+tot+' ('+Math.round(r.p)+'%)'); });
+  var txt=L.join('\n'), ok=function(){ if(typeof toast==='function') toast('📋 Resumo copiado'); };
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok,function(){}); else { var a=document.createElement('textarea'); a.value=txt; document.body.appendChild(a); a.select(); try{ document.execCommand('copy'); }catch(e){} a.remove(); ok(); }
+}
+function chkSupRender(){
+  var box=document.getElementById('chks-box'); if(!box) return;
+  if(!CHKS.seg) CHKS.seg=chksSegunda(new Date());
+  var tot=chksTotal(), hojeD=new Date(), hoje=chksIso(hojeD), hojeFim=hoje;
+  var st=chksLer(CHKS.sup), nomes=['Seg','Ter','Qua','Qui','Sex'], romano=['I','II','III','IV','V'];
+  var dias=[]; for(var i=0;i<5;i++){ var d=new Date(CHKS.seg); d.setDate(d.getDate()+i); dias.push({iso:chksIso(d),lab:nomes[i]+' '+String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')}); }
+  var fim=new Date(CHKS.seg); fim.setDate(fim.getDate()+4);
+  var h='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">';
+  CHKS_SUPS.forEach(function(s){
+    var f=chksFeitos(chksLer(s.k),hoje), p=Math.round(f/tot*100), on=CHKS.sup===s.k;
+    h+='<div onclick="chksSup(\''+s.k+'\')" style="cursor:pointer;min-width:132px;padding:8px 12px;border-radius:12px;border:2px solid '+(on?'#2F7DC1':'var(--g200)')+';background:'+(on?'#E8F0FA':'#fff')+'"><div style="font-weight:900;font-size:13px;color:var(--g900)">'+s.n+'</div><div style="font-size:11px;color:var(--g700)">Hoje: <b style="color:'+(p>=100?'#15803D':'#C0392B')+'">'+p+'%</b> ('+f+'/'+tot+')</div><div style="height:5px;background:var(--g100);border-radius:100px;margin-top:4px;overflow:hidden"><div style="height:100%;width:'+p+'%;background:#2F7DC1"></div></div></div>';
+  });
+  h+='</div>';
+  var bt='cursor:pointer;padding:6px 12px;border-radius:8px;border:1px solid var(--g200);background:#fff;font-size:12px;font-weight:800;color:var(--g700)';
+  var sp=CHKS_SUPS.filter(function(s){ return s.k===CHKS.sup; })[0];
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"><span style="font-weight:900;font-size:15px;color:var(--g900);margin-right:6px">Checklist de '+sp.n+'</span>'
+    +'<span onclick="chksSemana(-1)" style="'+bt+'">◀</span><span style="font-size:12px;font-weight:800;color:var(--g700)">Semana '+dias[0].lab.slice(4)+' a '+dias[4].lab.slice(4)+'/'+fim.getFullYear()+'</span><span onclick="chksSemana(1)" style="'+bt+'">▶</span>'
+    +'<span onclick="chksHoje()" style="'+bt+'">Hoje</span>'
+    +'<span onclick="chksLimparHoje()" style="'+bt+'">↩ Limpar hoje</span>'
+    +'<span onclick="chksCopiar()" style="margin-left:auto;cursor:pointer;padding:6px 12px;border-radius:8px;background:#00A86B;color:#fff;font-size:12px;font-weight:800">📋 Copiar resumo de hoje</span></div>';
+  h+='<div style="overflow-x:auto;border:1px solid #BFD3EA;border-radius:8px"><table class="chks-tb"><thead><tr><th class="chks-h1" rowspan="2" style="min-width:300px">Tasks</th><th class="chks-h1" colspan="5">Steps</th><th class="chks-h1" colspan="2">Progress</th></tr><tr>';
+  dias.forEach(function(d,i){ h+='<th class="chks-h2'+(d.iso===hoje?' hoje':'')+'">'+romano[i]+'<small>'+d.lab+'</small></th>'; });
+  h+='<th class="chks-h2" style="font-size:14px">%age</th><th class="chks-h2" style="font-size:14px">Graph</th></tr></thead><tbody>';
+  var totDia=[0,0,0,0,0], totSem=0;
+  CHKS_SEC.forEach(function(sec,si){
+    var feitosSec=dias.map(function(d){ var n=0; sec.it.forEach(function(x,ii){ if((st[d.iso]||{})['s'+si+'i'+ii]) n++; }); return n; });
+    var somaSec=feitosSec.reduce(function(a,b){ return a+b; },0), pSec=Math.round(somaSec/(sec.it.length*5)*100);
+    h+='<tr class="chks-sec"><td>'+sec.e+' '+sec.t+' · '+sec.it.length+(sec.crit?' atividades críticas':' atividades')+'</td>';
+    feitosSec.forEach(function(n){ h+='<td style="text-align:center">'+n+'/'+sec.it.length+'</td>'; });
+    h+='<td style="text-align:center;color:#C0392B">'+pSec+'%</td><td class="chks-g"><i style="width:'+pSec+'%"></i></td></tr>';
+    sec.it.forEach(function(txt,ii){
+      var id='s'+si+'i'+ii, nDias=0;
+      var cel=dias.map(function(d,di){
+        var on=!!(st[d.iso]||{})[id]; if(on){ nDias++; totDia[di]++; totSem++; }
+        var fut=d.iso>hojeFim;
+        return '<td class="chks-c"><input type="checkbox" class="chks-cb"'+(on?' checked':'')+(fut?' disabled title="Dia ainda não chegou"':'')+' onchange="chksToggle(\''+CHKS.sup+'\',\''+d.iso+'\',\''+id+'\',this.checked)"></td>';
+      }).join('');
+      var p=nDias*20;
+      h+='<tr><td class="chks-task">'+txt+'</td>'+cel+'<td class="chks-pct"'+(p>=100?' style="color:#15803D"':'')+'>'+p+'%</td><td class="chks-g"><i style="width:'+p+'%"></i></td></tr>';
+    });
+  });
+  h+='<tr class="chks-tot"><td style="padding:8px 9px">TOTAL DO DIA ('+tot+' atividades)</td>';
+  totDia.forEach(function(n){ h+='<td style="text-align:center">'+Math.round(n/tot*100)+'%</td>'; });
+  var pS=Math.round(totSem/(tot*5)*100);
+  h+='<td style="text-align:center;color:#C0392B">'+pS+'%</td><td class="chks-g"><i style="width:'+pS+'%"></i></td></tr></tbody></table></div>';
+  box.innerHTML=h;
+}
 function hoObjetivoGet(){
   const v = parseFloat(localStorage.getItem('cofen_objetivo_ho'));
   return (v && v > 0) ? v : 150000;
@@ -7801,7 +8061,7 @@ function closeM(e){
 function go(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   if(el)el.classList.add('on');
-  ['geral','editor','equipes','ranking','ranking-digital','ranking-bb','ranking-brenda','ranking-bruna','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas','recdia-op','proj-op','proj-ano','trilha','campanhas','fechamento','relatorio-diretoria','premiacoes','cofre'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
+  ['geral','editor','equipes','ranking','ranking-digital','ranking-bb','ranking-brenda','ranking-bruna','diario','recdia','gestao','import','acordos','calend','check','comparativo','inadimpl','metas','recdia-op','proj-op','rank-metas','proj-ano','trilha','campanhas','fechamento','relatorio-diretoria','premiacoes','cofre'].forEach(p=>{ const pg=document.getElementById('pg-'+p); if(pg) pg.classList.remove('on'); });
   document.getElementById('pg-'+id).classList.add('on');
   if(id==='geral'){mkGD();mkDist();buildDUManualGrid();if(typeof _updateOntemCard==='function')_updateOntemCard();}
   if(id==='editor') buildOpEditor();
@@ -7816,12 +8076,13 @@ function go(id,el){
   if(id==='import') importInit();
   if(id==='acordos') acordosInit();
   if(id==='calend') calInit();
-  if(id==='check') checkInit();
+  if(id==='check') chkSupRender();
   if(id==='comparativo') cmpInit();
   if(id==='inadimpl') inadimplInit();
   if(id==='metas'){ mtsAtualizarAbril(); if(typeof mtsAtualizarMaio==='function') mtsAtualizarMaio(); if(typeof mtsAtualizarJunho==='function') mtsAtualizarJunho(); if(typeof mtsAtualizarJulho==='function') mtsAtualizarJulho(); if(typeof mtsAtualizarAgosto==='function') mtsAtualizarAgosto(); }
   if(id==='recdia-op') rdopRender();
   if(id==='proj-op') projOpRender();
+  if(id==='rank-metas') rankMetasRender();
   if(id==='proj-ano') projAnoRender();
 }
 
@@ -8826,17 +9087,15 @@ function metaOpFillFromTeam(){
 // Quem não está no quadro de produção sai dos rankings (removidos, reversível em Gestão).
 var _reorgPend=false;
 function _reorgGarantir(ov){
-  var V='2026-10-06-d';
+  var V='2026-11-05-a';
   if(ov.reorgV===V) return false;
   var R={
-    'COFEN BIRIGUI BRUNA':['Diego Rodrigues','Kaue Nadai','Leticia Romeu','Silva Beatriz','Tassiane Viana','Thais Mayara','Thauany Moura','Amabelly Santos','Caio Shimite','Caroline Valverde','Mirella Arias','Raissa Paloma','Stephanie Fagundes','Thayla Santana'],
-    'COFEN STEPHANIE 2° TURNO':['Giovana Souza','Isabela Monteiro','Debora Sobrinho','Gisleide Guedes','Jade Faustino','Kauane Azevedo','Rayssa R. Oliveira'],
-    'COFEN MARILIA BRENDA':['Bruna Teles','Bruna Garbi','Claudineia Messias','Isabella Santos','Itallo Cardamoni','Joao Anguita','Karina Colonez','Leonardo Costa','Rebeca Camargo','Stephanie Bernardes','Valquiria Xavier'],
-    'COFEN TREINAMENTO':['Manuela Marini','Allana Barbosa','Kethely Santos','Leticia Quinallia','Sophia Costa','Luan Pinto'],
+    'COFEN BIRIGUI BRUNA':['Silva Beatriz','Caio Shimite','Thayla Santana','Raissa Paloma','Stephanie Fagundes','Amabelly Santos','Caroline Valverde','Diego Rodrigues','Leticia Romeu','Tassiane Viana','Thais Mayara','Thauany Moura','Kaue Nadai','Mirella Arias','Bruna Justimiano'],
+    'COFEN STEPHANIE 2° TURNO':['Kauane Azevedo','Rayssa R. Oliveira','Giovana Souza','Gisleide Guedes','Luan Pinto','Debora Sobrinho','Cibele Zaneli','Katia Regina'],
+    'COFEN MARILIA BRENDA':['Karina Colonez','Itallo Cardamoni','Bruna Garbi','Claudineia Messias','Bruna Teles','Isabella Santos','Leonardo Costa','Rebeca Camargo','Joao V Santos','Mariana Hilario','Livia Jacob','Vanessa Correa','Stephanie Bernardes'],
+    'COFEN TREINAMENTO':['Manuela Marini','Allana Barbosa','Sophia Costa','Leticia Quinallia','Thais P Rodrigues','Rhuan Silva','Poliana Varjao','Isabelle Moreira','Rafaela Lisboa'],
     'COFEN SUPORTE':['Estrategia Cofen']
   };
-  R['COFEN BIRIGUI BRUNA'].push('Bruna Justimiano');
-  R['COFEN STEPHANIE 2° TURNO'].push('Katia Regina');
   function kk(x){return String(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim().split(' ').sort().join(' ');}
   var known=[];
   try{(ORIG.equipes||[]).forEach(function(e){e.ops.forEach(function(o){if(known.indexOf(o.name)<0)known.push(o.name);});});}catch(e){}
@@ -8878,14 +9137,32 @@ function _reorgGarantir(ov){
 }
 // ══ QUADRO DE EQUIPES (fonte única: quem fica em qual equipe) ══
 var QUADRO_PADRAO={
-  'COFEN BIRIGUI BRUNA':['Diego Rodrigues','Kaue Nadai','Leticia Romeu','Silva Beatriz','Tassiane Viana','Thais Mayara','Thauany Moura','Amabelly Santos','Caio Shimite','Caroline Valverde','Mirella Arias','Raissa Paloma','Stephanie Fagundes','Thayla Santana','Bruna Justimiano'],
-  'COFEN STEPHANIE 2° TURNO':['Giovana Souza','Isabela Monteiro','Debora Sobrinho','Gisleide Guedes','Jade Faustino','Kauane Azevedo','Rayssa R. Oliveira','Katia Regina'],
-  'COFEN MARILIA BRENDA':['Bruna Teles','Stephanie Bernardes','Bruna Garbi','Claudineia Messias','Isabella Santos','Itallo Cardamoni','Joao Anguita','Karina Colonez','Leonardo Costa','Rebeca Camargo'],
-  'COFEN TREINAMENTO':['Manuela Marini','Allana Barbosa','Kethely Santos','Leticia Quinallia','Sophia Costa','Luan Pinto'],
+  'COFEN BIRIGUI BRUNA':['Silva Beatriz','Caio Shimite','Thayla Santana','Raissa Paloma','Stephanie Fagundes','Amabelly Santos','Caroline Valverde','Diego Rodrigues','Leticia Romeu','Tassiane Viana','Thais Mayara','Thauany Moura','Kaue Nadai','Mirella Arias','Bruna Justimiano'],
+  'COFEN STEPHANIE 2° TURNO':['Kauane Azevedo','Rayssa R. Oliveira','Giovana Souza','Gisleide Guedes','Luan Pinto','Debora Sobrinho','Cibele Zaneli','Katia Regina'],
+  'COFEN MARILIA BRENDA':['Karina Colonez','Itallo Cardamoni','Bruna Garbi','Claudineia Messias','Bruna Teles','Isabella Santos','Leonardo Costa','Rebeca Camargo','Joao V Santos','Mariana Hilario','Livia Jacob','Vanessa Correa','Stephanie Bernardes'],
+  'COFEN TREINAMENTO':['Manuela Marini','Allana Barbosa','Sophia Costa','Leticia Quinallia','Thais P Rodrigues','Rhuan Silva','Poliana Varjao','Isabelle Moreira','Rafaela Lisboa'],
   'COFEN SUPORTE':['Estrategia Cofen']
 };
 // Quem saiu da empresa: some das equipes e rankings e não é recriado por import. (Para voltar, restaurar em Gestão.)
 var QUADRO_REMOVIDOS=['Valquiria Xavier'];
+// ══ METAS INDIVIDUAIS DO QUADRO DE 05/11/2026 (cofen_metas_op + Projeção dos Operadores) ══
+var METAS_ROSTER_V='2026-11-05-a';
+var METAS_ROSTER={"Karina Colonez": 18000, "Itallo Cardamoni": 18000, "Bruna Garbi": 18000, "Claudineia Messias": 18000, "Bruna Teles": 18000, "Isabella Santos": 18000, "Leonardo Costa": 18000, "Rebeca Camargo": 18000, "Joao V Santos": 12000, "Mariana Hilario": 12000, "Livia Jacob": 12000, "Vanessa Correa": 12000, "Silva Beatriz": 30000, "Caio Shimite": 30000, "Thayla Santana": 30000, "Raissa Paloma": 30000, "Stephanie Fagundes": 30000, "Amabelly Santos": 30000, "Caroline Valverde": 30000, "Diego Rodrigues": 30000, "Leticia Romeu": 30000, "Tassiane Viana": 22000, "Thais Mayara": 22000, "Thauany Moura": 22000, "Kaue Nadai": 22000, "Mirella Arias": 18000, "Kauane Azevedo": 18000, "Rayssa R. Oliveira": 18000, "Giovana Souza": 18000, "Gisleide Guedes": 18000, "Debora Sobrinho": 18000, "Cibele Zaneli": 18000, "Luan Pinto": 12000, "Manuela Marini": 12000, "Allana Barbosa": 12000, "Sophia Costa": 12000, "Leticia Quinallia": 12000, "Thais P Rodrigues": 5000, "Rhuan Silva": 5000, "Poliana Varjao": 5000, "Isabelle Moreira": 5000, "Rafaela Lisboa": 5000};
+function metasRosterAplicar(force){
+  try{
+    if(!force && localStorage.getItem('cofen_metas_roster_v')===METAS_ROSTER_V) return false;
+    var alvo={}; Object.keys(METAS_ROSTER).forEach(function(n){ alvo[_qk(n)]=METAS_ROSTER[n]; });
+    var mo=getMetasOp(), ov={}; try{ ov=JSON.parse(localStorage.getItem('cofen_proj_meta_ho_op')||'{}')||{}; }catch(e){}
+    var n=0;
+    D.equipes.forEach(function(eq){ eq.ops.forEach(function(o){ var m=alvo[_qk(o.name)]; if(m>0){ mo[o.name]=m; delete ov[String(o.name).toUpperCase().trim()]; n++; } }); });
+    setMetasOp(mo); localStorage.setItem('cofen_proj_meta_ho_op',JSON.stringify(ov));
+    localStorage.setItem('cofen_metas_roster_v',METAS_ROSTER_V);
+    try{ if(typeof syncPush==='function') syncPush('cofen_proj_meta_ho_op'); }catch(e){}
+    try{ if(typeof fbPush==='function' && typeof fbDb!=='undefined' && fbDb) fbPush('metas_op',mo); }catch(e){}
+    return n;
+  }catch(e){ return false; }
+}
+
 function _qk(x){return String(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim().split(' ').sort().join(' ');}
 function _quadroNovoOp(nome,eq){
   var name=nome.toUpperCase().replace(/[^A-Z0-9]+/g,'_'),rec=0,ho=null;
@@ -9813,6 +10090,7 @@ function loadGestaoOverrides(){
     rebuildAll();
   }
   try{ quadroAplicar(); }catch(e){ console.warn('quadroAplicar',e); }
+  try{ metasRosterAplicar(false); }catch(e){}
 }
 
 
@@ -11462,10 +11740,10 @@ let tvSeletorAberto = false; // controla se o painel do seletor de equipe está 
 const TV_EQUIPES_REAIS = {
   'COFEN BIRIGUI BRUNA'     : '💙 Bruna',
   'COFEN MARILIA BRENDA'    : '🏙️ Stephanie',
-  'COFEN STEPHANIE 2° TURNO': '⭐ Katia 2°T',
+  'COFEN STEPHANIE 2° TURNO': '⭐ Katia Regina',
   'COFEN KATIA'             : '💜 Equipe Stephanie',
   'COFEN LETICIA'           : '🌿 Equipe Letícia',
-  'COFEN TREINAMENTO'       : '🎓 Treinamento Isabella',
+  'COFEN TREINAMENTO'       : '🎓 Isabela/Layane',
   'COFEN SUPORTE'           : '🛟 Suporte',
 };
 
@@ -11808,14 +12086,14 @@ function tvGetTodayVal(op){
 }
 
 // Monta 1 slide de "Destaque do Dia" por equipe (maior recebimento de hoje)
-// Todas as equipes ativas no Modo TV: Bruna, Katia, Equipe Stephanie, Marília Stephanie e Letícia
+// Todas as equipes ativas no Modo TV: Bruna, Katia, Equipe Stephanie, Stephanie Bernardes e Letícia
 const TV_HIGHLIGHT_TEAMS = {
-  'COFEN BIRIGUI BRUNA':      'Birigui Bruna',
-  'COFEN STEPHANIE 2° TURNO': 'Katia 2°T',
+  'COFEN BIRIGUI BRUNA':      'Bruna Justimiano',
+  'COFEN STEPHANIE 2° TURNO': 'Katia Regina',
   'COFEN KATIA':              'Equipe Stephanie',
-  'COFEN MARILIA BRENDA':     'Marília Stephanie',
+  'COFEN MARILIA BRENDA':     'Stephanie Bernardes',
   'COFEN LETICIA':            'Equipe Letícia',
-  'COFEN TREINAMENTO':        'Treinamento Isabella',
+  'COFEN TREINAMENTO':        'Isabela/Layane',
   'COFEN SUPORTE':            'Suporte'
 };
 function tvBuildDailyHighlights(){
@@ -13104,7 +13382,8 @@ const SYNC_KV_KEYS = [
   'cofen_du_overrides','cofen_feriados','cofen_premiacoes','cofen_op_ho','cofen_quadro_mov','cofen_cmp15du_metas','cofen_cmp15du_totais','cofen_ultimo_import',
   'cofen_hist_empresa','cofen_hist_geral','cofen_geral_daily_julho','cofen_julho_eq',
   'cofen_ops_du_julho','cofen_ops_du_junho','cofen_proj_meta_ho_op','cofen_lid_metas','cofen_import_linhas','cofen_rec_dia_conc','cofen_rec_dia_imp','cofen_plano_meta','cofen_proj_ocultos','cofen_empresa_dia',
-  'cofen_corens_extra','cofen_chk_cfg',
+  'cofen_corens_extra',
+  'cofen_chk_sup_brenda','cofen_chk_sup_bruna','cofen_chk_sup_katia','cofen_chk_sup_laysa','cofen_chk_sup_stephanie',
   'cofen_coren_mt','cofen_coren_pi','cofen_coren_ma','cofen_coren_ce','cofen_coren_sp',
   'cofen_coren_rj','cofen_coren_mg','cofen_coren_rs','cofen_coren_pr','cofen_coren_ba',
   'cofen_coren_go','cofen_coren_pe','cofen_coren_sc','cofen_coren_am','cofen_coren_pb',
@@ -13138,7 +13417,6 @@ function syncApplyKV(key, val){
       if(typeof renderCorenGrid==='function') renderCorenGrid(corenData);
       if(typeof liveCalcCorens==='function') liveCalcCorens();
     }
-    else if(key==='cofen_chk_cfg'){ try{ chkCfg=null; if(document.getElementById('pg-check')?.classList.contains('on') && !chkEditMode) checkRefreshAll(); }catch(e){} }
     else if(key==='cofen_corens_extra'){
       try{
         const extras = JSON.parse(val);
@@ -13147,6 +13425,7 @@ function syncApplyKV(key, val){
         if(typeof liveCalcCorens==='function') liveCalcCorens();
       }catch(e){}
     }
+    else if(key.indexOf('cofen_chk_sup_')===0){ if(typeof chkSupRender==='function' && document.getElementById('pg-check') && document.getElementById('pg-check').classList.contains('on')) chkSupRender(); }
     // cofen_du_overrides e cofen_feriados são lidos direto do localStorage a cada uso
     // (getDUOverrides()/getFeriados()), então só gravar já basta.
     if(typeof refreshAll==='function') refreshAll();
@@ -13704,6 +13983,8 @@ function fbStartListening(){
   fbDb.ref(fbRoom+'/metas_op').on('value', snap=>{
     const remote = snap.val();
     if(!remote) return;
+    // Metas do quadro de 05/11: o primeiro aparelho a conectar grava no Firebase (senao o remoto antigo desfaz)
+    try{ if(!window._metasRosterFb){ window._metasRosterFb=1; fbDb.ref(fbRoom+'/metas_roster_v').once('value').then(function(s){ if(s.val()!==METAS_ROSTER_V){ metasRosterAplicar(true); fbPush('metas_roster_v',METAS_ROSTER_V); } }); } }catch(e){}
     const local = getMetasOp();
     if(JSON.stringify(remote)===JSON.stringify(local)) return;
     setMetasOp({...local,...remote});
@@ -13781,9 +14062,6 @@ function fbStartListening(){
     pulseSyncDot();
   });
   fbListeners.extra_eq = true;
-
-  // ── Checklist por líder ──
-  chkListenFirebase();
 
   // ── Checklist por equipe ──
   D.equipes.forEach(eq=>{
@@ -14104,7 +14382,6 @@ function fbPushAllLocal(){
   // Extra por equipe
   const extraEq=extraGetAll();
   if(Object.keys(extraEq).length>0) fbPush('extra_eq',{...extraEq,_ts:Date.now()});
-  try{ chkCfgLoad().leaders.forEach(l=>{ const s=localStorage.getItem(chkStateKey(l.id)); if(s) fbDb.ref(fbRoom+'/chk_ld/'+chkDateStr()+'/'+l.id).set(s); }); }catch(e){}
   // Chaves genéricas (du_overrides, feriados, histórico Visão Geral, comparativo por operador)
   SYNC_KV_KEYS.forEach(key=>{
     const v = localStorage.getItem(key);
@@ -14680,14 +14957,14 @@ const CHK_BY_EQ = {
 
   // ── MARÍLIA BRENDA ──
   'COFEN MARILIA BRENDA': [
-    { id:'abertura', icon:'🌅', title:'Abertura — Marília Stephanie', items:[
+    { id:'abertura', icon:'🌅', title:'Abertura — Stephanie Bernardes', items:[
       {id:'mb_login',        label:'Login no CRM e verificar lista de devedores do dia'},
       {id:'mb_presenca',     label:'Confirmar presença de todos os 12 operadores'},
       {id:'mb_meta_dia',     label:'Comunicar meta do dia (valor + HO esperado) no grupo'},
       {id:'mb_script',       label:'Revisão rápida do script com foco nas objeções de ontem'},
       {id:'mb_carteira',     label:'Verificar se carteira está carregada e distribuída corretamente'},
     ]},
-    { id:'producao', icon:'📞', title:'Produção — Marília Stephanie', items:[
+    { id:'producao', icon:'📞', title:'Produção — Stephanie Bernardes', items:[
       {id:'mb_lig_1h',       label:'Checar volume de ligações na 1ª hora (meta: mín 10 por op)'},
       {id:'mb_ranking_manha',label:'Divulgar ranking parcial da manhã no grupo da equipe'},
       {id:'mb_acordos',      label:'Conferir acordos fechados e links gerados até as 12h'},
@@ -14695,19 +14972,19 @@ const CHK_BY_EQ = {
       {id:'mb_ops_baixos',   label:'Identificar operadores com baixa produção e dar suporte'},
       {id:'mb_sprint_tarde', label:'Acionar sprint da tarde: meta individual de 3 acordos/op'},
     ]},
-    { id:'qualidade', icon:'🎯', title:'Qualidade — Marília Stephanie', items:[
+    { id:'qualidade', icon:'🎯', title:'Qualidade — Stephanie Bernardes', items:[
       {id:'mb_monitoria',    label:'Monitorar ao menos 2 ligações ao vivo (escuta ativa)'},
       {id:'mb_feedback',     label:'Dar feedback individual para os 3 operadores mais baixos'},
       {id:'mb_conversao',    label:'Checar taxa de conversão: acordos pagos / links gerados'},
       {id:'mb_objecoes',     label:'Coletar objeções do dia e alinhar respostas novas'},
     ]},
-    { id:'comunicacao', icon:'📢', title:'Comunicação — Marília Stephanie', items:[
+    { id:'comunicacao', icon:'📢', title:'Comunicação — Stephanie Bernardes', items:[
       {id:'mb_msg_mot',      label:'Enviar mensagem motivacional no grupo (manhã e tarde)'},
       {id:'mb_destaque',     label:'Reconhecer publicamente o destaque do dia'},
       {id:'mb_alinhamento',  label:'Alinhar com Stephanie (liderança) sobre andamento e bloqueios'},
       {id:'mb_ranking_tarde',label:'Divulgar ranking atualizado às 15h no grupo'},
     ]},
-    { id:'encerramento', icon:'🌙', title:'Encerramento — Marília Stephanie', items:[
+    { id:'encerramento', icon:'🌙', title:'Encerramento — Stephanie Bernardes', items:[
       {id:'mb_relatorio',    label:'Importar relatório de recebimento e acordos no dashboard'},
       {id:'mb_meta_bate',    label:'Confirmar se meta da equipe foi atingida'},
       {id:'mb_ranking_final',label:'Divulgar ranking final do dia para toda a equipe'},
@@ -14719,33 +14996,33 @@ const CHK_BY_EQ = {
 
   // ── BIRIGUI BRUNA ──
   'COFEN BIRIGUI BRUNA': [
-    { id:'abertura', icon:'🌅', title:'Abertura — Birigui Bruna', items:[
+    { id:'abertura', icon:'🌅', title:'Abertura — Bruna Justimiano', items:[
       {id:'bb_login',        label:'Login no sistema e verificar funcionamento do CRM'},
       {id:'bb_presenca',     label:'Confirmar presença dos 10 operadores de Birigui'},
       {id:'bb_meta_dia',     label:'Comunicar meta do dia e HO esperado para a equipe'},
       {id:'bb_script',       label:'Alinhamento de script: foco em BOLETO e PIX para Birigui'},
       {id:'bb_carteira',     label:'Carteira/lista de cobrança carregada e priorizada'},
     ]},
-    { id:'producao', icon:'📞', title:'Produção — Birigui Bruna', items:[
+    { id:'producao', icon:'📞', title:'Produção — Bruna Justimiano', items:[
       {id:'bb_lig_1h',       label:'Volume de ligações na 1ª hora — acionar quem está parado'},
       {id:'bb_ranking_manha',label:'Ranking parcial da manhã divulgado no grupo de Birigui'},
       {id:'bb_acordos',      label:'Checar acordos fechados e links enviados até as 12h'},
       {id:'bb_pausas',       label:'Pausas controladas e dentro do horário permitido'},
       {id:'bb_ops_baixos',   label:'Suporte aos operadores abaixo da média (script/apoio)'},
     ]},
-    { id:'qualidade', icon:'🎯', title:'Qualidade — Birigui Bruna', items:[
+    { id:'qualidade', icon:'🎯', title:'Qualidade — Bruna Justimiano', items:[
       {id:'bb_monitoria',    label:'Monitorar ligações ao vivo — foco em negociação de valor'},
       {id:'bb_feedback',     label:'Feedback individual para operadores com taxa baixa'},
       {id:'bb_conversao',    label:'Checar taxa de conversão da equipe de Birigui'},
       {id:'bb_objecoes',     label:'Listar objeções do dia e definir resposta padrão'},
     ]},
-    { id:'comunicacao', icon:'📢', title:'Comunicação — Birigui Bruna', items:[
+    { id:'comunicacao', icon:'📢', title:'Comunicação — Bruna Justimiano', items:[
       {id:'bb_msg_mot',      label:'Mensagem motivacional no grupo de Birigui (manhã)'},
       {id:'bb_destaque',     label:'Reconhecer destaque do dia publicamente na equipe'},
       {id:'bb_alinhamento',  label:'Alinhamento com supervisora Bruna sobre metas e bloqueios'},
       {id:'bb_ranking_tarde',label:'Divulgar ranking da tarde antes das 16h'},
     ]},
-    { id:'encerramento', icon:'🌙', title:'Encerramento — Birigui Bruna', items:[
+    { id:'encerramento', icon:'🌙', title:'Encerramento — Bruna Justimiano', items:[
       {id:'bb_relatorio',    label:'Atualizar dashboard com recebimento e acordos do dia'},
       {id:'bb_meta_bate',    label:'Verificar se a meta da equipe de Birigui foi batida'},
       {id:'bb_ranking_final',label:'Ranking final divulgado no grupo'},
@@ -14759,61 +15036,44 @@ const CHK_BY_EQ = {
 
 // Checklist genérico (usado pelo painel global de checklist e equipes sem personalizado)
 const CHK_SECTIONS = [
-  { id:"abertura", icon:"🌅", title:"Abertura da operação", sub:"6 atividades", items:[
-    {id:'ab1', label:"Fazer login nos sistemas, CRM e canais de atendimento, verificando se estão funcionando."},
-    {id:'ab2', label:"Confirmar presença dos operadores e supervisores e organizar eventuais substituições."},
-    {id:'ab3', label:"Verificar se todos estão logados nas filas e equipes corretas."},
-    {id:'ab4', label:"Conferir se as carteiras e listas de devedores estão carregadas e atualizadas."},
-    {id:'ab5', label:"Apresentar a meta diária, o HO esperado e os objetivos individuais."},
-    {id:'ab6', label:"Alinhar orientações, campanhas, alterações de regras e pontos de atenção do dia."},
+  { id:'abertura', icon:'🌅', title:'Abertura da Operação', items:[
+    {id:'login_sistema',     label:'Fazer login no sistema / CRM e verificar funcionamento'},
+    {id:'presenca',          label:'Confirmar presença de todos os operadores e supervisores'},
+    {id:'metas_dia',         label:'Comunicar meta do dia para a equipe (valor + HO esperado)'},
+    {id:'script_revisao',    label:'Revisar script de abordagem com a equipe (ajustes do dia anterior)'},
+    {id:'carteira_carregada',label:'Verificar se carteira/lista de devedores está carregada no sistema'},
   ]},
-  { id:"acompanhamento", icon:"📞", title:"Acompanhamento da operação", sub:"7 atividades", items:[
-    {id:'ac1', label:"Acompanhar a produção da primeira hora e identificar operadores abaixo do esperado."},
-    {id:'ac2', label:"Monitorar volume de ligações, contatos efetivos e atendimentos realizados."},
-    {id:'ac3', label:"Acompanhar o desempenho individual e por equipe."},
-    {id:'ac4', label:"Verificar acordos realizados, links gerados e pagamentos confirmados."},
-    {id:'ac5', label:"Controlar pausas, atrasos, ausências e cumprimento dos horários."},
-    {id:'ac6', label:"Acompanhar filas de atendimento, transferências da IA e pendências do ChatPlay."},
-    {id:'ac7', label:"Atuar imediatamente em casos de baixa produtividade ou dificuldades operacionais."},
+  { id:'producao', icon:'📞', title:'Acompanhamento de Produção', items:[
+    {id:'ligacoes_1h',       label:'Verificar volume de ligações na 1ª hora e acionar quem está abaixo'},
+    {id:'ranking_am',        label:'Divulgar ranking parcial da manhã para a equipe (motivação)'},
+    {id:'acordos_fechados',  label:'Checar acordos fechados e links gerados até o momento'},
+    {id:'pausa_controlada',  label:'Gerenciar pausas — ninguém em pausa fora do horário permitido'},
+    {id:'operadores_baixos', label:'Identificar operadores com baixa produção e oferecer apoio/script'},
   ]},
-  { id:"qualidade", icon:"🎯", title:"Qualidade e conversão", sub:"7 atividades", items:[
-    {id:'ql1', label:"Monitorar pelo menos duas ligações ou atendimentos por operador ao longo do dia, conforme a capacidade da operação."},
-    {id:'ql2', label:"Avaliar abordagem, argumentação, condução e postura dos operadores."},
-    {id:'ql3', label:"Verificar se os scripts e procedimentos oficiais estão sendo seguidos."},
-    {id:'ql4', label:"Identificar as principais objeções dos profissionais e alinhar as melhores respostas."},
-    {id:'ql5', label:"Realizar feedbacks individuais e orientar correções de abordagem."},
-    {id:'ql6', label:"Acompanhar conversão de contatos em acordos e de links gerados em pagamentos."},
-    {id:'ql7', label:"Identificar falhas recorrentes da IA, CRM ou SIGEN e encaminhar para correção."},
+  { id:'qualidade', icon:'🎯', title:'Qualidade e Conversão', items:[
+    {id:'monitoria_lig',     label:'Monitorar ao menos 2 ligações ao vivo (escuta ativa)'},
+    {id:'feedback_script',   label:'Dar feedback individual sobre script e técnica de abordagem'},
+    {id:'taxa_conversao',    label:'Verificar taxa de conversão (acordos pagos / links gerados)'},
+    {id:'objecoes_dia',      label:'Levantar principais objeções do dia e alinhar resposta com equipe'},
   ]},
-  { id:"comunicacao", icon:"📢", title:"Comunicação e desenvolvimento da equipe", sub:"5 atividades", items:[
-    {id:'cm1', label:"Manter a equipe informada sobre resultados, metas e mudanças operacionais."},
-    {id:'cm2', label:"Divulgar o ranking atualizado pelo menos uma vez durante o dia."},
-    {id:'cm3', label:"Reconhecer publicamente os destaques e boas práticas."},
-    {id:'cm4', label:"Conversar individualmente com profissionais que apresentem dificuldades."},
-    {id:'cm5', label:"Alinhar com os demais supervisores e a gestão os problemas e necessidades da operação."},
+  { id:'comunicacao', icon:'📢', title:'Comunicação e Motivação', items:[
+    {id:'msg_motivacional',  label:'Enviar mensagem motivacional no grupo da equipe'},
+    {id:'ranking_divulgado', label:'Divulgar ranking atualizado no grupo (pelo menos 1x ao dia)'},
+    {id:'destaque_positivo', label:'Reconhecer publicamente operador destaque do dia'},
+    {id:'alinhamento_sup',   label:'Alinhar com supervisor sobre andamento e eventuais problemas'},
   ]},
-  { id:"indicadores", icon:"📊", title:"Indicadores e gestão de resultados", sub:"6 atividades", items:[
-    {id:'ind1', label:"Atualizar o dashboard com os relatórios de recebimentos."},
-    {id:'ind2', label:"Conferir acordos gerados, pagos, pendentes e quebrados."},
-    {id:'ind3', label:"Acompanhar o HO realizado em relação às metas individuais e coletivas."},
-    {id:'ind4', label:"Atualizar a projeção diária e mensal."},
-    {id:'ind5', label:"Identificar o valor que falta para atingir as metas e distribuir os objetivos restantes."},
-    {id:'ind6', label:"Comunicar à gerência os desvios relevantes, riscos e oportunidades de melhoria."},
+  { id:'dados', icon:'📊', title:'Gestão de Dados e Relatórios', items:[
+    {id:'importar_rec',      label:'Importar relatório de recebimento no dashboard (atualizar ranking)'},
+    {id:'importar_acordos',  label:'Importar relatório de acordos (gerados, pagos, pendentes)'},
+    {id:'meta_equipe_ok',    label:'Verificar se meta por equipe está sendo atingida'},
+    {id:'projecao_mensal',   label:'Verificar projeção mensal e comunicar gap à diretoria se necessário'},
   ]},
-  { id:"conformidade", icon:"⚖️", title:"Controle e conformidade COREN/COFEN", sub:"5 atividades críticas", items:[
-    {id:'cf1', label:"Garantir que os operadores não forneçam informações financeiras sem confirmação no sistema."},
-    {id:'cf2', label:"Verificar se falhas na localização de débitos estão sendo transferidas diretamente para atendimento humano."},
-    {id:'cf3', label:"Garantir que não sejam prometidos descontos, parcelamentos ou condições não autorizadas."},
-    {id:'cf4', label:"Acompanhar reclamações, contestações, problemas de pagamento e solicitações de retorno."},
-    {id:'cf5', label:"Verificar se os atendimentos respeitam as orientações de cobrança humanizada e proteção de dados dos profissionais."},
-  ]},
-  { id:"encerramento", icon:"🌙", title:"Encerramento da operação", sub:"6 atividades", items:[
-    {id:'en1', label:"Gerar e salvar o relatório final de produção e recebimento."},
-    {id:'en2', label:"Divulgar o resultado e o ranking final do dia."},
-    {id:'en3', label:"Conferir os pagamentos realizados e os acordos que ainda aguardam confirmação."},
-    {id:'en4', label:"Revisar os agendamentos e retornos previstos para os próximos dias."},
-    {id:'en5', label:"Registrar problemas, pendências e ações que precisam ser acompanhadas no dia seguinte."},
-    {id:'en6', label:"Garantir o encerramento correto dos atendimentos e o logoff dos operadores."},
+  { id:'encerramento', icon:'🌙', title:'Encerramento do Dia', items:[
+    {id:'relatorio_final',   label:'Gerar e salvar relatório final do dia'},
+    {id:'ranking_final',     label:'Divulgar ranking final do dia para toda a equipe'},
+    {id:'agendamentos_ok',   label:'Confirmar agendamentos de acordos para os próximos dias'},
+    {id:'pendencias',        label:'Registrar pendências e tarefas para o dia seguinte'},
+    {id:'logoff_sistema',    label:'Garantir logoff correto de todos os operadores no sistema'},
   ]},
 ];
 
@@ -14822,351 +15082,127 @@ function getEqChecklist(eqName){ return CHK_BY_EQ[eqName] || CHK_SECTIONS; }
 
 let chkChart = null;
 
-// ══════════════════════════════════════════
-// CHECKLIST POR LÍDER — tarefas editáveis + filtro por líder
-// Config: { leaders:[{id,name,sections:[{id,icon,title,items:[{id,label}]}]}], active:id }
-// Estado diário: chk_ld_<idLider>_<ano>_<mes>_<dia> = { idTarefa:[5 bools] }
-// ══════════════════════════════════════════
-const CHK_CFG_KEY = 'cofen_chk_cfg';
-const CHK_LEADERS_DEFAULT = ['Stephanie Bernardes','Bruna Justimiano','Katia Regina'];
-let chkEditMode = false;
-let chkCfg = null;
-
-function chkEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function chkUid(p){ return p+Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
-function chkSlug(n){ return String(n).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'') || chkUid('l'); }
-function chkDefaultSections(){
-  return CHK_SECTIONS.map(s=>({id:s.id, icon:s.icon, title:s.title, items:s.items.map(i=>({id:i.id,label:i.label}))}));
-}
-function chkCfgDefault(){
-  const leaders = CHK_LEADERS_DEFAULT.map(n=>({id:chkSlug(n), name:n, sections:chkDefaultSections()}));
-  return {leaders, active:leaders[0].id};
-}
-function chkCfgLoad(){
-  if(chkCfg) return chkCfg;
-  try{ const v=JSON.parse(localStorage.getItem(CHK_CFG_KEY)||'null'); if(v && Array.isArray(v.leaders) && v.leaders.length) chkCfg=v; }catch(e){}
-  if(!chkCfg) chkCfg = chkCfgDefault();
-  if(!chkCfg.leaders.find(l=>l.id===chkCfg.active)) chkCfg.active = chkCfg.leaders[0].id;
-  return chkCfg;
-}
-function chkCfgSave(){
-  try{ localStorage.setItem(CHK_CFG_KEY, JSON.stringify(chkCfg)); }catch(e){}
-  if(typeof syncPush==='function') syncPush(CHK_CFG_KEY);
-}
-function chkLeader(){ const c=chkCfgLoad(); return c.leaders.find(l=>l.id===c.active) || c.leaders[0]; }
-function chkSections(){ return chkLeader().sections; }
-
-function chkMonday(d){ d=new Date((d||new Date()).getTime()); d.setHours(12,0,0,0); const w=(d.getDay()+6)%7; d.setDate(d.getDate()-w); return d; }
-function chkDateStr(d){ const m=chkMonday(d); return `w${m.getFullYear()}_${m.getMonth()+1}_${m.getDate()}`; }  // chave da SEMANA (começa na segunda)
-const CHK_STEPS_DAYS_LONG = ['Segunda','Terça','Quarta','Quinta','Sexta'];
-function chkStateKey(leaderId, d){ return `chk_ld_${leaderId}_${chkDateStr(d)}`; }
-function checkLoad(leaderId){
-  try{ return JSON.parse(localStorage.getItem(chkStateKey(leaderId||chkLeader().id))||'{}'); }catch(e){ return {}; }
-}
-function checkSave(state, leaderId){
-  const id = leaderId||chkLeader().id;
-  localStorage.setItem(chkStateKey(id), JSON.stringify(state));
-  if(typeof fbDb!=='undefined' && fbDb && typeof fbRoom!=='undefined' && fbRoom){
-    try{ fbDb.ref(fbRoom+'/chk_ld/'+chkDateStr()+'/'+id).set(JSON.stringify(state)); }catch(e){}
-  }
+function checkTodayKey(){
+  const d=new Date(); return `chk_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
 }
 
-// Estado do checklist: { idDaTarefa: [bool x5] }  (etapas I a V)
-const CHK_STEPS = ['Seg','Ter','Qua','Qui','Sex'];
-const CHK_BLUE = '#2E75B6';
+function checkLoad(){
+  return JSON.parse(localStorage.getItem(checkTodayKey())||'{}');
+}
 
-function chkSteps(state, id){
-  const v = state[id];
-  return Array.isArray(v) && v.length===5 ? v : [false,false,false,false,false];
+function checkSave(state){
+  localStorage.setItem(checkTodayKey(), JSON.stringify(state));
 }
-function chkItemPct(state, id){
-  return chkSteps(state,id).filter(Boolean).length / CHK_STEPS.length;
-}
-function chkSecPct(state, sec){
-  return sec.items.length ? sec.items.reduce((a,i)=>a+chkItemPct(state,i.id),0) / sec.items.length : 0;
-}
-function checkCalcPct(state, sections){
-  sections = sections || chkSections();
-  let total=0, done=0, sum=0, n=0;
-  sections.forEach(s=>s.items.forEach(i=>{
-    total += CHK_STEPS.length;
-    done  += chkSteps(state,i.id).filter(Boolean).length;
-    sum   += chkItemPct(state,i.id); n++;
-  }));
-  return {total, done, pct: n>0 ? Math.round(sum/n*100) : 0};
+
+function checkCalcPct(state){
+  let total=0, done=0;
+  CHK_SECTIONS.forEach(s=>s.items.forEach(i=>{ total++; if(state[i.id]) done++; }));
+  return {total, done, pct:total>0?Math.round(done/total*100):0};
 }
 
 function checkInit(){
-  chkCfgLoad();
+  const state = checkLoad();
   const today = new Date();
   const daysNames=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
   const monthNames=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const lbl = document.getElementById('chk-date-label');
   if(lbl) lbl.textContent = `${daysNames[today.getDay()]}, ${today.getDate()} de ${monthNames[today.getMonth()]}`;
-  checkRefreshAll();
-}
-function checkRefreshAll(){
-  const state = checkLoad();
-  chkRenderLeaderBar();
+
   checkRender(state);
   checkUpdateBar(state);
   checkBuildChart();
 }
 
-// ── Barra de filtro por líder ──
-function chkRenderLeaderBar(){
-  const el = document.getElementById('chk-leader-bar'); if(!el) return;
-  const c = chkCfgLoad();
-  const chips = c.leaders.map(l=>{
-    const p = checkCalcPct(checkLoad(l.id), l.sections).pct;
-    const on = l.id===c.active;
-    const col = p===100?'#16A34A':p>=60?'#B45309':'#6B7280';
-    return `<button onclick="chkSelectLeader('${l.id}')" style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:100px;cursor:pointer;font-family:Nunito,sans-serif;font-size:12px;font-weight:800;border:2px solid ${on?'var(--pp)':'var(--g200)'};background:${on?'var(--pp)':'var(--w)'};color:${on?'#fff':'var(--g700)'};box-shadow:${on?'var(--sh)':'none'}">
-      👤 ${chkEsc(l.name)} <span style="font-size:11px;padding:1px 7px;border-radius:100px;background:${on?'rgba(255,255,255,.2)':'var(--g100)'};color:${on?'#fff':col}">${p}%</span></button>`;
-  }).join('');
-  const btn = (onclick,label,extra)=>`<button onclick="${onclick}" style="padding:8px 12px;border-radius:var(--rm);border:1px solid var(--g200);background:var(--w);color:var(--g700);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer;${extra||''}">${label}</button>`;
-  el.innerHTML = `
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <span style="font-size:11px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.8px">Líder:</span>
-      ${chips}
-      ${btn('chkAddLeader()','➕ Líder')}
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--g100)">
-      <span style="font-size:12px;font-weight:800;color:var(--g700)">Checklist de ${chkEsc(chkLeader().name)}</span>
-      <span style="flex:1"></span>
-      ${btn('chkToggleEdit()', chkEditMode?'✔ Concluir edição':'✏️ Editar tarefas', chkEditMode?'background:var(--pp);color:#fff;border-color:var(--pp)':'')}
-      ${btn('chkExportCsv()','⬇️ Exportar semana (CSV)')}
-      ${btn('chkRenameLeader()','🏷 Renomear líder')}
-      ${btn('chkCopyFrom()','📋 Copiar tarefas de…')}
-      ${btn('chkRestoreDefault()','♻ Restaurar padrão')}
-      ${c.leaders.length>1?btn('chkDeleteLeader()','🗑 Excluir líder','color:#C00000'):''}
-    </div>`;
-}
-function chkSelectLeader(id){
-  const c=chkCfgLoad(); c.active=id; chkCfgSave();
-  checkRefreshAll();
-}
-function chkAddLeader(){
-  const n = (prompt('Nome do líder de equipe:')||'').trim(); if(!n) return;
-  const c=chkCfgLoad();
-  let id=chkSlug(n); if(c.leaders.find(l=>l.id===id)) id=id+'_'+Math.random().toString(36).slice(2,5);
-  c.leaders.push({id,name:n,sections:chkDefaultSections()}); c.active=id; chkCfgSave();
-  checkRefreshAll(); toast('➕ Líder adicionado: '+n);
-}
-function chkRenameLeader(){
-  const l=chkLeader(); const n=(prompt('Novo nome do líder:', l.name)||'').trim(); if(!n) return;
-  l.name=n; chkCfgSave(); checkRefreshAll();
-}
-function chkDeleteLeader(){
-  const c=chkCfgLoad(); if(c.leaders.length<2) return;
-  const l=chkLeader();
-  if(!confirm('Excluir o líder "'+l.name+'" e o checklist dele?')) return;
-  c.leaders = c.leaders.filter(x=>x.id!==l.id); c.active=c.leaders[0].id; chkCfgSave();
-  checkRefreshAll(); toast('🗑 Líder excluído');
-}
-function chkCopyFrom(){
-  const c=chkCfgLoad(); const l=chkLeader();
-  const others=c.leaders.filter(x=>x.id!==l.id); if(!others.length){ toast('Não há outro líder para copiar'); return; }
-  const n=(prompt('Copiar as tarefas de qual líder?\n'+others.map(o=>'• '+o.name).join('\n'))||'').trim().toLowerCase(); if(!n) return;
-  const src=others.find(o=>o.name.toLowerCase()===n) || others.find(o=>o.name.toLowerCase().includes(n));
-  if(!src){ toast('Líder não encontrado'); return; }
-  if(!confirm('Substituir as tarefas de '+l.name+' pelas de '+src.name+'?')) return;
-  l.sections = JSON.parse(JSON.stringify(src.sections)); chkCfgSave(); checkRefreshAll();
-}
-function chkRestoreDefault(){
-  const l=chkLeader();
-  if(!confirm('Restaurar a lista padrão de tarefas de '+l.name+'? As edições serão perdidas.')) return;
-  l.sections = chkDefaultSections(); chkCfgSave(); checkRefreshAll();
-}
-
-// ── Edição de tarefas ──
-function chkToggleEdit(){ chkEditMode=!chkEditMode; checkRefreshAll(); }
-function chkFind(secId, itemId){
-  const sec = chkSections().find(s=>s.id===secId); if(!sec) return {};
-  return {sec, item: itemId? sec.items.find(i=>i.id===itemId) : null};
-}
-function chkEditLabel(secId,itemId,val){ const {item}=chkFind(secId,itemId); if(item){ item.label=val; chkCfgSave(); } }
-function chkInlineSave(secId,itemId,el){
-  const v=(el.innerText||'').replace(/\s+/g,' ').trim(); const {item}=chkFind(secId,itemId); if(!item) return;
-  if(!v){ el.textContent=item.label; return; }
-  if(v!==item.label){ item.label=v; chkCfgSave(); toast('✏️ Tarefa salva'); }
-}
-function chkMarkDay(k){
-  const secs=chkSections(), state=checkLoad();
-  const all=secs.every(sc=>sc.items.every(i=>chkSteps(state,i.id)[k]));
-  secs.forEach(sc=>sc.items.forEach(i=>{ const a=chkSteps(state,i.id).slice(); a[k]=!all; state[i.id]=a; }));
-  checkSave(state); checkRefreshAll(); toast(all?'↩ Dia desmarcado':'✅ Dia marcado em todas as tarefas');
-}
-function chkExportCsv(){
-  const l=chkLeader(), st=checkLoad(), mon=chkMonday();
-  const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
-  const head=['Bloco','Tarefa',...CHK_STEPS.map((n,k)=>{const d=new Date(mon.getTime());d.setDate(mon.getDate()+k);return n+' '+d.getDate()+'/'+(d.getMonth()+1);}),'%'];
-  const lines=[head.map(q).join(';')];
-  l.sections.forEach(sc=>sc.items.forEach(i=>lines.push([sc.title,i.label,...chkSteps(st,i.id).map(v=>v?'X':''),Math.round(chkItemPct(st,i.id)*100)+'%'].map(q).join(';'))));
-  lines.push(['','PROGRESSO GERAL','','','','','',checkCalcPct(st,l.sections).pct+'%'].map(q).join(';'));
-  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='checklist_'+l.id+'_semana_'+mon.getDate()+'-'+(mon.getMonth()+1)+'.csv'; a.click();
-}
-function chkEditTitle(secId,val){ const {sec}=chkFind(secId); if(sec){ sec.title=val; chkCfgSave(); } }
-function chkEditIcon(secId,val){ const {sec}=chkFind(secId); if(sec){ sec.icon=val||'📌'; chkCfgSave(); } }
-function chkAddItem(secId){
-  const {sec}=chkFind(secId); if(!sec) return;
-  sec.items.push({id:chkUid('t'), label:'Nova tarefa'}); chkCfgSave(); checkRefreshAll();
-  setTimeout(()=>{ const t=document.querySelectorAll('[data-chk-sec="'+secId+'"]'); if(t.length){ const last=t[t.length-1]; last.focus(); last.select(); } },30);
-}
-function chkDelItem(secId,itemId){
-  const {sec,item}=chkFind(secId,itemId); if(!item) return;
-  if(!confirm('Excluir esta tarefa?\n\n'+item.label)) return;
-  sec.items = sec.items.filter(i=>i.id!==itemId); chkCfgSave(); checkRefreshAll();
-}
-function chkMoveItem(secId,itemId,dir){
-  const {sec}=chkFind(secId); if(!sec) return;
-  const i=sec.items.findIndex(x=>x.id===itemId), j=i+dir; if(i<0||j<0||j>=sec.items.length) return;
-  [sec.items[i],sec.items[j]]=[sec.items[j],sec.items[i]]; chkCfgSave(); checkRefreshAll();
-}
-function chkAddSection(){
-  const t=(prompt('Nome do novo bloco de tarefas:')||'').trim(); if(!t) return;
-  chkSections().push({id:chkUid('s'), icon:'📌', title:t, items:[{id:chkUid('t'),label:'Nova tarefa'}]}); chkCfgSave(); checkRefreshAll();
-}
-function chkDelSection(secId){
-  const {sec}=chkFind(secId); if(!sec) return;
-  if(!confirm('Excluir o bloco "'+sec.title+'" e todas as tarefas dele?')) return;
-  const l=chkLeader(); l.sections=l.sections.filter(s=>s.id!==secId); chkCfgSave(); checkRefreshAll();
-}
-
-function chkBarCell(p){
-  return `<td style="padding:0;border:1px solid #9DC3E6;background:${CHK_BLUE};width:190px">
-    <div style="padding:6px 8px"><div style="background:#fff;height:22px;border-radius:2px;width:${Math.round(p*100)}%;transition:width .4s"></div></div>
-  </td>`;
-}
-
 function checkRender(state){
   const container = document.getElementById('chk-sections');
   if(!container) return;
-  const bd = 'border:1px solid #9DC3E6';
-  const sections = chkSections();
-  const ed = chkEditMode;
-  const inp = 'font-family:Nunito,sans-serif;border:1px solid #9DC3E6;border-radius:4px;background:#fff;color:var(--g700)';
-  const mini = 'border:1px solid var(--g200);background:#fff;border-radius:4px;cursor:pointer;font-size:11px;padding:2px 6px;line-height:1.2';
 
-  const head = `
-    <thead>
-      <tr>
-        <th rowspan="2" style="${bd};background:#fff;font-size:13px;font-weight:800;padding:10px;text-align:center">Tarefas</th>
-        <th colspan="5" style="${bd};background:#fff;font-size:14px;font-weight:800;padding:8px;text-align:center">Etapas</th>
-        <th colspan="2" style="${bd};background:#fff;font-size:14px;font-weight:800;padding:8px;text-align:center">Progresso</th>
-      </tr>
-      <tr>
-        ${CHK_STEPS.map((s,k)=>{ const mon=chkMonday(); const dd=new Date(mon.getTime()); dd.setDate(mon.getDate()+k); const hoje=(new Date().getDay()+6)%7===k;
-          return `<th title="${CHK_STEPS_DAYS_LONG[k]}, ${dd.getDate()}/${dd.getMonth()+1}" style="${bd};background:${hoje?'#BDD7EE':'#DDEBF7'};font-size:12px;font-weight:800;padding:6px;text-align:center;width:52px;color:${hoje?'#1F4E78':'inherit'}">${s}<div style="font-size:9px;font-weight:700;color:#5B7FA3">${dd.getDate()}/${dd.getMonth()+1}</div><button title="Marcar/desmarcar ${CHK_STEPS_DAYS_LONG[k]} em todas as tarefas" onclick="chkMarkDay(${k})" style="margin-top:3px;border:1px solid #9DC3E6;background:#fff;color:#1F4E78;border-radius:4px;font-size:10px;font-weight:800;cursor:pointer;padding:0 6px;line-height:16px">✓ todos</button></th>`;}).join('')}
-        <th style="${bd};background:#fff;font-size:12px;font-weight:800;padding:6px;text-align:center;width:64px">%</th>
-        <th style="${bd};background:#fff;font-size:12px;font-weight:800;padding:6px;text-align:center">Gráfico</th>
-      </tr>
-    </thead>`;
+  container.innerHTML = CHK_SECTIONS.map(sec=>{
+    const done  = sec.items.filter(i=>state[i.id]).length;
+    const total = sec.items.length;
+    const pct   = Math.round(done/total*100);
+    const color = pct===100?'#4ADE80':pct>=60?'#FCD34D':'var(--g300)';
 
-  let rows = '';
-  sections.forEach(sec=>{
-    const sp = chkSecPct(state, sec);
-    const n = sec.items.length;
-    const titleCell = ed
-      ? `<input value="${chkEsc(sec.icon)}" onchange="chkEditIcon('${sec.id}',this.value)" style="${inp};width:38px;text-align:center;font-size:14px;padding:3px">
-         <input value="${chkEsc(sec.title)}" onchange="chkEditTitle('${sec.id}',this.value)" style="${inp};width:min(380px,70%);font-size:13px;font-weight:800;color:#1F4E78;padding:4px 8px">
-         <span style="font-weight:600;color:#5B7FA3;font-size:11px">— ${n} atividade${n===1?'':'s'}</span>
-         <button onclick="chkDelSection('${sec.id}')" style="${mini};color:#C00000;margin-left:8px">🗑 Excluir bloco</button>`
-      : `${chkEsc(sec.icon)} ${chkEsc(sec.title)} <span style="font-weight:600;color:#5B7FA3;font-size:11px">— ${n} atividade${n===1?'':'s'}</span>`;
-    rows += `<tr style="background:#DDEBF7">
-      <td colspan="8" style="${bd};padding:9px 12px;font-size:13px;font-weight:800;color:#1F4E78">${titleCell}</td>
-    </tr>`;
-    sec.items.forEach((item,idx)=>{
-      const st = chkSteps(state, item.id);
-      const p  = chkItemPct(state, item.id);
-      const labelCell = ed
-        ? `<div style="display:flex;gap:6px;align-items:flex-start">
-             <textarea data-chk-sec="${sec.id}" rows="2" onchange="chkEditLabel('${sec.id}','${item.id}',this.value)" style="${inp};flex:1;font-size:13px;font-weight:600;padding:6px 8px;line-height:1.4;resize:vertical">${chkEsc(item.label)}</textarea>
-             <div style="display:flex;flex-direction:column;gap:3px">
-               <button title="Subir" onclick="chkMoveItem('${sec.id}','${item.id}',-1)" style="${mini}" ${idx===0?'disabled':''}>▲</button>
-               <button title="Descer" onclick="chkMoveItem('${sec.id}','${item.id}',1)" style="${mini}" ${idx===n-1?'disabled':''}>▼</button>
-               <button title="Excluir tarefa" onclick="chkDelItem('${sec.id}','${item.id}')" style="${mini};color:#C00000">🗑</button>
-             </div>
-           </div>`
-        : `<div class="chk-lbl" contenteditable="true" spellcheck="false" title="Clique para editar o texto da tarefa"
-             onpaste="event.preventDefault();document.execCommand('insertText',false,event.clipboardData.getData('text/plain'))"
-             onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
-             onblur="chkInlineSave('${sec.id}','${item.id}',this)">${chkEsc(item.label)}</div>`;
-      rows += `<tr>
-        <td style="${bd};padding:8px 12px;font-size:13px;font-weight:600;color:var(--g700);line-height:1.4">${labelCell}</td>
-        ${st.map((v,k)=>`<td style="${bd};text-align:center;padding:4px">
-          <input type="checkbox" ${v?'checked':''} onchange="checkToggle('${item.id}',${k},this.checked)"
-            style="width:20px;height:20px;accent-color:${CHK_BLUE};cursor:pointer;vertical-align:middle"></td>`).join('')}
-        <td style="${bd};text-align:center;font-weight:800;color:#C00000;font-size:14px">${Math.round(p*100)}%</td>
-        ${chkBarCell(p)}
-      </tr>`;
-    });
-    if(ed) rows += `<tr><td colspan="8" style="${bd};padding:6px 12px;background:#F8FBFF"><button onclick="chkAddItem('${sec.id}')" style="${mini};color:#1F4E78;font-weight:700;padding:5px 10px">➕ Adicionar tarefa neste bloco</button></td></tr>`;
-  });
-  if(ed) rows += `<tr><td colspan="8" style="${bd};padding:8px 12px;background:#F8FBFF"><button onclick="chkAddSection()" style="${mini};color:#1F4E78;font-weight:800;padding:6px 12px">➕ Novo bloco de tarefas</button></td></tr>`;
+    const items = sec.items.map(item=>{
+      const checked = !!state[item.id];
+      return `<label style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;
+        border-radius:var(--rm);cursor:pointer;transition:background .15s;
+        background:${checked?'#F0FDF4':'var(--g50)'};border:1px solid ${checked?'#BBF7D0':'var(--g200)'};"
+        onmouseover="this.style.background='${checked?'#DCFCE7':'var(--g100)'}'"
+        onmouseout="this.style.background='${checked?'#F0FDF4':'var(--g50)'}'">
+        <input type="checkbox" ${checked?'checked':''} onchange="checkToggle('${item.id}',this.checked)"
+          style="width:16px;height:16px;flex-shrink:0;margin-top:1px;accent-color:var(--pp);cursor:pointer">
+        <span style="font-size:13px;font-weight:${checked?'700':'600'};color:${checked?'var(--pp)':'var(--g700)'};
+          text-decoration:${checked?'none':'none'};line-height:1.4">${item.label}</span>
+        ${checked?'<span style="margin-left:auto;font-size:16px;flex-shrink:0">✅</span>':''}
+      </label>`;
+    }).join('');
 
-  const tp = checkCalcPct(state, sections).pct;
-  rows += `<tr style="background:#DDEBF7">
-    <td colspan="6" style="${bd};padding:10px 12px;font-size:13px;font-weight:800">PROGRESSO GERAL DA SEMANA — ${chkEsc(chkLeader().name.toUpperCase())}</td>
-    <td style="${bd};text-align:center;font-weight:800;color:#C00000;font-size:14px">${tp}%</td>
-    ${chkBarCell(tp/100)}
-  </tr>`;
-
-  container.innerHTML = `<div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);overflow:auto;box-shadow:var(--sh)">
-    <table style="border-collapse:collapse;width:100%;min-width:760px;font-family:Nunito,sans-serif">${head}<tbody>${rows}</tbody></table>
-  </div>
-  <div style="font-size:11px;color:var(--g500);padding:2px 6px;line-height:1.6">${ed
-    ? '✏️ <strong>Modo edição:</strong> altere o texto das tarefas, reordene (▲▼), exclua (🗑) ou adicione. As mudanças valem só para o checklist de <strong>'+chkEsc(chkLeader().name)+'</strong> e são salvas automaticamente.'
-    : '<strong>Clique no texto de qualquer tarefa para editá-la</strong> (Enter salva). Para adicionar, excluir ou reordenar use ✏️ Editar tarefas. Marque os dias (Seg a Sex) de cada tarefa; o % é calculado por <strong>dias marcados ÷ 5</strong>. Cada líder tem o seu próprio checklist — escolha o nome acima.'}</div>`;
+    return `<div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);overflow:hidden;box-shadow:var(--sh)">
+      <div style="padding:12px 18px;background:var(--g50);border-bottom:1px solid var(--g200);
+        display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">${sec.icon}</span>
+          <span style="font-size:13px;font-weight:800;color:var(--g900)">${sec.title}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="background:var(--g200);border-radius:100px;height:6px;width:80px;overflow:hidden">
+            <div style="height:100%;border-radius:100px;background:${color};width:${pct}%;transition:width .5s"></div>
+          </div>
+          <span style="font-size:11px;font-weight:800;color:${color}">${done}/${total}</span>
+        </div>
+      </div>
+      <div style="padding:10px 14px;display:flex;flex-direction:column;gap:6px">${items}</div>
+    </div>`;
+  }).join('');
 }
 
-function checkToggle(id, stepIdx, checked){
+function checkToggle(id, checked){
   const state = checkLoad();
-  const arr = chkSteps(state, id).slice();
-  arr[stepIdx] = checked;
-  state[id] = arr;
+  state[id] = checked;
   checkSave(state);
   checkUpdateBar(state);
+  // Re-render só o item afetado (mais rápido)
   checkRender(state);
-  chkRenderLeaderBar();
+  // Salvar histórico semanal
   checkSaveWeekly();
 }
 
 function checkUpdateBar(state){
-  const sections = chkSections();
-  const {pct} = checkCalcPct(state, sections);
+  const {total, done, pct} = checkCalcPct(state);
   const bar   = document.getElementById('chk-bar');
   const big   = document.getElementById('chk-pct-big');
   const lbl   = document.getElementById('chk-pct-label');
   const stats = document.getElementById('chk-stats');
+  const color = pct===100?'#4ADE80':pct>=80?'var(--pp)':pct>=50?'#FCD34D':'#EF4444';
 
   if(bar)   bar.style.width = pct+'%';
   if(big)   big.textContent = pct+'%';
-  if(lbl)   lbl.textContent = chkLeader().name+' · '+pct+'% concluído';
+  if(lbl)   lbl.textContent = pct+'% concluído';
 
-  if(stats) stats.innerHTML = sections.map(sec=>{
-    const p = Math.round(chkSecPct(state, sec)*100);
-    const col = p===100?'#4ADE80':p>=60?'#FCD34D':'var(--g400)';
+  if(stats) stats.innerHTML = CHK_SECTIONS.map(sec=>{
+    const d=sec.items.filter(i=>state[i.id]).length, t=sec.items.length;
+    const p=Math.round(d/t*100);
+    const col=p===100?'#4ADE80':p>=60?'#FCD34D':'var(--g400)';
     return `<div style="display:flex;align-items:center;gap:5px">
-      <span style="font-size:12px">${chkEsc(sec.icon)}</span>
-      <span style="font-size:11px;font-weight:700;color:${col}">${p}%</span>
+      <span style="font-size:12px">${sec.icon}</span>
+      <span style="font-size:11px;font-weight:700;color:${col}">${d}/${t}</span>
     </div>`;
   }).join('');
 }
 
 function checkReset(){
-  if(!confirm('Resetar o checklist da semana de '+chkLeader().name+'?')) return;
+  if(!confirm('Resetar todo o checklist de hoje?')) return;
   checkSave({});
-  checkRefreshAll();
+  checkRender({});
+  checkUpdateBar({});
   toast('↩ Checklist resetado!');
 }
 
 function checkSaveWeekly(){
   const {pct} = checkCalcPct(checkLoad());
   const d=new Date();
-  const key=`chk_week_${chkLeader().id}_${d.getFullYear()}_${Math.ceil(d.getDate()/7)}`;
+  const key=`chk_week_${d.getFullYear()}_${Math.ceil(d.getDate()/7)}`;
   const week=JSON.parse(localStorage.getItem(key)||'{}');
   const dayNames=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
   week[dayNames[d.getDay()]] = pct;
@@ -15177,37 +15213,46 @@ function checkBuildChart(){
   const canvas = document.getElementById('chk-chart');
   if(!canvas) return;
   if(chkChart){ chkChart.destroy(); chkChart=null; }
-  const sections = chkSections(), lid = chkLeader().id;
+
+  // Build last 7 days data
   const labels=[], data=[];
-  const state=checkLoad(lid), mon=chkMonday();
-  const total=sections.reduce((n,sc)=>n+sc.items.length,0);
-  CHK_STEPS.forEach((nm,k)=>{
-    const dd=new Date(mon.getTime()); dd.setDate(mon.getDate()+k);
-    const feitos=sections.reduce((n,sc)=>n+sc.items.filter(i=>chkSteps(state,i.id)[k]).length,0);
-    labels.push(nm+' '+dd.getDate()); data.push(total?Math.round(feitos/total*100):0);
-  });
+  const dayNames=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  for(let i=6;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const key=`chk_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
+    const state=JSON.parse(localStorage.getItem(key)||'{}');
+    const {pct}=checkCalcPct(state);
+    labels.push((i===0?'Hoje':dayNames[d.getDay()])+' '+d.getDate());
+    data.push(pct);
+  }
+
   chkChart = new Chart(canvas, {
     type:'line',
-    data:{ labels, datasets:[{ label:'% Concluído', data, borderColor:'#00A86B', backgroundColor:'rgba(0,168,107,.1)', borderWidth:2.5, pointBackgroundColor:'#00A86B', pointRadius:5, tension:.35, fill:true }] },
+    data:{
+      labels,
+      datasets:[{
+        label:'% Concluído',
+        data,
+        borderColor:'#00A86B',
+        backgroundColor:'rgba(0,168,107,.1)',
+        borderWidth:2.5,
+        pointBackgroundColor:'#00A86B',
+        pointRadius:5,
+        tension:.35,
+        fill:true,
+      }]
+    },
     options:{
       responsive:true,
-      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}% concluído`}} },
-      scales:{ y:{min:0,max:100,ticks:{callback:v=>v+'%',stepSize:25},grid:{color:'rgba(0,0,0,.05)'}}, x:{grid:{display:false}} }
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}% concluído`}}
+      },
+      scales:{
+        y:{min:0,max:100,ticks:{callback:v=>v+'%',stepSize:25},grid:{color:'rgba(0,0,0,.05)'}},
+        x:{grid:{display:false}}
+      }
     }
-  });
-}
-
-// Sync em tempo real do checklist dos líderes (chamado ao conectar o Firebase)
-function chkListenFirebase(){
-  if(typeof fbDb==='undefined' || !fbDb || !fbRoom) return;
-  fbDb.ref(fbRoom+'/chk_ld/'+chkDateStr()).on('value', snap=>{
-    const all = snap.val(); if(!all) return;
-    let changed=false;
-    Object.keys(all).forEach(id=>{
-      const k = chkStateKey(id);
-      if(localStorage.getItem(k)!==all[id]){ localStorage.setItem(k, all[id]); changed=true; }
-    });
-    if(changed && document.getElementById('pg-check')?.classList.contains('on') && !chkEditMode){ checkRefreshAll(); pulseSyncDot&&pulseSyncDot(); }
   });
 }
 
@@ -15714,9 +15759,9 @@ function fechDetectarEquipe(subGrupo, nomeOp){
   if(opAtual && opAtual.eq && EQ_LABELS[opAtual.eq]) return EQ_LABELS[opAtual.eq];
   // 2) Senão, tenta detectar pelo texto bruto do SubGrupo
   const s = (subGrupo||'').toUpperCase();
-  if(s.includes('BIRIGUI') || s.includes('BRUNA')) return 'Birigui Bruna';
-  if(s.includes('MARILIA') || s.includes('STEPHANIE')) return 'Marília Stephanie';
-  if(s.includes('LAYSA')) return 'Katia 2°T';
+  if(s.includes('BIRIGUI') || s.includes('BRUNA')) return 'Bruna Justimiano';
+  if(s.includes('MARILIA') || s.includes('STEPHANIE')) return 'Stephanie Bernardes';
+  if(s.includes('LAYSA')) return 'Katia Regina';
   if(s.includes('KATIA') || s.includes('KÁTIA')) return 'Equipe Stephanie';
   if(s.includes('LIDERAN')) return 'Liderança';
   if(s.includes('OUVIDORIA')) return 'Ouvidoria/Suporte';
@@ -15792,8 +15837,8 @@ function relDiretoriaGerar(){
   const metaGeral = parseFloat(document.getElementById('reldir-meta-geral').value) || metas.geral;
   relDiretoriaSetMetas(mes, {bruna:metaBruna, katia:metaKatia, laysa:metaLaysa, geral:metaGeral});
 
-  const eqBruna = relDiretoriaAcharEquipe(equipesAtual, 'Birigui Bruna');
-  const eqKatia = relDiretoriaAcharEquipe(equipesAtual, 'Katia 2°T', 'Katia');
+  const eqBruna = relDiretoriaAcharEquipe(equipesAtual, 'Bruna Justimiano');
+  const eqKatia = relDiretoriaAcharEquipe(equipesAtual, 'Katia Regina', 'Katia');
   const eqLaysa = relDiretoriaAcharEquipe(equipesAtual, 'Equipe Stephanie', 'Laysa/Stephanie', 'Laysa Lopes');
 
   const hoBruna = eqBruna?.ho || 0;
@@ -17494,42 +17539,32 @@ setInterval(()=>{
 
 
 <div class="page" id="pg-check">
-
-  <!-- Header -->
+<style>
+.chks-tb{width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;background:#fff;min-width:780px}
+.chks-tb th,.chks-tb td{border:1px solid #BFD3EA}
+.chks-h1{background:#fff;font-weight:900;font-size:17px;color:#111;text-align:center;padding:8px}
+.chks-h2{background:#D5E3F3;font-weight:900;font-size:15px;color:#111;text-align:center;padding:5px 2px;min-width:62px}
+.chks-h2 small{display:block;font-size:9px;font-weight:700;color:#456}
+.chks-h2.hoje{background:#2F7DC1;color:#fff}.chks-h2.hoje small{color:#DCEBFA}
+.chks-sec td{background:#E8F0FA;font-weight:900;font-size:13px;color:#16324F;padding:7px 8px}
+.chks-task{font-size:14px;color:#111;padding:7px 9px}
+.chks-c{text-align:center;padding:5px 0;width:62px}
+.chks-cb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border:2px solid #2F7DC1;border-radius:5px;background:#fff;cursor:pointer;vertical-align:middle;position:relative;margin:0}
+.chks-cb:checked{background:#2F7DC1}
+.chks-cb:checked::after{content:"";position:absolute;left:6px;top:1px;width:7px;height:13px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg)}
+.chks-cb:disabled{opacity:.3;cursor:not-allowed}
+.chks-pct{text-align:center;font-weight:900;font-size:16px;color:#C0392B;width:78px}
+.chks-g{background:#2F7DC1;width:190px;padding:5px 6px}
+.chks-g i{display:block;height:20px;background:#fff;border-radius:3px;min-width:0}
+.chks-tot td{background:#D5E3F3;font-weight:900;font-size:14px}
+.chks-sec td.chks-g,.chks-tot td.chks-g{background:#2F7DC1}
+</style>
   <div style="background:linear-gradient(135deg,var(--ppd),#1B4332);border-radius:var(--rxl);padding:16px 22px">
-    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Rotina Diária</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff;margin-bottom:8px">✅ CHECKLIST DIÁRIO | SUPERVISÃO COREN/COFEN</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-      <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:var(--rm);padding:6px 14px;font-size:12px;font-weight:700;color:#fff" id="chk-date-label">—</div>
-      <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:var(--rm);padding:6px 14px;font-size:12px;font-weight:700;color:#4ADE80" id="chk-pct-label">0% concluído</div>
-      <button onclick="checkReset()" style="padding:6px 14px;border-radius:var(--rm);border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-family:Nunito,sans-serif;font-weight:700;font-size:11px;cursor:pointer">↩ Resetar Semana</button>
-    </div>
+    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px">Rotina diária dos supervisores</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:#fff">✅ CHECKLIST DIÁRIO · SUPERVISÃO COREN/COFEN</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px">Cada supervisor marca o seu, dia a dia. Colunas I a V = segunda a sexta da semana. Os dias futuros ficam bloqueados.</div>
   </div>
-
-  <!-- Filtro por líder de equipe -->
-  <div id="chk-leader-bar" style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:12px 16px;box-shadow:var(--sh)"></div>
-
-  <!-- Progress bar geral -->
-  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:14px 18px;box-shadow:var(--sh)">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <span style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px">Progresso Geral da Semana</span>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--pp)" id="chk-pct-big">0%</span>
-    </div>
-    <div style="background:var(--g100);border-radius:100px;height:10px;overflow:hidden">
-      <div id="chk-bar" style="height:100%;border-radius:100px;background:linear-gradient(90deg,var(--pp),var(--pp3));transition:width .5s;width:0%"></div>
-    </div>
-    <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap" id="chk-stats"></div>
-  </div>
-
-  <!-- Gráfico de evolução semanal -->
-  <div style="background:var(--w);border:1px solid var(--g200);border-radius:var(--rl);padding:18px;box-shadow:var(--sh)">
-    <div style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px">📈 Evolução da Semana — % de tarefas feitas por dia</div>
-    <canvas id="chk-chart" height="120"></canvas>
-  </div>
-
-  <!-- Seções do checklist -->
-  <div id="chk-sections" style="display:flex;flex-direction:column;gap:12px"></div>
-
+  <div id="chks-box" style="margin-top:12px"></div>
 </div>
 
 
@@ -19192,9 +19227,9 @@ function mtsAtualizarJulho(){
     <div style="font-size:11px;font-weight:800;color:var(--g700);letter-spacing:.6px;text-transform:uppercase">Filtrar Equipe:</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap" id="rdop-fbtns">
       <button class="fbtn on" onclick="rdopFiltrar('TODAS',this)">Todas</button>
-      <button class="fbtn" onclick="rdopFiltrar('COFEN BIRIGUI BRUNA',this)">Birigui Bruna</button>
-      <button class="fbtn" onclick="rdopFiltrar('COFEN MARILIA BRENDA',this)">Marília Stephanie</button>
-      <button class="fbtn" onclick="rdopFiltrar('COFEN STEPHANIE 2° TURNO',this)">Katia 2°T</button>
+      <button class="fbtn" onclick="rdopFiltrar('COFEN BIRIGUI BRUNA',this)">Bruna Justimiano</button>
+      <button class="fbtn" onclick="rdopFiltrar('COFEN MARILIA BRENDA',this)">Stephanie Bernardes</button>
+      <button class="fbtn" onclick="rdopFiltrar('COFEN STEPHANIE 2° TURNO',this)">Katia Regina</button>
       <button class="fbtn" onclick="rdopFiltrar('COFEN DIGITAL',this)">Digital</button>
       <button class="fbtn" onclick="rdopFiltrar('COFEN KATIA',this)">Equipe Stephanie</button>
     </div>
@@ -19267,9 +19302,9 @@ function mtsAtualizarJulho(){
       <div style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:.6px;text-transform:uppercase">Equipe:</div>
       <div style="display:flex;gap:5px;flex-wrap:wrap" id="hist-fbtns">
         <button class="fbtn on" onclick="histFiltrar('TODAS',this)" style="font-size:10px">Todas</button>
-        <button class="fbtn" onclick="histFiltrar('Birigui Bruna',this)" style="font-size:10px">Birigui Bruna</button>
-        <button class="fbtn" onclick="histFiltrar('Marília Stephanie',this)" style="font-size:10px">Marília Stephanie</button>
-        <button class="fbtn" onclick="histFiltrar('Katia 2°T',this)" style="font-size:10px">Katia 2°T</button>
+        <button class="fbtn" onclick="histFiltrar('Bruna Justimiano',this)" style="font-size:10px">Bruna Justimiano</button>
+        <button class="fbtn" onclick="histFiltrar('Stephanie Bernardes',this)" style="font-size:10px">Stephanie Bernardes</button>
+        <button class="fbtn" onclick="histFiltrar('Katia Regina',this)" style="font-size:10px">Katia Regina</button>
         <button class="fbtn" onclick="histFiltrar('Digital',this)" style="font-size:10px">Digital</button>
       </div>
       <div style="font-size:10px;font-weight:800;color:var(--g500);letter-spacing:.6px;text-transform:uppercase;margin-left:6px">Estado:</div>
@@ -19679,11 +19714,11 @@ function projRowSub(d){
 
 let projViewMode = 'operador';
 // ── Exportar o painel inteiro (header + tabela + lateral) como imagem PNG ──
-let PROJ_ANO_DADOS = {"Janeiro":[{"eq":"Marília Stephanie","nOps":3,"rec":26480.07,"ho":6609.36,"meta":15000.0,"pct":0.4406,"falta":-8390.64},{"eq":"Katia 2°T","nOps":2,"rec":26386.92,"ho":6586.15,"meta":10000.0,"pct":0.6586,"falta":-3413.85},{"eq":"Líderes","nOps":1,"rec":4828.24,"ho":1205.12,"meta":5000.0,"pct":0.241,"falta":-3794.88},{"eq":"Liderança","nOps":1,"rec":4760.4,"ho":1188.17,"meta":5000.0,"pct":0.2376,"falta":-3811.83},{"eq":"Sem Equipe","nOps":1,"rec":1952.21,"ho":487.25,"meta":null,"pct":null,"falta":null}],"Fevereiro":[{"eq":"Marília Stephanie","nOps":11,"rec":64202.71,"ho":19445.56,"meta":88000.0,"pct":0.221,"falta":-68554.44},{"eq":"Katia 2°T","nOps":6,"rec":36794.08,"ho":10401.33,"meta":48000.0,"pct":0.2167,"falta":-37598.67},{"eq":"Birigui Bruna","nOps":4,"rec":2734.24,"ho":1782.12,"meta":32000.0,"pct":0.0557,"falta":-30217.88},{"eq":"Líderes","nOps":1,"rec":5849.73,"ho":1460.07,"meta":8000.0,"pct":0.1825,"falta":-6539.93},{"eq":"Sem Equipe","nOps":3,"rec":4345.8,"ho":1084.68,"meta":null,"pct":null,"falta":null},{"eq":"Liderança","nOps":1,"rec":3153.26,"ho":787.05,"meta":8000.0,"pct":0.0984,"falta":-7212.95}],"Março":[{"eq":"Marília Stephanie","nOps":12,"rec":289906.93,"ho":87269.52,"meta":144000.0,"pct":0.606,"falta":-56730.48},{"eq":"Birigui Bruna","nOps":18,"rec":254828.58,"ho":73283.97,"meta":216000.0,"pct":0.3393,"falta":-142716.03},{"eq":"Katia 2°T","nOps":11,"rec":179356.7,"ho":52971.02,"meta":132000.0,"pct":0.4013,"falta":-79028.98},{"eq":"Sem Equipe","nOps":2,"rec":12623.1,"ho":8147.29,"meta":null,"pct":null,"falta":null},{"eq":"Ouvidoria/Suporte","nOps":1,"rec":21918.33,"ho":6740.07,"meta":12000.0,"pct":0.5617,"falta":-5259.93},{"eq":"Liderança","nOps":3,"rec":23301.56,"ho":5816.09,"meta":36000.0,"pct":0.1616,"falta":-30183.91},{"eq":"Digital","nOps":1,"rec":19396.73,"ho":5459.2,"meta":12000.0,"pct":0.4549,"falta":-6540.8},{"eq":"Líderes","nOps":1,"rec":3987.39,"ho":2147.96,"meta":12000.0,"pct":0.179,"falta":-9852.04}],"Abril":[{"eq":"Birigui Bruna","nOps":19,"rec":609898.22,"ho":152231.01,"meta":285000.0,"pct":0.5341,"falta":-132768.99},{"eq":"Marília Stephanie","nOps":12,"rec":474201.17,"ho":118360.36,"meta":180000.0,"pct":0.6576,"falta":-61639.64},{"eq":"Katia 2°T","nOps":11,"rec":394165.78,"ho":98371.47,"meta":165000.0,"pct":0.5962,"falta":-66628.53},{"eq":"Liderança","nOps":2,"rec":73246.99,"ho":18282.41,"meta":30000.0,"pct":0.6094,"falta":-11717.59},{"eq":"Digital","nOps":1,"rec":28863.67,"ho":7204.4,"meta":15000.0,"pct":0.4803,"falta":-7795.6},{"eq":"Ouvidoria/Suporte","nOps":1,"rec":11853.38,"ho":2958.61,"meta":15000.0,"pct":0.1972,"falta":-12041.39},{"eq":"Líderes","nOps":1,"rec":6843.92,"ho":1708.28,"meta":15000.0,"pct":0.1139,"falta":-13291.72},{"eq":"Sem Equipe","nOps":3,"rec":2343.66,"ho":584.98,"meta":null,"pct":null,"falta":null}],"Maio":[{"eq":"Birigui Bruna","nOps":19,"rec":887648.84,"ho":221557.9,"meta":494000.0,"pct":0.4485,"falta":-272442.1},{"eq":"Marília Stephanie","nOps":12,"rec":502577.47,"ho":125444.41,"meta":180000.0,"pct":0.6969,"falta":-54555.59},{"eq":"Katia 2°T","nOps":10,"rec":397739.15,"ho":99276.33,"meta":150000.0,"pct":0.6618,"falta":-50723.67},{"eq":"Liderança","nOps":3,"rec":76213.73,"ho":19022.96,"meta":45000.0,"pct":0.4227,"falta":-25977.04},{"eq":"Digital","nOps":1,"rec":31779.87,"ho":7932.31,"meta":15000.0,"pct":0.5288,"falta":-7067.69},{"eq":"Ouvidoria/Suporte","nOps":1,"rec":27723.55,"ho":6919.82,"meta":15000.0,"pct":0.4613,"falta":-8080.18},{"eq":"Líderes","nOps":1,"rec":19254.58,"ho":4805.91,"meta":15000.0,"pct":0.3204,"falta":-10194.09},{"eq":"Sem Equipe","nOps":2,"rec":557.24,"ho":139.09,"meta":null,"pct":null,"falta":null}],"Junho":[{"eq":"Birigui Bruna","nOps":18,"rec":1171535.49,"ho":292416.8,"meta":540000.0,"pct":0.5415,"falta":-247583.2},{"eq":"Marília Stephanie","nOps":14,"rec":472039.29,"ho":117821.33,"meta":252000.0,"pct":0.4675,"falta":-134178.67},{"eq":"Katia 2°T","nOps":12,"rec":407462.75,"ho":101703.41,"meta":216000.0,"pct":0.4708,"falta":-114296.59},{"eq":"Liderança","nOps":3,"rec":67771.56,"ho":16915.84,"meta":54000.0,"pct":0.3133,"falta":-37084.16},{"eq":"Líderes","nOps":1,"rec":27862.78,"ho":6954.52,"meta":18000.0,"pct":0.3864,"falta":-11045.48},{"eq":"Digital","nOps":1,"rec":23958.85,"ho":5980.09,"meta":18000.0,"pct":0.3322,"falta":-12019.91},{"eq":"Ouvidoria/Suporte","nOps":1,"rec":21597.17,"ho":5390.67,"meta":18000.0,"pct":0.2995,"falta":-12609.33},{"eq":"Laysa Lopes","nOps":3,"rec":20652.37,"ho":5154.87,"meta":54000.0,"pct":0.0955,"falta":-48845.13},{"eq":"Sem Equipe","nOps":2,"rec":539.46,"ho":134.66,"meta":null,"pct":null,"falta":null}],"Julho":[{"eq":"Birigui Bruna","nOps":12,"rec":681209.7,"ho":170302.43,"meta":360000.0,"pct":0.4731,"falta":-189697.57},{"eq":"Marília Stephanie","nOps":9,"rec":307776.09,"ho":76944.02,"meta":162000.0,"pct":0.475,"falta":-85055.98},{"eq":"Katia 2°T","nOps":10,"rec":278247.42,"ho":69561.86,"meta":180000.0,"pct":0.3865,"falta":-110438.14},{"eq":"Laysa Lopes","nOps":10,"rec":244502.21,"ho":61125.55,"meta":50000.0,"pct":1.2225,"falta":11125.55},{"eq":"Sem Equipe","nOps":2,"rec":64829.46,"ho":16207.36,"meta":null,"pct":null,"falta":null},{"eq":"Liderança","nOps":4,"rec":11234.48,"ho":2808.62,"meta":null,"pct":null,"falta":null},{"eq":"Líderes","nOps":1,"rec":1476.55,"ho":369.14,"meta":null,"pct":null,"falta":null},{"eq":"Ouvidoria/Suporte","nOps":1,"rec":1047.04,"ho":261.76,"meta":null,"pct":null,"falta":null}],"Agosto":[{"eq":"Birigui Bruna","nOps":12,"rec":1569330.93,"ho":391705.0,"meta":500000,"pct":0.7834,"falta":-108295.0},{"eq":"Laysa/Stephanie","nOps":8,"rec":426980.97,"ho":106574.45,"meta":130000,"pct":0.8198,"falta":-23425.55},{"eq":"Katia 2°T","nOps":7,"rec":319629.93,"ho":79779.63,"meta":130000,"pct":0.6137,"falta":-50220.37},{"eq":"Ouvidoria/Suporte","nOps":2,"rec":161612.66,"ho":40403.17,"meta":null,"pct":null,"falta":null},{"eq":"Sem Equipe","nOps":3,"rec":91895.53,"ho":22979.88,"meta":null,"pct":null,"falta":null},{"eq":"Alisson","nOps":1,"rec":73367.53,"ho":18341.88,"meta":null,"pct":null,"falta":null},{"eq":"Time Matheus","nOps":2,"rec":71669.41,"ho":17917.35,"meta":null,"pct":null,"falta":null},{"eq":"Luciano e Luan","nOps":2,"rec":67840.92,"ho":16960.23,"meta":null,"pct":null,"falta":null},{"eq":"Digital","nOps":1,"rec":20244.3,"ho":5061.07,"meta":null,"pct":null,"falta":null},{"eq":"Liderança","nOps":4,"rec":8781.1,"ho":2195.28,"meta":null,"pct":null,"falta":null},{"eq":"Bianca","nOps":1,"rec":3147.08,"ho":786.77,"meta":null,"pct":null,"falta":null},{"eq":"Qualidade","nOps":1,"rec":2496.63,"ho":624.16,"meta":null,"pct":null,"falta":null},{"eq":"Suporte ao Usuário","nOps":1,"rec":1123.98,"ho":281.0,"meta":null,"pct":null,"falta":null}]}
+let PROJ_ANO_DADOS = {"Janeiro":[{"eq":"Stephanie Bernardes","nOps":3,"rec":26480.07,"ho":6609.36,"meta":15000.0,"pct":0.4406,"falta":-8390.64},{"eq":"Katia Regina","nOps":2,"rec":26386.92,"ho":6586.15,"meta":10000.0,"pct":0.6586,"falta":-3413.85},{"eq":"Líderes","nOps":1,"rec":4828.24,"ho":1205.12,"meta":5000.0,"pct":0.241,"falta":-3794.88},{"eq":"Liderança","nOps":1,"rec":4760.4,"ho":1188.17,"meta":5000.0,"pct":0.2376,"falta":-3811.83},{"eq":"Sem Equipe","nOps":1,"rec":1952.21,"ho":487.25,"meta":null,"pct":null,"falta":null}],"Fevereiro":[{"eq":"Stephanie Bernardes","nOps":11,"rec":64202.71,"ho":19445.56,"meta":88000.0,"pct":0.221,"falta":-68554.44},{"eq":"Katia Regina","nOps":6,"rec":36794.08,"ho":10401.33,"meta":48000.0,"pct":0.2167,"falta":-37598.67},{"eq":"Bruna Justimiano","nOps":4,"rec":2734.24,"ho":1782.12,"meta":32000.0,"pct":0.0557,"falta":-30217.88},{"eq":"Líderes","nOps":1,"rec":5849.73,"ho":1460.07,"meta":8000.0,"pct":0.1825,"falta":-6539.93},{"eq":"Sem Equipe","nOps":3,"rec":4345.8,"ho":1084.68,"meta":null,"pct":null,"falta":null},{"eq":"Liderança","nOps":1,"rec":3153.26,"ho":787.05,"meta":8000.0,"pct":0.0984,"falta":-7212.95}],"Março":[{"eq":"Stephanie Bernardes","nOps":12,"rec":289906.93,"ho":87269.52,"meta":144000.0,"pct":0.606,"falta":-56730.48},{"eq":"Bruna Justimiano","nOps":18,"rec":254828.58,"ho":73283.97,"meta":216000.0,"pct":0.3393,"falta":-142716.03},{"eq":"Katia Regina","nOps":11,"rec":179356.7,"ho":52971.02,"meta":132000.0,"pct":0.4013,"falta":-79028.98},{"eq":"Sem Equipe","nOps":2,"rec":12623.1,"ho":8147.29,"meta":null,"pct":null,"falta":null},{"eq":"Ouvidoria/Suporte","nOps":1,"rec":21918.33,"ho":6740.07,"meta":12000.0,"pct":0.5617,"falta":-5259.93},{"eq":"Liderança","nOps":3,"rec":23301.56,"ho":5816.09,"meta":36000.0,"pct":0.1616,"falta":-30183.91},{"eq":"Digital","nOps":1,"rec":19396.73,"ho":5459.2,"meta":12000.0,"pct":0.4549,"falta":-6540.8},{"eq":"Líderes","nOps":1,"rec":3987.39,"ho":2147.96,"meta":12000.0,"pct":0.179,"falta":-9852.04}],"Abril":[{"eq":"Bruna Justimiano","nOps":19,"rec":609898.22,"ho":152231.01,"meta":285000.0,"pct":0.5341,"falta":-132768.99},{"eq":"Stephanie Bernardes","nOps":12,"rec":474201.17,"ho":118360.36,"meta":180000.0,"pct":0.6576,"falta":-61639.64},{"eq":"Katia Regina","nOps":11,"rec":394165.78,"ho":98371.47,"meta":165000.0,"pct":0.5962,"falta":-66628.53},{"eq":"Liderança","nOps":2,"rec":73246.99,"ho":18282.41,"meta":30000.0,"pct":0.6094,"falta":-11717.59},{"eq":"Digital","nOps":1,"rec":28863.67,"ho":7204.4,"meta":15000.0,"pct":0.4803,"falta":-7795.6},{"eq":"Ouvidoria/Suporte","nOps":1,"rec":11853.38,"ho":2958.61,"meta":15000.0,"pct":0.1972,"falta":-12041.39},{"eq":"Líderes","nOps":1,"rec":6843.92,"ho":1708.28,"meta":15000.0,"pct":0.1139,"falta":-13291.72},{"eq":"Sem Equipe","nOps":3,"rec":2343.66,"ho":584.98,"meta":null,"pct":null,"falta":null}],"Maio":[{"eq":"Bruna Justimiano","nOps":19,"rec":887648.84,"ho":221557.9,"meta":494000.0,"pct":0.4485,"falta":-272442.1},{"eq":"Stephanie Bernardes","nOps":12,"rec":502577.47,"ho":125444.41,"meta":180000.0,"pct":0.6969,"falta":-54555.59},{"eq":"Katia Regina","nOps":10,"rec":397739.15,"ho":99276.33,"meta":150000.0,"pct":0.6618,"falta":-50723.67},{"eq":"Liderança","nOps":3,"rec":76213.73,"ho":19022.96,"meta":45000.0,"pct":0.4227,"falta":-25977.04},{"eq":"Digital","nOps":1,"rec":31779.87,"ho":7932.31,"meta":15000.0,"pct":0.5288,"falta":-7067.69},{"eq":"Ouvidoria/Suporte","nOps":1,"rec":27723.55,"ho":6919.82,"meta":15000.0,"pct":0.4613,"falta":-8080.18},{"eq":"Líderes","nOps":1,"rec":19254.58,"ho":4805.91,"meta":15000.0,"pct":0.3204,"falta":-10194.09},{"eq":"Sem Equipe","nOps":2,"rec":557.24,"ho":139.09,"meta":null,"pct":null,"falta":null}],"Junho":[{"eq":"Bruna Justimiano","nOps":18,"rec":1171535.49,"ho":292416.8,"meta":540000.0,"pct":0.5415,"falta":-247583.2},{"eq":"Stephanie Bernardes","nOps":14,"rec":472039.29,"ho":117821.33,"meta":252000.0,"pct":0.4675,"falta":-134178.67},{"eq":"Katia Regina","nOps":12,"rec":407462.75,"ho":101703.41,"meta":216000.0,"pct":0.4708,"falta":-114296.59},{"eq":"Liderança","nOps":3,"rec":67771.56,"ho":16915.84,"meta":54000.0,"pct":0.3133,"falta":-37084.16},{"eq":"Líderes","nOps":1,"rec":27862.78,"ho":6954.52,"meta":18000.0,"pct":0.3864,"falta":-11045.48},{"eq":"Digital","nOps":1,"rec":23958.85,"ho":5980.09,"meta":18000.0,"pct":0.3322,"falta":-12019.91},{"eq":"Ouvidoria/Suporte","nOps":1,"rec":21597.17,"ho":5390.67,"meta":18000.0,"pct":0.2995,"falta":-12609.33},{"eq":"Laysa Lopes","nOps":3,"rec":20652.37,"ho":5154.87,"meta":54000.0,"pct":0.0955,"falta":-48845.13},{"eq":"Sem Equipe","nOps":2,"rec":539.46,"ho":134.66,"meta":null,"pct":null,"falta":null}],"Julho":[{"eq":"Bruna Justimiano","nOps":12,"rec":681209.7,"ho":170302.43,"meta":360000.0,"pct":0.4731,"falta":-189697.57},{"eq":"Stephanie Bernardes","nOps":9,"rec":307776.09,"ho":76944.02,"meta":162000.0,"pct":0.475,"falta":-85055.98},{"eq":"Katia Regina","nOps":10,"rec":278247.42,"ho":69561.86,"meta":180000.0,"pct":0.3865,"falta":-110438.14},{"eq":"Laysa Lopes","nOps":10,"rec":244502.21,"ho":61125.55,"meta":50000.0,"pct":1.2225,"falta":11125.55},{"eq":"Sem Equipe","nOps":2,"rec":64829.46,"ho":16207.36,"meta":null,"pct":null,"falta":null},{"eq":"Liderança","nOps":4,"rec":11234.48,"ho":2808.62,"meta":null,"pct":null,"falta":null},{"eq":"Líderes","nOps":1,"rec":1476.55,"ho":369.14,"meta":null,"pct":null,"falta":null},{"eq":"Ouvidoria/Suporte","nOps":1,"rec":1047.04,"ho":261.76,"meta":null,"pct":null,"falta":null}],"Agosto":[{"eq":"Bruna Justimiano","nOps":12,"rec":1569330.93,"ho":391705.0,"meta":500000,"pct":0.7834,"falta":-108295.0},{"eq":"Laysa/Stephanie","nOps":8,"rec":426980.97,"ho":106574.45,"meta":130000,"pct":0.8198,"falta":-23425.55},{"eq":"Katia Regina","nOps":7,"rec":319629.93,"ho":79779.63,"meta":130000,"pct":0.6137,"falta":-50220.37},{"eq":"Ouvidoria/Suporte","nOps":2,"rec":161612.66,"ho":40403.17,"meta":null,"pct":null,"falta":null},{"eq":"Sem Equipe","nOps":3,"rec":91895.53,"ho":22979.88,"meta":null,"pct":null,"falta":null},{"eq":"Alisson","nOps":1,"rec":73367.53,"ho":18341.88,"meta":null,"pct":null,"falta":null},{"eq":"Time Matheus","nOps":2,"rec":71669.41,"ho":17917.35,"meta":null,"pct":null,"falta":null},{"eq":"Luciano e Luan","nOps":2,"rec":67840.92,"ho":16960.23,"meta":null,"pct":null,"falta":null},{"eq":"Digital","nOps":1,"rec":20244.3,"ho":5061.07,"meta":null,"pct":null,"falta":null},{"eq":"Liderança","nOps":4,"rec":8781.1,"ho":2195.28,"meta":null,"pct":null,"falta":null},{"eq":"Bianca","nOps":1,"rec":3147.08,"ho":786.77,"meta":null,"pct":null,"falta":null},{"eq":"Qualidade","nOps":1,"rec":2496.63,"ho":624.16,"meta":null,"pct":null,"falta":null},{"eq":"Suporte ao Usuário","nOps":1,"rec":1123.98,"ho":281.0,"meta":null,"pct":null,"falta":null}]}
 ;
 
 
-let PROJ_ANO_OPS_DADOS = {"Janeiro":[{"nome":"GIOVANA_SOUZA","eq":"Katia 2°T","rec":15592.11,"ho":3891.76,"meta":5000.0,"pct":0.7784,"falta":-1108.24},{"nome":"BIANCA_V_SILVA","eq":"Marília Stephanie","rec":11141.94,"ho":2780.96,"meta":5000.0,"pct":0.5562,"falta":-2219.04},{"nome":"ISABELA_MONTEIRO","eq":"Katia 2°T","rec":10794.81,"ho":2694.39,"meta":5000.0,"pct":0.5389,"falta":-2305.61},{"nome":"JESSICA_O_SILVA","eq":"Marília Stephanie","rec":10552.78,"ho":2633.95,"meta":5000.0,"pct":0.5268,"falta":-2366.05},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":4828.24,"ho":1205.12,"meta":5000.0,"pct":0.241,"falta":-3794.88},{"nome":"KELY_SILVA","eq":"Marília Stephanie","rec":4785.35,"ho":1194.45,"meta":5000.0,"pct":0.2389,"falta":-3805.55},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":4760.4,"ho":1188.17,"meta":5000.0,"pct":0.2376,"falta":-3811.83},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":1952.21,"ho":487.25,"meta":null,"pct":null,"falta":null}],"Fevereiro":[{"nome":"BIANCA_V_SILVA","eq":"Marília Stephanie","rec":16120.49,"ho":5250.78,"meta":8000.0,"pct":0.6563,"falta":-2749.22},{"nome":"GIOVANA_SOUZA","eq":"Katia 2°T","rec":18351.17,"ho":4580.42,"meta":8000.0,"pct":0.5726,"falta":-3419.58},{"nome":"ISABELA_MONTEIRO","eq":"Katia 2°T","rec":12311.87,"ho":4290.59,"meta":8000.0,"pct":0.5363,"falta":-3709.41},{"nome":"JESSICA_O_SILVA","eq":"Marília Stephanie","rec":12316.0,"ho":3730.1,"meta":8000.0,"pct":0.4663,"falta":-4269.9},{"nome":"KELY_SILVA","eq":"Marília Stephanie","rec":12632.11,"ho":3152.94,"meta":8000.0,"pct":0.3941,"falta":-4847.06},{"nome":"STEPHANIE_FAGUNDES","eq":"Marília Stephanie","rec":7842.12,"ho":1957.39,"meta":8000.0,"pct":0.2447,"falta":-6042.61},{"nome":"raissa_paloma","eq":"Marília Stephanie","rec":1507.45,"ho":1507.45,"meta":8000.0,"pct":0.1884,"falta":-6492.55},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":5849.73,"ho":1460.07,"meta":8000.0,"pct":0.1825,"falta":-6539.93},{"nome":"silva_beatriz","eq":"Marília Stephanie","rec":5218.69,"ho":1302.6,"meta":8000.0,"pct":0.1628,"falta":-6697.4},{"nome":"CAIO_SHIMITE","eq":"Marília Stephanie","rec":3482.55,"ho":1077.68,"meta":8000.0,"pct":0.1347,"falta":-6922.32},{"nome":"THAYRA_FERREIRASILVA","eq":"Birigui Bruna","rec":896.2,"ho":896.2,"meta":8000.0,"pct":0.112,"falta":-7103.8},{"nome":"rodrigo_martins","eq":"Sem Equipe","rec":3397.16,"ho":847.89,"meta":null,"pct":null,"falta":null},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":3153.26,"ho":787.05,"meta":8000.0,"pct":0.0984,"falta":-7212.95},{"nome":"thauany_moura","eq":"Marília Stephanie","rec":2197.96,"ho":746.42,"meta":8000.0,"pct":0.0933,"falta":-7253.58},{"nome":"geovanna_almeida","eq":"Katia 2°T","rec":2641.89,"ho":659.43,"meta":8000.0,"pct":0.0824,"falta":-7340.57},{"nome":"LYVIA_DIAS","eq":"Birigui Bruna","rec":569.22,"ho":569.22,"meta":8000.0,"pct":0.0712,"falta":-7430.78},{"nome":"jussara_pereira","eq":"Katia 2°T","rec":2240.09,"ho":559.12,"meta":8000.0,"pct":0.0699,"falta":-7440.88},{"nome":"felipe_arruda","eq":"Marília Stephanie","rec":1893.9,"ho":472.73,"meta":8000.0,"pct":0.0591,"falta":-7527.27},{"nome":"aline_pupim","eq":"Katia 2°T","rec":989.13,"ho":246.89,"meta":8000.0,"pct":0.0309,"falta":-7753.11},{"nome":"HELTON_ROLDON","eq":"Birigui Bruna","rec":989.13,"ho":246.89,"meta":8000.0,"pct":0.0309,"falta":-7753.11},{"nome":"leticia_romeu","eq":"Marília Stephanie","rec":557.31,"ho":139.11,"meta":8000.0,"pct":0.0174,"falta":-7860.89},{"nome":"miguel_rodrigues","eq":"Sem Equipe","rec":488.75,"ho":121.99,"meta":null,"pct":null,"falta":null},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":459.89,"ho":114.8,"meta":null,"pct":null,"falta":null},{"nome":"itallo_cardamoni","eq":"Marília Stephanie","rec":434.13,"ho":108.36,"meta":8000.0,"pct":0.0135,"falta":-7891.64},{"nome":"MATHEUS_SOUZA","eq":"Birigui Bruna","rec":279.69,"ho":69.81,"meta":8000.0,"pct":0.0087,"falta":-7930.19},{"nome":"THAIS_MAYARA","eq":"Katia 2°T","rec":259.93,"ho":64.88,"meta":8000.0,"pct":0.0081,"falta":-7935.12}],"Março":[{"nome":"CAIO_SHIMITE","eq":"Marília Stephanie","rec":52988.65,"ho":15311.2,"meta":12000.0,"pct":1.2759,"falta":3311.2},{"nome":"STEPHANIE_FAGUNDES","eq":"Marília Stephanie","rec":48669.57,"ho":14951.33,"meta":12000.0,"pct":1.2459,"falta":2951.33},{"nome":"KAROLAINE_SILVA","eq":"Birigui Bruna","rec":35622.26,"ho":11528.75,"meta":12000.0,"pct":0.9607,"falta":-471.25},{"nome":"raissa_paloma","eq":"Marília Stephanie","rec":38167.78,"ho":10448.56,"meta":12000.0,"pct":0.8707,"falta":-1551.44},{"nome":"MATHEUS_SOUZA","eq":"Birigui Bruna","rec":27939.81,"ho":10030.23,"meta":12000.0,"pct":0.8359,"falta":-1969.77},{"nome":"itallo_cardamoni","eq":"Marília Stephanie","rec":28613.17,"ho":9859.58,"meta":12000.0,"pct":0.8216,"falta":-2140.42},{"nome":"jussara_pereira","eq":"Katia 2°T","rec":17269.16,"ho":9675.51,"meta":12000.0,"pct":0.8063,"falta":-2324.49},{"nome":"leticia_romeu","eq":"Marília Stephanie","rec":24422.88,"ho":9639.4,"meta":12000.0,"pct":0.8033,"falta":-2360.6},{"nome":"BIANCA_V_SILVA","eq":"Marília Stephanie","rec":28325.93,"ho":9379.89,"meta":12000.0,"pct":0.7817,"falta":-2620.11},{"nome":"LEONARDO_NUNES","eq":"Birigui Bruna","rec":36537.11,"ho":9119.93,"meta":12000.0,"pct":0.76,"falta":-2880.07},{"nome":"GIOVANA_SOUZA","eq":"Katia 2°T","rec":34086.36,"ho":8507.97,"meta":12000.0,"pct":0.709,"falta":-3492.03},{"nome":"ISABELA_MONTEIRO","eq":"Katia 2°T","rec":31925.63,"ho":7968.64,"meta":12000.0,"pct":0.6641,"falta":-4031.36},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":11513.23,"ho":7870.27,"meta":null,"pct":null,"falta":null},{"nome":"larissa_santana","eq":"Katia 2°T","rec":21545.17,"ho":6877.71,"meta":12000.0,"pct":0.5731,"falta":-5122.29},{"nome":"JHONATA_NASCIMENTO","eq":"Ouvidoria/Suporte","rec":21918.33,"ho":6740.07,"meta":12000.0,"pct":0.5617,"falta":-5259.93},{"nome":"FRANCISCA_BRITO","eq":"Birigui Bruna","rec":17509.07,"ho":6333.84,"meta":12000.0,"pct":0.5278,"falta":-5666.16},{"nome":"silva_beatriz","eq":"Marília Stephanie","rec":22875.59,"ho":5918.1,"meta":12000.0,"pct":0.4932,"falta":-6081.9},{"nome":"KATIA_REGINA","eq":"Liderança","rec":22578.94,"ho":5635.73,"meta":12000.0,"pct":0.4696,"falta":-6364.27},{"nome":"geovanna_almeida","eq":"Katia 2°T","rec":19073.49,"ho":5607.48,"meta":12000.0,"pct":0.4673,"falta":-6392.52},{"nome":"CLEBER_JUNIOR","eq":"Digital","rec":19396.73,"ho":5459.2,"meta":12000.0,"pct":0.4549,"falta":-6540.8},{"nome":"HELTON_ROLDON","eq":"Birigui Bruna","rec":17352.04,"ho":4953.14,"meta":12000.0,"pct":0.4128,"falta":-7046.86},{"nome":"MAYSA_OLIVEIRA","eq":"Birigui Bruna","rec":18769.26,"ho":4684.82,"meta":12000.0,"pct":0.3904,"falta":-7315.18},{"nome":"MARIA_MOREIRASANTOS","eq":"Birigui Bruna","rec":17145.74,"ho":4673.48,"meta":12000.0,"pct":0.3895,"falta":-7326.52},{"nome":"RENATARODRIGUES","eq":"Birigui Bruna","rec":18245.69,"ho":4554.1,"meta":12000.0,"pct":0.3795,"falta":-7445.9},{"nome":"aline_pupim","eq":"Katia 2°T","rec":16006.8,"ho":3995.27,"meta":12000.0,"pct":0.3329,"falta":-8004.73},{"nome":"thauany_moura","eq":"Marília Stephanie","rec":15779.43,"ho":3938.54,"meta":12000.0,"pct":0.3282,"falta":-8061.46},{"nome":"carulini_santos","eq":"Marília Stephanie","rec":15673.98,"ho":3912.38,"meta":12000.0,"pct":0.326,"falta":-8087.62},{"nome":"THAIS_MAYARA","eq":"Katia 2°T","rec":12242.78,"ho":3547.49,"meta":12000.0,"pct":0.2956,"falta":-8452.51},{"nome":"THAYRA_FERREIRASILVA","eq":"Birigui Bruna","rec":11115.26,"ho":2774.37,"meta":12000.0,"pct":0.2312,"falta":-9225.63},{"nome":"LYVIA_DIAS","eq":"Birigui Bruna","rec":10514.54,"ho":2624.42,"meta":12000.0,"pct":0.2187,"falta":-9375.58},{"nome":"AMABELLY_SANTOS","eq":"Katia 2°T","rec":9690.77,"ho":2418.8,"meta":12000.0,"pct":0.2016,"falta":-9581.2},{"nome":"NAYARA_CRUZ","eq":"Birigui Bruna","rec":8524.18,"ho":2336.2,"meta":12000.0,"pct":0.1947,"falta":-9663.8},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":3987.39,"ho":2147.96,"meta":12000.0,"pct":0.179,"falta":-9852.04},{"nome":"RAFAELA_MINHOTO","eq":"Birigui Bruna","rec":8051.23,"ho":2009.65,"meta":12000.0,"pct":0.1675,"falta":-9990.35},{"nome":"HELENA_SANTOS","eq":"Birigui Bruna","rec":7725.62,"ho":1928.34,"meta":12000.0,"pct":0.1607,"falta":-10071.66},{"nome":"thalia_thomaz","eq":"Katia 2°T","rec":7680.21,"ho":1916.99,"meta":12000.0,"pct":0.1597,"falta":-10083.01},{"nome":"kauane_azevedo","eq":"Katia 2°T","rec":7096.3,"ho":1771.24,"meta":12000.0,"pct":0.1476,"falta":-10228.76},{"nome":"felipe_arruda","eq":"Marília Stephanie","rec":5398.77,"ho":1666.39,"meta":12000.0,"pct":0.1389,"falta":-10333.61},{"nome":"KELY_SILVA","eq":"Marília Stephanie","rec":6362.32,"ho":1587.99,"meta":12000.0,"pct":0.1323,"falta":-10412.01},{"nome":"JOAO_MIRANDA","eq":"Birigui Bruna","rec":2268.86,"ho":1362.71,"meta":12000.0,"pct":0.1136,"falta":-10637.29},{"nome":"DEBORA_ANDRIELLY","eq":"Birigui Bruna","rec":5038.61,"ho":1257.59,"meta":12000.0,"pct":0.1048,"falta":-10742.41},{"nome":"EDUARDO_SILVA","eq":"Birigui Bruna","rec":4603.8,"ho":1149.14,"meta":12000.0,"pct":0.0958,"falta":-10850.86},{"nome":"MARIA_BRAIDOTI","eq":"Birigui Bruna","rec":3943.4,"ho":984.28,"meta":12000.0,"pct":0.082,"falta":-11015.72},{"nome":"ANA_BENTO","eq":"Birigui Bruna","rec":3922.1,"ho":978.98,"meta":12000.0,"pct":0.0816,"falta":-11021.02},{"nome":"thais_c_ferreira","eq":"Katia 2°T","rec":2740.03,"ho":683.92,"meta":12000.0,"pct":0.057,"falta":-11316.08},{"nome":"JESSICA_O_SILVA","eq":"Marília Stephanie","rec":2628.86,"ho":656.16,"meta":12000.0,"pct":0.0547,"falta":-11343.84},{"nome":"BRUNO_UEMURA","eq":"Sem Equipe","rec":1109.87,"ho":277.02,"meta":null,"pct":null,"falta":null},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":545.54,"ho":136.16,"meta":12000.0,"pct":0.0113,"falta":-11863.84},{"nome":"BRUNA_JUSTIMIANO","eq":"Liderança","rec":177.08,"ho":44.2,"meta":12000.0,"pct":0.0037,"falta":-11955.8}],"Abril":[{"nome":"KAROLAINE_SILVA","eq":"Birigui Bruna","rec":110494.36,"ho":27579.51,"meta":15000.0,"pct":1.8386,"falta":12579.51},{"nome":"STEPHANIE_FAGUNDES","eq":"Marília Stephanie","rec":70448.62,"ho":17583.86,"meta":15000.0,"pct":1.1723,"falta":2583.86},{"nome":"KATIA_REGINA","eq":"Liderança","rec":66284.35,"ho":16544.54,"meta":15000.0,"pct":1.103,"falta":1544.54},{"nome":"raissa_paloma","eq":"Marília Stephanie","rec":65116.95,"ho":16253.15,"meta":15000.0,"pct":1.0835,"falta":1253.15},{"nome":"MATHEUS_SOUZA","eq":"Birigui Bruna","rec":64347.09,"ho":16061.2,"meta":15000.0,"pct":1.0707,"falta":1061.2},{"nome":"silva_beatriz","eq":"Marília Stephanie","rec":61866.17,"ho":15441.85,"meta":15000.0,"pct":1.0295,"falta":441.85},{"nome":"GIOVANA_SOUZA","eq":"Katia 2°T","rec":61480.51,"ho":15345.52,"meta":15000.0,"pct":1.023,"falta":345.52},{"nome":"LEONARDO_NUNES","eq":"Birigui Bruna","rec":60884.16,"ho":15196.67,"meta":15000.0,"pct":1.0131,"falta":196.67},{"nome":"leticia_romeu","eq":"Marília Stephanie","rec":59097.3,"ho":14750.61,"meta":15000.0,"pct":0.9834,"falta":-249.39},{"nome":"thauany_moura","eq":"Marília Stephanie","rec":54193.13,"ho":13526.57,"meta":15000.0,"pct":0.9018,"falta":-1473.43},{"nome":"RENATARODRIGUES","eq":"Birigui Bruna","rec":53722.82,"ho":13409.26,"meta":15000.0,"pct":0.894,"falta":-1590.74},{"nome":"CAIO_SHIMITE","eq":"Marília Stephanie","rec":53630.26,"ho":13386.12,"meta":15000.0,"pct":0.8924,"falta":-1613.88},{"nome":"MARIA_MOREIRASANTOS","eq":"Birigui Bruna","rec":51600.97,"ho":12879.56,"meta":15000.0,"pct":0.8586,"falta":-2120.44},{"nome":"aline_pupim","eq":"Katia 2°T","rec":50195.16,"ho":12516.61,"meta":15000.0,"pct":0.8344,"falta":-2483.39},{"nome":"kauane_azevedo","eq":"Katia 2°T","rec":46974.31,"ho":11724.76,"meta":15000.0,"pct":0.7817,"falta":-3275.24},{"nome":"HELTON_ROLDON","eq":"Birigui Bruna","rec":46816.26,"ho":11685.46,"meta":15000.0,"pct":0.779,"falta":-3314.54},{"nome":"itallo_cardamoni","eq":"Marília Stephanie","rec":46380.88,"ho":11576.63,"meta":15000.0,"pct":0.7718,"falta":-3423.37},{"nome":"AMABELLY_SANTOS","eq":"Katia 2°T","rec":45854.72,"ho":11445.37,"meta":15000.0,"pct":0.763,"falta":-3554.63},{"nome":"FRANCISCA_BRITO","eq":"Birigui Bruna","rec":43190.85,"ho":10780.69,"meta":15000.0,"pct":0.7187,"falta":-4219.31},{"nome":"jussara_pereira","eq":"Katia 2°T","rec":41839.23,"ho":10443.03,"meta":15000.0,"pct":0.6962,"falta":-4556.97},{"nome":"THAIS_MAYARA","eq":"Katia 2°T","rec":40194.8,"ho":10032.6,"meta":15000.0,"pct":0.6688,"falta":-4967.4},{"nome":"geovanna_almeida","eq":"Katia 2°T","rec":39550.72,"ho":9871.83,"meta":15000.0,"pct":0.6581,"falta":-5128.17},{"nome":"BIANCA_V_SILVA","eq":"Marília Stephanie","rec":36750.97,"ho":9173.0,"meta":15000.0,"pct":0.6115,"falta":-5827.0},{"nome":"ISABELA_MONTEIRO","eq":"Katia 2°T","rec":33699.7,"ho":8411.38,"meta":15000.0,"pct":0.5608,"falta":-6588.62},{"nome":"CLEBER_JUNIOR","eq":"Digital","rec":28863.67,"ho":7204.4,"meta":15000.0,"pct":0.4803,"falta":-7795.6},{"nome":"larissa_santana","eq":"Katia 2°T","rec":24661.92,"ho":6155.54,"meta":15000.0,"pct":0.4104,"falta":-8844.46},{"nome":"carulini_santos","eq":"Marília Stephanie","rec":24369.19,"ho":6082.59,"meta":15000.0,"pct":0.4055,"falta":-8917.41},{"nome":"THAYRA_FERREIRASILVA","eq":"Birigui Bruna","rec":23470.19,"ho":5858.14,"meta":15000.0,"pct":0.3905,"falta":-9141.86},{"nome":"RAFAELA_MINHOTO","eq":"Birigui Bruna","rec":20824.45,"ho":5197.75,"meta":15000.0,"pct":0.3465,"falta":-9802.25},{"nome":"LYVIA_DIAS","eq":"Birigui Bruna","rec":20324.1,"ho":5072.96,"meta":15000.0,"pct":0.3382,"falta":-9927.04},{"nome":"HELENA_SANTOS","eq":"Birigui Bruna","rec":17641.83,"ho":4403.37,"meta":15000.0,"pct":0.2936,"falta":-10596.63},{"nome":"ANA_BENTO","eq":"Birigui Bruna","rec":16990.83,"ho":4240.9,"meta":15000.0,"pct":0.2827,"falta":-10759.1},{"nome":"MAYSA_OLIVEIRA","eq":"Birigui Bruna","rec":16930.23,"ho":4225.76,"meta":15000.0,"pct":0.2817,"falta":-10774.24},{"nome":"MARIA_BRAIDOTI","eq":"Birigui Bruna","rec":16899.59,"ho":4218.11,"meta":15000.0,"pct":0.2812,"falta":-10781.89},{"nome":"EDUARDO_SILVA","eq":"Birigui Bruna","rec":16577.75,"ho":4137.74,"meta":15000.0,"pct":0.2758,"falta":-10862.26},{"nome":"MARIA_RODARTE","eq":"Birigui Bruna","rec":15620.19,"ho":3898.75,"meta":15000.0,"pct":0.2599,"falta":-11101.25},{"nome":"JHONATA_NASCIMENTO","eq":"Ouvidoria/Suporte","rec":11853.38,"ho":2958.61,"meta":15000.0,"pct":0.1972,"falta":-12041.39},{"nome":"JOAO_MIRANDA","eq":"Birigui Bruna","rec":9178.34,"ho":2290.91,"meta":15000.0,"pct":0.1527,"falta":-12709.09},{"nome":"BRUNA_JUSTIMIANO","eq":"Liderança","rec":6962.64,"ho":1737.87,"meta":15000.0,"pct":0.1159,"falta":-13262.13},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":6843.92,"ho":1708.28,"meta":15000.0,"pct":0.1139,"falta":-13291.72},{"nome":"thalia_thomaz","eq":"Katia 2°T","rec":5712.15,"ho":1425.77,"meta":15000.0,"pct":0.0951,"falta":-13574.23},{"nome":"thais_c_ferreira","eq":"Katia 2°T","rec":4002.56,"ho":999.06,"meta":15000.0,"pct":0.0666,"falta":-14000.94},{"nome":"DEBORA_ANDRIELLY","eq":"Birigui Bruna","rec":3340.58,"ho":833.79,"meta":15000.0,"pct":0.0556,"falta":-14166.21},{"nome":"LUCIANO_COSTA","eq":"Sem Equipe","rec":1375.26,"ho":343.26,"meta":null,"pct":null,"falta":null},{"nome":"JESSICA_O_SILVA","eq":"Marília Stephanie","rec":1255.99,"ho":313.5,"meta":15000.0,"pct":0.0209,"falta":-14686.5},{"nome":"NAYARA_CRUZ","eq":"Birigui Bruna","rec":1043.63,"ho":260.48,"meta":15000.0,"pct":0.0174,"falta":-14739.52},{"nome":"felipe_arruda","eq":"Marília Stephanie","rec":556.59,"ho":138.92,"meta":15000.0,"pct":0.0093,"falta":-14861.08},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":537.53,"ho":134.17,"meta":null,"pct":null,"falta":null},{"nome":"KELY_SILVA","eq":"Marília Stephanie","rec":535.12,"ho":133.56,"meta":15000.0,"pct":0.0089,"falta":-14866.44},{"nome":"GABRIELY_ALVES","eq":"Sem Equipe","rec":430.87,"ho":107.55,"meta":null,"pct":null,"falta":null}],"Maio":[{"nome":"KAROLAINE_SILVA","eq":"Birigui Bruna","rec":140840.86,"ho":35154.14,"meta":26000.0,"pct":1.3521,"falta":9154.14},{"nome":"RENATARODRIGUES","eq":"Birigui Bruna","rec":106762.19,"ho":26648.02,"meta":26000.0,"pct":1.0249,"falta":648.02},{"nome":"LYVIA_DIAS","eq":"Birigui Bruna","rec":88478.31,"ho":22084.05,"meta":26000.0,"pct":0.8494,"falta":-3915.95},{"nome":"MATHEUS_SOUZA","eq":"Birigui Bruna","rec":86032.29,"ho":21473.81,"meta":26000.0,"pct":0.8259,"falta":-4526.19},{"nome":"HELTON_ROLDON","eq":"Birigui Bruna","rec":84499.09,"ho":21091.0,"meta":26000.0,"pct":0.8112,"falta":-4909.0},{"nome":"silva_beatriz","eq":"Marília Stephanie","rec":82897.37,"ho":20691.46,"meta":15000.0,"pct":1.3794,"falta":5691.46},{"nome":"LEONARDO_NUNES","eq":"Birigui Bruna","rec":82691.67,"ho":20640.01,"meta":26000.0,"pct":0.7938,"falta":-5359.99},{"nome":"MARIA_MOREIRASANTOS","eq":"Birigui Bruna","rec":81403.34,"ho":20318.23,"meta":26000.0,"pct":0.7815,"falta":-5681.77},{"nome":"raissa_paloma","eq":"Marília Stephanie","rec":75685.23,"ho":18891.04,"meta":15000.0,"pct":1.2594,"falta":3891.04},{"nome":"KATIA_REGINA","eq":"Liderança","rec":73556.02,"ho":18359.58,"meta":15000.0,"pct":1.224,"falta":3359.58},{"nome":"itallo_cardamoni","eq":"Marília Stephanie","rec":73138.37,"ho":18255.6,"meta":15000.0,"pct":1.217,"falta":3255.6},{"nome":"CAIO_SHIMITE","eq":"Marília Stephanie","rec":67677.38,"ho":16892.5,"meta":15000.0,"pct":1.1262,"falta":1892.5},{"nome":"leticia_romeu","eq":"Marília Stephanie","rec":65627.74,"ho":16380.66,"meta":15000.0,"pct":1.092,"falta":1380.66},{"nome":"STEPHANIE_FAGUNDES","eq":"Marília Stephanie","rec":64983.92,"ho":16220.17,"meta":15000.0,"pct":1.0813,"falta":1220.17},{"nome":"GIOVANA_SOUZA","eq":"Katia 2°T","rec":59284.82,"ho":14797.41,"meta":15000.0,"pct":0.9865,"falta":-202.59},{"nome":"THAYRA_FERREIRASILVA","eq":"Birigui Bruna","rec":58748.86,"ho":14663.71,"meta":26000.0,"pct":0.564,"falta":-11336.29},{"nome":"THAIS_MAYARA","eq":"Katia 2°T","rec":56294.95,"ho":14051.19,"meta":15000.0,"pct":0.9367,"falta":-948.81},{"nome":"thauany_moura","eq":"Marília Stephanie","rec":55694.53,"ho":13901.5,"meta":15000.0,"pct":0.9268,"falta":-1098.5},{"nome":"geovanna_almeida","eq":"Katia 2°T","rec":53717.98,"ho":13408.28,"meta":15000.0,"pct":0.8939,"falta":-1591.72},{"nome":"FRANCISCA_BRITO","eq":"Birigui Bruna","rec":52908.48,"ho":13206.0,"meta":26000.0,"pct":0.5079,"falta":-12794.0},{"nome":"AMABELLY_SANTOS","eq":"Katia 2°T","rec":48900.14,"ho":12205.83,"meta":15000.0,"pct":0.8137,"falta":-2794.17},{"nome":"kauane_azevedo","eq":"Katia 2°T","rec":46148.37,"ho":11518.64,"meta":15000.0,"pct":0.7679,"falta":-3481.36},{"nome":"aline_pupim","eq":"Katia 2°T","rec":45647.26,"ho":11393.61,"meta":15000.0,"pct":0.7596,"falta":-3606.39},{"nome":"ISABELA_MONTEIRO","eq":"Katia 2°T","rec":34247.74,"ho":8548.34,"meta":15000.0,"pct":0.5699,"falta":-6451.66},{"nome":"CLEBER_JUNIOR","eq":"Digital","rec":31779.87,"ho":7932.31,"meta":15000.0,"pct":0.5288,"falta":-7067.69},{"nome":"larissa_santana","eq":"Katia 2°T","rec":30815.86,"ho":7691.62,"meta":15000.0,"pct":0.5128,"falta":-7308.38},{"nome":"JHONATA_NASCIMENTO","eq":"Ouvidoria/Suporte","rec":27723.55,"ho":6919.82,"meta":15000.0,"pct":0.4613,"falta":-8080.18},{"nome":"EDUARDO_SILVA","eq":"Birigui Bruna","rec":24664.53,"ho":6156.29,"meta":26000.0,"pct":0.2368,"falta":-19843.71},{"nome":"jussara_pereira","eq":"Katia 2°T","rec":22319.9,"ho":5571.03,"meta":15000.0,"pct":0.3714,"falta":-9428.97},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":19254.58,"ho":4805.91,"meta":15000.0,"pct":0.3204,"falta":-10194.09},{"nome":"MARIA_BRAIDOTI","eq":"Birigui Bruna","rec":18993.95,"ho":4740.97,"meta":26000.0,"pct":0.1823,"falta":-21259.03},{"nome":"HELENA_SANTOS","eq":"Birigui Bruna","rec":17803.6,"ho":4443.81,"meta":26000.0,"pct":0.1709,"falta":-21556.19},{"nome":"MARIA_RODARTE","eq":"Birigui Bruna","rec":16431.79,"ho":4101.4,"meta":26000.0,"pct":0.1577,"falta":-21898.6},{"nome":"JOAO_MIRANDA","eq":"Birigui Bruna","rec":12884.71,"ho":3215.97,"meta":26000.0,"pct":0.1237,"falta":-22784.03},{"nome":"BIANCA_V_SILVA","eq":"Marília Stephanie","rec":7440.82,"ho":1857.24,"meta":15000.0,"pct":0.1238,"falta":-13142.76},{"nome":"KELY_SILVA","eq":"Marília Stephanie","rec":4490.32,"ho":1120.79,"meta":15000.0,"pct":0.0747,"falta":-13879.21},{"nome":"DEBORA_ANDRIELLY","eq":"Birigui Bruna","rec":4461.73,"ho":1113.65,"meta":26000.0,"pct":0.0428,"falta":-24886.35},{"nome":"RAFAELA_MINHOTO","eq":"Birigui Bruna","rec":4161.62,"ho":1038.74,"meta":26000.0,"pct":0.04,"falta":-24961.26},{"nome":"ANA_BENTO","eq":"Birigui Bruna","rec":3067.32,"ho":765.61,"meta":26000.0,"pct":0.0294,"falta":-25234.39},{"nome":"carulini_santos","eq":"Marília Stephanie","rec":2982.32,"ho":744.36,"meta":15000.0,"pct":0.0496,"falta":-14255.64},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":2502.84,"ho":624.72,"meta":15000.0,"pct":0.0416,"falta":-14375.28},{"nome":"MAYSA_OLIVEIRA","eq":"Birigui Bruna","rec":2236.68,"ho":558.26,"meta":26000.0,"pct":0.0215,"falta":-25441.74},{"nome":"felipe_arruda","eq":"Marília Stephanie","rec":1345.01,"ho":335.72,"meta":15000.0,"pct":0.0224,"falta":-14664.28},{"nome":"JESSICA_O_SILVA","eq":"Marília Stephanie","rec":614.46,"ho":153.37,"meta":15000.0,"pct":0.0102,"falta":-14846.63},{"nome":"NAYARA_CRUZ","eq":"Birigui Bruna","rec":577.82,"ho":144.23,"meta":26000.0,"pct":0.0055,"falta":-25855.77},{"nome":"LUCIANO_COSTA","eq":"Sem Equipe","rec":369.88,"ho":92.32,"meta":null,"pct":null,"falta":null},{"nome":"thalia_thomaz","eq":"Katia 2°T","rec":362.13,"ho":90.38,"meta":15000.0,"pct":0.006,"falta":-14909.62},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":187.36,"ho":46.77,"meta":null,"pct":null,"falta":null},{"nome":"BRUNA_JUSTIMIANO","eq":"Liderança","rec":154.87,"ho":38.66,"meta":15000.0,"pct":0.0026,"falta":-14961.34}],"Junho":[{"nome":"KAROLAINE_SILVA","eq":"Birigui Bruna","rec":179517.83,"ho":44807.62,"meta":30000.0,"pct":1.4936,"falta":14807.62},{"nome":"MATHEUS_SOUZA","eq":"Birigui Bruna","rec":151615.97,"ho":37844.12,"meta":30000.0,"pct":1.2615,"falta":7844.12},{"nome":"HELTON_ROLDON","eq":"Birigui Bruna","rec":149927.6,"ho":37421.76,"meta":30000.0,"pct":1.2474,"falta":7421.76},{"nome":"MARIA_MOREIRASANTOS","eq":"Birigui Bruna","rec":125794.16,"ho":31398.45,"meta":30000.0,"pct":1.0466,"falta":1398.45},{"nome":"LEONARDO_NUNES","eq":"Birigui Bruna","rec":122545.79,"ho":30588.08,"meta":30000.0,"pct":1.0196,"falta":588.08},{"nome":"LYVIA_DIAS","eq":"Birigui Bruna","rec":114123.13,"ho":28485.05,"meta":30000.0,"pct":0.9495,"falta":-1514.95},{"nome":"FRANCISCA_BRITO","eq":"Birigui Bruna","rec":109134.93,"ho":27240.06,"meta":30000.0,"pct":0.908,"falta":-2759.94},{"nome":"silva_beatriz","eq":"Marília Stephanie","rec":83029.83,"ho":20724.45,"meta":18000.0,"pct":1.1514,"falta":2724.45},{"nome":"RENATARODRIGUES","eq":"Birigui Bruna","rec":72614.26,"ho":18124.48,"meta":30000.0,"pct":0.6041,"falta":-11875.52},{"nome":"THAYRA_FERREIRASILVA","eq":"Birigui Bruna","rec":71809.83,"ho":17923.89,"meta":30000.0,"pct":0.5975,"falta":-12076.11},{"nome":"GIOVANA_SOUZA","eq":"Katia 2°T","rec":71112.05,"ho":17749.74,"meta":18000.0,"pct":0.9861,"falta":-250.26},{"nome":"raissa_paloma","eq":"Marília Stephanie","rec":69426.61,"ho":17328.8,"meta":18000.0,"pct":0.9627,"falta":-671.2},{"nome":"itallo_cardamoni","eq":"Marília Stephanie","rec":69282.55,"ho":17292.88,"meta":18000.0,"pct":0.9607,"falta":-707.12},{"nome":"aline_pupim","eq":"Katia 2°T","rec":65473.33,"ho":16342.21,"meta":18000.0,"pct":0.9079,"falta":-1657.79},{"nome":"AMABELLY_SANTOS","eq":"Katia 2°T","rec":63585.34,"ho":15871.0,"meta":18000.0,"pct":0.8817,"falta":-2129.0},{"nome":"CAIO_SHIMITE","eq":"Marília Stephanie","rec":61716.93,"ho":15404.54,"meta":18000.0,"pct":0.8558,"falta":-2595.46},{"nome":"leticia_romeu","eq":"Marília Stephanie","rec":55501.69,"ho":13853.33,"meta":18000.0,"pct":0.7696,"falta":-4146.67},{"nome":"STEPHANIE_FAGUNDES","eq":"Marília Stephanie","rec":50473.97,"ho":12598.35,"meta":18000.0,"pct":0.6999,"falta":-5401.65},{"nome":"THAIS_MAYARA","eq":"Katia 2°T","rec":49302.89,"ho":12305.96,"meta":18000.0,"pct":0.6837,"falta":-5694.04},{"nome":"thauany_moura","eq":"Marília Stephanie","rec":48734.66,"ho":12164.26,"meta":18000.0,"pct":0.6758,"falta":-5835.74},{"nome":"KATIA_REGINA","eq":"Liderança","rec":48440.6,"ho":12090.87,"meta":18000.0,"pct":0.6717,"falta":-5909.13},{"nome":"geovanna_almeida","eq":"Katia 2°T","rec":47388.2,"ho":11828.17,"meta":18000.0,"pct":0.6571,"falta":-6171.83},{"nome":"kauane_azevedo","eq":"Katia 2°T","rec":40362.95,"ho":10074.8,"meta":18000.0,"pct":0.5597,"falta":-7925.2},{"nome":"ISABELA_MONTEIRO","eq":"Katia 2°T","rec":38799.66,"ho":9684.5,"meta":18000.0,"pct":0.538,"falta":-8315.5},{"nome":"HELENA_SANTOS","eq":"Birigui Bruna","rec":34485.85,"ho":8607.81,"meta":30000.0,"pct":0.2869,"falta":-21392.19},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":27862.78,"ho":6954.52,"meta":18000.0,"pct":0.3864,"falta":-11045.48},{"nome":"CLEBER_JUNIOR","eq":"Digital","rec":23958.85,"ho":5980.09,"meta":18000.0,"pct":0.3322,"falta":-12019.91},{"nome":"JHONATA_NASCIMENTO","eq":"Ouvidoria/Suporte","rec":21597.17,"ho":5390.67,"meta":18000.0,"pct":0.2995,"falta":-12609.33},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":16923.06,"ho":4223.96,"meta":18000.0,"pct":0.2347,"falta":-13776.04},{"nome":"EDUARDO_SILVA","eq":"Birigui Bruna","rec":11955.65,"ho":2984.12,"meta":30000.0,"pct":0.0995,"falta":-27015.88},{"nome":"larissa_santana","eq":"Katia 2°T","rec":11738.43,"ho":2929.89,"meta":18000.0,"pct":0.1628,"falta":-15070.11},{"nome":"BRUNA_GARBI","eq":"Marília Stephanie","rec":11199.08,"ho":2795.32,"meta":18000.0,"pct":0.1553,"falta":-15204.68},{"nome":"joao_anguita","eq":"Marília Stephanie","rec":10006.76,"ho":2497.73,"meta":18000.0,"pct":0.1388,"falta":-15502.27},{"nome":"MARIA_BRAIDOTI","eq":"Birigui Bruna","rec":9548.32,"ho":2383.18,"meta":30000.0,"pct":0.0794,"falta":-27616.82},{"nome":"jussara_pereira","eq":"Katia 2°T","rec":9465.4,"ho":2362.59,"meta":18000.0,"pct":0.1313,"falta":-15637.41},{"nome":"renan_almeida","eq":"Laysa Lopes","rec":9052.26,"ho":2259.46,"meta":18000.0,"pct":0.1255,"falta":-15740.54},{"nome":"thayla_santana","eq":"Laysa Lopes","rec":8183.51,"ho":2042.63,"meta":18000.0,"pct":0.1135,"falta":-15957.37},{"nome":"JOAO_MIRANDA","eq":"Birigui Bruna","rec":5813.72,"ho":1451.1,"meta":30000.0,"pct":0.0484,"falta":-28548.9},{"nome":"gisleide_guedes","eq":"Katia 2°T","rec":5620.45,"ho":1402.88,"meta":18000.0,"pct":0.0779,"falta":-16597.12},{"nome":"BIANCA_V_SILVA","eq":"Marília Stephanie","rec":5184.41,"ho":1294.0,"meta":18000.0,"pct":0.0719,"falta":-16706.0},{"nome":"DEBORA_ANDRIELLY","eq":"Birigui Bruna","rec":5060.34,"ho":1263.05,"meta":30000.0,"pct":0.0421,"falta":-28736.95},{"nome":"rayssa_r_oliveira","eq":"Katia 2°T","rec":4344.0,"ho":1084.27,"meta":18000.0,"pct":0.0602,"falta":-16915.73},{"nome":"karina_colonez","eq":"Laysa Lopes","rec":3416.6,"ho":852.78,"meta":18000.0,"pct":0.0474,"falta":-17147.22},{"nome":"carulini_santos","eq":"Marília Stephanie","rec":3041.19,"ho":759.06,"meta":18000.0,"pct":0.0422,"falta":-17240.94},{"nome":"MARIA_RODARTE","eq":"Birigui Bruna","rec":2615.07,"ho":652.75,"meta":30000.0,"pct":0.0218,"falta":-29347.25},{"nome":"KELY_SILVA","eq":"Marília Stephanie","rec":2607.1,"ho":650.73,"meta":18000.0,"pct":0.0362,"falta":-17349.27},{"nome":"BRUNA_JUSTIMIANO","eq":"Liderança","rec":2407.9,"ho":601.01,"meta":18000.0,"pct":0.0334,"falta":-17398.99},{"nome":"RAFAELA_MINHOTO","eq":"Birigui Bruna","rec":2349.73,"ho":586.49,"meta":30000.0,"pct":0.0195,"falta":-29413.51},{"nome":"MAYSA_OLIVEIRA","eq":"Birigui Bruna","rec":1675.41,"ho":418.19,"meta":30000.0,"pct":0.0139,"falta":-29581.81},{"nome":"felipe_arruda","eq":"Marília Stephanie","rec":1065.24,"ho":265.87,"meta":18000.0,"pct":0.0148,"falta":-17734.13},{"nome":"ANA_BENTO","eq":"Birigui Bruna","rec":947.9,"ho":236.6,"meta":30000.0,"pct":0.0079,"falta":-29763.4},{"nome":"JESSICA_O_SILVA","eq":"Marília Stephanie","rec":769.27,"ho":192.01,"meta":18000.0,"pct":0.0107,"falta":-17807.99},{"nome":"KAUAN_TEIXEIRA","eq":"Sem Equipe","rec":282.79,"ho":70.59,"meta":null,"pct":null,"falta":null},{"nome":"thalia_thomaz","eq":"Katia 2°T","rec":270.05,"ho":67.4,"meta":18000.0,"pct":0.0037,"falta":-17932.6},{"nome":"BRUNO_UEMURA","eq":"Sem Equipe","rec":256.67,"ho":64.07,"meta":null,"pct":null,"falta":null}],"Julho":[{"nome":"MATHEUS_SOUZA","eq":"Birigui Bruna","rec":239411.71,"ho":59852.93,"meta":30000.0,"pct":7.9804,"falta":209411.71},{"nome":"MARIA_MOREIRASANTOS","eq":"Birigui Bruna","rec":209540.16,"ho":52385.04,"meta":30000.0,"pct":6.9847,"falta":179540.16},{"nome":"HELTON_ROLDON","eq":"Birigui Bruna","rec":139350.2,"ho":34837.55,"meta":30000.0,"pct":4.645,"falta":109350.2},{"nome":"THAYRA_FERREIRASILVA","eq":"Birigui Bruna","rec":125147.24,"ho":31286.81,"meta":30000.0,"pct":4.1716,"falta":95147.24},{"nome":"LEONARDO_NUNES","eq":"Birigui Bruna","rec":85912.14,"ho":21478.04,"meta":30000.0,"pct":2.8637,"falta":55912.14},{"nome":"pagueplay","eq":"Sem Equipe","rec":101288.5,"ho":25322.13,"meta":null,"pct":null,"falta":null},{"nome":"FRANCISCA_BRITO","eq":"Birigui Bruna","rec":68486.83,"ho":17121.71,"meta":30000.0,"pct":2.2829,"falta":38486.83},{"nome":"karina_colonez","eq":"Laysa Lopes","rec":70662.82,"ho":17665.71,"meta":5000.0,"pct":14.1326,"falta":65662.82},{"nome":"silva_beatriz","eq":"Marília Stephanie","rec":63655.1,"ho":15913.78,"meta":18000.0,"pct":3.5364,"falta":45655.1},{"nome":"itallo_cardamoni","eq":"Marília Stephanie","rec":64474.87,"ho":16118.72,"meta":18000.0,"pct":3.5819,"falta":46474.87},{"nome":"aline_pupim","eq":"Katia 2°T","rec":53058.76,"ho":13264.69,"meta":18000.0,"pct":2.9477,"falta":35058.76},{"nome":"CAIO_SHIMITE","eq":"Marília Stephanie","rec":53029.77,"ho":13257.44,"meta":18000.0,"pct":2.9461,"falta":35029.77},{"nome":"DEBORA_PORTELA","eq":"Laysa Lopes","rec":71951.86,"ho":17987.97,"meta":5000.0,"pct":14.3904,"falta":66951.86},{"nome":"leticia_romeu","eq":"Marília Stephanie","rec":57279.23,"ho":14319.81,"meta":18000.0,"pct":3.1822,"falta":39279.23},{"nome":"raissa_paloma","eq":"Marília Stephanie","rec":54387.7,"ho":13596.93,"meta":18000.0,"pct":3.0215,"falta":36387.7},{"nome":"AMABELLY_SANTOS","eq":"Katia 2°T","rec":56946.95,"ho":14236.74,"meta":18000.0,"pct":3.1637,"falta":38946.95},{"nome":"thauany_moura","eq":"Marília Stephanie","rec":50389.63,"ho":12597.41,"meta":18000.0,"pct":2.7994,"falta":32389.63},{"nome":"ISABELA_MONTEIRO","eq":"Katia 2°T","rec":44842.56,"ho":11210.64,"meta":18000.0,"pct":2.4913,"falta":26842.56},{"nome":"THAIS_MAYARA","eq":"Katia 2°T","rec":51488.01,"ho":12872.0,"meta":18000.0,"pct":2.8604,"falta":33488.01},{"nome":"ELIARA_PRADO","eq":"Laysa Lopes","rec":72551.12,"ho":18137.78,"meta":5000.0,"pct":14.5102,"falta":67551.12},{"nome":"RENATARODRIGUES","eq":"Birigui Bruna","rec":36237.17,"ho":9059.29,"meta":30000.0,"pct":1.2079,"falta":6237.17},{"nome":"geovanna_almeida","eq":"Katia 2°T","rec":36036.77,"ho":9009.19,"meta":18000.0,"pct":2.002,"falta":18036.77},{"nome":"kauane_azevedo","eq":"Katia 2°T","rec":39750.11,"ho":9937.53,"meta":18000.0,"pct":2.2083,"falta":21750.11},{"nome":"GIOVANA_SOUZA","eq":"Katia 2°T","rec":39818.71,"ho":9954.68,"meta":18000.0,"pct":2.2122,"falta":21818.71},{"nome":"renan_almeida","eq":"Laysa Lopes","rec":36252.33,"ho":9063.08,"meta":5000.0,"pct":7.2505,"falta":31252.33},{"nome":"STEPHANIE_FAGUNDES","eq":"Marília Stephanie","rec":42022.45,"ho":10505.61,"meta":18000.0,"pct":2.3346,"falta":24022.45},{"nome":"BRUNA_GARBI","eq":"Marília Stephanie","rec":52480.64,"ho":13120.16,"meta":18000.0,"pct":2.9156,"falta":34480.64},{"nome":"rayssa_r_oliveira","eq":"Katia 2°T","rec":37286.33,"ho":9321.58,"meta":18000.0,"pct":2.0715,"falta":19286.33},{"nome":"NANCI_MOREIRA","eq":"Laysa Lopes","rec":42717.22,"ho":10679.31,"meta":5000.0,"pct":8.5434,"falta":37717.22},{"nome":"joao_anguita","eq":"Marília Stephanie","rec":41226.51,"ho":10306.63,"meta":18000.0,"pct":2.2904,"falta":23226.51},{"nome":"gisleide_guedes","eq":"Katia 2°T","rec":34860.32,"ho":8715.08,"meta":18000.0,"pct":1.9367,"falta":16860.32},{"nome":"LOAMI_FERRAZ","eq":"Laysa Lopes","rec":29488.16,"ho":7372.04,"meta":5000.0,"pct":5.8976,"falta":24488.16},{"nome":"thayla_santana","eq":"Laysa Lopes","rec":26595.67,"ho":6648.92,"meta":5000.0,"pct":5.3191,"falta":21595.67},{"nome":"VALQUIRIA_XAVIER","eq":"Laysa Lopes","rec":21573.94,"ho":5393.49,"meta":5000.0,"pct":4.3148,"falta":16573.94},{"nome":"LYVIA_DIAS","eq":"Birigui Bruna","rec":38452.02,"ho":9613.01,"meta":30000.0,"pct":1.2817,"falta":8452.02},{"nome":"KAROLAINE_SILVA","eq":"Birigui Bruna","rec":40771.4,"ho":10192.85,"meta":30000.0,"pct":1.359,"falta":10771.4},{"nome":"TASSIANE_VIANA","eq":"Laysa Lopes","rec":18244.24,"ho":4561.06,"meta":5000.0,"pct":3.6488,"falta":13244.24},{"nome":"BRUNA_JUSTIMIANO","eq":"Liderança","rec":9150.34,"ho":2287.59,"meta":null,"pct":null,"falta":null},{"nome":"HELENA_SANTOS","eq":"Birigui Bruna","rec":7241.46,"ho":1810.37,"meta":30000.0,"pct":0.2414,"falta":-22758.54},{"nome":"KATIA_REGINA","eq":"Liderança","rec":2927.42,"ho":731.86,"meta":null,"pct":null,"falta":null},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":1476.55,"ho":369.14,"meta":null,"pct":null,"falta":null},{"nome":"camila_rebelato","eq":"Laysa Lopes","rec":1425.63,"ho":356.41,"meta":5000.0,"pct":0.2851,"falta":-3574.37},{"nome":"JHONATA_NASCIMENTO","eq":"Ouvidoria/Suporte","rec":1047.04,"ho":261.76,"meta":null,"pct":null,"falta":null},{"nome":"LAYSA_LOPES","eq":"Liderança","rec":4096.4,"ho":1024.1,"meta":null,"pct":null,"falta":null},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":672.44,"ho":168.11,"meta":null,"pct":null,"falta":null},{"nome":"larissa_santana","eq":"Katia 2°T","rec":624.07,"ho":156.02,"meta":18000.0,"pct":0.0347,"falta":-17375.93},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":474.74,"ho":118.69,"meta":null,"pct":null,"falta":null},{"nome":"JOAO_MIRANDA","eq":"Birigui Bruna","rec":404.24,"ho":101.06,"meta":30000.0,"pct":0.0135,"falta":-29595.76},{"nome":"EDUARDO_SILVA","eq":"Birigui Bruna","rec":82.14,"ho":20.54,"meta":30000.0,"pct":0.0027,"falta":-29917.86}],"Agosto":[{"nome":"MATHEUS_SOUZA","eq":"Birigui Bruna","rec":229143.16,"ho":57285.79,"meta":null,"pct":null,"falta":null},{"nome":"KAROLAINE_SILVA","eq":"Birigui Bruna","rec":182253.92,"ho":45563.48,"meta":null,"pct":null,"falta":null},{"nome":"HELTON_ROLDON","eq":"Birigui Bruna","rec":122945.05,"ho":30736.26,"meta":null,"pct":null,"falta":null},{"nome":"TASSIANE_VIANA","eq":"Ouvidoria/Suporte","rec":95145.86,"ho":23786.47,"meta":null,"pct":null,"falta":null},{"nome":"raissa_paloma","eq":"Birigui Bruna","rec":92764.36,"ho":23191.09,"meta":null,"pct":null,"falta":null},{"nome":"STEPHANIE_FAGUNDES","eq":"Birigui Bruna","rec":91163.0,"ho":22790.75,"meta":null,"pct":null,"falta":null},{"nome":"silva_beatriz","eq":"Birigui Bruna","rec":89409.4,"ho":22352.35,"meta":null,"pct":null,"falta":null},{"nome":"pagueplay","eq":"Sem Equipe","rec":85569.63,"ho":21392.41,"meta":null,"pct":null,"falta":null},{"nome":"leticia_romeu","eq":"Birigui Bruna","rec":84760.37,"ho":21190.09,"meta":null,"pct":null,"falta":null},{"nome":"CAIO_SHIMITE","eq":"Birigui Bruna","rec":83922.56,"ho":20980.64,"meta":null,"pct":null,"falta":null},{"nome":"MARIA_MOREIRASANTOS","eq":"Alisson","rec":73367.53,"ho":18341.88,"meta":null,"pct":null,"falta":null},{"nome":"karina_colonez","eq":"Laysa/Stephanie","rec":71146.03,"ho":17786.51,"meta":null,"pct":null,"falta":null},{"nome":"ISABELA_MONTEIRO","eq":"Katia 2°T","rec":69718.6,"ho":17429.65,"meta":null,"pct":null,"falta":null},{"nome":"itallo_cardamoni","eq":"Laysa/Stephanie","rec":68899.17,"ho":17224.79,"meta":null,"pct":null,"falta":null},{"nome":"BRUNA_GARBI","eq":"Laysa/Stephanie","rec":68762.09,"ho":17190.52,"meta":null,"pct":null,"falta":null},{"nome":"THAIS_MAYARA","eq":"Ouvidoria/Suporte","rec":66466.8,"ho":16616.7,"meta":null,"pct":null,"falta":null},{"nome":"kauane_azevedo","eq":"Katia 2°T","rec":64385.77,"ho":16096.44,"meta":null,"pct":null,"falta":null},{"nome":"GIOVANA_SOUZA","eq":"Birigui Bruna","rec":60921.76,"ho":15230.44,"meta":null,"pct":null,"falta":null},{"nome":"gisleide_guedes","eq":"Katia 2°T","rec":59877.82,"ho":14969.45,"meta":null,"pct":null,"falta":null},{"nome":"thayla_santana","eq":"Birigui Bruna","rec":48914.1,"ho":12228.52,"meta":null,"pct":null,"falta":null},{"nome":"LYVIA_DIAS","eq":"Birigui Bruna","rec":48666.19,"ho":12166.55,"meta":null,"pct":null,"falta":null},{"nome":"aline_pupim","eq":"Katia 2°T","rec":46410.74,"ho":11602.68,"meta":null,"pct":null,"falta":null},{"nome":"joao_anguita","eq":"Laysa/Stephanie","rec":45492.73,"ho":11373.18,"meta":null,"pct":null,"falta":null},{"nome":"rayssa_r_oliveira","eq":"Katia 2°T","rec":41073.9,"ho":10268.48,"meta":null,"pct":null,"falta":null},{"nome":"THAYRA_FERREIRASILVA","eq":"Luciano e Luan","rec":40404.73,"ho":10101.18,"meta":null,"pct":null,"falta":null},{"nome":"thauany_moura","eq":"Laysa/Stephanie","rec":39491.35,"ho":9872.84,"meta":null,"pct":null,"falta":null},{"nome":"DEBORA_PORTELA","eq":"Time Matheus","rec":38824.01,"ho":9706.0,"meta":null,"pct":null,"falta":null},{"nome":"NANCI_MOREIRA","eq":"Time Matheus","rec":32845.4,"ho":8211.35,"meta":null,"pct":null,"falta":null},{"nome":"VALQUIRIA_XAVIER","eq":"Laysa/Stephanie","rec":31537.34,"ho":7884.34,"meta":null,"pct":null,"falta":null},{"nome":"CLAUDINEIA_MESSIAS","eq":"Laysa/Stephanie","rec":31107.32,"ho":7776.83,"meta":null,"pct":null,"falta":null},{"nome":"RENATARODRIGUES","eq":"Birigui Bruna","rec":30454.39,"ho":7613.6,"meta":null,"pct":null,"falta":null},{"nome":"caroline_valverde","eq":"Laysa/Stephanie","rec":29861.78,"ho":7465.44,"meta":null,"pct":null,"falta":null},{"nome":"AMABELLY_SANTOS","eq":"Katia 2°T","rec":27743.03,"ho":6935.76,"meta":null,"pct":null,"falta":null},{"nome":"LOAMI_FERRAZ","eq":"Luciano e Luan","rec":27436.19,"ho":6859.05,"meta":null,"pct":null,"falta":null},{"nome":"FRANCISCA_BRITO","eq":"Digital","rec":20244.3,"ho":5061.07,"meta":null,"pct":null,"falta":null},{"nome":"ELIARA_PRADO","eq":"Sem Equipe","rec":6146.96,"ho":1536.74,"meta":null,"pct":null,"falta":null},{"nome":"BRUNA_JUSTIMIANO","eq":"Liderança","rec":5612.03,"ho":1403.01,"meta":null,"pct":null,"falta":null},{"nome":"LEONARDO_NUNES","eq":"Bianca","rec":3147.08,"ho":786.77,"meta":null,"pct":null,"falta":null},{"nome":"HELENA_SANTOS","eq":"Qualidade","rec":2496.63,"ho":624.16,"meta":null,"pct":null,"falta":null},{"nome":"geovanna_almeida","eq":"Katia 2°T","rec":1908.66,"ho":477.16,"meta":null,"pct":null,"falta":null},{"nome":"LAYSA_LOPES","eq":"Liderança","rec":1636.9,"ho":409.23,"meta":null,"pct":null,"falta":null},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":1163.28,"ho":290.82,"meta":null,"pct":null,"falta":null},{"nome":"renan_almeida","eq":"Suporte ao Usuário","rec":1123.98,"ho":281.0,"meta":null,"pct":null,"falta":null},{"nome":"KATIA_REGINA","eq":"Liderança","rec":368.89,"ho":92.22,"meta":null,"pct":null,"falta":null},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":170.94,"ho":42.73,"meta":null,"pct":null,"falta":null}]};
+let PROJ_ANO_OPS_DADOS = {"Janeiro":[{"nome":"GIOVANA_SOUZA","eq":"Katia Regina","rec":15592.11,"ho":3891.76,"meta":5000.0,"pct":0.7784,"falta":-1108.24},{"nome":"BIANCA_V_SILVA","eq":"Stephanie Bernardes","rec":11141.94,"ho":2780.96,"meta":5000.0,"pct":0.5562,"falta":-2219.04},{"nome":"ISABELA_MONTEIRO","eq":"Katia Regina","rec":10794.81,"ho":2694.39,"meta":5000.0,"pct":0.5389,"falta":-2305.61},{"nome":"JESSICA_O_SILVA","eq":"Stephanie Bernardes","rec":10552.78,"ho":2633.95,"meta":5000.0,"pct":0.5268,"falta":-2366.05},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":4828.24,"ho":1205.12,"meta":5000.0,"pct":0.241,"falta":-3794.88},{"nome":"KELY_SILVA","eq":"Stephanie Bernardes","rec":4785.35,"ho":1194.45,"meta":5000.0,"pct":0.2389,"falta":-3805.55},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":4760.4,"ho":1188.17,"meta":5000.0,"pct":0.2376,"falta":-3811.83},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":1952.21,"ho":487.25,"meta":null,"pct":null,"falta":null}],"Fevereiro":[{"nome":"BIANCA_V_SILVA","eq":"Stephanie Bernardes","rec":16120.49,"ho":5250.78,"meta":8000.0,"pct":0.6563,"falta":-2749.22},{"nome":"GIOVANA_SOUZA","eq":"Katia Regina","rec":18351.17,"ho":4580.42,"meta":8000.0,"pct":0.5726,"falta":-3419.58},{"nome":"ISABELA_MONTEIRO","eq":"Katia Regina","rec":12311.87,"ho":4290.59,"meta":8000.0,"pct":0.5363,"falta":-3709.41},{"nome":"JESSICA_O_SILVA","eq":"Stephanie Bernardes","rec":12316.0,"ho":3730.1,"meta":8000.0,"pct":0.4663,"falta":-4269.9},{"nome":"KELY_SILVA","eq":"Stephanie Bernardes","rec":12632.11,"ho":3152.94,"meta":8000.0,"pct":0.3941,"falta":-4847.06},{"nome":"STEPHANIE_FAGUNDES","eq":"Stephanie Bernardes","rec":7842.12,"ho":1957.39,"meta":8000.0,"pct":0.2447,"falta":-6042.61},{"nome":"raissa_paloma","eq":"Stephanie Bernardes","rec":1507.45,"ho":1507.45,"meta":8000.0,"pct":0.1884,"falta":-6492.55},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":5849.73,"ho":1460.07,"meta":8000.0,"pct":0.1825,"falta":-6539.93},{"nome":"silva_beatriz","eq":"Stephanie Bernardes","rec":5218.69,"ho":1302.6,"meta":8000.0,"pct":0.1628,"falta":-6697.4},{"nome":"CAIO_SHIMITE","eq":"Stephanie Bernardes","rec":3482.55,"ho":1077.68,"meta":8000.0,"pct":0.1347,"falta":-6922.32},{"nome":"THAYRA_FERREIRASILVA","eq":"Bruna Justimiano","rec":896.2,"ho":896.2,"meta":8000.0,"pct":0.112,"falta":-7103.8},{"nome":"rodrigo_martins","eq":"Sem Equipe","rec":3397.16,"ho":847.89,"meta":null,"pct":null,"falta":null},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":3153.26,"ho":787.05,"meta":8000.0,"pct":0.0984,"falta":-7212.95},{"nome":"thauany_moura","eq":"Stephanie Bernardes","rec":2197.96,"ho":746.42,"meta":8000.0,"pct":0.0933,"falta":-7253.58},{"nome":"geovanna_almeida","eq":"Katia Regina","rec":2641.89,"ho":659.43,"meta":8000.0,"pct":0.0824,"falta":-7340.57},{"nome":"LYVIA_DIAS","eq":"Bruna Justimiano","rec":569.22,"ho":569.22,"meta":8000.0,"pct":0.0712,"falta":-7430.78},{"nome":"jussara_pereira","eq":"Katia Regina","rec":2240.09,"ho":559.12,"meta":8000.0,"pct":0.0699,"falta":-7440.88},{"nome":"felipe_arruda","eq":"Stephanie Bernardes","rec":1893.9,"ho":472.73,"meta":8000.0,"pct":0.0591,"falta":-7527.27},{"nome":"aline_pupim","eq":"Katia Regina","rec":989.13,"ho":246.89,"meta":8000.0,"pct":0.0309,"falta":-7753.11},{"nome":"HELTON_ROLDON","eq":"Bruna Justimiano","rec":989.13,"ho":246.89,"meta":8000.0,"pct":0.0309,"falta":-7753.11},{"nome":"leticia_romeu","eq":"Stephanie Bernardes","rec":557.31,"ho":139.11,"meta":8000.0,"pct":0.0174,"falta":-7860.89},{"nome":"miguel_rodrigues","eq":"Sem Equipe","rec":488.75,"ho":121.99,"meta":null,"pct":null,"falta":null},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":459.89,"ho":114.8,"meta":null,"pct":null,"falta":null},{"nome":"itallo_cardamoni","eq":"Stephanie Bernardes","rec":434.13,"ho":108.36,"meta":8000.0,"pct":0.0135,"falta":-7891.64},{"nome":"MATHEUS_SOUZA","eq":"Bruna Justimiano","rec":279.69,"ho":69.81,"meta":8000.0,"pct":0.0087,"falta":-7930.19},{"nome":"THAIS_MAYARA","eq":"Katia Regina","rec":259.93,"ho":64.88,"meta":8000.0,"pct":0.0081,"falta":-7935.12}],"Março":[{"nome":"CAIO_SHIMITE","eq":"Stephanie Bernardes","rec":52988.65,"ho":15311.2,"meta":12000.0,"pct":1.2759,"falta":3311.2},{"nome":"STEPHANIE_FAGUNDES","eq":"Stephanie Bernardes","rec":48669.57,"ho":14951.33,"meta":12000.0,"pct":1.2459,"falta":2951.33},{"nome":"KAROLAINE_SILVA","eq":"Bruna Justimiano","rec":35622.26,"ho":11528.75,"meta":12000.0,"pct":0.9607,"falta":-471.25},{"nome":"raissa_paloma","eq":"Stephanie Bernardes","rec":38167.78,"ho":10448.56,"meta":12000.0,"pct":0.8707,"falta":-1551.44},{"nome":"MATHEUS_SOUZA","eq":"Bruna Justimiano","rec":27939.81,"ho":10030.23,"meta":12000.0,"pct":0.8359,"falta":-1969.77},{"nome":"itallo_cardamoni","eq":"Stephanie Bernardes","rec":28613.17,"ho":9859.58,"meta":12000.0,"pct":0.8216,"falta":-2140.42},{"nome":"jussara_pereira","eq":"Katia Regina","rec":17269.16,"ho":9675.51,"meta":12000.0,"pct":0.8063,"falta":-2324.49},{"nome":"leticia_romeu","eq":"Stephanie Bernardes","rec":24422.88,"ho":9639.4,"meta":12000.0,"pct":0.8033,"falta":-2360.6},{"nome":"BIANCA_V_SILVA","eq":"Stephanie Bernardes","rec":28325.93,"ho":9379.89,"meta":12000.0,"pct":0.7817,"falta":-2620.11},{"nome":"LEONARDO_NUNES","eq":"Bruna Justimiano","rec":36537.11,"ho":9119.93,"meta":12000.0,"pct":0.76,"falta":-2880.07},{"nome":"GIOVANA_SOUZA","eq":"Katia Regina","rec":34086.36,"ho":8507.97,"meta":12000.0,"pct":0.709,"falta":-3492.03},{"nome":"ISABELA_MONTEIRO","eq":"Katia Regina","rec":31925.63,"ho":7968.64,"meta":12000.0,"pct":0.6641,"falta":-4031.36},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":11513.23,"ho":7870.27,"meta":null,"pct":null,"falta":null},{"nome":"larissa_santana","eq":"Katia Regina","rec":21545.17,"ho":6877.71,"meta":12000.0,"pct":0.5731,"falta":-5122.29},{"nome":"JHONATA_NASCIMENTO","eq":"Ouvidoria/Suporte","rec":21918.33,"ho":6740.07,"meta":12000.0,"pct":0.5617,"falta":-5259.93},{"nome":"FRANCISCA_BRITO","eq":"Bruna Justimiano","rec":17509.07,"ho":6333.84,"meta":12000.0,"pct":0.5278,"falta":-5666.16},{"nome":"silva_beatriz","eq":"Stephanie Bernardes","rec":22875.59,"ho":5918.1,"meta":12000.0,"pct":0.4932,"falta":-6081.9},{"nome":"KATIA_REGINA","eq":"Liderança","rec":22578.94,"ho":5635.73,"meta":12000.0,"pct":0.4696,"falta":-6364.27},{"nome":"geovanna_almeida","eq":"Katia Regina","rec":19073.49,"ho":5607.48,"meta":12000.0,"pct":0.4673,"falta":-6392.52},{"nome":"CLEBER_JUNIOR","eq":"Digital","rec":19396.73,"ho":5459.2,"meta":12000.0,"pct":0.4549,"falta":-6540.8},{"nome":"HELTON_ROLDON","eq":"Bruna Justimiano","rec":17352.04,"ho":4953.14,"meta":12000.0,"pct":0.4128,"falta":-7046.86},{"nome":"MAYSA_OLIVEIRA","eq":"Bruna Justimiano","rec":18769.26,"ho":4684.82,"meta":12000.0,"pct":0.3904,"falta":-7315.18},{"nome":"MARIA_MOREIRASANTOS","eq":"Bruna Justimiano","rec":17145.74,"ho":4673.48,"meta":12000.0,"pct":0.3895,"falta":-7326.52},{"nome":"RENATARODRIGUES","eq":"Bruna Justimiano","rec":18245.69,"ho":4554.1,"meta":12000.0,"pct":0.3795,"falta":-7445.9},{"nome":"aline_pupim","eq":"Katia Regina","rec":16006.8,"ho":3995.27,"meta":12000.0,"pct":0.3329,"falta":-8004.73},{"nome":"thauany_moura","eq":"Stephanie Bernardes","rec":15779.43,"ho":3938.54,"meta":12000.0,"pct":0.3282,"falta":-8061.46},{"nome":"carulini_santos","eq":"Stephanie Bernardes","rec":15673.98,"ho":3912.38,"meta":12000.0,"pct":0.326,"falta":-8087.62},{"nome":"THAIS_MAYARA","eq":"Katia Regina","rec":12242.78,"ho":3547.49,"meta":12000.0,"pct":0.2956,"falta":-8452.51},{"nome":"THAYRA_FERREIRASILVA","eq":"Bruna Justimiano","rec":11115.26,"ho":2774.37,"meta":12000.0,"pct":0.2312,"falta":-9225.63},{"nome":"LYVIA_DIAS","eq":"Bruna Justimiano","rec":10514.54,"ho":2624.42,"meta":12000.0,"pct":0.2187,"falta":-9375.58},{"nome":"AMABELLY_SANTOS","eq":"Katia Regina","rec":9690.77,"ho":2418.8,"meta":12000.0,"pct":0.2016,"falta":-9581.2},{"nome":"NAYARA_CRUZ","eq":"Bruna Justimiano","rec":8524.18,"ho":2336.2,"meta":12000.0,"pct":0.1947,"falta":-9663.8},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":3987.39,"ho":2147.96,"meta":12000.0,"pct":0.179,"falta":-9852.04},{"nome":"RAFAELA_MINHOTO","eq":"Bruna Justimiano","rec":8051.23,"ho":2009.65,"meta":12000.0,"pct":0.1675,"falta":-9990.35},{"nome":"HELENA_SANTOS","eq":"Bruna Justimiano","rec":7725.62,"ho":1928.34,"meta":12000.0,"pct":0.1607,"falta":-10071.66},{"nome":"thalia_thomaz","eq":"Katia Regina","rec":7680.21,"ho":1916.99,"meta":12000.0,"pct":0.1597,"falta":-10083.01},{"nome":"kauane_azevedo","eq":"Katia Regina","rec":7096.3,"ho":1771.24,"meta":12000.0,"pct":0.1476,"falta":-10228.76},{"nome":"felipe_arruda","eq":"Stephanie Bernardes","rec":5398.77,"ho":1666.39,"meta":12000.0,"pct":0.1389,"falta":-10333.61},{"nome":"KELY_SILVA","eq":"Stephanie Bernardes","rec":6362.32,"ho":1587.99,"meta":12000.0,"pct":0.1323,"falta":-10412.01},{"nome":"JOAO_MIRANDA","eq":"Bruna Justimiano","rec":2268.86,"ho":1362.71,"meta":12000.0,"pct":0.1136,"falta":-10637.29},{"nome":"DEBORA_ANDRIELLY","eq":"Bruna Justimiano","rec":5038.61,"ho":1257.59,"meta":12000.0,"pct":0.1048,"falta":-10742.41},{"nome":"EDUARDO_SILVA","eq":"Bruna Justimiano","rec":4603.8,"ho":1149.14,"meta":12000.0,"pct":0.0958,"falta":-10850.86},{"nome":"MARIA_BRAIDOTI","eq":"Bruna Justimiano","rec":3943.4,"ho":984.28,"meta":12000.0,"pct":0.082,"falta":-11015.72},{"nome":"ANA_BENTO","eq":"Bruna Justimiano","rec":3922.1,"ho":978.98,"meta":12000.0,"pct":0.0816,"falta":-11021.02},{"nome":"thais_c_ferreira","eq":"Katia Regina","rec":2740.03,"ho":683.92,"meta":12000.0,"pct":0.057,"falta":-11316.08},{"nome":"JESSICA_O_SILVA","eq":"Stephanie Bernardes","rec":2628.86,"ho":656.16,"meta":12000.0,"pct":0.0547,"falta":-11343.84},{"nome":"BRUNO_UEMURA","eq":"Sem Equipe","rec":1109.87,"ho":277.02,"meta":null,"pct":null,"falta":null},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":545.54,"ho":136.16,"meta":12000.0,"pct":0.0113,"falta":-11863.84},{"nome":"BRUNA_JUSTIMIANO","eq":"Liderança","rec":177.08,"ho":44.2,"meta":12000.0,"pct":0.0037,"falta":-11955.8}],"Abril":[{"nome":"KAROLAINE_SILVA","eq":"Bruna Justimiano","rec":110494.36,"ho":27579.51,"meta":15000.0,"pct":1.8386,"falta":12579.51},{"nome":"STEPHANIE_FAGUNDES","eq":"Stephanie Bernardes","rec":70448.62,"ho":17583.86,"meta":15000.0,"pct":1.1723,"falta":2583.86},{"nome":"KATIA_REGINA","eq":"Liderança","rec":66284.35,"ho":16544.54,"meta":15000.0,"pct":1.103,"falta":1544.54},{"nome":"raissa_paloma","eq":"Stephanie Bernardes","rec":65116.95,"ho":16253.15,"meta":15000.0,"pct":1.0835,"falta":1253.15},{"nome":"MATHEUS_SOUZA","eq":"Bruna Justimiano","rec":64347.09,"ho":16061.2,"meta":15000.0,"pct":1.0707,"falta":1061.2},{"nome":"silva_beatriz","eq":"Stephanie Bernardes","rec":61866.17,"ho":15441.85,"meta":15000.0,"pct":1.0295,"falta":441.85},{"nome":"GIOVANA_SOUZA","eq":"Katia Regina","rec":61480.51,"ho":15345.52,"meta":15000.0,"pct":1.023,"falta":345.52},{"nome":"LEONARDO_NUNES","eq":"Bruna Justimiano","rec":60884.16,"ho":15196.67,"meta":15000.0,"pct":1.0131,"falta":196.67},{"nome":"leticia_romeu","eq":"Stephanie Bernardes","rec":59097.3,"ho":14750.61,"meta":15000.0,"pct":0.9834,"falta":-249.39},{"nome":"thauany_moura","eq":"Stephanie Bernardes","rec":54193.13,"ho":13526.57,"meta":15000.0,"pct":0.9018,"falta":-1473.43},{"nome":"RENATARODRIGUES","eq":"Bruna Justimiano","rec":53722.82,"ho":13409.26,"meta":15000.0,"pct":0.894,"falta":-1590.74},{"nome":"CAIO_SHIMITE","eq":"Stephanie Bernardes","rec":53630.26,"ho":13386.12,"meta":15000.0,"pct":0.8924,"falta":-1613.88},{"nome":"MARIA_MOREIRASANTOS","eq":"Bruna Justimiano","rec":51600.97,"ho":12879.56,"meta":15000.0,"pct":0.8586,"falta":-2120.44},{"nome":"aline_pupim","eq":"Katia Regina","rec":50195.16,"ho":12516.61,"meta":15000.0,"pct":0.8344,"falta":-2483.39},{"nome":"kauane_azevedo","eq":"Katia Regina","rec":46974.31,"ho":11724.76,"meta":15000.0,"pct":0.7817,"falta":-3275.24},{"nome":"HELTON_ROLDON","eq":"Bruna Justimiano","rec":46816.26,"ho":11685.46,"meta":15000.0,"pct":0.779,"falta":-3314.54},{"nome":"itallo_cardamoni","eq":"Stephanie Bernardes","rec":46380.88,"ho":11576.63,"meta":15000.0,"pct":0.7718,"falta":-3423.37},{"nome":"AMABELLY_SANTOS","eq":"Katia Regina","rec":45854.72,"ho":11445.37,"meta":15000.0,"pct":0.763,"falta":-3554.63},{"nome":"FRANCISCA_BRITO","eq":"Bruna Justimiano","rec":43190.85,"ho":10780.69,"meta":15000.0,"pct":0.7187,"falta":-4219.31},{"nome":"jussara_pereira","eq":"Katia Regina","rec":41839.23,"ho":10443.03,"meta":15000.0,"pct":0.6962,"falta":-4556.97},{"nome":"THAIS_MAYARA","eq":"Katia Regina","rec":40194.8,"ho":10032.6,"meta":15000.0,"pct":0.6688,"falta":-4967.4},{"nome":"geovanna_almeida","eq":"Katia Regina","rec":39550.72,"ho":9871.83,"meta":15000.0,"pct":0.6581,"falta":-5128.17},{"nome":"BIANCA_V_SILVA","eq":"Stephanie Bernardes","rec":36750.97,"ho":9173.0,"meta":15000.0,"pct":0.6115,"falta":-5827.0},{"nome":"ISABELA_MONTEIRO","eq":"Katia Regina","rec":33699.7,"ho":8411.38,"meta":15000.0,"pct":0.5608,"falta":-6588.62},{"nome":"CLEBER_JUNIOR","eq":"Digital","rec":28863.67,"ho":7204.4,"meta":15000.0,"pct":0.4803,"falta":-7795.6},{"nome":"larissa_santana","eq":"Katia Regina","rec":24661.92,"ho":6155.54,"meta":15000.0,"pct":0.4104,"falta":-8844.46},{"nome":"carulini_santos","eq":"Stephanie Bernardes","rec":24369.19,"ho":6082.59,"meta":15000.0,"pct":0.4055,"falta":-8917.41},{"nome":"THAYRA_FERREIRASILVA","eq":"Bruna Justimiano","rec":23470.19,"ho":5858.14,"meta":15000.0,"pct":0.3905,"falta":-9141.86},{"nome":"RAFAELA_MINHOTO","eq":"Bruna Justimiano","rec":20824.45,"ho":5197.75,"meta":15000.0,"pct":0.3465,"falta":-9802.25},{"nome":"LYVIA_DIAS","eq":"Bruna Justimiano","rec":20324.1,"ho":5072.96,"meta":15000.0,"pct":0.3382,"falta":-9927.04},{"nome":"HELENA_SANTOS","eq":"Bruna Justimiano","rec":17641.83,"ho":4403.37,"meta":15000.0,"pct":0.2936,"falta":-10596.63},{"nome":"ANA_BENTO","eq":"Bruna Justimiano","rec":16990.83,"ho":4240.9,"meta":15000.0,"pct":0.2827,"falta":-10759.1},{"nome":"MAYSA_OLIVEIRA","eq":"Bruna Justimiano","rec":16930.23,"ho":4225.76,"meta":15000.0,"pct":0.2817,"falta":-10774.24},{"nome":"MARIA_BRAIDOTI","eq":"Bruna Justimiano","rec":16899.59,"ho":4218.11,"meta":15000.0,"pct":0.2812,"falta":-10781.89},{"nome":"EDUARDO_SILVA","eq":"Bruna Justimiano","rec":16577.75,"ho":4137.74,"meta":15000.0,"pct":0.2758,"falta":-10862.26},{"nome":"MARIA_RODARTE","eq":"Bruna Justimiano","rec":15620.19,"ho":3898.75,"meta":15000.0,"pct":0.2599,"falta":-11101.25},{"nome":"JHONATA_NASCIMENTO","eq":"Ouvidoria/Suporte","rec":11853.38,"ho":2958.61,"meta":15000.0,"pct":0.1972,"falta":-12041.39},{"nome":"JOAO_MIRANDA","eq":"Bruna Justimiano","rec":9178.34,"ho":2290.91,"meta":15000.0,"pct":0.1527,"falta":-12709.09},{"nome":"BRUNA_JUSTIMIANO","eq":"Liderança","rec":6962.64,"ho":1737.87,"meta":15000.0,"pct":0.1159,"falta":-13262.13},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":6843.92,"ho":1708.28,"meta":15000.0,"pct":0.1139,"falta":-13291.72},{"nome":"thalia_thomaz","eq":"Katia Regina","rec":5712.15,"ho":1425.77,"meta":15000.0,"pct":0.0951,"falta":-13574.23},{"nome":"thais_c_ferreira","eq":"Katia Regina","rec":4002.56,"ho":999.06,"meta":15000.0,"pct":0.0666,"falta":-14000.94},{"nome":"DEBORA_ANDRIELLY","eq":"Bruna Justimiano","rec":3340.58,"ho":833.79,"meta":15000.0,"pct":0.0556,"falta":-14166.21},{"nome":"LUCIANO_COSTA","eq":"Sem Equipe","rec":1375.26,"ho":343.26,"meta":null,"pct":null,"falta":null},{"nome":"JESSICA_O_SILVA","eq":"Stephanie Bernardes","rec":1255.99,"ho":313.5,"meta":15000.0,"pct":0.0209,"falta":-14686.5},{"nome":"NAYARA_CRUZ","eq":"Bruna Justimiano","rec":1043.63,"ho":260.48,"meta":15000.0,"pct":0.0174,"falta":-14739.52},{"nome":"felipe_arruda","eq":"Stephanie Bernardes","rec":556.59,"ho":138.92,"meta":15000.0,"pct":0.0093,"falta":-14861.08},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":537.53,"ho":134.17,"meta":null,"pct":null,"falta":null},{"nome":"KELY_SILVA","eq":"Stephanie Bernardes","rec":535.12,"ho":133.56,"meta":15000.0,"pct":0.0089,"falta":-14866.44},{"nome":"GABRIELY_ALVES","eq":"Sem Equipe","rec":430.87,"ho":107.55,"meta":null,"pct":null,"falta":null}],"Maio":[{"nome":"KAROLAINE_SILVA","eq":"Bruna Justimiano","rec":140840.86,"ho":35154.14,"meta":26000.0,"pct":1.3521,"falta":9154.14},{"nome":"RENATARODRIGUES","eq":"Bruna Justimiano","rec":106762.19,"ho":26648.02,"meta":26000.0,"pct":1.0249,"falta":648.02},{"nome":"LYVIA_DIAS","eq":"Bruna Justimiano","rec":88478.31,"ho":22084.05,"meta":26000.0,"pct":0.8494,"falta":-3915.95},{"nome":"MATHEUS_SOUZA","eq":"Bruna Justimiano","rec":86032.29,"ho":21473.81,"meta":26000.0,"pct":0.8259,"falta":-4526.19},{"nome":"HELTON_ROLDON","eq":"Bruna Justimiano","rec":84499.09,"ho":21091.0,"meta":26000.0,"pct":0.8112,"falta":-4909.0},{"nome":"silva_beatriz","eq":"Stephanie Bernardes","rec":82897.37,"ho":20691.46,"meta":15000.0,"pct":1.3794,"falta":5691.46},{"nome":"LEONARDO_NUNES","eq":"Bruna Justimiano","rec":82691.67,"ho":20640.01,"meta":26000.0,"pct":0.7938,"falta":-5359.99},{"nome":"MARIA_MOREIRASANTOS","eq":"Bruna Justimiano","rec":81403.34,"ho":20318.23,"meta":26000.0,"pct":0.7815,"falta":-5681.77},{"nome":"raissa_paloma","eq":"Stephanie Bernardes","rec":75685.23,"ho":18891.04,"meta":15000.0,"pct":1.2594,"falta":3891.04},{"nome":"KATIA_REGINA","eq":"Liderança","rec":73556.02,"ho":18359.58,"meta":15000.0,"pct":1.224,"falta":3359.58},{"nome":"itallo_cardamoni","eq":"Stephanie Bernardes","rec":73138.37,"ho":18255.6,"meta":15000.0,"pct":1.217,"falta":3255.6},{"nome":"CAIO_SHIMITE","eq":"Stephanie Bernardes","rec":67677.38,"ho":16892.5,"meta":15000.0,"pct":1.1262,"falta":1892.5},{"nome":"leticia_romeu","eq":"Stephanie Bernardes","rec":65627.74,"ho":16380.66,"meta":15000.0,"pct":1.092,"falta":1380.66},{"nome":"STEPHANIE_FAGUNDES","eq":"Stephanie Bernardes","rec":64983.92,"ho":16220.17,"meta":15000.0,"pct":1.0813,"falta":1220.17},{"nome":"GIOVANA_SOUZA","eq":"Katia Regina","rec":59284.82,"ho":14797.41,"meta":15000.0,"pct":0.9865,"falta":-202.59},{"nome":"THAYRA_FERREIRASILVA","eq":"Bruna Justimiano","rec":58748.86,"ho":14663.71,"meta":26000.0,"pct":0.564,"falta":-11336.29},{"nome":"THAIS_MAYARA","eq":"Katia Regina","rec":56294.95,"ho":14051.19,"meta":15000.0,"pct":0.9367,"falta":-948.81},{"nome":"thauany_moura","eq":"Stephanie Bernardes","rec":55694.53,"ho":13901.5,"meta":15000.0,"pct":0.9268,"falta":-1098.5},{"nome":"geovanna_almeida","eq":"Katia Regina","rec":53717.98,"ho":13408.28,"meta":15000.0,"pct":0.8939,"falta":-1591.72},{"nome":"FRANCISCA_BRITO","eq":"Bruna Justimiano","rec":52908.48,"ho":13206.0,"meta":26000.0,"pct":0.5079,"falta":-12794.0},{"nome":"AMABELLY_SANTOS","eq":"Katia Regina","rec":48900.14,"ho":12205.83,"meta":15000.0,"pct":0.8137,"falta":-2794.17},{"nome":"kauane_azevedo","eq":"Katia Regina","rec":46148.37,"ho":11518.64,"meta":15000.0,"pct":0.7679,"falta":-3481.36},{"nome":"aline_pupim","eq":"Katia Regina","rec":45647.26,"ho":11393.61,"meta":15000.0,"pct":0.7596,"falta":-3606.39},{"nome":"ISABELA_MONTEIRO","eq":"Katia Regina","rec":34247.74,"ho":8548.34,"meta":15000.0,"pct":0.5699,"falta":-6451.66},{"nome":"CLEBER_JUNIOR","eq":"Digital","rec":31779.87,"ho":7932.31,"meta":15000.0,"pct":0.5288,"falta":-7067.69},{"nome":"larissa_santana","eq":"Katia Regina","rec":30815.86,"ho":7691.62,"meta":15000.0,"pct":0.5128,"falta":-7308.38},{"nome":"JHONATA_NASCIMENTO","eq":"Ouvidoria/Suporte","rec":27723.55,"ho":6919.82,"meta":15000.0,"pct":0.4613,"falta":-8080.18},{"nome":"EDUARDO_SILVA","eq":"Bruna Justimiano","rec":24664.53,"ho":6156.29,"meta":26000.0,"pct":0.2368,"falta":-19843.71},{"nome":"jussara_pereira","eq":"Katia Regina","rec":22319.9,"ho":5571.03,"meta":15000.0,"pct":0.3714,"falta":-9428.97},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":19254.58,"ho":4805.91,"meta":15000.0,"pct":0.3204,"falta":-10194.09},{"nome":"MARIA_BRAIDOTI","eq":"Bruna Justimiano","rec":18993.95,"ho":4740.97,"meta":26000.0,"pct":0.1823,"falta":-21259.03},{"nome":"HELENA_SANTOS","eq":"Bruna Justimiano","rec":17803.6,"ho":4443.81,"meta":26000.0,"pct":0.1709,"falta":-21556.19},{"nome":"MARIA_RODARTE","eq":"Bruna Justimiano","rec":16431.79,"ho":4101.4,"meta":26000.0,"pct":0.1577,"falta":-21898.6},{"nome":"JOAO_MIRANDA","eq":"Bruna Justimiano","rec":12884.71,"ho":3215.97,"meta":26000.0,"pct":0.1237,"falta":-22784.03},{"nome":"BIANCA_V_SILVA","eq":"Stephanie Bernardes","rec":7440.82,"ho":1857.24,"meta":15000.0,"pct":0.1238,"falta":-13142.76},{"nome":"KELY_SILVA","eq":"Stephanie Bernardes","rec":4490.32,"ho":1120.79,"meta":15000.0,"pct":0.0747,"falta":-13879.21},{"nome":"DEBORA_ANDRIELLY","eq":"Bruna Justimiano","rec":4461.73,"ho":1113.65,"meta":26000.0,"pct":0.0428,"falta":-24886.35},{"nome":"RAFAELA_MINHOTO","eq":"Bruna Justimiano","rec":4161.62,"ho":1038.74,"meta":26000.0,"pct":0.04,"falta":-24961.26},{"nome":"ANA_BENTO","eq":"Bruna Justimiano","rec":3067.32,"ho":765.61,"meta":26000.0,"pct":0.0294,"falta":-25234.39},{"nome":"carulini_santos","eq":"Stephanie Bernardes","rec":2982.32,"ho":744.36,"meta":15000.0,"pct":0.0496,"falta":-14255.64},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":2502.84,"ho":624.72,"meta":15000.0,"pct":0.0416,"falta":-14375.28},{"nome":"MAYSA_OLIVEIRA","eq":"Bruna Justimiano","rec":2236.68,"ho":558.26,"meta":26000.0,"pct":0.0215,"falta":-25441.74},{"nome":"felipe_arruda","eq":"Stephanie Bernardes","rec":1345.01,"ho":335.72,"meta":15000.0,"pct":0.0224,"falta":-14664.28},{"nome":"JESSICA_O_SILVA","eq":"Stephanie Bernardes","rec":614.46,"ho":153.37,"meta":15000.0,"pct":0.0102,"falta":-14846.63},{"nome":"NAYARA_CRUZ","eq":"Bruna Justimiano","rec":577.82,"ho":144.23,"meta":26000.0,"pct":0.0055,"falta":-25855.77},{"nome":"LUCIANO_COSTA","eq":"Sem Equipe","rec":369.88,"ho":92.32,"meta":null,"pct":null,"falta":null},{"nome":"thalia_thomaz","eq":"Katia Regina","rec":362.13,"ho":90.38,"meta":15000.0,"pct":0.006,"falta":-14909.62},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":187.36,"ho":46.77,"meta":null,"pct":null,"falta":null},{"nome":"BRUNA_JUSTIMIANO","eq":"Liderança","rec":154.87,"ho":38.66,"meta":15000.0,"pct":0.0026,"falta":-14961.34}],"Junho":[{"nome":"KAROLAINE_SILVA","eq":"Bruna Justimiano","rec":179517.83,"ho":44807.62,"meta":30000.0,"pct":1.4936,"falta":14807.62},{"nome":"MATHEUS_SOUZA","eq":"Bruna Justimiano","rec":151615.97,"ho":37844.12,"meta":30000.0,"pct":1.2615,"falta":7844.12},{"nome":"HELTON_ROLDON","eq":"Bruna Justimiano","rec":149927.6,"ho":37421.76,"meta":30000.0,"pct":1.2474,"falta":7421.76},{"nome":"MARIA_MOREIRASANTOS","eq":"Bruna Justimiano","rec":125794.16,"ho":31398.45,"meta":30000.0,"pct":1.0466,"falta":1398.45},{"nome":"LEONARDO_NUNES","eq":"Bruna Justimiano","rec":122545.79,"ho":30588.08,"meta":30000.0,"pct":1.0196,"falta":588.08},{"nome":"LYVIA_DIAS","eq":"Bruna Justimiano","rec":114123.13,"ho":28485.05,"meta":30000.0,"pct":0.9495,"falta":-1514.95},{"nome":"FRANCISCA_BRITO","eq":"Bruna Justimiano","rec":109134.93,"ho":27240.06,"meta":30000.0,"pct":0.908,"falta":-2759.94},{"nome":"silva_beatriz","eq":"Stephanie Bernardes","rec":83029.83,"ho":20724.45,"meta":18000.0,"pct":1.1514,"falta":2724.45},{"nome":"RENATARODRIGUES","eq":"Bruna Justimiano","rec":72614.26,"ho":18124.48,"meta":30000.0,"pct":0.6041,"falta":-11875.52},{"nome":"THAYRA_FERREIRASILVA","eq":"Bruna Justimiano","rec":71809.83,"ho":17923.89,"meta":30000.0,"pct":0.5975,"falta":-12076.11},{"nome":"GIOVANA_SOUZA","eq":"Katia Regina","rec":71112.05,"ho":17749.74,"meta":18000.0,"pct":0.9861,"falta":-250.26},{"nome":"raissa_paloma","eq":"Stephanie Bernardes","rec":69426.61,"ho":17328.8,"meta":18000.0,"pct":0.9627,"falta":-671.2},{"nome":"itallo_cardamoni","eq":"Stephanie Bernardes","rec":69282.55,"ho":17292.88,"meta":18000.0,"pct":0.9607,"falta":-707.12},{"nome":"aline_pupim","eq":"Katia Regina","rec":65473.33,"ho":16342.21,"meta":18000.0,"pct":0.9079,"falta":-1657.79},{"nome":"AMABELLY_SANTOS","eq":"Katia Regina","rec":63585.34,"ho":15871.0,"meta":18000.0,"pct":0.8817,"falta":-2129.0},{"nome":"CAIO_SHIMITE","eq":"Stephanie Bernardes","rec":61716.93,"ho":15404.54,"meta":18000.0,"pct":0.8558,"falta":-2595.46},{"nome":"leticia_romeu","eq":"Stephanie Bernardes","rec":55501.69,"ho":13853.33,"meta":18000.0,"pct":0.7696,"falta":-4146.67},{"nome":"STEPHANIE_FAGUNDES","eq":"Stephanie Bernardes","rec":50473.97,"ho":12598.35,"meta":18000.0,"pct":0.6999,"falta":-5401.65},{"nome":"THAIS_MAYARA","eq":"Katia Regina","rec":49302.89,"ho":12305.96,"meta":18000.0,"pct":0.6837,"falta":-5694.04},{"nome":"thauany_moura","eq":"Stephanie Bernardes","rec":48734.66,"ho":12164.26,"meta":18000.0,"pct":0.6758,"falta":-5835.74},{"nome":"KATIA_REGINA","eq":"Liderança","rec":48440.6,"ho":12090.87,"meta":18000.0,"pct":0.6717,"falta":-5909.13},{"nome":"geovanna_almeida","eq":"Katia Regina","rec":47388.2,"ho":11828.17,"meta":18000.0,"pct":0.6571,"falta":-6171.83},{"nome":"kauane_azevedo","eq":"Katia Regina","rec":40362.95,"ho":10074.8,"meta":18000.0,"pct":0.5597,"falta":-7925.2},{"nome":"ISABELA_MONTEIRO","eq":"Katia Regina","rec":38799.66,"ho":9684.5,"meta":18000.0,"pct":0.538,"falta":-8315.5},{"nome":"HELENA_SANTOS","eq":"Bruna Justimiano","rec":34485.85,"ho":8607.81,"meta":30000.0,"pct":0.2869,"falta":-21392.19},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":27862.78,"ho":6954.52,"meta":18000.0,"pct":0.3864,"falta":-11045.48},{"nome":"CLEBER_JUNIOR","eq":"Digital","rec":23958.85,"ho":5980.09,"meta":18000.0,"pct":0.3322,"falta":-12019.91},{"nome":"JHONATA_NASCIMENTO","eq":"Ouvidoria/Suporte","rec":21597.17,"ho":5390.67,"meta":18000.0,"pct":0.2995,"falta":-12609.33},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":16923.06,"ho":4223.96,"meta":18000.0,"pct":0.2347,"falta":-13776.04},{"nome":"EDUARDO_SILVA","eq":"Bruna Justimiano","rec":11955.65,"ho":2984.12,"meta":30000.0,"pct":0.0995,"falta":-27015.88},{"nome":"larissa_santana","eq":"Katia Regina","rec":11738.43,"ho":2929.89,"meta":18000.0,"pct":0.1628,"falta":-15070.11},{"nome":"BRUNA_GARBI","eq":"Stephanie Bernardes","rec":11199.08,"ho":2795.32,"meta":18000.0,"pct":0.1553,"falta":-15204.68},{"nome":"joao_anguita","eq":"Stephanie Bernardes","rec":10006.76,"ho":2497.73,"meta":18000.0,"pct":0.1388,"falta":-15502.27},{"nome":"MARIA_BRAIDOTI","eq":"Bruna Justimiano","rec":9548.32,"ho":2383.18,"meta":30000.0,"pct":0.0794,"falta":-27616.82},{"nome":"jussara_pereira","eq":"Katia Regina","rec":9465.4,"ho":2362.59,"meta":18000.0,"pct":0.1313,"falta":-15637.41},{"nome":"renan_almeida","eq":"Laysa Lopes","rec":9052.26,"ho":2259.46,"meta":18000.0,"pct":0.1255,"falta":-15740.54},{"nome":"thayla_santana","eq":"Laysa Lopes","rec":8183.51,"ho":2042.63,"meta":18000.0,"pct":0.1135,"falta":-15957.37},{"nome":"JOAO_MIRANDA","eq":"Bruna Justimiano","rec":5813.72,"ho":1451.1,"meta":30000.0,"pct":0.0484,"falta":-28548.9},{"nome":"gisleide_guedes","eq":"Katia Regina","rec":5620.45,"ho":1402.88,"meta":18000.0,"pct":0.0779,"falta":-16597.12},{"nome":"BIANCA_V_SILVA","eq":"Stephanie Bernardes","rec":5184.41,"ho":1294.0,"meta":18000.0,"pct":0.0719,"falta":-16706.0},{"nome":"DEBORA_ANDRIELLY","eq":"Bruna Justimiano","rec":5060.34,"ho":1263.05,"meta":30000.0,"pct":0.0421,"falta":-28736.95},{"nome":"rayssa_r_oliveira","eq":"Katia Regina","rec":4344.0,"ho":1084.27,"meta":18000.0,"pct":0.0602,"falta":-16915.73},{"nome":"karina_colonez","eq":"Laysa Lopes","rec":3416.6,"ho":852.78,"meta":18000.0,"pct":0.0474,"falta":-17147.22},{"nome":"carulini_santos","eq":"Stephanie Bernardes","rec":3041.19,"ho":759.06,"meta":18000.0,"pct":0.0422,"falta":-17240.94},{"nome":"MARIA_RODARTE","eq":"Bruna Justimiano","rec":2615.07,"ho":652.75,"meta":30000.0,"pct":0.0218,"falta":-29347.25},{"nome":"KELY_SILVA","eq":"Stephanie Bernardes","rec":2607.1,"ho":650.73,"meta":18000.0,"pct":0.0362,"falta":-17349.27},{"nome":"BRUNA_JUSTIMIANO","eq":"Liderança","rec":2407.9,"ho":601.01,"meta":18000.0,"pct":0.0334,"falta":-17398.99},{"nome":"RAFAELA_MINHOTO","eq":"Bruna Justimiano","rec":2349.73,"ho":586.49,"meta":30000.0,"pct":0.0195,"falta":-29413.51},{"nome":"MAYSA_OLIVEIRA","eq":"Bruna Justimiano","rec":1675.41,"ho":418.19,"meta":30000.0,"pct":0.0139,"falta":-29581.81},{"nome":"felipe_arruda","eq":"Stephanie Bernardes","rec":1065.24,"ho":265.87,"meta":18000.0,"pct":0.0148,"falta":-17734.13},{"nome":"ANA_BENTO","eq":"Bruna Justimiano","rec":947.9,"ho":236.6,"meta":30000.0,"pct":0.0079,"falta":-29763.4},{"nome":"JESSICA_O_SILVA","eq":"Stephanie Bernardes","rec":769.27,"ho":192.01,"meta":18000.0,"pct":0.0107,"falta":-17807.99},{"nome":"KAUAN_TEIXEIRA","eq":"Sem Equipe","rec":282.79,"ho":70.59,"meta":null,"pct":null,"falta":null},{"nome":"thalia_thomaz","eq":"Katia Regina","rec":270.05,"ho":67.4,"meta":18000.0,"pct":0.0037,"falta":-17932.6},{"nome":"BRUNO_UEMURA","eq":"Sem Equipe","rec":256.67,"ho":64.07,"meta":null,"pct":null,"falta":null}],"Julho":[{"nome":"MATHEUS_SOUZA","eq":"Bruna Justimiano","rec":239411.71,"ho":59852.93,"meta":30000.0,"pct":7.9804,"falta":209411.71},{"nome":"MARIA_MOREIRASANTOS","eq":"Bruna Justimiano","rec":209540.16,"ho":52385.04,"meta":30000.0,"pct":6.9847,"falta":179540.16},{"nome":"HELTON_ROLDON","eq":"Bruna Justimiano","rec":139350.2,"ho":34837.55,"meta":30000.0,"pct":4.645,"falta":109350.2},{"nome":"THAYRA_FERREIRASILVA","eq":"Bruna Justimiano","rec":125147.24,"ho":31286.81,"meta":30000.0,"pct":4.1716,"falta":95147.24},{"nome":"LEONARDO_NUNES","eq":"Bruna Justimiano","rec":85912.14,"ho":21478.04,"meta":30000.0,"pct":2.8637,"falta":55912.14},{"nome":"pagueplay","eq":"Sem Equipe","rec":101288.5,"ho":25322.13,"meta":null,"pct":null,"falta":null},{"nome":"FRANCISCA_BRITO","eq":"Bruna Justimiano","rec":68486.83,"ho":17121.71,"meta":30000.0,"pct":2.2829,"falta":38486.83},{"nome":"karina_colonez","eq":"Laysa Lopes","rec":70662.82,"ho":17665.71,"meta":5000.0,"pct":14.1326,"falta":65662.82},{"nome":"silva_beatriz","eq":"Stephanie Bernardes","rec":63655.1,"ho":15913.78,"meta":18000.0,"pct":3.5364,"falta":45655.1},{"nome":"itallo_cardamoni","eq":"Stephanie Bernardes","rec":64474.87,"ho":16118.72,"meta":18000.0,"pct":3.5819,"falta":46474.87},{"nome":"aline_pupim","eq":"Katia Regina","rec":53058.76,"ho":13264.69,"meta":18000.0,"pct":2.9477,"falta":35058.76},{"nome":"CAIO_SHIMITE","eq":"Stephanie Bernardes","rec":53029.77,"ho":13257.44,"meta":18000.0,"pct":2.9461,"falta":35029.77},{"nome":"DEBORA_PORTELA","eq":"Laysa Lopes","rec":71951.86,"ho":17987.97,"meta":5000.0,"pct":14.3904,"falta":66951.86},{"nome":"leticia_romeu","eq":"Stephanie Bernardes","rec":57279.23,"ho":14319.81,"meta":18000.0,"pct":3.1822,"falta":39279.23},{"nome":"raissa_paloma","eq":"Stephanie Bernardes","rec":54387.7,"ho":13596.93,"meta":18000.0,"pct":3.0215,"falta":36387.7},{"nome":"AMABELLY_SANTOS","eq":"Katia Regina","rec":56946.95,"ho":14236.74,"meta":18000.0,"pct":3.1637,"falta":38946.95},{"nome":"thauany_moura","eq":"Stephanie Bernardes","rec":50389.63,"ho":12597.41,"meta":18000.0,"pct":2.7994,"falta":32389.63},{"nome":"ISABELA_MONTEIRO","eq":"Katia Regina","rec":44842.56,"ho":11210.64,"meta":18000.0,"pct":2.4913,"falta":26842.56},{"nome":"THAIS_MAYARA","eq":"Katia Regina","rec":51488.01,"ho":12872.0,"meta":18000.0,"pct":2.8604,"falta":33488.01},{"nome":"ELIARA_PRADO","eq":"Laysa Lopes","rec":72551.12,"ho":18137.78,"meta":5000.0,"pct":14.5102,"falta":67551.12},{"nome":"RENATARODRIGUES","eq":"Bruna Justimiano","rec":36237.17,"ho":9059.29,"meta":30000.0,"pct":1.2079,"falta":6237.17},{"nome":"geovanna_almeida","eq":"Katia Regina","rec":36036.77,"ho":9009.19,"meta":18000.0,"pct":2.002,"falta":18036.77},{"nome":"kauane_azevedo","eq":"Katia Regina","rec":39750.11,"ho":9937.53,"meta":18000.0,"pct":2.2083,"falta":21750.11},{"nome":"GIOVANA_SOUZA","eq":"Katia Regina","rec":39818.71,"ho":9954.68,"meta":18000.0,"pct":2.2122,"falta":21818.71},{"nome":"renan_almeida","eq":"Laysa Lopes","rec":36252.33,"ho":9063.08,"meta":5000.0,"pct":7.2505,"falta":31252.33},{"nome":"STEPHANIE_FAGUNDES","eq":"Stephanie Bernardes","rec":42022.45,"ho":10505.61,"meta":18000.0,"pct":2.3346,"falta":24022.45},{"nome":"BRUNA_GARBI","eq":"Stephanie Bernardes","rec":52480.64,"ho":13120.16,"meta":18000.0,"pct":2.9156,"falta":34480.64},{"nome":"rayssa_r_oliveira","eq":"Katia Regina","rec":37286.33,"ho":9321.58,"meta":18000.0,"pct":2.0715,"falta":19286.33},{"nome":"NANCI_MOREIRA","eq":"Laysa Lopes","rec":42717.22,"ho":10679.31,"meta":5000.0,"pct":8.5434,"falta":37717.22},{"nome":"joao_anguita","eq":"Stephanie Bernardes","rec":41226.51,"ho":10306.63,"meta":18000.0,"pct":2.2904,"falta":23226.51},{"nome":"gisleide_guedes","eq":"Katia Regina","rec":34860.32,"ho":8715.08,"meta":18000.0,"pct":1.9367,"falta":16860.32},{"nome":"LOAMI_FERRAZ","eq":"Laysa Lopes","rec":29488.16,"ho":7372.04,"meta":5000.0,"pct":5.8976,"falta":24488.16},{"nome":"thayla_santana","eq":"Laysa Lopes","rec":26595.67,"ho":6648.92,"meta":5000.0,"pct":5.3191,"falta":21595.67},{"nome":"VALQUIRIA_XAVIER","eq":"Laysa Lopes","rec":21573.94,"ho":5393.49,"meta":5000.0,"pct":4.3148,"falta":16573.94},{"nome":"LYVIA_DIAS","eq":"Bruna Justimiano","rec":38452.02,"ho":9613.01,"meta":30000.0,"pct":1.2817,"falta":8452.02},{"nome":"KAROLAINE_SILVA","eq":"Bruna Justimiano","rec":40771.4,"ho":10192.85,"meta":30000.0,"pct":1.359,"falta":10771.4},{"nome":"TASSIANE_VIANA","eq":"Laysa Lopes","rec":18244.24,"ho":4561.06,"meta":5000.0,"pct":3.6488,"falta":13244.24},{"nome":"BRUNA_JUSTIMIANO","eq":"Liderança","rec":9150.34,"ho":2287.59,"meta":null,"pct":null,"falta":null},{"nome":"HELENA_SANTOS","eq":"Bruna Justimiano","rec":7241.46,"ho":1810.37,"meta":30000.0,"pct":0.2414,"falta":-22758.54},{"nome":"KATIA_REGINA","eq":"Liderança","rec":2927.42,"ho":731.86,"meta":null,"pct":null,"falta":null},{"nome":"BRENDA_FERREIRA","eq":"Líderes","rec":1476.55,"ho":369.14,"meta":null,"pct":null,"falta":null},{"nome":"camila_rebelato","eq":"Laysa Lopes","rec":1425.63,"ho":356.41,"meta":5000.0,"pct":0.2851,"falta":-3574.37},{"nome":"JHONATA_NASCIMENTO","eq":"Ouvidoria/Suporte","rec":1047.04,"ho":261.76,"meta":null,"pct":null,"falta":null},{"nome":"LAYSA_LOPES","eq":"Liderança","rec":4096.4,"ho":1024.1,"meta":null,"pct":null,"falta":null},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":672.44,"ho":168.11,"meta":null,"pct":null,"falta":null},{"nome":"larissa_santana","eq":"Katia Regina","rec":624.07,"ho":156.02,"meta":18000.0,"pct":0.0347,"falta":-17375.93},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":474.74,"ho":118.69,"meta":null,"pct":null,"falta":null},{"nome":"JOAO_MIRANDA","eq":"Bruna Justimiano","rec":404.24,"ho":101.06,"meta":30000.0,"pct":0.0135,"falta":-29595.76},{"nome":"EDUARDO_SILVA","eq":"Bruna Justimiano","rec":82.14,"ho":20.54,"meta":30000.0,"pct":0.0027,"falta":-29917.86}],"Agosto":[{"nome":"MATHEUS_SOUZA","eq":"Bruna Justimiano","rec":229143.16,"ho":57285.79,"meta":null,"pct":null,"falta":null},{"nome":"KAROLAINE_SILVA","eq":"Bruna Justimiano","rec":182253.92,"ho":45563.48,"meta":null,"pct":null,"falta":null},{"nome":"HELTON_ROLDON","eq":"Bruna Justimiano","rec":122945.05,"ho":30736.26,"meta":null,"pct":null,"falta":null},{"nome":"TASSIANE_VIANA","eq":"Ouvidoria/Suporte","rec":95145.86,"ho":23786.47,"meta":null,"pct":null,"falta":null},{"nome":"raissa_paloma","eq":"Bruna Justimiano","rec":92764.36,"ho":23191.09,"meta":null,"pct":null,"falta":null},{"nome":"STEPHANIE_FAGUNDES","eq":"Bruna Justimiano","rec":91163.0,"ho":22790.75,"meta":null,"pct":null,"falta":null},{"nome":"silva_beatriz","eq":"Bruna Justimiano","rec":89409.4,"ho":22352.35,"meta":null,"pct":null,"falta":null},{"nome":"pagueplay","eq":"Sem Equipe","rec":85569.63,"ho":21392.41,"meta":null,"pct":null,"falta":null},{"nome":"leticia_romeu","eq":"Bruna Justimiano","rec":84760.37,"ho":21190.09,"meta":null,"pct":null,"falta":null},{"nome":"CAIO_SHIMITE","eq":"Bruna Justimiano","rec":83922.56,"ho":20980.64,"meta":null,"pct":null,"falta":null},{"nome":"MARIA_MOREIRASANTOS","eq":"Alisson","rec":73367.53,"ho":18341.88,"meta":null,"pct":null,"falta":null},{"nome":"karina_colonez","eq":"Laysa/Stephanie","rec":71146.03,"ho":17786.51,"meta":null,"pct":null,"falta":null},{"nome":"ISABELA_MONTEIRO","eq":"Katia Regina","rec":69718.6,"ho":17429.65,"meta":null,"pct":null,"falta":null},{"nome":"itallo_cardamoni","eq":"Laysa/Stephanie","rec":68899.17,"ho":17224.79,"meta":null,"pct":null,"falta":null},{"nome":"BRUNA_GARBI","eq":"Laysa/Stephanie","rec":68762.09,"ho":17190.52,"meta":null,"pct":null,"falta":null},{"nome":"THAIS_MAYARA","eq":"Ouvidoria/Suporte","rec":66466.8,"ho":16616.7,"meta":null,"pct":null,"falta":null},{"nome":"kauane_azevedo","eq":"Katia Regina","rec":64385.77,"ho":16096.44,"meta":null,"pct":null,"falta":null},{"nome":"GIOVANA_SOUZA","eq":"Bruna Justimiano","rec":60921.76,"ho":15230.44,"meta":null,"pct":null,"falta":null},{"nome":"gisleide_guedes","eq":"Katia Regina","rec":59877.82,"ho":14969.45,"meta":null,"pct":null,"falta":null},{"nome":"thayla_santana","eq":"Bruna Justimiano","rec":48914.1,"ho":12228.52,"meta":null,"pct":null,"falta":null},{"nome":"LYVIA_DIAS","eq":"Bruna Justimiano","rec":48666.19,"ho":12166.55,"meta":null,"pct":null,"falta":null},{"nome":"aline_pupim","eq":"Katia Regina","rec":46410.74,"ho":11602.68,"meta":null,"pct":null,"falta":null},{"nome":"joao_anguita","eq":"Laysa/Stephanie","rec":45492.73,"ho":11373.18,"meta":null,"pct":null,"falta":null},{"nome":"rayssa_r_oliveira","eq":"Katia Regina","rec":41073.9,"ho":10268.48,"meta":null,"pct":null,"falta":null},{"nome":"THAYRA_FERREIRASILVA","eq":"Luciano e Luan","rec":40404.73,"ho":10101.18,"meta":null,"pct":null,"falta":null},{"nome":"thauany_moura","eq":"Laysa/Stephanie","rec":39491.35,"ho":9872.84,"meta":null,"pct":null,"falta":null},{"nome":"DEBORA_PORTELA","eq":"Time Matheus","rec":38824.01,"ho":9706.0,"meta":null,"pct":null,"falta":null},{"nome":"NANCI_MOREIRA","eq":"Time Matheus","rec":32845.4,"ho":8211.35,"meta":null,"pct":null,"falta":null},{"nome":"VALQUIRIA_XAVIER","eq":"Laysa/Stephanie","rec":31537.34,"ho":7884.34,"meta":null,"pct":null,"falta":null},{"nome":"CLAUDINEIA_MESSIAS","eq":"Laysa/Stephanie","rec":31107.32,"ho":7776.83,"meta":null,"pct":null,"falta":null},{"nome":"RENATARODRIGUES","eq":"Bruna Justimiano","rec":30454.39,"ho":7613.6,"meta":null,"pct":null,"falta":null},{"nome":"caroline_valverde","eq":"Laysa/Stephanie","rec":29861.78,"ho":7465.44,"meta":null,"pct":null,"falta":null},{"nome":"AMABELLY_SANTOS","eq":"Katia Regina","rec":27743.03,"ho":6935.76,"meta":null,"pct":null,"falta":null},{"nome":"LOAMI_FERRAZ","eq":"Luciano e Luan","rec":27436.19,"ho":6859.05,"meta":null,"pct":null,"falta":null},{"nome":"FRANCISCA_BRITO","eq":"Digital","rec":20244.3,"ho":5061.07,"meta":null,"pct":null,"falta":null},{"nome":"ELIARA_PRADO","eq":"Sem Equipe","rec":6146.96,"ho":1536.74,"meta":null,"pct":null,"falta":null},{"nome":"BRUNA_JUSTIMIANO","eq":"Liderança","rec":5612.03,"ho":1403.01,"meta":null,"pct":null,"falta":null},{"nome":"LEONARDO_NUNES","eq":"Bianca","rec":3147.08,"ho":786.77,"meta":null,"pct":null,"falta":null},{"nome":"HELENA_SANTOS","eq":"Qualidade","rec":2496.63,"ho":624.16,"meta":null,"pct":null,"falta":null},{"nome":"geovanna_almeida","eq":"Katia Regina","rec":1908.66,"ho":477.16,"meta":null,"pct":null,"falta":null},{"nome":"LAYSA_LOPES","eq":"Liderança","rec":1636.9,"ho":409.23,"meta":null,"pct":null,"falta":null},{"nome":"STEPHANIE_BERNARDES","eq":"Liderança","rec":1163.28,"ho":290.82,"meta":null,"pct":null,"falta":null},{"nome":"renan_almeida","eq":"Suporte ao Usuário","rec":1123.98,"ho":281.0,"meta":null,"pct":null,"falta":null},{"nome":"KATIA_REGINA","eq":"Liderança","rec":368.89,"ho":92.22,"meta":null,"pct":null,"falta":null},{"nome":"FABIO_AQUINO","eq":"Sem Equipe","rec":170.94,"ho":42.73,"meta":null,"pct":null,"falta":null}]};
 
 const PROJ_ANO_MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto'];
 // Botões da página Projeção Operador Ano: vão até o mês corrente (Setembro, Outubro...), sem mexer na lista usada por Relatório Diretoria/Fechamento
@@ -19718,9 +19753,9 @@ function projAnoQuartilInfo(pct){
 
 // Cor por equipe (mesma lógica de cor usada no painel Metas & Projeções HO)
 const PROJ_ANO_EQ_COLOR = {
-  'Birigui Bruna':'#4776E6', 'Marília Stephanie':'#00A86B', 'Katia 2°T':'#F7971E',
+  'Bruna Justimiano':'#4776E6', 'Stephanie Bernardes':'#00A86B', 'Katia Regina':'#F7971E',
   'Laysa Lopes':'#8B5CF6', 'Laysa/Stephanie':'#8B5CF6', 'Equipe Stephanie':'#8B5CF6', 'Digital':'#f953c6', 'Líderes':'#64748B', 'Liderança':'#0EA5E9',
-  'Ouvidoria/Suporte':'#14B8A6', 'Treinamento Isabella':'#06B6D4', 'Suporte':'#64748B', 'Sem Equipe':'#9CA3AF',
+  'Ouvidoria/Suporte':'#14B8A6', 'Isabela/Layane':'#06B6D4', 'Suporte':'#64748B', 'Sem Equipe':'#9CA3AF',
 };
 function projAnoAvatarHtml(nome, eq, size){
   size = size || 32;
@@ -20447,9 +20482,9 @@ function rdopRender(){
     const isEven = idx % 2 === 0;
     const bg = isEven ? 'var(--g50)' : 'var(--w)';
     const ec = EQ_COR[r.equipe] || {c:'#7A8899',bg:'#F8FAFB'};
-    const eqLabel = r.equipe==='COFEN MARILIA BRENDA'?'Marília Stephanie'
-                  : r.equipe==='COFEN BIRIGUI BRUNA'?'Birigui Bruna'
-                  : r.equipe==='COFEN STEPHANIE 2° TURNO'?'Katia 2°T'
+    const eqLabel = r.equipe==='COFEN MARILIA BRENDA'?'Stephanie Bernardes'
+                  : r.equipe==='COFEN BIRIGUI BRUNA'?'Bruna Justimiano'
+                  : r.equipe==='COFEN STEPHANIE 2° TURNO'?'Katia Regina'
                   : r.equipe==='COFEN DIGITAL'?'Digital'
                   : r.equipe==='COFEN KATIA'?'Equipe Stephanie':'—';
     html += `<tr style="background:${bg};border-bottom:1px solid var(--g100);transition:background .15s"
@@ -20711,11 +20746,11 @@ function renderEqMetasTable(){
 
   const ORDER = ['COFEN BIRIGUI BRUNA','COFEN STEPHANIE 2° TURNO','COFEN KATIA','COFEN MARILIA BRENDA','COFEN LETICIA','COFEN TREINAMENTO','COFEN SUPORTE'];
   const EQ_LABELS = {
-    'COFEN TREINAMENTO'       : 'Treinamento Isabella',
+    'COFEN TREINAMENTO'       : 'Isabela/Layane',
     'COFEN SUPORTE'           : 'Suporte',
-    'COFEN BIRIGUI BRUNA'     : 'Birigui Bruna',
-    'COFEN MARILIA BRENDA'    : 'Marília Stephanie',
-    'COFEN STEPHANIE 2° TURNO': 'Katia 2°T',
+    'COFEN BIRIGUI BRUNA'     : 'Bruna Justimiano',
+    'COFEN MARILIA BRENDA'    : 'Stephanie Bernardes',
+    'COFEN STEPHANIE 2° TURNO': 'Katia Regina',
     'COFEN DIGITAL'           : 'Digital',
     'COFEN KATIA'             : 'Equipe Stephanie',
     'COFEN LETICIA'           : 'Equipe Letícia',
@@ -20810,7 +20845,7 @@ function renderEqMetasTable(){
                 : `<span style="font-weight:900;font-size:13px;color:#fff;font-family:'Bebas Neue',sans-serif">S</span>`}
             </div>` : ''}
             ${(eqName==='COFEN KATIA'||eqName==='COFEN STEPHANIE 2° TURNO') ? `<button onclick="event.stopPropagation();trocarFotoLiderKatiaLaysaManual()"
-              title="Trocar fotos Katia 2°T ⇄ Equipe Stephanie (caso estejam invertidas)"
+              title="Trocar fotos Katia Regina ⇄ Equipe Stephanie (caso estejam invertidas)"
               style="width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);
               color:rgba(255,255,255,.6);font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;
               margin-left:4px;flex-shrink:0;padding:0" onmouseover="this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">🔄</button>` : ''}
@@ -20902,7 +20937,7 @@ function migrarFotoLiderKatiaLaysa(){
 }
 migrarFotoLiderKatiaLaysa();
 
-// Botão manual pra trocar as fotos dos líderes Katia 2°T ⇄ Equipe Stephanie
+// Botão manual pra trocar as fotos dos líderes Katia Regina ⇄ Equipe Stephanie
 // a qualquer momento (caso alguém suba a foto no lugar errado de novo).
 function trocarFotoLiderKatiaLaysaManual(){
   const all = photoGetAll();
@@ -21112,9 +21147,9 @@ function histGetEquipe(nome){
 }
 
 const HIST_EQ_COR = {
-  'COFEN MARILIA BRENDA':    {c:'#00A86B',bg:'#E6F7F1',label:'Marília Stephanie'},
-  'COFEN BIRIGUI BRUNA':     {c:'#4776E6',bg:'#EEF2FF',label:'Birigui Bruna'},
-  'COFEN STEPHANIE 2° TURNO':{c:'#F7971E',bg:'#FFF7ED',label:'Katia 2°T'},
+  'COFEN MARILIA BRENDA':    {c:'#00A86B',bg:'#E6F7F1',label:'Stephanie Bernardes'},
+  'COFEN BIRIGUI BRUNA':     {c:'#4776E6',bg:'#EEF2FF',label:'Bruna Justimiano'},
+  'COFEN STEPHANIE 2° TURNO':{c:'#F7971E',bg:'#FFF7ED',label:'Katia Regina'},
   'COFEN DIGITAL':           {c:'#f953c6',bg:'#FDF2FF',label:'Digital'},
   '—':                       {c:'#7A8899',bg:'#F8FAFB',label:'—'},
 };
@@ -21170,9 +21205,9 @@ function histSortBy(by){
 
 // Mapeamento label de filtro → equipe real
 const HIST_LABEL_EQ = {
-  'Birigui Bruna':  'COFEN BIRIGUI BRUNA',
-  'Marília Stephanie': 'COFEN MARILIA BRENDA',
-  'Katia 2°T':  'COFEN STEPHANIE 2° TURNO',
+  'Bruna Justimiano':  'COFEN BIRIGUI BRUNA',
+  'Stephanie Bernardes': 'COFEN MARILIA BRENDA',
+  'Katia Regina':  'COFEN STEPHANIE 2° TURNO',
   'Digital':        'COFEN DIGITAL',
 };
 
@@ -21991,7 +22026,7 @@ window.eqdTeam=team;window.eqdMember=member;
 // Formato da planilha 58_op: SubGrupo | Usuário | Recebido | Total HO | METAS | HOJE | PROJEÇÃO
 // HOJE = META ÷ D.U. total × D.U. passados | PROJEÇÃO = Total HO ÷ HOJE. Atualiza sozinho (import, virada do dia, 60 s).
 (function(){
-var META_HO_PADRAO = {"CAIO_SHIMITE": 30000, "DIEGO_RODRIGUES": 30000, "THAYLA_SANTANA": 30000, "CAROLINE_VALVERDE": 30000, "AMABELLY_SANTOS": 30000, "THAIS_MAYARA": 30000, "RAISSA_PALOMA": 30000, "STEPHANIE_FAGUNDES": 30000, "MIRELLA_ARIAS": 30000, "KAUANE_AZEVEDO": 18000, "THAUANY_MOURA": 30000, "JOAO_ANGUITA": 18000, "KAUE_NADAI": 30000, "ITALLO_CARDAMONI": 18000, "TASSIANE_VIANA": 30000, "GIOVANA_SOUZA": 18000, "RAYSSA_R_OLIVEIRA": 18000, "GISLEIDE_GUEDES": 18000, "KARINA_COLONEZ": 18000, "SILVA_BEATRIZ": 30000, "ISABELLA_SANTOS": 18000, "CLAUDINEIA_MESSIAS": 18000, "BRUNA_GARBI": 18000, "BRUNA_TELES": 12000, "SOPHIA_COSTA": 5000, "DEBORA_SOBRINHO": 18000, "REBECA_CAMARGO": 12000, "LETICIA_QUINALLIA": 5000, "MANUELA_MARINI": 5000, "LEONARDO_COSTA": 12000, "LUAN_PINTO": 5000, "JADE_FAUSTINO": 18000, "KETHELY_SANTOS": 5000, "ALLANA_BARBOSA": 5000, "JOAO_V_SANTOS": 5000, "CIBELE_ZANELI": 5000, "MARIANA_HILARIO": 5000, "LETICIA_ROMEU": 30000, "VANESSA_CORREA": 5000, "SILVA_JESSICA": 5000, "INGRYD_OLIVEIRA": 5000, "JASMIM_SOUSA": 5000, "LIVIA_JACOB": 5000};
+var META_HO_PADRAO = {"KARINA_COLONEZ": 18000, "ITALLO_CARDAMONI": 18000, "BRUNA_GARBI": 18000, "CLAUDINEIA_MESSIAS": 18000, "BRUNA_TELES": 18000, "ISABELLA_SANTOS": 18000, "LEONARDO_COSTA": 18000, "REBECA_CAMARGO": 18000, "JOAO_V_SANTOS": 12000, "MARIANA_HILARIO": 12000, "LIVIA_JACOB": 12000, "VANESSA_CORREA": 12000, "SILVA_BEATRIZ": 30000, "CAIO_SHIMITE": 30000, "THAYLA_SANTANA": 30000, "RAISSA_PALOMA": 30000, "STEPHANIE_FAGUNDES": 30000, "AMABELLY_SANTOS": 30000, "CAROLINE_VALVERDE": 30000, "DIEGO_RODRIGUES": 30000, "LETICIA_ROMEU": 30000, "TASSIANE_VIANA": 22000, "THAIS_MAYARA": 22000, "THAUANY_MOURA": 22000, "KAUE_NADAI": 22000, "MIRELLA_ARIAS": 18000, "KAUANE_AZEVEDO": 18000, "RAYSSA_R_OLIVEIRA": 18000, "GIOVANA_SOUZA": 18000, "GISLEIDE_GUEDES": 18000, "DEBORA_SOBRINHO": 18000, "CIBELE_ZANELI": 18000, "LUAN_PINTO": 12000, "MANUELA_MARINI": 12000, "ALLANA_BARBOSA": 12000, "SOPHIA_COSTA": 12000, "LETICIA_QUINALLIA": 12000, "THAIS_P_RODRIGUES": 5000, "RHUAN_SILVA": 5000, "POLIANA_VARJAO": 5000, "ISABELLE_MOREIRA": 5000, "RAFAELA_LISBOA": 5000};
 var META_HO_EQ = {'COFEN BIRIGUI BRUNA':30000,'COFEN MARILIA BRENDA':18000,'COFEN STEPHANIE 2° TURNO':18000,'COFEN TREINAMENTO':5000};
 function norm(n){ return String(n||'').toUpperCase().trim(); }
 function getOv(){ try{ return JSON.parse(localStorage.getItem('cofen_proj_meta_ho_op')||'{}'); }catch(e){ return {}; } }
