@@ -9145,6 +9145,25 @@ var QUADRO_PADRAO={
 };
 // Quem saiu da empresa: some das equipes e rankings e não é recriado por import. (Para voltar, restaurar em Gestão.)
 var QUADRO_REMOVIDOS=['Valquiria Xavier'];
+// ══ LISTA OFICIAL DE OPERADORES (05/11/2026): só estes aparecem; quem saiu (ex.: Jade) não volta nem pelo relatório ══
+var OP_OFICIAIS={"KARINA_COLONEZ": "COFEN MARILIA BRENDA", "ITALLO_CARDAMONI": "COFEN MARILIA BRENDA", "BRUNA_GARBI": "COFEN MARILIA BRENDA", "CLAUDINEIA_MESSIAS": "COFEN MARILIA BRENDA", "BRUNA_TELES": "COFEN MARILIA BRENDA", "ISABELLA_SANTOS": "COFEN MARILIA BRENDA", "LEONARDO_COSTA": "COFEN MARILIA BRENDA", "REBECA_CAMARGO": "COFEN MARILIA BRENDA", "JOAO_V_SANTOS": "COFEN MARILIA BRENDA", "MARIANA_HILARIO": "COFEN MARILIA BRENDA", "LIVIA_JACOB": "COFEN MARILIA BRENDA", "VANESSA_CORREA": "COFEN MARILIA BRENDA", "SILVA_BEATRIZ": "COFEN BIRIGUI BRUNA", "CAIO_SHIMITE": "COFEN BIRIGUI BRUNA", "THAYLA_SANTANA": "COFEN BIRIGUI BRUNA", "RAISSA_PALOMA": "COFEN BIRIGUI BRUNA", "STEPHANIE_FAGUNDES": "COFEN BIRIGUI BRUNA", "AMABELLY_SANTOS": "COFEN BIRIGUI BRUNA", "CAROLINE_VALVERDE": "COFEN BIRIGUI BRUNA", "DIEGO_RODRIGUES": "COFEN BIRIGUI BRUNA", "LETICIA_ROMEU": "COFEN BIRIGUI BRUNA", "TASSIANE_VIANA": "COFEN BIRIGUI BRUNA", "THAIS_MAYARA": "COFEN BIRIGUI BRUNA", "THAUANY_MOURA": "COFEN BIRIGUI BRUNA", "KAUE_NADAI": "COFEN BIRIGUI BRUNA", "MIRELLA_ARIAS": "COFEN BIRIGUI BRUNA", "KAUANE_AZEVEDO": "COFEN STEPHANIE 2° TURNO", "RAYSSA_R_OLIVEIRA": "COFEN STEPHANIE 2° TURNO", "GIOVANA_SOUZA": "COFEN STEPHANIE 2° TURNO", "GISLEIDE_GUEDES": "COFEN STEPHANIE 2° TURNO", "LUAN_PINTO": "COFEN STEPHANIE 2° TURNO", "DEBORA_SOBRINHO": "COFEN STEPHANIE 2° TURNO", "CIBELE_ZANELI": "COFEN STEPHANIE 2° TURNO", "MANUELA_MARINI": "COFEN TREINAMENTO", "ALLANA_BARBOSA": "COFEN TREINAMENTO", "SOPHIA_COSTA": "COFEN TREINAMENTO", "LETICIA_QUINALLIA": "COFEN TREINAMENTO", "THAIS_P_RODRIGUES": "COFEN TREINAMENTO", "RHUAN_SILVA": "COFEN TREINAMENTO", "POLIANA_VARJAO": "COFEN TREINAMENTO", "ISABELLE_MOREIRA": "COFEN TREINAMENTO", "RAFAELA_LISBOA": "COFEN TREINAMENTO"};
+var OP_FORA_RANKING=['BRUNA_JUSTIMIANO','KATIA_REGINA','STEPHANIE_BERNARDES','ESTRATEGIA_COFEN']; // líderes e login de suporte: ficam na equipe, não entram nos rankings
+var OP_ALIAS={'AMABELYSANTOS':'AMABELLYSANTOS','REBECACARAMGO':'REBECACAMARGO','SILVIABEATRIZ':'SILVABEATRIZ'};
+function _okey(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,''); }
+var _OK_MAPA=null, _OK_FORA=null;
+function _okInit(){ if(_OK_MAPA) return; _OK_MAPA={}; Object.keys(OP_OFICIAIS).forEach(function(n){ _OK_MAPA[_okey(n)]=n; }); _OK_FORA={}; OP_FORA_RANKING.forEach(function(n){ _OK_FORA[_okey(n)]=1; }); }
+function _okLev(a,b){ var m=a.length,n=b.length,d=[],i,j; for(i=0;i<=m;i++){ d[i]=[i]; } for(j=1;j<=n;j++) d[0][j]=j;
+  for(i=1;i<=m;i++) for(j=1;j<=n;j++) d[i][j]=a[i-1]===b[j-1]?d[i-1][j-1]:1+Math.min(d[i-1][j],d[i][j-1],d[i-1][j-1]); return d[m][n]; }
+// devolve o nome oficial (ex.: AMABELLY_SANTOS) ou null se a pessoa não está na lista
+function opOficialNome(name){
+  _okInit(); var k=_okey(name); if(!k) return null;
+  if(_OK_MAPA[k]) return _OK_MAPA[k];
+  if(OP_ALIAS[k] && _OK_MAPA[OP_ALIAS[k]]) return _OK_MAPA[OP_ALIAS[k]];
+  var best=null,bd=3; Object.keys(_OK_MAPA).forEach(function(o){ if(Math.abs(o.length-k.length)>2 || o.slice(0,4)!==k.slice(0,4)) return; var d=_okLev(k,o); if(d<bd){ bd=d; best=_OK_MAPA[o]; } });
+  return best;
+}
+function opEhOficial(name){ _okInit(); return !!opOficialNome(name) || !!_OK_FORA[_okey(name)]; }
+
 // ══ METAS INDIVIDUAIS DO QUADRO DE 05/11/2026 (cofen_metas_op + Projeção dos Operadores) ══
 var METAS_ROSTER_V='2026-11-05-a';
 var METAS_ROSTER={"Karina Colonez": 18000, "Itallo Cardamoni": 18000, "Bruna Garbi": 18000, "Claudineia Messias": 18000, "Bruna Teles": 18000, "Isabella Santos": 18000, "Leonardo Costa": 18000, "Rebeca Camargo": 18000, "Joao V Santos": 12000, "Mariana Hilario": 12000, "Livia Jacob": 12000, "Vanessa Correa": 12000, "Silva Beatriz": 30000, "Caio Shimite": 30000, "Thayla Santana": 30000, "Raissa Paloma": 30000, "Stephanie Fagundes": 30000, "Amabelly Santos": 30000, "Caroline Valverde": 30000, "Diego Rodrigues": 30000, "Leticia Romeu": 30000, "Tassiane Viana": 22000, "Thais Mayara": 22000, "Thauany Moura": 22000, "Kaue Nadai": 22000, "Mirella Arias": 18000, "Kauane Azevedo": 18000, "Rayssa R. Oliveira": 18000, "Giovana Souza": 18000, "Gisleide Guedes": 18000, "Debora Sobrinho": 18000, "Cibele Zaneli": 18000, "Luan Pinto": 12000, "Manuela Marini": 12000, "Allana Barbosa": 12000, "Sophia Costa": 12000, "Leticia Quinallia": 12000, "Thais P Rodrigues": 5000, "Rhuan Silva": 5000, "Poliana Varjao": 5000, "Isabelle Moreira": 5000, "Rafaela Lisboa": 5000};
@@ -9185,6 +9204,13 @@ function quadroAplicar(){
   }catch(e){}
   Object.keys(QUADRO_PADRAO).forEach(function(t){ QUADRO_PADRAO[t].forEach(function(n){ alvo[_qk(n)]=t; }); });
   Object.keys(mov).forEach(function(k){ alvo[k]=mov[k]; });   // mudança manual feita depois na Gestão vence
+  // Lista oficial manda: quem não está nela sai (e não é recriado); quem está nela nunca fica como "removido"
+  try{
+    var _al=false;
+    D.equipes.forEach(function(eq){ eq.ops.forEach(function(o){ if(!opEhOficial(o.name) && rm.indexOf(o.name)<0){ rm.push(o.name); _al=true; } }); });
+    var _rm2=rm.filter(function(n){ return !alvo[_qk(n)]; }); if(_rm2.length!==rm.length){ rm=_rm2; _al=true; }
+    if(_al){ ov.removidos=rm; gSetOverrides(ov); try{ fbPush('gestao',ov); }catch(e){} }
+  }catch(e){}
   rm.forEach(function(n){ rmSet[n]=1; rmKeys[_qk(n)]=1; });
   var mudou=false;
   // melhor cópia de cada pessoa (prefere a que já está na equipe certa, depois a de maior recebimento)
@@ -10603,6 +10629,7 @@ function importApply(){
       // de entradas fantasma).
       const _nomesLixo = ['PAGUEPLAY','PAGUEPAY','PAGUE PLAY','TOTAL','SUBTOTAL','GERAL','SOMA','COFEN','PAGUEPLA'];
       if(_nomesLixo.includes(opNameNorm)) return;
+      if(typeof opEhOficial==='function' && !opEhOficial(m.rawName)) return; // quem saiu não volta pelo relatório
       const targetEq = m.eq || 'COFEN PAGUEPLAY';
       let eqObj = D.equipes.find(e=>e.name===targetEq);
       if(!eqObj){ eqObj = {name:targetEq, rec:0, ho:0, n_op:0, acordos:0, ops:[]}; D.equipes.push(eqObj); }
@@ -19609,6 +19636,7 @@ function projOpRender(){
   const _xlsUpper = {};
   Object.keys(REC_JULHO_XLS).forEach(k=>{ _xlsUpper[k.toUpperCase()] = REC_JULHO_XLS[k]; });
   const xlsGet = name => {
+    if(new Date().getMonth() !== 6) return undefined; // valores fixos são de julho: não valem em outros meses
     if(REC_JULHO_XLS[name] !== undefined) return REC_JULHO_XLS[name];
     return _xlsUpper[name.toUpperCase()];
   };
@@ -22077,7 +22105,20 @@ function linhas(){
     out.push({name:r.n,eq:r.sg,sh:titulo(r.sg)||'Sem equipe',c:'#94A3B8',rec:r.rec||0,ho:r.ho>0?r.ho:(r.rec||0)*HO_PCT,vivo:false});
   });
   var oc=ocLer();
-  return out.filter(function(o){ return oc.indexOf(nk(o.name))<0; });
+  // Lista oficial: só os 42 aparecem (líderes e suporte ficam de fora do ranking), cada um uma vez, e todos presentes mesmo sem recebimento
+  var por={}, res=[];
+  out.forEach(function(o){
+    var of=opOficialNome(o.name); if(!of) return;
+    var k=nk(of), a=por[k];
+    if(!a){ por[k]=o; }
+    else { var win=((o.rec||0)>(a.rec||0))?o:a, base=a.vivo?a:(o.vivo?o:a); por[k]=Object.assign({},base,{rec:win.rec,ho:win.ho}); } // mesma pessoa em duas grafias: fica com o maior recebimento
+  });
+  Object.keys(OP_OFICIAIS).forEach(function(n){
+    var k=nk(n);
+    if(!por[k]){ var eq=OP_OFICIAIS[n], cfg=(typeof EQ!=='undefined'&&EQ[eq])||{c:'#888',sh:eq}; por[k]={name:n,eq:eq,sh:cfg.sh,c:cfg.c,rec:0,ho:0,vivo:false}; }
+  });
+  Object.keys(por).forEach(function(k){ res.push(por[k]); });
+  return res.filter(function(o){ return oc.indexOf(nk(o.name))<0; });
 }
 window.projOpDashSnapshot=function(){
   var ip=(typeof importParsed!=='undefined')?importParsed:null; if(!ip) return;
