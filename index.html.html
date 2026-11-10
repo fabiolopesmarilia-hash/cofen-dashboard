@@ -22079,7 +22079,7 @@ function foto(n,sz){var f=null;try{f=photoGet(n);}catch(e){}
 function mesRef(){var m=(localStorage.getItem('cofen_mes_dados')||'').match(/^(\d{4})-(\d{2})$/),d=new Date();return m?{y:+m[1],m:+m[2]}:{y:d.getFullYear(),m:d.getMonth()+1};}
 function removidos(){try{return gGetOverrides().removidos||[];}catch(e){return [];}}
 function close(){var el=document.getElementById('eqd-ov');if(el)el.style.display='none';}
-function show(html){
+function show(html,wide){
   var el=document.getElementById('eqd-ov');
   if(!el){el=document.createElement('div');el.id='eqd-ov';
     el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99980;display:none;align-items:center;justify-content:center;padding:14px';
@@ -22089,7 +22089,7 @@ function show(html){
       var a=b.getAttribute('data-act');
       if(a==='close')close();else if(a==='back')team(lastTeam);else if(a==='op')member(b.getAttribute('data-op'));});
     document.body.appendChild(el);}
-  el.innerHTML='<div style="background:#0f2e22;color:#f1f5f9;border:1px solid rgba(255,255,255,.15);border-radius:16px;width:min(760px,100%);max-height:90vh;overflow:auto;padding:18px;font-family:inherit">'+html+'</div>';
+  el.innerHTML='<div style="background:#0f2e22;color:#f1f5f9;border:1px solid rgba(255,255,255,.15);border-radius:16px;width:min('+(wide?'1040':'760')+'px,100%);max-height:92vh;overflow:auto;padding:18px;font-family:inherit">'+html+'</div>';
   el.style.display='flex';}
 function head(titulo,sub,back){
   return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
@@ -22098,25 +22098,92 @@ function head(titulo,sub,back){
    +'<button data-act="close" style="background:#ef4444;color:#fff;border:0;border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:700">✕</button></div>';}
 var TH='style="text-align:right;padding:7px 8px;font-size:10px;letter-spacing:1px;color:#94a3b8;text-transform:uppercase"';
 var TD='style="text-align:right;padding:8px;font-weight:700"';
+function pctFmt(v){return v.toFixed(1).replace('.',',')+'%';}
+function corP(p){return p>=100?'#22c55e':p>=80?'#60a5fa':p>=50?'#f59e0b':'#ef4444';}
+function faixaDe(p){return p>=100?1:p>=80?2:p>=50?3:4;}
+function stat(l,v,c){return '<div style="display:flex;justify-content:space-between;gap:8px;padding:2px 0;font-size:11px"><span style="color:#94a3b8">'+l+'</span><b style="color:'+(c||'#e2e8f0')+'">'+v+'</b></div>';}
+function card(tit,big,bigSub,cor,linhas){return '<div style="flex:1;min-width:210px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px">'
+  +'<div style="font-size:10px;letter-spacing:1.5px;color:#94a3b8;font-weight:800">'+tit+'</div>'
+  +'<div style="font-size:24px;font-weight:800;color:'+cor+';margin:4px 0 8px">'+big+(bigSub?' <span style="font-size:11px;color:#94a3b8;font-weight:600">'+bigSub+'</span>':'')+'</div>'+linhas+'</div>';}
 function team(key){
   lastTeam=key;
   var eq=D.equipes.find(function(e){return e.name===key;});if(!eq)return;
-  var rm=removidos(),hojeMap={};
-  var ops=eq.ops.filter(function(o){var lid=false;try{lid=_ehLider(o.name);}catch(e){}return rm.indexOf(o.name)<0 && !(lid && !(o.rec>0));}).slice().sort(function(a,b){return (b.rec-a.rec)||String(a.name).localeCompare(b.name);});
-  var tot=ops.reduce(function(s,o){return s+o.rec;},0),ho=ops.reduce(function(s,o){return s+o.ho;},0);
-  var hoje=0;
-  var rows=ops.map(function(o,i){
-    var h=0;try{h=tvGetTodayVal(o)||0;}catch(e){}hoje+=h;
-    var lid=false;try{lid=_ehLider(o.name);}catch(e){}
-    return '<tr data-act="op" data-op="'+esc(o.name)+'" style="cursor:pointer;border-top:1px solid rgba(255,255,255,.08)" onmouseover="this.style.background=\'rgba(255,255,255,.07)\'" onmouseout="this.style.background=\'\'">'
-     +'<td style="padding:8px;width:34px;font-weight:800;color:#fbbf24">'+(i+1)+'º</td>'
-     +'<td style="padding:8px"><div style="display:flex;align-items:center;gap:9px">'+foto(o.name,34)+'<b>'+esc(bonito(o.name))+'</b>'+(lid?' <span style="font-size:9px;background:#fbbf24;color:#000;border-radius:6px;padding:2px 6px;font-weight:800">LÍDER</span>':'')+'</div></td>'
-     +'<td '+TD+'>'+fR(o.rec)+'</td><td '+TD+' >'+fR(o.ho)+'</td><td '+TD+'>'+(h>0?fR(h):'-')+'</td>'
-     +'<td '+TD+'>'+(tot>0?(o.rec/tot*100).toFixed(1).replace('.',',')+'%':'-')+'</td></tr>';}).join('');
+  var rm=removidos();
+  var duP=(typeof DU!=='undefined'&&DU&&DU.passou>0)?DU.passou:1, duR=(typeof DU!=='undefined'&&DU&&DU.restam>0)?DU.restam:1;
+  var duT=(typeof DU!=='undefined'&&DU&&DU.total>0)?DU.total:(duP+duR);
+  var metaEq=0;try{metaEq=metaHoGet(key)||0;}catch(e){}
+  var hoEq=eq.ho||0, recEq=eq.rec||0;
+  var esperado=duT>0?metaEq/duT*duP:0, esperadoAmanha=duT>0?metaEq/duT*Math.min(duT,duP+1):0;
+  var pEq=esperado>0?hoEq/esperado*100:0, cEq=corP(pEq);
+  var falta=Math.max(0,metaEq-hoEq), porDia=duR>0?falta/duR:0, media=duP>0?hoEq/duP:0;
+  var proj=duP>0?hoEq/duP*duT:0;
+  // metas individuais (mesma conta do ranking de projeção)
+  var pm={};try{(window.projOpDashRows()||[]).forEach(function(r){pm[r.name]=r;});}catch(e){}
+  var ops=eq.ops.filter(function(o){var lid=false;try{lid=_ehLider(o.name);}catch(e){}return rm.indexOf(o.name)<0 && !(lid && !(o.rec>0));}).map(function(o){
+    var r=pm[o.name],h=0;try{h=tvGetTodayVal(o)||0;}catch(e){}
+    var ho=(o.ho>0?o.ho:(r?r.ho:0)),meta=r?r.meta:0,esp=r?r.esperado:0;
+    return {o:o,ho:ho,meta:meta,esp:esp,p:esp>0?ho/esp*100:-1,hoje:h};
+  }).sort(function(a,b){return (b.p-a.p)||(b.o.rec-a.o.rec)||String(a.o.name).localeCompare(b.o.name);});
+  var hojeTot=ops.reduce(function(s,x){return s+x.hoje;},0);
+  var diaLbl='';try{diaLbl=String(tvGetRefDay()).padStart(2,'0');}catch(e){}
+  var topHoje=ops.filter(function(x){return x.hoje>0;}).sort(function(a,b){return b.hoje-a.hoje;})[0];
+  var apoio=ops.filter(function(x){return x.p>=0;}).slice().sort(function(a,b){return a.p-b.p;})[0];
   var lbl=(EQ[key]&&EQ[key].sh)||key;
-  show(head('👥 '+esc(lbl),ops.length+' membros | Recebido '+fR(tot)+' | HO '+fR(ho)+' | clique no nome para ver os recebimentos',false)
-   +'<table style="width:100%;border-collapse:collapse"><thead><tr><th></th><th style="text-align:left;padding:7px 8px;font-size:10px;letter-spacing:1px;color:#94a3b8">MEMBRO</th><th '+TH+'>Recebido</th><th '+TH+'>HO</th><th '+TH+'>Último dia</th><th '+TH+'>% equipe</th></tr></thead><tbody>'+rows
-   +'</tbody><tfoot><tr style="border-top:2px solid rgba(255,255,255,.25)"><td></td><td style="padding:9px 8px;font-weight:800">TOTAL DA EQUIPE</td><td '+TD+'>'+fR(tot)+'</td><td '+TD+'>'+fR(ho)+'</td><td '+TD+'>'+(hoje>0?fR(hoje):'-')+'</td><td '+TD+'>100%</td></tr></tfoot></table>');}
+
+  // faixas: quanto falta pra entrar em cada uma hoje / amanhã
+  var FX=[[1,'1ª','100%+',1],[2,'2ª','80%+',.8],[3,'3ª','50%+',.5],[4,'4ª','0%+',0]],cur=faixaDe(pEq);
+  var fxHtml=FX.map(function(f){
+    var h=f[3]*esperado-hoEq, am=f[3]*esperadoAmanha-hoEq, ativo=(f[0]===cur);
+    var cel=function(v){return v<=0.005?'<span style="color:#22c55e">✓</span>':fR(v);};
+    return '<div style="display:grid;grid-template-columns:70px 1fr 1fr;gap:6px;align-items:center;padding:7px 8px;border-radius:8px;margin-bottom:4px;font-size:11px;'+(ativo?'border:1.5px solid '+corP(f[3]*100+0.01)+';background:rgba(255,255,255,.07)':'background:rgba(255,255,255,.03)')+'">'
+      +'<span style="font-weight:800;color:'+corP(f[3]*100+0.01)+'">'+f[1]+' '+f[2]+'</span><span style="text-align:right;font-weight:700">'+cel(h)+'</span><span style="text-align:right;font-weight:700">'+cel(am)+'</span></div>';}).join('');
+
+  var ESC=140;
+  var linhas=ops.map(function(x,i){
+    var o=x.o,lid=false;try{lid=_ehLider(o.name);}catch(e){}
+    var temP=x.p>=0, c=temP?corP(x.p):'#64748b';
+    var w=temP?Math.max(2,Math.min(x.p,ESC)/ESC*100):0;
+    var prox='<span style="color:#64748b">sem meta</span>';
+    if(temP){
+      if(x.p>=100) prox='<span style="color:#22c55e">✓ na 1ª faixa</span>';
+      else{var t=x.p>=80?1:x.p>=50?.8:.5, nm=x.p>=80?'1ª':x.p>=50?'2ª':'3ª';
+        prox='<b>'+fR(Math.max(0,t*x.esp-x.ho))+'</b><div style="font-size:9px;color:#94a3b8">p/ a '+nm+' faixa</div>';}
+    }
+    return '<div data-act="op" data-op="'+esc(o.name)+'" title="Clique para ver os recebimentos por data" style="display:grid;grid-template-columns:26px minmax(130px,1.1fr) minmax(120px,1.6fr) 62px minmax(110px,.9fr) minmax(100px,.8fr);gap:8px;align-items:center;padding:8px 6px;border-top:1px solid rgba(255,255,255,.08);cursor:pointer" onmouseover="this.style.background=\'rgba(255,255,255,.06)\'" onmouseout="this.style.background=\'\'">'
+      +'<span style="font-weight:800;color:#94a3b8;font-size:12px">'+(i+1)+'º</span>'
+      +'<div style="display:flex;align-items:center;gap:8px;min-width:0">'+foto(o.name,30)+'<div style="min-width:0"><div style="font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(bonito(o.name))+(lid?' <span style="font-size:8px;background:#fbbf24;color:#000;border-radius:5px;padding:1px 5px;font-weight:800">LÍDER</span>':'')+'</div>'
+        +(x.hoje>0?'<div style="font-size:9px;color:#4ade80">📅 Dia '+diaLbl+': '+fR(x.hoje)+'</div>':'<div style="font-size:9px;color:#64748b">📅 Dia '+diaLbl+': —</div>')+'</div></div>'
+      +'<div style="position:relative;height:9px;background:rgba(255,255,255,.1);border-radius:99px"><div style="height:100%;width:'+w+'%;background:'+c+';border-radius:99px"></div><div style="position:absolute;top:-4px;bottom:-4px;left:'+(100/ESC*100)+'%;width:2px;background:rgba(255,255,255,.55)"></div></div>'
+      +'<b style="text-align:right;font-size:14px;color:'+c+'">'+(temP?pctFmt(x.p):'—')+'</b>'
+      +'<div style="text-align:right;font-size:11px"><b>'+fR(x.ho)+'</b><div style="font-size:9px;color:#94a3b8">'+(x.meta>0?'de '+fR(x.meta):'sem meta')+'</div></div>'
+      +'<div style="text-align:right;font-size:11px">'+prox+'</div></div>';}).join('');
+
+  var badges='<div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 8px;font-size:10px">'
+    +(topHoje?'<span style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.4);color:#86efac;border-radius:99px;padding:3px 10px">🖐 Quem mais recebeu: <b>'+esc(bonito(topHoje.o.name).split(' ')[0])+'</b> ('+fR(topHoje.hoje)+')</span>':'')
+    +(apoio&&apoio.p<100?'<span style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#fca5a5;border-radius:99px;padding:3px 10px">🎯 Precisa de apoio: <b>'+esc(bonito(apoio.o.name).split(' ')[0])+'</b> ('+pctFmt(apoio.p)+')</span>':'')+'</div>';
+
+  var cab='<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'
+    +'<div style="flex:1;min-width:0"><div style="font-size:10px;letter-spacing:1.5px;color:#94a3b8">EQUIPE</div><div style="font-size:22px;font-weight:800">'+esc(lbl)+'</div></div>'
+    +'<div style="text-align:right"><div style="font-size:30px;font-weight:800;color:'+cEq+';line-height:1">'+pctFmt(pEq)+'</div><div style="font-size:9px;letter-spacing:1px;color:#94a3b8">DO RITMO · '+cur+'ª FAIXA</div></div></div>';
+
+  var c1=card('ATÉ HOJE',fR(hoEq),'H.O.',cEq,
+     stat('Deveria ter',fR(esperado))+stat(hoEq>=esperado?'À frente do ritmo':'Atrás do ritmo',(hoEq>=esperado?'+':'-')+fR(Math.abs(hoEq-esperado)),hoEq>=esperado?'#22c55e':'#ef4444')
+    +stat('Meta do mês H.O.',fR(metaEq))+stat('Bruto recebido',fR(recEq)));
+  var c2=card('PARA AMANHÃ',fR(Math.max(0,esperadoAmanha-hoEq)),'p/ manter o ritmo',(esperadoAmanha-hoEq)<=0?'#22c55e':'#ef4444',
+     stat('Para bater a meta',fR(porDia)+'/dia útil')+stat('Média atual',fR(media)+'/dia')+stat('Dias úteis restantes',String(duR))+stat('Recebido no dia '+diaLbl,hojeTot>0?fR(hojeTot):'—'));
+  var c3=card('ONDE O MÊS FECHA',fR(proj),'',proj>=metaEq?'#22c55e':'#f59e0b',
+     stat(proj>=metaEq?'Acima da meta':'Abaixo da meta',(proj>=metaEq?'+':'-')+fR(Math.abs(proj-metaEq)),proj>=metaEq?'#22c55e':'#ef4444')
+    +stat('Mantendo a média de',fR(media)+'/dia')+stat('Média por pessoa ('+ops.length+')',fR(ops.length?hoEq/ops.length:0)));
+
+  var corpo=cab+'<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">'+c1+c2+c3+'</div>'
+    +'<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">'
+    +'<div style="flex:0 0 230px;min-width:220px"><div style="font-size:11px;font-weight:800;margin-bottom:6px">Quanto falta por faixa</div>'
+      +'<div style="display:grid;grid-template-columns:70px 1fr 1fr;gap:6px;padding:0 8px 4px;font-size:9px;letter-spacing:1px;color:#94a3b8"><span>FAIXA</span><span style="text-align:right">ENTRAR HOJE</span><span style="text-align:right">FICAR AMANHÃ</span></div>'+fxHtml+'</div>'
+    +'<div style="flex:1;min-width:340px"><div style="font-size:11px;font-weight:800">Pessoas ('+ops.length+')</div>'+badges
+      +'<div style="display:grid;grid-template-columns:26px minmax(130px,1.1fr) minmax(120px,1.6fr) 62px minmax(110px,.9fr) minmax(100px,.8fr);gap:8px;padding:4px 6px;font-size:9px;letter-spacing:1px;color:#94a3b8"><span></span><span>PESSOA</span><span>RITMO</span><span style="text-align:right">%</span><span style="text-align:right">RECEBIDO / META</span><span style="text-align:right">PRÓXIMO PASSO</span></div>'
+      +(linhas||'<div style="padding:14px;color:#94a3b8">Nenhum membro nesta equipe.</div>')
+      +'<div style="font-size:10px;color:#64748b;margin-top:8px">Valores em H.O. contra a meta individual (aba Metas). Clique numa pessoa para ver os recebimentos por data.</div></div></div>';
+  show(head('👥 '+esc(lbl),'Dia útil '+duP+' de '+duT+' · '+ops.length+' membros',false)+corpo,true);}
 function member(name){
   var op=null;D.equipes.forEach(function(e){e.ops.forEach(function(o){if(o.name===name)op=o;});});if(!op)return;
   var r=mesRef(),dl=op.daily||{};
