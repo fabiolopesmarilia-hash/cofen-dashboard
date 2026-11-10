@@ -1691,9 +1691,9 @@ var HO_PCT_TXT = (HO_PCT*100).toFixed(2).replace('.',',')+'%';
         <span style="text-align:center">#</span>
         <span id="proj-col-label">Operador</span>
         <span style="text-align:right">Meta</span>
-        <span style="text-align:right">Recebimento</span>
-        <span style="text-align:right">Diário</span>
-        <span style="text-align:right">Hoje</span>
+        <span style="text-align:right" title="HO realizado (22,6% do recebimento)">HO realizado</span>
+        <span style="text-align:right" title="Meta de HO por dia útil">Diário</span>
+        <span style="text-align:right" title="Meta de HO esperada até hoje (dias úteis já passados)">Esperado</span>
         <span style="text-align:right">Falta/Sobra</span>
         <span style="text-align:right">Alcance</span>
         <span style="text-align:center">Quartil</span>
@@ -19678,25 +19678,26 @@ function projOpRender(){
   }catch(e){}
 
   // Lista final: ALL se populado, senão opMap direto
-  const srcList = ALL.length > 0 ? ALL
-    : Object.values(opMap).sort((a,b)=>b.rec-a.rec);
+  const srcList = (ALL.length > 0 ? ALL
+    : Object.values(opMap).sort((a,b)=>b.rec-a.rec)).filter(op=>typeof opOficialNome==='function' ? !!opOficialNome(op.name) : true);
 
   // ── 4. Build _projAllData ──
   _projAllData = srcList.map(op=>{
     const rec  = op.rec || 0;
+    const ho   = rec * HO_PCT;               // a meta é de HO: compara HO realizado, não o recebimento total
     const meta = projOpGetMeta(op);
     // Meta esperada até hoje (proporcional aos DUs passados)
     const hoje     = meta > 0 ? meta * (duPassou / duTotal) : 0;
     const diario   = meta > 0 ? meta / duTotal : 0;
     // Alcance: vs meta-hoje se tiver meta, senão relativo à meta total
     const alcance  = hoje > 0
-      ? (rec / hoje * 100)
-      : (meta > 0 ? (rec / meta * 100) : 0);
-    const faltaSob = rec - hoje;
+      ? (ho / hoje * 100)
+      : (meta > 0 ? (ho / meta * 100) : 0);
+    const faltaSob = ho - hoje;
     const qi       = projOpQuartilInfo(alcance);
-    return { op, meta, rec, diario, hoje, faltaSob, alcance, qi };
+    return { op, meta, rec, ho, diario, hoje, faltaSob, alcance, qi };
   })
-  .sort((a,b)=>b.rec-a.rec)
+  .sort((a,b)=>(b.alcance-a.alcance)||(b.ho-a.ho))
   .map((d,i)=>({...d, rank:i+1}));
 
   // Subtitle
@@ -19718,26 +19719,27 @@ function projOpBuildEquipeGroups(){
   const map = {};
   _projAllData.forEach(d=>{
     const eq = d.op.eq || 'SEM EQUIPE';
-    if(!map[eq]) map[eq] = { eqKey:eq, eqName:projEqDisplay(eq), ops:[], meta:0, rec:0, hoje:0 };
+    if(!map[eq]) map[eq] = { eqKey:eq, eqName:projEqDisplay(eq), ops:[], meta:0, rec:0, ho:0, hoje:0 };
     const m = map[eq];
     m.ops.push(d);
-    m.meta += d.meta; m.rec += d.rec; m.hoje += d.hoje;
+    m.meta += d.meta; m.rec += d.rec; m.ho += d.ho; m.hoje += d.hoje;
   });
   return Object.values(map).map(e=>{
     const diario   = e.meta>0 ? e.meta/duTotal : 0;
-    const alcance  = e.hoje>0 ? (e.rec/e.hoje*100) : (e.meta>0 ? (e.rec/e.meta*100) : 0);
-    const faltaSob = e.rec - e.hoje;
+    const alcance  = e.hoje>0 ? (e.ho/e.hoje*100) : (e.meta>0 ? (e.ho/e.meta*100) : 0);
+    const faltaSob = e.ho - e.hoje;
     const qi       = projOpQuartilInfo(alcance);
-    e.ops.sort((a,b)=>b.rec-a.rec);
+    e.ops.sort((a,b)=>(b.alcance-a.alcance)||(b.ho-a.ho));
     return { ...e, diario, alcance, faltaSob, qi, nOps:e.ops.length };
-  }).sort((a,b)=>b.rec-a.rec);
+  }).sort((a,b)=>(b.alcance-a.alcance)||(b.ho-a.ho));
 }
 
 function projRowLabel(d){
   return d.op ? d.op.name.replace(/_/g,' ') : d.eqName;
 }
 function projRowSub(d){
-  return d.op ? projEqDisplay(d.op.eq) : `${d.nOps} operador${d.nOps!==1?'es':''}`;
+  const rb = 'R$ '+(d.rec||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return d.op ? `${projEqDisplay(d.op.eq)} · Receb. ${rb}` : `${d.nOps} operador${d.nOps!==1?'es':''} · Receb. ${rb}`;
 }
 
 let projViewMode = 'operador';
@@ -20321,7 +20323,7 @@ function projOpRenderCurrentView(){
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:${d.qi.color}">${d.alcance.toFixed(1)}%</div>
-          <div style="font-size:9px;color:var(--g500);font-weight:600">${fR2b(d.rec)}</div>
+          <div style="font-size:9px;color:var(--g500);font-weight:600">HO ${fR2b(d.ho)}</div>
         </div>
       </div>`).join('');
   }
@@ -20363,7 +20365,7 @@ function projOpRenderList(flt){
         <div style="font-size:9px;color:var(--g500);font-weight:600">${projRowSub(d)}</div>
       </div>
       <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:var(--g700);text-align:right">${d.meta>0?fR2(d.meta):'—'}</span>
-      <span style="font-family:Bebas Neue,sans-serif;font-size:13px;color:var(--g900);text-align:right;font-weight:800">${fR2(d.rec)}</span>
+      <span style="font-family:Bebas Neue,sans-serif;font-size:13px;color:var(--g900);text-align:right;font-weight:800">${fR2(d.ho)}</span>
       <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:var(--g500);text-align:right">${d.diario>0?fR2(d.diario):'—'}</span>
       <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:var(--info);text-align:right">${d.hoje>0?fR2(d.hoje):'—'}</span>
       <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:${isPos?'var(--ok)':'var(--danger)'};text-align:right">
@@ -20401,7 +20403,7 @@ function projOpRenderList(flt){
         <div style="font-weight:900;font-size:12px;color:#fff;letter-spacing:.3px">${g.eqName}
           <span style="font-weight:600;color:rgba(255,255,255,.55);font-size:10px"> · ${g.nOps} operador${g.nOps!==1?'es':''}</span></div>
         <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:rgba(255,255,255,.7);text-align:right">${g.meta>0?fR2(g.meta):'—'}</span>
-        <span style="font-family:Bebas Neue,sans-serif;font-size:13px;color:#fff;text-align:right;font-weight:800">${fR2(g.rec)}</span>
+        <span style="font-family:Bebas Neue,sans-serif;font-size:13px;color:#fff;text-align:right;font-weight:800">${fR2(g.ho)}</span>
         <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:rgba(255,255,255,.5);text-align:right">${g.diario>0?fR2(g.diario):'—'}</span>
         <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:#7DD3FC;text-align:right">${g.hoje>0?fR2(g.hoje):'—'}</span>
         <span style="font-family:Bebas Neue,sans-serif;font-size:11px;color:${g.faltaSob>=0?'#4ADE80':'#FCA5A5'};text-align:right">${g.faltaSob>=0?'+':''}${fR2(g.faltaSob)}</span>
@@ -20428,7 +20430,7 @@ function projOpRenderList(flt){
 
   // Footer — total dos operadores efetivamente visíveis na tela
   if(footerEl){
-    const totRec=visivel.reduce((s,d)=>s+d.rec,0);
+    const totRec=visivel.reduce((s,d)=>s+d.ho,0);
     const totMeta=visivel.reduce((s,d)=>s+d.meta,0);
     const totHoje=visivel.reduce((s,d)=>s+d.hoje,0);
     const totFS=visivel.reduce((s,d)=>s+d.faltaSob,0);
