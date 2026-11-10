@@ -11992,6 +11992,7 @@ function tvComboTeams(mode){
 // Nos modos de equipe/combinação respeita as equipes do modo; no modo "proj" mostra todo mundo.
 // Páginas de 8 operadores (até 6 páginas), cada uma é um slide da rotação.
 const TV_PROJ_POR_PAG = 8;
+const TV_PROJ_CORTE = 17000; // meta HO do operador: >= 17 mil = ranking "acima"; < 17 mil = ranking "abaixo"
 function tvProjTeams(){
   if(tvMode==='proj' || tvMode==='geral') return null;
   return tvComboTeams(tvMode) || [tvMode];
@@ -12003,14 +12004,26 @@ function tvBuildProjRankSlides(){
   let rows = [];
   try{ rows = window.projOpDashRows(); }catch(e){ return []; }
   rows = rows.filter(r=> r.p>=0 && !rem.includes(r.name) && (!teams || teams.includes(r.eq)));
-  const pages = Math.min(6, Math.ceil(rows.length/TV_PROJ_POR_PAG));
-  const totH = rows.reduce((s,r)=>s+r.ho,0), totE = rows.reduce((s,r)=>s+r.esperado,0);
-  const pctTotal = totE>0 ? totH/totE*100 : null;
-  return Array.from({length:pages},(_,pg)=>({
-    _projrank:true, name:'PROJRANK_'+pg, page:pg, pages,
-    rows: rows.slice(pg*TV_PROJ_POR_PAG,(pg+1)*TV_PROJ_POR_PAG),
-    total: rows.length, pctTotal
-  }));
+  // Dois rankings separados pela meta HO do operador: 17 mil ou mais / abaixo de 17 mil.
+  const grupos = [
+    {key:'alta',  label:'META ACIMA DE R$ 17 MIL',  rows: rows.filter(r=>r.meta>=TV_PROJ_CORTE)},
+    {key:'baixa', label:'META ABAIXO DE R$ 17 MIL', rows: rows.filter(r=>r.meta<TV_PROJ_CORTE)}
+  ];
+  const slides = [];
+  grupos.forEach(g=>{
+    if(!g.rows.length) return;
+    const pages = Math.min(6, Math.ceil(g.rows.length/TV_PROJ_POR_PAG));
+    const totH = g.rows.reduce((s,r)=>s+r.ho,0), totE = g.rows.reduce((s,r)=>s+r.esperado,0);
+    const pctTotal = totE>0 ? totH/totE*100 : null;
+    for(let pg=0; pg<pages; pg++){
+      slides.push({
+        _projrank:true, name:'PROJRANK_'+g.key+'_'+pg, grupo:g.key, grupoLabel:g.label, page:pg, pages,
+        rows: g.rows.slice(pg*TV_PROJ_POR_PAG,(pg+1)*TV_PROJ_POR_PAG),
+        total: g.rows.length, pctTotal
+      });
+    }
+  });
+  return slides;
 }
 
 function tvBuildList(){
@@ -12815,6 +12828,7 @@ function tvShowProjRankSlide(slide){
     <div class="tv-podium-wrap" style="height:calc(100vh - 80px)">
       <div class="tv-podium-head">
         <div class="tv-pr-title">🎯 RANKING DE PROJEÇÃO DE META</div>
+        ${slide.grupoLabel?`<div style="display:inline-block;margin:2px auto 4px;padding:3px 16px;border-radius:999px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:${slide.grupo==='alta'?'#34D399':'#FBBF24'};border:1.5px solid ${slide.grupo==='alta'?'rgba(52,211,153,.6)':'rgba(251,191,36,.6)'};background:${slide.grupo==='alta'?'rgba(52,211,153,.12)':'rgba(251,191,36,.12)'}">${slide.grupoLabel}</div>`:''}
         <div class="tv-podium-sub">${modeLbl} · ${mesesPt[now.getMonth()]}/${now.getFullYear()}${duP!=null?` · D.U. ${duP}/${duT}`:''}${pctT}${pagTxt}</div>
         <div class="tv-pr-legend">
           <span style="color:#34D399">● 100% OU MAIS</span><span style="color:#60A5FA">● 80% A 99,9%</span>
