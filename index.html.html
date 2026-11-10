@@ -409,6 +409,10 @@ select.ev-inp{cursor:pointer}
 .tv-pr-pct{width:clamp(110px,13vw,190px);flex-shrink:0;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,4.2vw,58px);line-height:1}
 .tv-pr-det{width:clamp(120px,14vw,200px);flex-shrink:0;text-align:right;font-size:clamp(10px,1.1vw,14px);font-weight:700;color:rgba(255,255,255,.55);line-height:1.35}
 .tv-pr-det b{color:#fff;font-weight:800}
+.tv-pr-prem{width:clamp(110px,12vw,170px);flex-shrink:0;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,2.3vw,32px);letter-spacing:.5px;line-height:1.05;color:#FBBF24;
+  background:rgba(251,191,36,.12);border:1.5px solid rgba(251,191,36,.5);border-radius:12px;padding:4px 6px}
+.tv-pr-prem small{display:block;font-family:Nunito,sans-serif;font-size:clamp(8px,.8vw,11px);font-weight:800;letter-spacing:1.2px;color:rgba(251,191,36,.8)}
+.tv-pr-prem.off{background:none;border-color:transparent;color:rgba(255,255,255,.25)}
 .tv-pr-hi{background:linear-gradient(90deg,rgba(52,211,153,.20),rgba(52,211,153,.07) 60%,rgba(255,255,255,.05));
   border:2px solid var(--hi,#34D399);animation:tvPodColIn .55s cubic-bezier(.22,1,.36,1) forwards,tvPrHiGlow 2.2s ease-in-out .6s infinite}
 @keyframes tvPrHiGlow{0%,100%{box-shadow:0 0 10px rgba(52,211,153,.30)}50%{box-shadow:0 0 30px rgba(52,211,153,.75)}}
@@ -11992,6 +11996,79 @@ function tvComboTeams(mode){
 // Nos modos de equipe/combinação respeita as equipes do modo; no modo "proj" mostra todo mundo.
 // Páginas de 8 operadores (até 6 páginas), cada uma é um slide da rotação.
 const TV_PROJ_POR_PAG = 8;
+// Premiação por posição no ranking "acima de 17 mil" (1º ao 10º)
+// Valores editáveis (botão "✏️ Premiações" no slide). Guardado no navegador + Firebase (sala) quando conectado.
+const TV_PROJ_PREMIOS_PADRAO = {alta:[1900,1200,1100,900,800,700,600,550,400,300], baixa:[]};
+const TV_PROJ_NPREM = 10;
+function tvPremNorm(o){
+  const out={alta:[],baixa:[]};
+  ['alta','baixa'].forEach(k=>{ for(let i=0;i<TV_PROJ_NPREM;i++){ const v=Number(o&&o[k]&&o[k][i]); out[k][i]=(isFinite(v)&&v>0)?Math.round(v*100)/100:0; } });
+  return out;
+}
+function tvPremLoad(){
+  try{ const r=localStorage.getItem('tvProjPremios'); if(r) return tvPremNorm(JSON.parse(r)); }catch(e){}
+  return tvPremNorm(TV_PROJ_PREMIOS_PADRAO);
+}
+let TV_PROJ_PREMIOS = tvPremLoad();
+function tvPremSalvar(obj){
+  TV_PROJ_PREMIOS = tvPremNorm(obj);
+  try{ localStorage.setItem('tvProjPremios', JSON.stringify(TV_PROJ_PREMIOS)); }catch(e){}
+  try{ if(typeof fbPush==='function' && typeof fbDb!=='undefined' && fbDb && typeof fbRoom!=='undefined' && fbRoom) fbPush('tv_premios', TV_PROJ_PREMIOS); }catch(e){}
+}
+function fbListenTvPremios(){
+  if(!fbDb||!fbRoom||fbListeners.tvPrem) return;
+  fbDb.ref(fbRoom+'/tv_premios').on('value', snap=>{
+    const remote=snap.val(); if(!remote) return;
+    TV_PROJ_PREMIOS = tvPremNorm(remote);
+    try{ localStorage.setItem('tvProjPremios', JSON.stringify(TV_PROJ_PREMIOS)); }catch(e){}
+    const m=document.getElementById('tv-prem-modal');
+    if(!m && document.getElementById('tv-overlay')?.classList.contains('on') && tvList[tvIdx]?._projrank) tvShow(tvIdx);
+  });
+  fbListeners.tvPrem = true;
+}
+let _tvPremEstavaPausado=false;
+function tvPremParse(v){
+  let t=String(v||'').replace(/[^\d.,]/g,'');
+  if(t.includes(',')) t=t.replace(/\./g,'').replace(',','.');
+  else if(/^\d{1,3}(\.\d{3})+$/.test(t)) t=t.replace(/\./g,'');
+  const n=parseFloat(t); return isFinite(n)&&n>0?n:0;
+}
+function tvPremAbrir(){
+  if(document.getElementById('tv-prem-modal')) return;
+  _tvPremEstavaPausado=tvPaused; clearTimeout(tvTimer);
+  const col=(k,tit,cor)=>`<div style="flex:1;min-width:220px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1.5px;color:${cor};margin-bottom:8px">${tit}</div>
+      ${Array.from({length:TV_PROJ_NPREM},(_,i)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="width:34px;font-weight:800;color:rgba(255,255,255,.6)">${i+1}°</span>
+        <input data-k="${k}" data-i="${i}" inputmode="decimal" placeholder="sem prêmio" value="${TV_PROJ_PREMIOS[k][i]>0?TV_PROJ_PREMIOS[k][i].toFixed(2).replace('.',','):''}"
+          style="flex:1;padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font:700 15px Nunito,sans-serif;min-width:0">
+      </div>`).join('')}
+    </div>`;
+  const m=document.createElement('div');
+  m.id='tv-prem-modal';
+  m.style.cssText='position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:16px';
+  m.innerHTML=`<div style="background:#12183A;border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:20px 22px;max-width:640px;width:100%;max-height:92vh;overflow:auto;color:#fff;font-family:Nunito,sans-serif">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;margin-bottom:4px">💰 Editar premiações do ranking</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:14px">Valor em R$ por posição. Deixe em branco para não mostrar prêmio naquela posição.</div>
+      <div style="display:flex;gap:18px;flex-wrap:wrap">${col('alta','META ACIMA DE R$ 17 MIL','#34D399')}${col('baixa','META ABAIXO DE R$ 17 MIL','#FBBF24')}</div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+        <button onclick="tvPremFechar(false)" style="padding:9px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.3);background:none;color:#fff;font-weight:800;cursor:pointer">Cancelar</button>
+        <button onclick="tvPremFechar(true)" style="padding:9px 18px;border-radius:10px;border:none;background:#34D399;color:#04281C;font-weight:900;cursor:pointer">Salvar</button>
+      </div></div>`;
+  document.body.appendChild(m);
+}
+function tvPremFechar(salvar){
+  const m=document.getElementById('tv-prem-modal'); if(!m) return;
+  if(salvar){
+    const o={alta:[],baixa:[]};
+    m.querySelectorAll('input[data-k]').forEach(inp=>{ o[inp.dataset.k][+inp.dataset.i]=tvPremParse(inp.value); });
+    tvPremSalvar(o);
+    toast('💰 Premiações salvas!');
+  }
+  m.remove();
+  if(tvList[tvIdx]?._projrank) tvShow(tvIdx);
+  if(!_tvPremEstavaPausado) tvSchedule();
+}
 const TV_PROJ_CORTE = 17000; // meta HO do operador: >= 17 mil = ranking "acima"; < 17 mil = ranking "abaixo"
 function tvProjTeams(){
   if(tvMode==='proj' || tvMode==='geral') return null;
@@ -12801,6 +12878,8 @@ function tvShowProjRankSlide(slide){
     const w = Math.max(2, Math.min(r.p, ESC)/ESC*100);
     const topo = rank===0;
     const bateu = r.p>=100;
+    const premio = (TV_PROJ_PREMIOS[slide.grupo]||[])[rank];
+    const premHtml = premio>0 ? `<div class="tv-pr-prem"><small>💰 PODE GANHAR</small>${fR(premio)}</div>` : `<div class="tv-pr-prem off">—</div>`;
     return `<div class="tv-pr-row${bateu?' tv-pr-hi':''}" style="animation-delay:${(.06*i).toFixed(2)}s;--hi:${k.c};${topo?`border-color:${k.c};box-shadow:0 0 26px ${k.g}`:''}">
         <div class="tv-pr-pos">${pos}</div>
         ${av}
@@ -12813,6 +12892,7 @@ function tvShowProjRankSlide(slide){
           <div class="tv-pr-mark" style="left:${100/ESC*100}%" title="100%"></div>
         </div>
         <div class="tv-pr-pct" style="color:${k.c};text-shadow:0 0 22px ${k.g}">${fmtPct(r.p)}</div>
+        ${premHtml}
         <div class="tv-pr-det">HO <b>${fR(r.ho)}</b><br>esperado ${fR(r.esperado)}</div>
       </div>`;
   }).join('');
@@ -12836,6 +12916,7 @@ function tvShowProjRankSlide(slide){
         </div>
       </div>
       ${rows.length ? `<div class="tv-pr-list">${rowsHtml}</div>` : vazio}
+      <button onclick="tvPremAbrir()" style="position:absolute;top:10px;right:16px;z-index:8;padding:6px 14px;border-radius:10px;border:1px solid rgba(251,191,36,.6);background:rgba(251,191,36,.12);color:#FBBF24;font:800 12px Nunito,sans-serif;letter-spacing:1px;cursor:pointer">✏️ PREMIAÇÕES</button>
       ${slide.page===0 && rows.length ? '<canvas id="tv-fw-canvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:6;pointer-events:none"></canvas>' : ''}
     </div>`;
   if(slide.page===0 && rows.length) tvProjFogos(document.getElementById('tv-fw-canvas'));
@@ -14234,6 +14315,7 @@ function fbStartListening(){
   fbListenConciliacaoDias();
   // ── Contagem regressiva da meta (painel) ──
   fbListenCountdown();
+  fbListenTvPremios();
 }
 
 // ── PUSH TO FIREBASE ──
