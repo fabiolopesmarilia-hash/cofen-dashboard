@@ -10171,6 +10171,13 @@ function importParse(raw){
   const iEq   = colIdx(['equipe','subgrupo','sub grupo','grupo','setor','squad']);
   const iDate = colIdx(['dtpagamento','dt.pagamento','data pagamento','dtpgto','dt.pgto','dt pgto','data pgto','data pag','dtlig','dt.lig','dt lig','dtbaixa','dt.baixa','dt baixa','data baixa','data lig','baixa','pgto','ligacao','dt','date','data']);
   const iDoc  = colIdx(['nrdocumento','nr documento','nrdoc','documento','doc','numero','número','parcela','titulo','título']);
+  const iDevRaw = colIdx(['devedor','cliente','sacado','contribuinte','nome do dev','inscrito','profissional']);
+  const iDev = (iDevRaw===iCob) ? -1 : iDevRaw;
+  const iUF   = colIdx(['estado','uf']);
+  const iVenc = colIdx(['vencimento','venc']);
+  const iStat = colIdx(['status','situacao','situação']);
+  const iParcRaw = colIdx(['parcela','parc']);
+  const iParc = (iParcRaw===iDoc) ? -1 : iParcRaw;
   const iTipo = colIdx(['forma pgto','forma pag','tipo pgto','tipo pag','forma de pag','tipo de pag','tipo','forma','pagamento']);
 
   // Mapeia texto livre de equipe (do relatório) para o nome canônico da equipe no sistema.
@@ -10303,11 +10310,12 @@ function importParse(raw){
     // importação só), uma linha de um mês antigo não pode entrar no total do
     // mês atual — senão o "Total Real" (usado no ranking) fica inflado com
     // recebimento de meses passados.
-    let _contaNoTotal = true;
+    let _contaNoTotal = true, _dayLin = null, _monLin = null, _yrLin = null;
     if(iDate >= 0 && recVal > 0){
       const dp = extractDateParts(row[iDate]);
       const day = dp ? dp.day : null;
       if(day && day >= 1 && day <= 31){
+        _dayLin = day; _monLin = dp.month||null; _yrLin = dp.year||null;
         // Só entra no "daily" (usado pro cálculo de HOJE e gráfico do mês ativo)
         // se a linha realmente for do mês/ano atual — evita misturar dia 6 de
         // meses diferentes num relatório que cobre vários meses de uma vez.
@@ -10332,6 +10340,14 @@ function importParse(raw){
       }
     } else if(iDate < 0 && recVal > 0){
       acc[rawName]._semData = true;
+    }
+    if(recVal > 0){
+      // Linha a linha de TODOS os recebimentos (qualquer mês do relatório) para o detalhe do operador:
+      // [dia, documento, valor, HO, forma, devedor, mês, ano, UF, vencimento, status, parcela]
+      let _hl = recVal*HO_PCT;
+      if(iHO >= 0 && iHO !== iRec){ const _hx=_parseNumFlex(row[iHO]); if(_hx>0 && Math.abs(_hx-_hl)>0.0051) _hl=_hx; }
+      const _g = i2 => (i2>=0 && row[i2]) ? row[i2].trim() : '';
+      (acc[rawName].lin = acc[rawName].lin || []).push([_dayLin, _g(iDoc), Math.round(recVal*100)/100, Math.round(_hl*100)/100, _g(iTipo), _g(iDev), _monLin, _yrLin, _g(iUF), _g(iVenc), _g(iStat), _g(iParc)]);
     }
     if(_contaNoTotal) acc[rawName].total += recVal;
     if(_contaNoTotal && iHO >= 0 && iHO !== iRec && recVal > 0){ const _hv=_parseNumFlex(row[iHO]); if(_hv>0){ acc[rawName].hoRep = (acc[rawName].hoRep||0) + _hv;
@@ -10455,6 +10471,7 @@ function importParse(raw){
         porMes: accData.porMes || {},
         tipos: accData.tipos || {},
         acordos: accData.docs ? accData.docs.size : 0,
+        lin: accData.lin || [],
       });
     } else {
       missing.push({
@@ -10725,6 +10742,7 @@ function importApply(){
   const ov = {};
   importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
   localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
+  try{ const _lm={}; importParsed.found.forEach(r=>{ if(r.lin&&r.lin.length) _lm[r.opName]=r.lin; }); let _js=JSON.stringify(_lm); if(_js.length>3500000){ const _mA=new Date().getMonth()+1; Object.keys(_lm).forEach(k=>{ _lm[k]=_lm[k].filter(x=>!x[6]||x[6]===_mA); }); _js=JSON.stringify(_lm); } localStorage.setItem('cofen_op_linhas', _js); }catch(e){ console.warn('detalhe dos recebimentos não salvo (espaço do navegador):',e); }
   { const _hm={}; importParsed.found.forEach(r=>{ _hm[r.opName]=(r.hoReport>0 ? r.hoReport : r.recImport*HO_PCT); });
     localStorage.setItem('cofen_op_ho', JSON.stringify(_hm));
     try{ if(typeof syncPush==='function') syncPush('cofen_op_ho'); }catch(e){} }
@@ -22196,6 +22214,45 @@ function member(name){
   var rows=lin.map(function(x){return '<tr style="border-top:1px solid rgba(255,255,255,.08)"><td style="padding:8px">'+x.txt+'</td><td style="padding:8px;color:#94a3b8">'+x.sem+'</td><td '+TD+'>'+fR(x.v)+'</td><td '+TD+' >'+fR(x.ac)+'</td></tr>';}).join('');
   if(resto>0.01) rows+='<tr style="border-top:1px solid rgba(255,255,255,.08);color:#fbbf24"><td style="padding:8px" colspan="2">Sem data identificada no relatório</td><td '+TD+'>'+fR(resto)+'</td><td></td></tr>';
   if(!rows) rows='<tr><td colspan="4" style="padding:14px;color:#94a3b8">Nenhum recebimento com data neste mês.</td></tr>';
+  var det='';
+  try{
+    var LM=JSON.parse(localStorage.getItem('cofen_op_linhas')||'{}'),L=LM[op.name]||[];
+    if(L.length){
+      var DSEMF=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+      var hj=new Date(),docs={},porDia={};
+      L.forEach(function(x){
+        var yy=x[7]||r.y,mo=x[6]||r.m,dd=x[0]||0;
+        var k=dd?(yy+'-'+String(mo).padStart(2,'0')+'-'+String(dd).padStart(2,'0')):'0000-sem-data';
+        (porDia[k]=porDia[k]||[]).push(x);if(x[1])docs[x[1]]=1;});
+      var nAc=Object.keys(docs).length||L.length, totL=L.reduce(function(s,x){return s+x[2];},0), hoL=L.reduce(function(s,x){return s+x[3];},0);
+      var ds=Object.keys(porDia).sort().reverse();
+      var temDev=L.some(function(x){return x[5];}),temUF=L.some(function(x){return x[8];}),temVc=L.some(function(x){return x[9];});
+      var nCol=1+(temUF?1:0)+(temVc?1:0);
+      var TL='style="text-align:left;padding:8px;font-size:10px;letter-spacing:1px;color:#94a3b8"';
+      var body=ds.map(function(k){
+        var it=porDia[k].slice().sort(function(a,b){return b[2]-a[2];}),st=it.reduce(function(s,x){return s+x[2];},0),sh=it.reduce(function(s,x){return s+x[3];},0);
+        var lab='Sem data';
+        if(k!=='0000-sem-data'){var pt=k.split('-'),dt=new Date(+pt[0],+pt[1]-1,+pt[2]);
+          var ehHoje=(dt.toDateString()===hj.toDateString());
+          lab=(ehHoje?'Hoje':DSEMF[dt.getDay()])+' · '+pt[2]+'/'+pt[1]+'/'+pt[0];}
+        var h='<tr style="background:rgba(74,222,128,.12)"><td colspan="'+(nCol+2)+'" style="padding:8px;font-weight:800;color:#86efac">📅 '+lab+'</td>'
+          +'<td colspan="2" style="padding:8px;text-align:right;font-size:11px;color:#94a3b8">'+it.length+' recebimento'+(it.length>1?'s':'')+' · <b style="color:#fbbf24">'+fR(st)+'</b> · HO '+fR(sh)+'</td></tr>';
+        return h+it.map(function(x){
+          var pago=x[10]?esc(x[10]):'Pago', ok=!x[10]||/pag|receb|quit|baix/i.test(x[10])&&!/n[ãa]o/i.test(x[10]);
+          return '<tr style="border-top:1px solid rgba(255,255,255,.06)">'
+          +'<td style="padding:7px 8px"><span style="display:inline-block;font-family:monospace;font-size:12px;font-weight:700;background:rgba(74,222,128,.12);color:#86efac;border-radius:6px;padding:2px 8px">'+(x[1]?'# '+esc(x[1]):'—')+'</span>'+(temDev&&x[5]?'<div style="font-family:monospace;font-size:10px;color:#94a3b8;margin-top:3px">'+esc(x[5])+'</div>':'')+'</td>'
+          +(temUF?'<td style="padding:7px 8px;font-size:12px;color:#cbd5e1">'+(x[8]?'📍 '+esc(x[8]):'—')+'</td>':'')
+          +(temVc?'<td style="padding:7px 8px;font-family:monospace;font-size:12px;color:#fbbf24">'+esc(x[9]||'—')+'</td>':'')
+          +'<td '+TD+'>'+fR(x[2])+'</td>'
+          +'<td style="padding:7px 8px"><span style="display:inline-block;font-size:10px;border-radius:99px;padding:2px 9px;'+(/cart/i.test(x[4])?'background:rgba(251,146,60,.18);color:#fdba74;border:1px solid rgba(251,146,60,.4)':'background:rgba(74,222,128,.15);color:#86efac;border:1px solid rgba(74,222,128,.4)')+'">'+esc(x[4]||'—')+'</span>'+(x[11]?' <span style="font-size:10px;background:rgba(251,191,36,.2);color:#fcd34d;border-radius:6px;padding:1px 6px;font-weight:800">'+esc(x[11])+'</span>':'')+'</td>'
+          +'<td style="padding:7px 8px"><span style="font-size:10px;font-weight:800;border-radius:99px;padding:2px 10px;'+(ok?'background:rgba(34,197,94,.2);color:#4ade80;border:1px solid rgba(34,197,94,.5)':'background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.4)')+'">'+pago+'</span></td>'
+          +'<td '+TD+'>'+fR(x[3])+'</td></tr>';}).join('');
+      }).join('');
+      det='<div style="margin-top:16px;font-size:10px;letter-spacing:1px;color:#94a3b8">TODOS OS RECEBIMENTOS · '+ds.length+' data'+(ds.length>1?'s':'')+' · '+nAc+' acordo'+(nAc>1?'s':'')+' · ticket médio '+fR(totL/L.length)+'</div>'
+        +'<div style="max-height:460px;overflow:auto;margin-top:6px;border:1px solid rgba(255,255,255,.1);border-radius:10px"><table style="width:100%;border-collapse:collapse"><thead style="position:sticky;top:0;background:#0f2e22;z-index:1"><tr><th '+TL+'>CÓDIGO</th>'+(temUF?'<th '+TL+'>ESTADO</th>':'')+(temVc?'<th '+TL+'>VENCIMENTO</th>':'')+'<th '+TH+'>Valor</th><th '+TL+'>TIPO</th><th '+TL+'>STATUS</th><th '+TH+'>HO</th></tr></thead><tbody>'+body
+        +'</tbody><tfoot><tr style="border-top:2px solid rgba(255,255,255,.25)"><td colspan="'+nCol+'" style="padding:9px 8px;font-weight:800">TOTAL</td><td '+TD+'>'+fR(totL)+'</td><td colspan="2"></td><td '+TD+'>'+fR(hoL)+'</td></tr></tfoot></table></div>';
+    } else det='<div style="margin-top:16px;padding:10px 12px;border-radius:10px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);font-size:11px;color:#fcd34d">ℹ️ O detalhe de todos os recebimentos (data, código, valor, tipo) aparece depois que o relatório for importado de novo.</div>';
+  }catch(e){}
   var tp='',tipos=op.tipos||{},tk=Object.keys(tipos).sort(function(a,b){return tipos[b]-tipos[a];});
   if(tk.length) tp='<div style="margin-top:14px;font-size:10px;letter-spacing:1px;color:#94a3b8">FORMAS DE PAGAMENTO</div>'+tk.map(function(k){return '<div style="display:flex;justify-content:space-between;padding:5px 2px;border-top:1px solid rgba(255,255,255,.06)"><span>'+esc(k)+'</span><b>'+fR(tipos[k])+'</b></div>';}).join('');
   var hist='';try{var meses=Object.keys(HIST_DADOS||{}).map(function(m){var row=(HIST_DADOS[m].rows||[]).find(function(x){return x.nome===op.name;});return row&&row.total>0?'<div style="display:flex;justify-content:space-between;padding:5px 2px;border-top:1px solid rgba(255,255,255,.06)"><span>'+m+'</span><b>'+fR(row.total)+'</b></div>':'';}).join('');
@@ -22203,8 +22260,8 @@ function member(name){
   show(head(esc(bonito(op.name)),MESES[r.m-1]+' '+r.y+' | Recebido '+fR(op.rec)+' | HO '+fR(op.ho),true)
    +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">'+foto(op.name,64)+'<div><div style="font-size:11px;color:#94a3b8">'+esc((EQ[op.eq||'']&&EQ[op.eq].sh)||(lastTeam&&EQ[lastTeam]&&EQ[lastTeam].sh)||'')+'</div><div style="font-size:22px;font-weight:800;color:#fbbf24">'+fR(op.rec)+'</div></div></div>'
    +'<table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:7px 8px;font-size:10px;letter-spacing:1px;color:#94a3b8">DATA</th><th style="text-align:left;padding:7px 8px;font-size:10px;letter-spacing:1px;color:#94a3b8">DIA</th><th '+TH+'>Recebido no dia</th><th '+TH+'>Acumulado</th></tr></thead><tbody>'+rows+'</tbody></table>'
-   +tp+hist
-   +'<div style="margin-top:12px;font-size:11px;color:#94a3b8">As datas vêm do relatório importado. Se o relatório não tiver coluna de data, só aparece o que entrou desde o último import.</div>');}
+   +det+tp+hist
+   +'<div style="margin-top:12px;font-size:11px;color:#94a3b8">As datas vêm do relatório importado. Se o relatório não tiver coluna de data, só aparece o que entrou desde o último import.</div>',true);}
 document.addEventListener('click',function(e){
   var tr=e.target.closest&&e.target.closest('#eq-metas-tbody tr[data-eq]');if(!tr)return;
   for(var n=e.target;n&&n!==tr;n=n.parentElement){
