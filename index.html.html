@@ -10149,6 +10149,37 @@ function importInit(){
 }
 
 // ── PARSE raw TSV/CSV text ──
+// ── Detalhe dos recebimentos (linha a linha do relatório) — guardado no IndexedDB (sem o limite apertado do localStorage) ──
+window.linDB = {
+  _open(){ return new Promise((ok,no)=>{ try{ const rq=indexedDB.open('cofen_det',1); rq.onupgradeneeded=()=>rq.result.createObjectStore('kv'); rq.onsuccess=()=>ok(rq.result); rq.onerror=()=>no(rq.error); }catch(e){ no(e); } }); },
+  set(k,v){ return this._open().then(db=>new Promise((ok,no)=>{ const tx=db.transaction('kv','readwrite'); tx.objectStore('kv').put(v,k); tx.oncomplete=()=>ok(true); tx.onerror=()=>no(tx.error); })); },
+  get(k){ return this._open().then(db=>new Promise((ok,no)=>{ const rq=db.transaction('kv').objectStore('kv').get(k); rq.onsuccess=()=>ok(rq.result); rq.onerror=()=>no(rq.error); })); }
+};
+// ── Sincronização do detalhe (recebimentos e acordos) entre computadores via Firebase ──
+function linKey(n){ return String(n||'').replace(/[.#$\[\]\/]/g,'_'); }
+function fbClean(v){ // Firebase não guarda null dentro de listas
+  if(Array.isArray(v)) return v.map(x=>x==null?0:fbClean(x));
+  if(v&&typeof v==='object'){ const o={}; Object.keys(v).forEach(k=>{ if(v[k]!=null) o[k]=fbClean(v[k]); }); return o; }
+  return v;
+}
+function linPushFB(path,map){
+  try{
+    if(typeof fbDb==='undefined'||!fbDb||typeof fbRoom==='undefined'||!fbRoom) return;
+    const out={}; Object.keys(map).forEach(k=>{ out[linKey(k)]=fbClean(map[k]); });
+    fbDb.ref(fbRoom+'/'+path).set(out).catch(e=>console.warn('FB '+path+' err:',e));
+  }catch(e){ console.warn(e); }
+}
+function fbListenLinhas(){
+  if(typeof fbDb==='undefined'||!fbDb||typeof fbRoom==='undefined'||!fbRoom) return;
+  [['op_linhas','linhas'],['op_acordos','acordos']].forEach(([path,key])=>{
+    if(fbListeners['det_'+key]) return;
+    fbDb.ref(fbRoom+'/'+path).on('value', snap=>{
+      const remote=snap.val(); if(!remote) return;
+      window.linDB.set(key,remote).catch(()=>{});
+    });
+    fbListeners['det_'+key]=true;
+  });
+}
 function importParse(raw){
   const lines = raw.trim().split(/\r?\n/);
   if(lines.length < 2) return null;
@@ -10172,7 +10203,8 @@ function importParse(raw){
   const iDate = colIdx(['dtpagamento','dt.pagamento','data pagamento','dtpgto','dt.pgto','dt pgto','data pgto','data pag','dtlig','dt.lig','dt lig','dtbaixa','dt.baixa','dt baixa','data baixa','data lig','baixa','pgto','ligacao','dt','date','data']);
   const iDoc  = colIdx(['nrdocumento','nr documento','nrdoc','documento','doc','numero','número','parcela','titulo','título']);
   const iDevRaw = colIdx(['devedor','cliente','sacado','contribuinte','nome do dev','inscrito','profissional']);
-  const iDev = (iDevRaw===iCob) ? -1 : iDevRaw;
+  let iDev = (iDevRaw===iCob) ? -1 : iDevRaw;
+  if(iDev<0) iDev = headers.findIndex((h,i)=> i!==iCob && /nome|devedor|cliente|sacado|contribuinte|inscrit|profission/.test(h) && !/cobrad|operador|equipe|grupo/.test(h));
   const iUF   = colIdx(['estado','uf']);
   const iVenc = colIdx(['vencimento','venc']);
   const iStat = colIdx(['status','situacao','situação']);
@@ -10480,7 +10512,8 @@ function importParse(raw){
         daily: daily,
         porMes: accData.porMes || {},
         tipos: accData.tipos || {},
-        acordos: accData.docs ? accData.docs.size : 0
+        acordos: accData.docs ? accData.docs.size : 0,
+        lin: accData.lin || []
       });
     }
   });
@@ -10742,7 +10775,14 @@ function importApply(){
   const ov = {};
   importParsed.found.forEach(r=>{ ov[r.opName]=r.recImport; });
   localStorage.setItem('cofen_op_overrides', JSON.stringify(ov));
-  try{ const _lm={}; importParsed.found.forEach(r=>{ if(r.lin&&r.lin.length) _lm[r.opName]=r.lin; }); let _js=JSON.stringify(_lm); if(_js.length>3500000){ const _mA=new Date().getMonth()+1; Object.keys(_lm).forEach(k=>{ _lm[k]=_lm[k].filter(x=>!x[6]||x[6]===_mA); }); _js=JSON.stringify(_lm); } localStorage.setItem('cofen_op_linhas', _js); }catch(e){ console.warn('detalhe dos recebimentos não salvo (espaço do navegador):',e); }
+  try{
+    const _lm={}; let _nLin=0;
+    importParsed.found.forEach(r=>{ if(r.lin&&r.lin.length){ _lm[r.opName]=r.lin; _nLin+=r.lin.length; } });
+    (importParsed.missing||[]).forEach(m=>{ if(m.lin&&m.lin.length){ const k=m.rawName.trim().replace(/\s+/g,'_'); if(!_lm[k]){ _lm[k]=m.lin; _nLin+=m.lin.length; } } });
+    try{ localStorage.removeItem('cofen_op_linhas'); }catch(e){}
+    linPushFB('op_linhas',_lm);
+    window.linDB.set('linhas',_lm).then(()=>toast('🧾 '+_nLin.toLocaleString('pt-BR')+' recebimentos detalhados salvos por operador')).catch(err=>{ console.warn('detalhe dos recebimentos não salvo:',err); toast('⚠️ Não consegui guardar o detalhe dos recebimentos neste navegador'); });
+  }catch(e){ console.warn(e); }
   { const _hm={}; importParsed.found.forEach(r=>{ _hm[r.opName]=(r.hoReport>0 ? r.hoReport : r.recImport*HO_PCT); });
     localStorage.setItem('cofen_op_ho', JSON.stringify(_hm));
     try{ if(typeof syncPush==='function') syncPush('cofen_op_ho'); }catch(e){} }
@@ -11189,6 +11229,15 @@ function acImportPreview(raw){
   const iDtPg = idx(['dtpagamento','dt pagamento','pagamento','baixa']);
   const iDtPv = idx(['dtprev','dt prev','prev.pgto','agendamento','prev pgto','prevpgto']);
   const iSaldo= idx(['saldo','valor','divida','vl ','vlr','saldo divida','vl.div','total divida']);
+  // colunas extras para o detalhe de cada acordo (código, devedor, UF, tipo, parcela, status)
+  const iCod  = idx(['nrdocumento','nr documento','nrdoc','documento','codigo','código','cod','acordo','titulo','título']);
+  let iDevA = idx(['devedor','cliente','sacado','contribuinte','inscrit','profission']);
+  if(iDevA<0) iDevA = headers.findIndex((h,i)=> i!==iCob && /nome/.test(h) && !/cobrad|operador|usuario|equipe|grupo/.test(h));
+  if(iDevA===iCob) iDevA=-1;
+  const iUFa  = idx(['estado','uf']);
+  const iTpA  = idx(['forma pgto','forma pag','tipo pgto','tipo pag','forma de pag','tipo de pag','tipo','forma']);
+  const iParA = idx(['parcela','parc']);
+  const iStA  = idx(['status','situacao','situação']);
 
   if(iCob<0){ document.getElementById('ac-import-status').textContent='⚠️ Coluna "Usuário" não encontrada'; return; }
 
@@ -11208,6 +11257,8 @@ function acImportPreview(raw){
     return null;
   };
   const today = new Date().toISOString().slice(0,10);
+  // data -> AAAA-MM-DD (aceita ISO, DD/MM/AAAA e serial do Excel); '' se não reconhecer
+  const dISO = v => { if(!v) return ''; const p=parseDate(String(v).trim()); if(p) return p; const n=parseFloat(v); if(n>=40000&&n<=60000){ return new Date(Math.round((n-25569)*86400000)).toISOString().slice(0,10); } return ''; };
 
   const normalize=s=>s.toLowerCase().replace(/[_\s]/g,'');
   const acc={};
@@ -11215,13 +11266,21 @@ function acImportPreview(raw){
     const row=lines[i].split(sep).map(v=>v.trim().replace(/^"|"$/g,''));
     if(row.length<=iCob) continue;
     const nm=row[iCob]||''; if(!nm||nm==='nan'||nm==='-') continue;
-    if(!acc[nm]) acc[nm]={g:0,p:0,ag:0,avista:0,ate3d:0,mais3d:0,ag_futuro:{},ag_futuro_val:{}};
+    if(!acc[nm]) acc[nm]={g:0,p:0,ag:0,avista:0,ate3d:0,mais3d:0,ag_futuro:{},ag_futuro_val:{},det:[]};
     acc[nm].g++;
     const pgVal = iDtPg>=0 ? row[iDtPg]||'' : '';
     const pvVal = iDtPv>=0 ? row[iDtPv]||'' : '';
     const acVal = iDtAc>=0 ? row[iDtAc]||'' : '';
     const isPago = isValidDate(pgVal);
     const hasPrev = isValidDate(pvVal);
+    { // detalhe do acordo: [código, devedor, UF, vencimento, valor, tipo, status, dtPag, dtPrev, parcela]
+      const _g=i2=>(i2>=0&&row[i2])?row[i2].trim():'';
+      let st = isPago ? 'pago' : hasPrev ? 'pend' : 'nao';
+      const stTxt=_g(iStA);
+      if(stTxt){ const t=stTxt.toLowerCase(); st = /n[ãa]o/.test(t) ? 'nao' : /pend|agend|prev/.test(t) ? 'pend' : /pag|quit|baix/.test(t) ? 'pago' : st; }
+      const venc = dISO(acVal) || dISO(pvVal) || dISO(pgVal);
+      acc[nm].det.push([_g(iCod), _g(iDevA), _g(iUFa), venc, iSaldo>=0?_parseNumFlex(row[iSaldo]||''):0, _g(iTpA), st, dISO(pgVal), dISO(pvVal), _g(iParA)]);
+    }
 
     if(isPago){
       acc[nm].p++;
@@ -11259,7 +11318,7 @@ function acImportPreview(raw){
   acImportParsed=Object.entries(acc).map(([nm,d])=>{
     const matched=ALL.find(o=>normalize(o.name)===normalize(nm));
     return {rawName:nm,opName:matched?.name||null,g:d.g,p:d.p,ag:d.ag,
-            avista:d.avista,ate3d:d.ate3d,mais3d:d.mais3d,ag_futuro:d.ag_futuro,ag_futuro_val:d.ag_futuro_val||{},
+            avista:d.avista,ate3d:d.ate3d,mais3d:d.mais3d,ag_futuro:d.ag_futuro,ag_futuro_val:d.ag_futuro_val||{},det:d.det||[],
             matched:!!matched};
   });
   const found=acImportParsed.filter(r=>r.matched);
@@ -11331,6 +11390,11 @@ function acImportApply(){
 
   // ── 2. Salvar no localStorage ANTES do rebuildAll ──
   localStorage.setItem("cofen_acordos_override", JSON.stringify(acordosLocal));
+  try{ // detalhe acordo a acordo (IndexedDB)
+    const _am={}; let _n=0; acImportParsed.forEach(r=>{ if(r.det&&r.det.length){ _am[r.opName]=r.det; _n+=r.det.length; } });
+    linPushFB('op_acordos',_am);
+    window.linDB.set('acordos',_am).then(()=>toast('🧾 '+_n.toLocaleString('pt-BR')+' acordos detalhados salvos por operador')).catch(e=>console.warn('detalhe dos acordos não salvo:',e));
+  }catch(e){ console.warn(e); }
 
   // ── 3. Reconstruir ALL (já restaura acordos do localStorage via rebuildAll) ──
   rebuildAll();
@@ -14334,6 +14398,7 @@ function fbStartListening(){
   // ── Contagem regressiva da meta (painel) ──
   fbListenCountdown();
   fbListenTvPremios();
+  fbListenLinhas();
 }
 
 // ── PUSH TO FIREBASE ──
@@ -22214,9 +22279,10 @@ function member(name){
   var rows=lin.map(function(x){return '<tr style="border-top:1px solid rgba(255,255,255,.08)"><td style="padding:8px">'+x.txt+'</td><td style="padding:8px;color:#94a3b8">'+x.sem+'</td><td '+TD+'>'+fR(x.v)+'</td><td '+TD+' >'+fR(x.ac)+'</td></tr>';}).join('');
   if(resto>0.01) rows+='<tr style="border-top:1px solid rgba(255,255,255,.08);color:#fbbf24"><td style="padding:8px" colspan="2">Sem data identificada no relatório</td><td '+TD+'>'+fR(resto)+'</td><td></td></tr>';
   if(!rows) rows='<tr><td colspan="4" style="padding:14px;color:#94a3b8">Nenhum recebimento com data neste mês.</td></tr>';
+  var det='<div id="eqd-det" style="margin-top:16px;color:#94a3b8;font-size:11px">⏳ Carregando recebimentos…</div>';
+  function renderDet(L){
   var det='';
   try{
-    var LM=JSON.parse(localStorage.getItem('cofen_op_linhas')||'{}'),L=LM[op.name]||[];
     if(L.length){
       var DSEMF=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
       var hj=new Date(),docs={},porDia={};
@@ -22251,8 +22317,37 @@ function member(name){
       det='<div style="margin-top:16px;font-size:10px;letter-spacing:1px;color:#94a3b8">TODOS OS RECEBIMENTOS · '+ds.length+' data'+(ds.length>1?'s':'')+' · '+nAc+' acordo'+(nAc>1?'s':'')+' · ticket médio '+fR(totL/L.length)+'</div>'
         +'<div style="max-height:460px;overflow:auto;margin-top:6px;border:1px solid rgba(255,255,255,.1);border-radius:10px"><table style="width:100%;border-collapse:collapse"><thead style="position:sticky;top:0;background:#0f2e22;z-index:1"><tr><th '+TL+'>CÓDIGO</th>'+(temUF?'<th '+TL+'>ESTADO</th>':'')+(temVc?'<th '+TL+'>VENCIMENTO</th>':'')+'<th '+TH+'>Valor</th><th '+TL+'>TIPO</th><th '+TL+'>STATUS</th><th '+TH+'>HO</th></tr></thead><tbody>'+body
         +'</tbody><tfoot><tr style="border-top:2px solid rgba(255,255,255,.25)"><td colspan="'+nCol+'" style="padding:9px 8px;font-weight:800">TOTAL</td><td '+TD+'>'+fR(totL)+'</td><td colspan="2"></td><td '+TD+'>'+fR(hoL)+'</td></tr></tfoot></table></div>';
-    } else det='<div style="margin-top:16px;padding:10px 12px;border-radius:10px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);font-size:11px;color:#fcd34d">ℹ️ O detalhe de todos os recebimentos (data, código, valor, tipo) aparece depois que o relatório for importado de novo.</div>';
+    } else det = (op.rec>0)
+      ? '<div style="margin-top:16px;padding:10px 12px;border-radius:10px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);font-size:11px;color:#fcd34d">ℹ️ Este operador tem recebimento, mas o detalhe linha a linha só aparece depois que o relatório de <b>Recebimento</b> for importado de novo (aba Importar Relatório).</div>'
+      : '<div style="margin-top:16px;font-size:11px;color:#94a3b8">Nenhum recebimento deste operador no mês.</div>';
   }catch(e){}
+  return det;}
+  function renderAc(A,temMapa){
+    var NOTE=function(t){return '<div style="margin-top:16px;padding:10px 12px;border-radius:10px;background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.3);font-size:11px;color:#93c5fd">'+t+'</div>';};
+    if(!temMapa) return NOTE('ℹ️ Para ver os <b>acordos</b> deste operador (código, vencimento, valor, tipo e status), importe o arquivo de <b>Acordos / Preventivos</b> (aba Importar Relatório → Acordos / Preventivos).');
+    if(!A||!A.length) return '<div style="margin-top:16px;font-size:11px;color:#94a3b8">Nenhum acordo deste operador no arquivo de Acordos / Preventivos.</div>';
+    var DSF=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'],hj=new Date(),hjIso=hj.toISOString().slice(0,10);
+    var grp={};A.forEach(function(x){var k=x[3]||'sem-data';(grp[k]=grp[k]||[]).push(x);});
+    var ks=Object.keys(grp).sort().reverse();
+    var cnt={pago:0,pend:0,nao:0},tot=0;A.forEach(function(x){cnt[x[6]]=(cnt[x[6]]||0)+1;tot+=x[4]||0;});
+    var temDev=A.some(function(x){return x[1];}),temUF=A.some(function(x){return x[2];});
+    var TL='style="text-align:left;padding:8px;font-size:10px;letter-spacing:1px;color:#94a3b8"';
+    var stPill={pago:['Pago','rgba(34,197,94,.2)','#4ade80','rgba(34,197,94,.5)'],pend:['Pendente','rgba(251,191,36,.18)','#fcd34d','rgba(251,191,36,.5)'],nao:['Não Pago','rgba(239,68,68,.15)','#fca5a5','rgba(239,68,68,.45)']};
+    var body=ks.map(function(k){
+      var it=grp[k].slice().sort(function(a,b){return (b[4]||0)-(a[4]||0);}),c={pago:0,pend:0,nao:0},sv=0;it.forEach(function(x){c[x[6]]++;sv+=x[4]||0;});
+      var lab='Sem data';
+      if(k!=='sem-data'){var pt=k.split('-'),dt=new Date(+pt[0],+pt[1]-1,+pt[2]);lab=(k===hjIso?'Hoje':DSF[dt.getDay()])+' · '+pt[2]+'/'+pt[1]+'/'+pt[0];}
+      var h='<tr style="background:rgba(96,165,250,.14)"><td colspan="'+(temUF?2:1)+'" style="padding:8px;font-weight:800;color:#93c5fd">📅 '+lab+'</td><td colspan="4" style="padding:8px;text-align:right;font-size:11px;color:#94a3b8">'+it.length+' acordo'+(it.length>1?'s':'')+' · <b style="color:#fbbf24">'+c.pend+' pendentes</b> · <b style="color:#4ade80">'+c.pago+' pagos</b> · <b style="color:#fca5a5">'+c.nao+' não pagos</b> · '+fR(sv)+'</td></tr>';
+      return h+it.map(function(x){var sp=stPill[x[6]]||stPill.nao,venc=x[3]?x[3].split('-').reverse().join('/'):'—',atras=(x[3]&&x[3]<hjIso&&x[6]!=='pago');
+        return '<tr style="border-top:1px solid rgba(255,255,255,.06)"><td style="padding:7px 8px"><span style="display:inline-block;font-family:monospace;font-size:12px;font-weight:700;background:rgba(96,165,250,.15);color:#93c5fd;border-radius:6px;padding:2px 8px">'+(x[0]?'# '+esc(x[0]):'—')+'</span>'+(temDev&&x[1]?'<div style="font-family:monospace;font-size:10px;color:#94a3b8;margin-top:3px">'+esc(x[1])+'</div>':'')+'</td>'
+         +(temUF?'<td style="padding:7px 8px;font-size:12px;color:#cbd5e1">'+(x[2]?'📍 '+esc(x[2]):'—')+'</td>':'')
+         +'<td style="padding:7px 8px;font-family:monospace;font-size:12px;color:'+(atras?'#fca5a5':'#fbbf24')+'">'+venc+'</td><td '+TD+'>'+fR(x[4])+'</td>'
+         +'<td style="padding:7px 8px"><span style="display:inline-block;font-size:10px;border-radius:99px;padding:2px 9px;'+(/cart/i.test(x[5])?'background:rgba(251,146,60,.18);color:#fdba74;border:1px solid rgba(251,146,60,.4)':'background:rgba(74,222,128,.15);color:#86efac;border:1px solid rgba(74,222,128,.4)')+'">'+esc(x[5]||'—')+'</span>'+(x[9]?' <span style="font-size:10px;background:rgba(251,191,36,.2);color:#fcd34d;border-radius:6px;padding:1px 6px;font-weight:800">'+esc(x[9])+'</span>':'')+'</td>'
+         +'<td style="padding:7px 8px"><span style="font-size:10px;font-weight:800;border-radius:99px;padding:2px 10px;background:'+sp[1]+';color:'+sp[2]+';border:1px solid '+sp[3]+'">'+sp[0]+'</span></td></tr>';}).join('');
+    }).join('');
+    return '<div style="margin-top:18px;font-size:10px;letter-spacing:1px;color:#94a3b8">ACORDOS / PREVENTIVOS · '+A.length+' acordos · '+cnt.pend+' pendentes · '+cnt.pago+' pagos · '+cnt.nao+' não pagos · '+fR(tot)+'</div>'
+     +'<div style="max-height:420px;overflow:auto;margin-top:6px;border:1px solid rgba(255,255,255,.1);border-radius:10px"><table style="width:100%;border-collapse:collapse"><thead style="position:sticky;top:0;background:#0f2e22;z-index:1"><tr><th '+TL+'>CÓDIGO</th>'+(temUF?'<th '+TL+'>ESTADO</th>':'')+'<th '+TL+'>VENCIMENTO</th><th '+TH+'>Valor</th><th '+TL+'>TIPO</th><th '+TL+'>STATUS</th></tr></thead><tbody>'+body+'</tbody></table></div>';
+  }
   var tp='',tipos=op.tipos||{},tk=Object.keys(tipos).sort(function(a,b){return tipos[b]-tipos[a];});
   if(tk.length) tp='<div style="margin-top:14px;font-size:10px;letter-spacing:1px;color:#94a3b8">FORMAS DE PAGAMENTO</div>'+tk.map(function(k){return '<div style="display:flex;justify-content:space-between;padding:5px 2px;border-top:1px solid rgba(255,255,255,.06)"><span>'+esc(k)+'</span><b>'+fR(tipos[k])+'</b></div>';}).join('');
   var hist='';try{var meses=Object.keys(HIST_DADOS||{}).map(function(m){var row=(HIST_DADOS[m].rows||[]).find(function(x){return x.nome===op.name;});return row&&row.total>0?'<div style="display:flex;justify-content:space-between;padding:5px 2px;border-top:1px solid rgba(255,255,255,.06)"><span>'+m+'</span><b>'+fR(row.total)+'</b></div>':'';}).join('');
@@ -22261,7 +22356,22 @@ function member(name){
    +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">'+foto(op.name,64)+'<div><div style="font-size:11px;color:#94a3b8">'+esc((EQ[op.eq||'']&&EQ[op.eq].sh)||(lastTeam&&EQ[lastTeam]&&EQ[lastTeam].sh)||'')+'</div><div style="font-size:22px;font-weight:800;color:#fbbf24">'+fR(op.rec)+'</div></div></div>'
    +'<table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:7px 8px;font-size:10px;letter-spacing:1px;color:#94a3b8">DATA</th><th style="text-align:left;padding:7px 8px;font-size:10px;letter-spacing:1px;color:#94a3b8">DIA</th><th '+TH+'>Recebido no dia</th><th '+TH+'>Acumulado</th></tr></thead><tbody>'+rows+'</tbody></table>'
    +det+tp+hist
-   +'<div style="margin-top:12px;font-size:11px;color:#94a3b8">As datas vêm do relatório importado. Se o relatório não tiver coluna de data, só aparece o que entrou desde o último import.</div>',true);}
+   +'<div style="margin-top:12px;font-size:11px;color:#94a3b8">As datas vêm do relatório importado. Se o relatório não tiver coluna de data, só aparece o que entrou desde o último import.</div>',true);
+  var _nm=op.name;
+  function getDet(key,path){
+    return Promise.resolve().then(function(){return window.linDB.get(key);}).catch(function(){return null;}).then(function(M){
+      if(!M && key==='linhas'){try{M=JSON.parse(localStorage.getItem('cofen_op_linhas')||'null');}catch(e){M=null;}}
+      var L=M&&(M[_nm]||M[linKey(_nm)]);
+      if(L||M) return {L:L||[],tem:!!M};
+      // este computador ainda não tem o detalhe: busca direto na nuvem (importado em outro computador)
+      if(typeof fbDb!=='undefined'&&fbDb&&typeof fbRoom!=='undefined'&&fbRoom){
+        return fbDb.ref(fbRoom+'/'+path+'/'+linKey(_nm)).once('value').then(function(sn){var v=sn.val();return v?{L:Array.isArray(v)?v:Object.keys(v).map(function(k){return v[k];}),tem:true}:{L:[],tem:false};}).catch(function(){return {L:[],tem:false};});
+      }
+      return {L:[],tem:false};
+    });
+  }
+  Promise.all([getDet('linhas','op_linhas'),getDet('acordos','op_acordos')]).then(function(R){
+    var el=document.getElementById('eqd-det');if(el)el.outerHTML=renderDet(R[0].L)+renderAc(R[1].L,R[1].tem);});}
 document.addEventListener('click',function(e){
   var tr=e.target.closest&&e.target.closest('#eq-metas-tbody tr[data-eq]');if(!tr)return;
   for(var n=e.target;n&&n!==tr;n=n.parentElement){
