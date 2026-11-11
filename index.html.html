@@ -12082,6 +12082,8 @@ const TV_PROJ_POR_PAG = 8;
 // Valores editáveis (botão "✏️ Premiações" no slide). Guardado no navegador + Firebase (sala) quando conectado.
 const TV_PROJ_PREMIOS_PADRAO = {alta:[1900,1200,1100,900,800,700,600,550,400,300], baixa:[]};
 const TV_PROJ_NPREM = 10;
+// Do 11º em diante, quem está com projeção de 100% ou mais (ranking "acima de 17 mil") também ganha este valor
+const TV_PROJ_PREMIO_CAUDA = 300;
 function tvPremNorm(o){
   const out={alta:[],baixa:[]};
   ['alta','baixa'].forEach(k=>{ for(let i=0;i<TV_PROJ_NPREM;i++){ const v=Number(o&&o[k]&&o[k][i]); out[k][i]=(isFinite(v)&&v>0)?Math.round(v*100)/100:0; } });
@@ -12960,7 +12962,8 @@ function tvShowProjRankSlide(slide){
     const w = Math.max(2, Math.min(r.p, ESC)/ESC*100);
     const topo = rank===0;
     const bateu = r.p>=100;
-    const premio = (TV_PROJ_PREMIOS[slide.grupo]||[])[rank];
+    let premio = (TV_PROJ_PREMIOS[slide.grupo]||[])[rank];
+    if(!(premio>0) && slide.grupo==='alta' && rank>=TV_PROJ_NPREM && r.p>=100) premio = TV_PROJ_PREMIO_CAUDA;
     const premHtml = premio>0 ? `<div class="tv-pr-prem"><small>💰 PODE GANHAR</small>${fR(premio)}</div>` : `<div class="tv-pr-prem off">—</div>`;
     return `<div class="tv-pr-row${bateu?' tv-pr-hi':''}" style="animation-delay:${(.06*i).toFixed(2)}s;--hi:${k.c};${topo?`border-color:${k.c};box-shadow:0 0 26px ${k.g}`:''}">
         <div class="tv-pr-pos">${pos}</div>
