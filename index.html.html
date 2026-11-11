@@ -3233,7 +3233,7 @@ let CMP_OPS_DU_JUNHO = {};
       eq.rec = eq.ops.reduce((s,o)=>s+(o.rec||0),0);
       eq.ho  = eq.ops.reduce((s,o)=>s+(o.ho||0),0);
       eq.n_op = eq.ops.length;
-      eq.acordos = eq.ops.reduce((s,o)=>s+(o.acordos||0),0);
+      eq.acordos = eq.ops.reduce((s,o)=>s+acNum(o.acordos),0);
     }
   });
   if(removeu){
@@ -3541,7 +3541,7 @@ function rebuildAll(){
     eq.rec=visibleOps.reduce((s,o)=>s+o.rec,0);
     eq.ho=visibleOps.reduce((s,o)=>s+o.ho,0);
     eq.n_op=visibleOps.filter(o=>!_ehLider(o.name)).length;
-    eq.acordos=visibleOps.reduce((s,o)=>s+(o.acordos||0),0);
+    eq.acordos=visibleOps.reduce((s,o)=>s+acNum(o.acordos),0);
   });
   // Restaurar acordos do localStorage (persistência offline)
   try {
@@ -3550,7 +3550,7 @@ function rebuildAll(){
       const saved = _ac[op.name];
       if(saved){
         op.gerados=saved.g||0; op.pagos=saved.p||0; op.eficiencia=saved.ef||0;
-        op.acordos=saved.p||0; // acordos = pagos (links pagos)
+        op.acordos=acNum(saved.p); // acordos = pagos (links pagos)
         op.agendados=saved.ag||0; op.avista=saved.avista||0;
         op.ate3dias=saved.ate3d||0; op.mais3dias=saved.mais3d||0;
         op.ag_futuro=saved.ag_futuro||{}; op.ag_futuro_val=saved.ag_futuro_val||{};
@@ -3910,6 +3910,7 @@ function renderPPDiaEscolhido(){
     </div>`;
 }
 
+function acNum(v){ if(typeof v==='number') return isFinite(v)&&v>0?v:0; if(typeof v==='string'&&/^\s*\d{1,7}\s*$/.test(v)) return parseInt(v,10); return 0; }
 function initHero(){
   renderPPDiasHO();
   const totalRec = getTotalRec();
@@ -3917,7 +3918,7 @@ function initHero(){
   const falta    = Math.max(0, meta - totalRec);
   const media    = DU.passou>0 ? totalRec/DU.passou : 0;
   const need     = DU.restam>0 ? falta/DU.restam : 0;
-  const totalAc  = D.equipes.reduce((s,e)=>s+e.acordos,0);
+  const totalAc  = D.equipes.reduce((s,e)=>s+acNum(e.acordos),0);
 
   // ── Meta 1: Total Real Recebido ──
   const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
@@ -4614,6 +4615,8 @@ window.addEventListener('load', function(){ setTimeout(arqMesesRender, 900); });
     try{
       var N=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'], d=new Date();
       var a=document.getElementById('bn-mes-sub'); if(a) a.textContent='Dashboard Completo · '+N[d.getMonth()]+' '+d.getFullYear();
+      var h1=document.querySelector('.hero .htitle'); if(h1) h1.textContent='Recebimento Global · '+N[d.getMonth()]+' '+d.getFullYear();
+      var h2=document.querySelector('.hero .hmonth'); if(h2) h2.textContent=N[d.getMonth()].toUpperCase()+' '+d.getFullYear()+' — COB COFEN';
       var b=document.getElementById('mts-hero-sub-meses'); if(b) b.textContent=N.slice(0,d.getMonth()+1).join(' · ');
     }catch(e){}
   }
@@ -8338,7 +8341,7 @@ function loadSavedOverrides(){
           if(savedOpHist[op.name]){
             if(savedOpHist[op.name].daily) op.daily = savedOpHist[op.name].daily;
             if(savedOpHist[op.name].tipos) op.tipos = savedOpHist[op.name].tipos;
-            if(savedOpHist[op.name].acordos) op.acordos = savedOpHist[op.name].acordos;
+            if(acNum(savedOpHist[op.name].acordos)) op.acordos = acNum(savedOpHist[op.name].acordos);
           } else if(savedDaily[op.name]){
             op.daily = savedDaily[op.name];
           }
@@ -9819,7 +9822,7 @@ function mvApply(){
     e.rec    = e.ops.reduce((s,o)=>s+o.rec,0);
     e.ho     = e.ops.reduce((s,o)=>s+o.ho,0);
     e.n_op   = e.ops.length;
-    e.acordos= e.ops.reduce((s,o)=>s+o.acordos,0);
+    e.acordos= e.ops.reduce((s,o)=>s+acNum(o.acordos),0);
   });
 
   // Remove empty equipes — mas nunca as 7 equipes canônicas da operação
@@ -10093,7 +10096,7 @@ function loadGestaoOverrides(){
         e.rec=e.ops.reduce((s,o)=>s+o.rec,0);
         e.ho=e.ops.reduce((s,o)=>s+o.ho,0);
         e.n_op=e.ops.length;
-        e.acordos=e.ops.reduce((s,o)=>s+o.acordos,0);
+        e.acordos=e.ops.reduce((s,o)=>s+acNum(o.acordos),0);
       });
     });
     // Mesma proteção: nunca remover as equipes canônicas, só times avulsos vazios
@@ -10965,7 +10968,7 @@ function importApply(){
     // Sincronizar acordos via op_acordos
     const acordosData = {};
     importParsed.found.forEach(r=>{ if(r.acordos > 0) acordosData[r.opName] = r.acordos; });
-    if(Object.keys(acordosData).length > 0) fbPush('op_acordos', acordosData);
+    if(Object.keys(acordosData).length > 0) fbPush('op_acordos_qtd', acordosData);
     // Persistir daily e tipos no localStorage para restaurar ao reabrir
     try{
       const savedOpHist = JSON.parse(localStorage.getItem('cofen_op_hist')||'{}');
@@ -13899,7 +13902,7 @@ function fbStartListening(){
 
   // ── Acordos por operador (op_acordos) ──
   if(!fbListeners.op_acordos){
-    fbDb.ref(fbRoom+'/op_acordos').on('value', snap=>{
+    fbDb.ref(fbRoom+'/op_acordos_qtd').on('value', snap=>{
       const remote = snap.val();
       if(!remote) return;
       let changed = false;
@@ -13907,7 +13910,7 @@ function fbStartListening(){
         if(!acordos) return;
         D.equipes.forEach(eq=>{
           const opReal = eq.ops.find(o=>o.name===nm);
-          if(opReal){ opReal.acordos = acordos; changed = true; }
+          if(opReal && acNum(acordos)>0){ opReal.acordos = acNum(acordos); changed = true; }
         });
       });
       // Persistir no localStorage
@@ -13915,7 +13918,7 @@ function fbStartListening(){
         const savedOpHist = JSON.parse(localStorage.getItem('cofen_op_hist')||'{}');
         Object.entries(remote).forEach(([nm, acordos])=>{
           if(!savedOpHist[nm]) savedOpHist[nm] = {};
-          savedOpHist[nm].acordos = acordos;
+          if(acNum(acordos)>0) savedOpHist[nm].acordos = acNum(acordos);
         });
         localStorage.setItem('cofen_op_hist', JSON.stringify(savedOpHist));
       }catch(e){}
@@ -14375,7 +14378,7 @@ function fbStartListening(){
       if(nm==='_ts'||nm.startsWith('_')) return;
       const op = ALL.find(o=>o.name===nm);
       if(!op) return;
-      if(val.g !== undefined){ op.gerados=val.g; op.pagos=val.p; op.acordos=val.p||0; op.eficiencia=val.ef||0; op.agendados=val.ag||0; op['ag_futuro_val']=val.ag_futuro_val||{};
+      if(val.g !== undefined){ op.gerados=val.g; op.pagos=val.p; op.acordos=acNum(val.p); op.eficiencia=val.ef||0; op.agendados=val.ag||0; op['ag_futuro_val']=val.ag_futuro_val||{};
         op.avista=val.avista||0; op.ate3dias=val.ate3d||0; op.mais3dias=val.mais3d||0;
         op.ag_futuro=val.ag_futuro||{}; changed=true; }
     });
