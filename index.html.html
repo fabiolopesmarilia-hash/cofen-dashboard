@@ -3170,6 +3170,10 @@ var HO_PCT_TXT = (HO_PCT*100).toFixed(2).replace('.',',')+'%';
 <div id="toast"></div>
 
 <script>
+// Firebase: declarado no topo (var) para que chamadas feitas durante o carregamento não quebrem o script
+var fbApp = null, fbDb = null, fbRoom = null;
+var fbListeners = {};
+var SYNC_KV_KEYS;
 // ══════════════════════════════
 // DATA
 // ══════════════════════════════
@@ -13582,13 +13586,12 @@ function pulseSyncDot(){
 // ══════════════════════════════════════════
 // FIREBASE SYNC — TEMPO REAL MULTI-DISPOSITIVO
 // ══════════════════════════════════════════
-let fbApp = null, fbDb = null, fbRoom = null;
-let fbListeners = {};
+// (fbApp, fbDb, fbRoom e fbListeners agora são declarados no início do script)
 
 // ── Chaves de configuração/dados que NÃO tinham nenhum canal de sincronização
 // (overrides, meta, arrecadado e op_acordos já sincronizam por conta própria —
 // não duplicar essas aqui pra não conflitar com a lógica anti-loop delas) ──
-const SYNC_KV_KEYS = [
+SYNC_KV_KEYS = [
   'cofen_du_overrides','cofen_feriados','cofen_premiacoes','cofen_op_ho','cofen_quadro_mov','cofen_cmp15du_metas','cofen_cmp15du_totais','cofen_ultimo_import',
   'cofen_hist_empresa','cofen_hist_geral','cofen_geral_daily_julho','cofen_julho_eq',
   'cofen_ops_du_julho','cofen_ops_du_junho','cofen_proj_meta_ho_op','cofen_lid_metas','cofen_import_linhas','cofen_rec_dia_conc','cofen_rec_dia_imp','cofen_plano_meta','cofen_proj_ocultos','cofen_empresa_dia',
