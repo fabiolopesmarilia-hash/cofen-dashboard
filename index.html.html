@@ -421,6 +421,35 @@ select.ev-inp{cursor:pointer}
 .tv-pr-legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:11px;font-weight:800;color:rgba(255,255,255,.55);letter-spacing:1px;margin-top:6px}
 @media (max-width:900px){.tv-pr-det{display:none}.tv-pr-av{display:none}}
 
+/* ─ TV RANKING PROJEÇÃO: MODO INDIVIDUAL (um por um) ─ */
+.tv-pi-stage{position:relative;z-index:3;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:clamp(20px,4vw,72px);padding:0 clamp(16px,4vw,64px) 64px}
+.tv-pi-rank{flex-shrink:0;text-align:center;font-family:'Bebas Neue',sans-serif;line-height:.82;font-size:clamp(130px,38vh,420px);animation:tvPiPop .8s cubic-bezier(.34,1.56,.64,1) both}
+.tv-pi-rank .medal{display:block;font-size:.34em;line-height:1;margin-bottom:.06em}
+.tv-pi-rank sup{font-size:.42em;vertical-align:top;position:relative;top:.12em;margin-left:.04em}
+.tv-pi-photo{flex-shrink:0;width:clamp(220px,min(64vh,36vw),700px);aspect-ratio:1;border-radius:50%;object-fit:cover;display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(90px,22vh,260px);color:#fff;border:clamp(6px,.9vh,12px) solid var(--k);box-shadow:0 0 70px var(--g),0 0 0 clamp(8px,1.3vh,16px) rgba(255,255,255,.06);
+  animation:tvPiPop .9s cubic-bezier(.34,1.56,.64,1) .1s both}
+.tv-pi-info{flex:1 1 0;min-width:0;max-width:clamp(300px,42vw,820px);animation:tvPodColIn .7s cubic-bezier(.22,1,.36,1) .25s both}
+.tv-pi-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,4.6vw,88px);letter-spacing:1px;line-height:1;color:#fff;text-shadow:0 0 24px rgba(255,255,255,.18);overflow-wrap:anywhere}
+.tv-pi-team{margin-top:8px;font-size:clamp(12px,1.3vw,22px);font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.tv-pi-pct{font-family:'Bebas Neue',sans-serif;font-size:clamp(70px,10vw,170px);line-height:1;margin-top:clamp(6px,1.5vh,18px)}
+.tv-pi-lbl{font-size:clamp(10px,1vw,15px);font-weight:800;letter-spacing:2px;color:rgba(255,255,255,.55);margin-top:-4px}
+.tv-pi-track{height:clamp(16px,2.6vh,30px);background:rgba(255,255,255,.1);border-radius:100px;position:relative;margin:clamp(10px,2vh,22px) 0}
+.tv-pi-fill{height:100%;border-radius:100px}
+.tv-pi-mark{position:absolute;top:-7px;bottom:-7px;width:3px;background:rgba(255,255,255,.65);border-radius:2px}
+.tv-pi-row{display:flex;gap:clamp(10px,1.6vw,26px);align-items:stretch;flex-wrap:wrap}
+.tv-pi-prem{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3.4vw,58px);letter-spacing:.5px;line-height:1.05;color:#FBBF24;background:rgba(251,191,36,.12);border:2px solid rgba(251,191,36,.55);border-radius:16px;padding:6px 18px;text-align:center}
+.tv-pi-prem small{display:block;font-family:Nunito,sans-serif;font-size:clamp(9px,.9vw,14px);font-weight:800;letter-spacing:1.5px;color:rgba(251,191,36,.85)}
+.tv-pi-det{font-size:clamp(12px,1.3vw,22px);font-weight:700;color:rgba(255,255,255,.6);line-height:1.45;align-self:center}
+.tv-pi-det b{color:#fff;font-weight:800}
+.tv-pi-tag{display:inline-block;margin-top:10px;padding:3px 14px;border-radius:100px;background:#34D399;color:#04281C;font-weight:900;font-size:clamp(11px,1.1vw,18px);letter-spacing:1.2px}
+.tv-pi-count{position:absolute;bottom:18px;left:24px;font-size:15px!important;z-index:4;font-size:12px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,.45)}
+.tv-pr-btn{position:absolute;top:10px;z-index:8;padding:6px 14px;border-radius:10px;font:800 12px Nunito,sans-serif;letter-spacing:1px;cursor:pointer}
+@keyframes tvPiPop{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:none}}
+@media (max-width:900px){.tv-pi-stage{flex-direction:column;gap:12px;padding-bottom:56px}.tv-pi-rank{font-size:clamp(70px,16vh,160px)}.tv-pi-rank .medal{display:inline;margin-right:.1em}
+  .tv-pi-photo{width:clamp(150px,min(34vh,60vw),420px)}.tv-pi-info{text-align:center;max-width:94vw}.tv-pi-row{justify-content:center}}
+
+
 /* ─ TRILHA: dado 3D ─ */
 .trilha-dice-scene{width:90px;height:90px;perspective:600px;margin:0 auto}
 .trilha-dice-cube{width:90px;height:90px;position:relative;transform-style:preserve-3d;
@@ -12070,6 +12099,10 @@ function tvRenderSeletor(){
   </div>`;
 }
 const TV_INTERVAL = 9000;
+let TV_PROJ_INDIV = false;
+try{ TV_PROJ_INDIV = localStorage.getItem('tvProjIndiv')==='1'; }catch(e){}
+const TV_INTERVAL_INDIV = 7000;
+
 
 // Normaliza nome de equipe para id de botão
 function tvEqBtnId(eqName){
@@ -12232,6 +12265,13 @@ function tvBuildProjRankSlides(){
     const pages = Math.min(6, Math.ceil(g.rows.length/TV_PROJ_POR_PAG));
     const totH = g.rows.reduce((s,r)=>s+r.ho,0), totE = g.rows.reduce((s,r)=>s+r.esperado,0);
     const pctTotal = totE>0 ? totH/totE*100 : null;
+    if(TV_PROJ_INDIV){
+      g.rows.forEach((r,i)=>slides.push({
+        _projrank:true, _indiv:true, name:'PROJRANKI_'+g.key+'_'+r.name, grupo:g.key, grupoLabel:g.label,
+        rank:i, row:r, rows:[r], total:g.rows.length, pctTotal, page:Math.floor(i/TV_PROJ_POR_PAG), pages
+      }));
+      return;
+    }
     for(let pg=0; pg<pages; pg++){
       slides.push({
         _projrank:true, name:'PROJRANK_'+g.key+'_'+pg, grupo:g.key, grupoLabel:g.label, page:pg, pages,
@@ -12413,7 +12453,7 @@ function tvStop(){
 
 function tvSchedule(){
   clearTimeout(tvTimer);
-  if(!tvPaused) tvTimer=setTimeout(()=>{ tvNext(); }, TV_INTERVAL);
+  if(!tvPaused) tvTimer=setTimeout(()=>{ tvNext(); }, tvList[tvIdx]&&tvList[tvIdx]._indiv ? TV_INTERVAL_INDIV : TV_INTERVAL);
 }
 
 function tvTogglePause(){
@@ -12445,6 +12485,7 @@ document.addEventListener('keydown', e=>{
   // Tecla 9: pula direto pro(s) slide(s) de Destaque do Dia, pra testar sem esperar o ciclo inteiro
   if(e.key==='9'){ tvGoToHighlights(); }
   // Tecla 8: pula direto pro Ranking de Projeção de Meta (%)
+  if(e.key==='i'||e.key==='I'){ if(tvList[tvIdx]?._projrank) tvProjToggleIndiv(); }
   if(e.key==='8'){ const i=tvList.findIndex(o=>o._projrank); if(i>=0) tvGoTo(i); else toast('⚠️ Nenhum operador com meta definida.'); }
 });
 
@@ -12978,6 +13019,7 @@ function tvProjFogos(cv){
 
 // ── SLIDE: RANKING POR PROJEÇÃO DE META (%) ──────────────────────────
 function tvShowProjRankSlide(slide){
+  if(slide._indiv){ tvShowProjIndivSlide(slide); return; }
   const now = new Date();
   const clkEl=document.getElementById('tv-clock-display');
   if(clkEl) clkEl.textContent=[now.getHours(),now.getMinutes(),now.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
@@ -13057,6 +13099,7 @@ function tvShowProjRankSlide(slide){
         </div>
       </div>
       ${rows.length ? `<div class="tv-pr-list">${rowsHtml}</div>` : vazio}
+      <button onclick="tvProjToggleIndiv()" class="tv-pr-btn" style="right:172px;border:1px solid rgba(52,211,153,.6);background:rgba(52,211,153,.12);color:#34D399" title="Mostrar um operador por vez (tecla I)">👤 INDIVIDUAL</button>
       <button onclick="tvPremAbrir()" style="position:absolute;top:10px;right:16px;z-index:8;padding:6px 14px;border-radius:10px;border:1px solid rgba(251,191,36,.6);background:rgba(251,191,36,.12);color:#FBBF24;font:800 12px Nunito,sans-serif;letter-spacing:1px;cursor:pointer">✏️ PREMIAÇÕES</button>
       ${slide.page===0 && rows.length ? '<canvas id="tv-fw-canvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:6;pointer-events:none"></canvas>' : ''}
     </div>`;
@@ -13068,6 +13111,98 @@ function tvShowProjRankSlide(slide){
     bar.style.transition='none'; bar.style.width='0%';
     bar.style.background='linear-gradient(90deg,#34D399,#60A5FA,#FBBF24,#34D399)';
     setTimeout(()=>{ bar.style.transition=`width ${TV_INTERVAL}ms linear`; bar.style.width='100%'; },50);
+  }
+}
+
+// ── MODO INDIVIDUAL do ranking de projeção: um operador por slide, foto e colocação gigantes ──
+function tvProjToggleIndiv(){
+  const cur = tvList[tvIdx];
+  const g = cur && cur.grupo;
+  const rank = cur ? (cur._indiv ? cur.rank : (cur.page||0)*TV_PROJ_POR_PAG) : 0;
+  TV_PROJ_INDIV = !TV_PROJ_INDIV;
+  try{ localStorage.setItem('tvProjIndiv', TV_PROJ_INDIV?'1':'0'); }catch(e){}
+  tvBuildList(); tvBuildDots();
+  let idx = tvList.findIndex(o=>o._projrank && o.grupo===g && (TV_PROJ_INDIV ? o.rank===rank : o.page===Math.floor(rank/TV_PROJ_POR_PAG)));
+  if(idx<0) idx = tvList.findIndex(o=>o._projrank);
+  if(idx>=0) tvIdx = idx;
+  tvShowCurrent();
+  toast(TV_PROJ_INDIV ? '👤 Ranking individual: um por vez' : '📋 Ranking em lista');
+}
+function tvShowProjIndivSlide(slide){
+  const now = new Date();
+  const clkEl=document.getElementById('tv-clock-display');
+  if(clkEl) clkEl.textContent=[now.getHours(),now.getMinutes(),now.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
+  const dtEl=document.getElementById('tv-date-display');
+  if(dtEl){const Dw=['DOM','SEG','TER','QUA','QUI','SEX','SAB'];dtEl.textContent=Dw[now.getDay()]+' '+String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0');}
+
+  const r = slide.row, rank = slide.rank;
+  const fmtPct = v => v.toFixed(1).replace('.',',')+'%';
+  const k = r.p>=100 ? {c:'#34D399',g:'rgba(52,211,153,.55)'}
+          : r.p>=80  ? {c:'#60A5FA',g:'rgba(96,165,250,.5)'}
+          : r.p>=50  ? {c:'#FBBF24',g:'rgba(251,191,36,.5)'}
+                     : {c:'#F87171',g:'rgba(248,113,113,.5)'};
+  const ESC = 200;
+  const cfg = EQ[r.eq] || {c:r.c||'#888',ico:'⭐',sh:r.sh||r.eq};
+  const photo = r.vivo ? photoGet(r.name) : null;
+  const nome = String(r.name).replace(/_/g,' ').toUpperCase();
+  const medalhas = ['🥇','🥈','🥉'];
+  const rankCor = rank===0 ? '#FBBF24' : rank===1 ? '#E5E7EB' : rank===2 ? '#FB923C' : k.c;
+  const w = Math.max(2, Math.min(r.p, ESC)/ESC*100);
+  let premio = (TV_PROJ_PREMIOS[slide.grupo]||[])[rank];
+  if(!(premio>0) && slide.grupo==='alta' && rank>=TV_PROJ_NPREM && r.p>=100) premio = TV_PROJ_PREMIO_CAUDA;
+  const mesesPt = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+  const modeLbl = tvMode==='proj' || tvMode==='geral' ? 'TODAS AS EQUIPES'
+    : tvMode==='bs' ? 'STEPHANIE + KATIA' : tvMode==='bb' ? 'BRUNA + STEPHANIE'
+    : tvMode==='bsk'? 'STEPHANIE + KATIA + EQUIPE STEPHANIE'
+    : tvMode==='custom' ? (tvCustomEquipes||[]).map(n=>TV_EQUIPES_REAIS[n]||n).join(' + ').toUpperCase()
+    : ((EQ[tvMode]&&EQ[tvMode].sh) || tvMode).toUpperCase();
+  const grpCor = slide.grupo==='alta' ? '52,211,153' : '251,191,36';
+  const grpHex = slide.grupo==='alta' ? '#34D399' : '#FBBF24';
+
+  const photoHtml = photo
+    ? `<img src="${photo}" class="tv-pi-photo">`
+    : `<div class="tv-pi-photo" style="background:linear-gradient(160deg,${cfg.c}88,${cfg.c}22)">${ini(String(r.name))}</div>`;
+  const medalHtml = medalhas[rank] ? `<span class="medal">${medalhas[rank]}</span>` : '';
+
+  document.getElementById('tv-card').innerHTML = `
+    <div class="tv-podium-wrap" style="height:calc(100vh - 80px)">
+      <div class="tv-podium-head">
+        <div class="tv-pr-title">🎯 RANKING DE PROJEÇÃO DE META</div>
+        <div style="display:inline-block;margin:2px auto 4px;padding:3px 16px;border-radius:999px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:${grpHex};border:1.5px solid rgba(${grpCor},.6);background:rgba(${grpCor},.12)">${slide.grupoLabel}</div>
+        <div class="tv-podium-sub">${modeLbl} · ${mesesPt[now.getMonth()]}/${now.getFullYear()}${r.duP!=null?` · D.U. ${r.duP}/${r.duT}`:''}${slide.pctTotal!=null?` · MÉDIA ${fmtPct(slide.pctTotal)}`:''}</div>
+      </div>
+      <div class="tv-pi-stage" style="--k:${k.c};--g:${k.g}">
+        <div class="tv-pi-rank" style="color:${rankCor};text-shadow:0 0 60px ${rankCor}88">${medalHtml}${rank+1}<sup>°</sup></div>
+        ${photoHtml}
+        <div class="tv-pi-info">
+          <div class="tv-pi-name">${nome}</div>
+          <div class="tv-pi-team" style="color:${cfg.c}">${cfg.ico||'⭐'} ${cfg.sh||r.eq}</div>
+          <div class="tv-pi-pct" style="color:${k.c};text-shadow:0 0 34px ${k.g}">${fmtPct(r.p)}</div>
+          <div class="tv-pi-lbl">PROJEÇÃO DE META</div>
+          <div class="tv-pi-track">
+            <div class="tv-pi-fill" style="width:${w}%;background:linear-gradient(90deg,${k.c}88,${k.c});box-shadow:0 0 18px ${k.g}"></div>
+            <div class="tv-pi-mark" style="left:${100/ESC*100}%"></div>
+          </div>
+          <div class="tv-pi-row">
+            ${premio>0 ? `<div class="tv-pi-prem"><small>💰 PODE GANHAR</small>${fR(premio)}</div>` : ''}
+            <div class="tv-pi-det">HO <b>${fR(r.ho)}</b><br>esperado ${fR(r.esperado)}</div>
+          </div>
+          ${(r.meta>0 && r.ho>=r.meta)?'<div class="tv-pi-tag">🏆 META DO MÊS BATIDA</div>':''}
+        </div>
+      </div>
+      <div class="tv-pi-count">${rank+1} DE ${slide.total}</div>
+      <button onclick="tvProjToggleIndiv()" class="tv-pr-btn" style="right:172px;border:1px solid rgba(52,211,153,.6);background:rgba(52,211,153,.12);color:#34D399" title="Voltar para a lista (tecla I)">📋 LISTA</button>
+      <button onclick="tvPremAbrir()" class="tv-pr-btn" style="right:16px;border:1px solid rgba(251,191,36,.6);background:rgba(251,191,36,.12);color:#FBBF24">✏️ PREMIAÇÕES</button>
+      ${rank<3 || r.p>=100 ? '<canvas id="tv-fw-canvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:6;pointer-events:none"></canvas>' : ''}
+    </div>`;
+  if(rank<3 || r.p>=100) tvProjFogos(document.getElementById('tv-fw-canvas'));
+
+  tvUpdateDots();
+  const bar=document.getElementById('tv-bar');
+  if(bar){
+    bar.style.transition='none'; bar.style.width='0%';
+    bar.style.background='linear-gradient(90deg,#34D399,#60A5FA,#FBBF24,#34D399)';
+    setTimeout(()=>{ bar.style.transition=`width ${TV_INTERVAL_INDIV}ms linear`; bar.style.width='100%'; },50);
   }
 }
 
