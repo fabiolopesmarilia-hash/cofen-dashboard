@@ -14861,6 +14861,7 @@ function exportCSV(){
 // GESTAO DE FOTOS — ABA GESTAO > FOTOS
 // ══════════════════════════════════════════
 let fotosActiveEq  = 'all';
+let fotosSoSem = false;
 let fotosClickOp   = null;
 
 function fotosInit(){
@@ -14876,6 +14877,11 @@ function fotosInit(){
         + 'font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;transition:all .2s">'
         + cfg.sh + '</button>';
     }).join('');
+    const _base = fotosActiveEq==='all' ? ALL : ALL.filter(o=>o.eq===fotosActiveEq);
+    const _falta = _base.filter(o=>!photoGet(o.name)).length;
+    fbEl.innerHTML += '<button onclick="fotosSoSem=!fotosSoSem;fotosInit()" style="padding:6px 14px;border-radius:var(--rm);border:1.5px solid '
+      + (fotosSoSem?'#DC2626':'var(--g200)') + ';background:' + (fotosSoSem?'#DC262618':'var(--w)') + ';color:' + (fotosSoSem?'#DC2626':'var(--g500)')
+      + ';font-family:Nunito,sans-serif;font-weight:800;font-size:11px;cursor:pointer;margin-left:auto">\ud83d\udcf7 S\u00f3 sem foto (' + _falta + ')</button>';
   }
   fotosRenderGrid();
 }
@@ -14888,14 +14894,14 @@ function fotosSetEq(eq){
 function fotosRenderGrid(){
   const grid = document.getElementById('fotos-grid');
   if(!grid) return;
-  const list = fotosActiveEq==='all' ? ALL : ALL.filter(o=>o.eq===fotosActiveEq);
-  const photos = photoGetAll();
+  let list = fotosActiveEq==='all' ? ALL : ALL.filter(o=>o.eq===fotosActiveEq);
+  if(fotosSoSem) list = list.filter(o=>!photoGet(o.name));
 
   // Reconstrói via DOM para evitar bugs de escaping em nomes com caracteres especiais
   grid.innerHTML = '';
   list.forEach(op=>{
     const cfg      = EQ[op.eq]||{c:'#888',sh:op.eq};
-    const photo    = photos[op.name];
+    const photo    = photoGet(op.name);
     const hasPhoto = !!photo;
 
     const card = document.createElement('div');
@@ -14992,7 +14998,7 @@ function fotosFileSelected(inp){
     photoSet(opName, e.target.result);
     // Aguarda compressão antes de atualizar UI
     setTimeout(()=>{
-      fotosRenderGrid();
+      fotosInit();
       if(document.getElementById('pg-ranking').classList.contains('on')) mkRanking();
       if(currentModalOp === opName){
         const cfg = EQ[ALL.find(o=>o.name===opName)?.eq]||{c:'#888'};
